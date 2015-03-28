@@ -52,7 +52,7 @@ static const UTF8_CU_COUNTER _cuCache;
 
 
 static bool
-is_valid_date( const int year, const uint_t month, const uint_t day)
+is_valid_date (const int year, const uint_t month, const uint_t day)
 {
   if ((month == 0) || (month > 12))
     return false;
@@ -62,7 +62,7 @@ is_valid_date( const int year, const uint_t month, const uint_t day)
 
   if (month == 2)
     {
-      const bool leapYear = is_leap_year( year);
+      const bool leapYear = is_leap_year (year);
 
       if (day > (leapYear ? MNTH_DAYS[1] + 1 : MNTH_DAYS[1]))
         return false;
@@ -75,14 +75,14 @@ is_valid_date( const int year, const uint_t month, const uint_t day)
 
 
 static bool
-is_valid_datetime( const int          year,
+is_valid_datetime (const int          year,
                    const uint_t       month,
                    const uint_t       day,
                    const uint_t       hour,
                    const uint_t       min,
                    const uint_t       sec)
 {
-  if (is_valid_date( year, month, day) == false)
+  if (is_valid_date (year, month, day) == false)
     return false;
 
   else if ((hour > 23) || (min > 59) || (sec > 59))
@@ -93,7 +93,7 @@ is_valid_datetime( const int          year,
 
 
 static bool
-is_valid_hiresdate( const int       year,
+is_valid_hiresdate (const int       year,
                     const uint_t    month,
                     const uint_t    day,
                     const uint_t    hour,
@@ -101,7 +101,7 @@ is_valid_hiresdate( const int       year,
                     const uint_t    sec,
                     const uint_t    microsec)
 {
-  if (is_valid_datetime( year, month, day, hour, min, sec) == false)
+  if (is_valid_datetime (year, month, day, hour, min, sec) == false)
     return false;
 
   else if (microsec > 999999)
@@ -120,7 +120,7 @@ DChar::operator< (const DChar& second) const
   else if (second.IsNull())
     return false;
 
-  return wh_cmp_alphabetically( mValue, second.mValue) < 0;
+  return wh_cmp_alphabetically (mValue, second.mValue) < 0;
 }
 
 
@@ -128,9 +128,9 @@ DChar
 DChar::Prev() const
 {
   if (mIsNull || (mValue == 1))
-    return DChar();
+    return DChar ();
 
-  return DChar( wh_prev_char( mValue));
+  return DChar (wh_prev_char (mValue));
 }
 
 
@@ -138,23 +138,23 @@ DChar
 DChar::Next() const
 {
   if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
-      return DChar();
+      return DChar ();
 
-  return DChar( wh_next_char( mValue));
+  return DChar (wh_next_char (mValue));
 }
 
 
 
-DDate::DDate( const int32_t year, const uint8_t month, const uint8_t day)
-  : mYear( year),
-    mMonth( month),
-    mDay( day),
-    mIsNull( false)
+DDate::DDate (const int32_t year, const uint8_t month, const uint8_t day)
+  : mYear (year),
+    mMonth (month),
+    mDay (day),
+    mIsNull (false)
 {
   if ((mIsNull == false)
-      && ! is_valid_date( year, month, day))
+      && ! is_valid_date (year, month, day))
     {
-      throw DBSException( _EXTRA( DBSException::INVALID_DATE));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATE));
     }
 }
 
@@ -162,14 +162,14 @@ DDate::DDate( const int32_t year, const uint8_t month, const uint8_t day)
 DDate
 DDate::Min ()
 {
-  return DDate( -32768, 1, 1);
+  return DDate (-32768, 1, 1);
 }
 
 
 DDate
 DDate::Max ()
 {
-  return DDate( 32767, 12, 31);
+  return DDate (32767, 12, 31);
 }
 
 
@@ -188,14 +188,14 @@ DDate::Prev() const
       if (--mnth == 0)
           --year, mnth = 12;
 
-      if ((mnth == 2) && is_leap_year( year))
+      if ((mnth == 2) && is_leap_year (year))
         day = MNTH_DAYS[mnth - 1] + 1;
 
       else
         day = MNTH_DAYS[mnth - 1];
     }
 
-  return DDate( year, mnth, day);
+  return DDate (year, mnth, day);
 }
 
 
@@ -211,7 +211,7 @@ DDate::Next() const
 
   uint8_t  mnthDays = MNTH_DAYS[mnth - 1];
 
-  if ((mnth == 2) && is_leap_year( year))
+  if ((mnth == 2) && is_leap_year (year))
     mnthDays++;
 
   if (++day > mnthDays)
@@ -222,29 +222,29 @@ DDate::Next() const
           ++year, mnth = 1;
     }
 
-  return DDate( year, mnth, day);
+  return DDate (year, mnth, day);
 }
 
 
 
-DDateTime::DDateTime( const int32_t     year,
+DDateTime::DDateTime (const int32_t     year,
                       const uint8_t     month,
                       const uint8_t     day,
                       const uint8_t     hour,
                       const uint8_t     minutes,
                       const uint8_t     seconds)
-  : mYear( year),
-    mMonth( month),
-    mDay( day),
-    mHour( hour),
-    mMinutes( minutes),
-    mSeconds( seconds),
-    mIsNull( false)
+  : mYear (year),
+    mMonth (month),
+    mDay (day),
+    mHour (hour),
+    mMinutes (minutes),
+    mSeconds (seconds),
+    mIsNull (false)
 {
   if ((mIsNull == false)
-       && ! is_valid_datetime( year, month, day, hour, minutes, seconds))
+       && ! is_valid_datetime (year, month, day, hour, minutes, seconds))
     {
-      throw DBSException( _EXTRA( DBSException::INVALID_DATETIME));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
@@ -252,14 +252,14 @@ DDateTime::DDateTime( const int32_t     year,
 DDateTime
 DDateTime::Min ()
 {
-  return DDateTime( -32768, 1, 1, 0, 0, 0);
+  return DDateTime (-32768, 1, 1, 0, 0, 0);
 }
 
 
 DDateTime
 DDateTime::Max ()
 {
-  return DDateTime( 32767, 12, 31, 23, 59, 59);
+  return DDateTime (32767, 12, 31, 23, 59, 59);
 }
 
 
@@ -290,7 +290,7 @@ DDateTime::Prev() const
                   if (--mnth == 0)
                       --year, mnth = 12;
 
-                  if ((mnth == 2) && is_leap_year( year))
+                  if ((mnth == 2) && is_leap_year (year))
                     day = MNTH_DAYS[mnth - 1] + 1;
 
                   else
@@ -300,7 +300,7 @@ DDateTime::Prev() const
         }
     }
 
-  return DDateTime( year, mnth, day, hour, mins, secs);
+  return DDateTime (year, mnth, day, hour, mins, secs);
 }
 
 
@@ -328,7 +328,7 @@ DDateTime::Next() const
               hour = 0;
 
               uint8_t mnthDays = MNTH_DAYS[mnth - 1];
-              if ((mnth == 2) && is_leap_year( year))
+              if ((mnth == 2) && is_leap_year (year))
                 mnthDays++;
 
               if (++day > mnthDays)
@@ -342,29 +342,29 @@ DDateTime::Next() const
         }
     }
 
-  return DDateTime( year, mnth, day, hour, mins, secs);
+  return DDateTime (year, mnth, day, hour, mins, secs);
 }
 
 
 
-DHiresTime::DHiresTime( const int32_t    year,
+DHiresTime::DHiresTime (const int32_t    year,
                         const uint8_t    month,
                         const uint8_t    day,
                         const uint8_t    hour,
                         const uint8_t    minutes,
                         const uint8_t    seconds,
                         const uint32_t   microsec)
-  : mMicrosec( microsec),
-    mYear( year),
-    mMonth( month),
-    mDay( day),
-    mHour( hour),
-    mMinutes( minutes),
-    mSeconds( seconds),
-    mIsNull( false)
+  : mMicrosec (microsec),
+    mYear (year),
+    mMonth (month),
+    mDay (day),
+    mHour (hour),
+    mMinutes (minutes),
+    mSeconds (seconds),
+    mIsNull (false)
 {
   if ((mIsNull == false)
-      && ! is_valid_hiresdate( year,
+      && ! is_valid_hiresdate (year,
                                month,
                                day,
                                hour,
@@ -372,7 +372,7 @@ DHiresTime::DHiresTime( const int32_t    year,
                                seconds,
                                microsec))
     {
-      throw DBSException( _EXTRA( DBSException::INVALID_DATETIME));
+      throw DBSException (_EXTRA (DBSException::INVALID_DATETIME));
     }
 }
 
@@ -380,14 +380,14 @@ DHiresTime::DHiresTime( const int32_t    year,
 DHiresTime
 DHiresTime::Min ()
 {
-  return DHiresTime( -32768, 1, 1, 0, 0, 0, 0);
+  return DHiresTime (-32768, 1, 1, 0, 0, 0, 0);
 }
 
 
 DHiresTime
 DHiresTime::Max ()
 {
-  return DHiresTime( 32767, 12, 31, 23, 59, 59, 999999);
+  return DHiresTime (32767, 12, 31, 23, 59, 59, 999999);
 }
 
 
@@ -424,7 +424,7 @@ DHiresTime::Prev() const
                       if (--mnth == 0)
                           --year, mnth = 12;
 
-                      if ((mnth == 2) && is_leap_year( year))
+                      if ((mnth == 2) && is_leap_year (year))
                         day = MNTH_DAYS[mnth - 1] + 1;
 
                       else
@@ -435,7 +435,7 @@ DHiresTime::Prev() const
         }
     }
 
-  return DHiresTime( year, mnth, day, hour, mins, secs, usecs);
+  return DHiresTime (year, mnth, day, hour, mins, secs, usecs);
 }
 
 
@@ -467,7 +467,7 @@ DHiresTime::Next() const
                   hour = 0;
 
                   uint8_t  mnthDays = MNTH_DAYS[mnth - 1];
-                  if ((mnth == 2) && is_leap_year( year))
+                  if ((mnth == 2) && is_leap_year (year))
                     mnthDays++;
 
                   if (++day > mnthDays)
@@ -482,7 +482,7 @@ DHiresTime::Next() const
         }
     }
 
-  return DHiresTime( year, mnth, day, hour, mins, secs, usecs);
+  return DHiresTime (year, mnth, day, hour, mins, secs, usecs);
 }
 
 
@@ -493,7 +493,7 @@ DReal::Min ()
   const int64_t intPart  = 0xFFFFFF8000000000ll;
   const int64_t fracPart = -1 * (DBS_REAL_PREC - 1);
 
-  return DReal( DBS_REAL_T( intPart, fracPart, DBS_REAL_PREC));
+  return DReal (DBS_REAL_T (intPart, fracPart, DBS_REAL_PREC));
 }
 
 
@@ -503,7 +503,7 @@ DReal::Max ()
   const int64_t intPart  = 0x0000007FFFFFFFFFll;
   const int64_t fracPart = (DBS_REAL_PREC - 1);
 
-  return DReal( DBS_REAL_T( intPart, fracPart, DBS_REAL_PREC));
+  return DReal (DBS_REAL_T (intPart, fracPart, DBS_REAL_PREC));
 }
 
 
@@ -513,7 +513,7 @@ DReal::Prev() const
   if (mIsNull || (*this == Min ()))
     return DReal();
 
-  return DReal( mValue - DBS_REAL_T( 0, 1, DBS_REAL_PREC));
+  return DReal (mValue - DBS_REAL_T (0, 1, DBS_REAL_PREC));
 }
 
 
@@ -523,7 +523,7 @@ DReal::Next() const
   if (mIsNull || (*this == Max ()))
     return DReal();
 
-  return DReal( mValue + DBS_REAL_T( 0, 1, DBS_REAL_PREC));
+  return DReal (mValue + DBS_REAL_T (0, 1, DBS_REAL_PREC));
 }
 
 
@@ -534,7 +534,7 @@ DRichReal::Min ()
   const int64_t intPart  = 0x8000000000000000ull;
   const int64_t fracPart = -1 * (DBS_RICHREAL_PREC - 1);
 
-  return DRichReal( DBS_RICHREAL_T( intPart, fracPart, DBS_RICHREAL_PREC));
+  return DRichReal (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
 }
 
 
@@ -544,7 +544,7 @@ DRichReal::Max ()
   const int64_t intPart  = 0x7FFFFFFFFFFFFFFFull;
   const int64_t fracPart = (DBS_RICHREAL_PREC - 1);
 
-  return DRichReal( DBS_RICHREAL_T( intPart, fracPart, DBS_RICHREAL_PREC));
+  return DRichReal (DBS_RICHREAL_T (intPart, fracPart, DBS_RICHREAL_PREC));
 }
 
 
@@ -554,7 +554,7 @@ DRichReal::Prev() const
   if (mIsNull || (*this == Min ()))
     return DRichReal();
 
-  return DRichReal( mValue - DBS_RICHREAL_T( 0, 1, DBS_RICHREAL_PREC));
+  return DRichReal (mValue - DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
 }
 
 
@@ -564,39 +564,39 @@ DRichReal::Next() const
   if (mIsNull || (*this == Max ()))
     return DRichReal();
 
-  return DRichReal( mValue + DBS_RICHREAL_T( 0, 1, DBS_RICHREAL_PREC));
+  return DRichReal (mValue + DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
 }
 
 
 
-DText::DText( const char* text)
+DText::DText (const char* text)
   : mText (&pastra::NullText::GetSingletoneInstace()),
     mTextRefs (0)
 
 {
   if ((text != NULL) && (text[0] != 0))
-    mText = new TemporalText( _RC (const uint8_t*, text));
+    mText = new TemporalText (_RC (const uint8_t*, text));
 }
 
 
-DText::DText( const uint8_t *utf8Src, uint_t unitsCount)
+DText::DText (const uint8_t *utf8Src, uint_t unitsCount)
   : mText (& NullText::GetSingletoneInstace()),
     mTextRefs (0)
 
 {
   if ((utf8Src != NULL) && (utf8Src[0] != 0) && (unitsCount > 0))
-    mText = new TemporalText( utf8Src, unitsCount);
+    mText = new TemporalText (utf8Src, unitsCount);
 }
 
 
-DText::DText( ITextStrategy& text)
+DText::DText (ITextStrategy& text)
   : mText (&text),
     mTextRefs (0)
 {
 }
 
 
-DText::DText( const DText& source)
+DText::DText (const DText& source)
   : mText (NULL),
     mTextRefs (0)
 {
@@ -657,7 +657,7 @@ DText::RawSize() const
 
 
 void
-DText::RawRead( uint64_t        offset,
+DText::RawRead (uint64_t        offset,
                 uint64_t        count,
                 uint8_t* const  dest) const
 {
@@ -666,21 +666,21 @@ DText::RawRead( uint64_t        offset,
 
 
 uint64_t
-DText::OffsetOfChar( const uint64_t chIndex) const
+DText::OffsetOfChar (const uint64_t chIndex) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).OffsetOfChar( chIndex);
+  return _SC (ITextStrategy&, GetStrategyRAII()).OffsetOfChar (chIndex);
 }
 
 
 uint64_t
-DText::CharsUntilOffset( const uint64_t offset) const
+DText::CharsUntilOffset (const uint64_t offset) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharsUntilOffset( offset);
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharsUntilOffset (offset);
 }
 
 
 void
-DText::Append( const DChar& ch)
+DText::Append (const DChar& ch)
 {
   if (ch.IsNull())
     return ;
@@ -699,7 +699,7 @@ DText::Append( const DChar& ch)
 
 
 void
-DText::Append( const DText& text)
+DText::Append (const DText& text)
 {
   if (text.IsNull ())
     return ;
@@ -719,14 +719,14 @@ DText::Append( const DText& text)
 
 
 DChar
-DText::CharAt( const uint64_t index) const
+DText::CharAt (const uint64_t index) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharAt( index);
+  return _SC (ITextStrategy&, GetStrategyRAII()).CharAt (index);
 }
 
 
 void
-DText::CharAt( const uint64_t index, const DChar& ch)
+DText::CharAt (const uint64_t index, const DChar& ch)
 {
   StrategyRAII    t = GetStrategyRAII ();
   ITextStrategy&  s = t;
@@ -742,7 +742,7 @@ DText::CharAt( const uint64_t index, const DChar& ch)
 
 
 DUInt64
-DText::FindInText( const DText&      text,
+DText::FindInText (const DText&      text,
                    const bool        ignoreCase,
                    const uint64_t    fromCh,
                    const uint64_t    toCh)
@@ -755,7 +755,7 @@ DText::FindInText( const DText&      text,
 
 
 DUInt64
-DText::FindSubstring( const DText&      substr,
+DText::FindSubstring (const DText&      substr,
                       const bool        ignoreCase,
                       const uint64_t    fromCh,
                       const uint64_t    toCh)
@@ -798,7 +798,7 @@ DText::UpperCase() const
 
 
 void
-DText::MakeMirror( DText& inoutText)
+DText::MakeMirror (DText& inoutText)
 {
   if (this == &inoutText)
     return ;
@@ -905,22 +905,22 @@ DText::CompareTo (const DText& second) const
 
 
 template <class T> void
-wh_array_init( const T* const       array,
+wh_array_init (const T* const       array,
                const uint64_t       count,
                IArrayStrategy* volatile *     outStrategy)
 {
   if (count == 0)
     {
-      assert( array == NULL);
+      assert (array == NULL);
 
       *outStrategy = &NullArray::GetSingletoneInstace (array[0].DBSType ());
 
       return;
     }
   else if (array == NULL)
-    throw DBSException( _EXTRA( DBSException::BAD_PARAMETERS));
+    throw DBSException (_EXTRA (DBSException::BAD_PARAMETERS));
 
-  auto_ptr<IArrayStrategy> s (new TemporalArray( array[0].DBSType()));
+  auto_ptr<IArrayStrategy> s (new TemporalArray (array[0].DBSType()));
 
   for (uint64_t index = 0; index < count; ++index)
     {
@@ -942,141 +942,141 @@ wh_array_init( const T* const       array,
 
 
 DArray::DArray()
-  : mArray( &NullArray::GetSingletoneInstace( T_UNDETERMINED)),
+  : mArray (&NullArray::GetSingletoneInstace (T_UNDETERMINED)),
     mArrayRefs (0)
 {
 }
 
 
-DArray::DArray( const DBool* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DBool* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DChar* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DChar* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DDate* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DDate* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DDateTime* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DDateTime* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DHiresTime* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DHiresTime* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DUInt8* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DUInt8* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DUInt16* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DUInt16* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DUInt32* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DUInt32* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DUInt64* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DUInt64* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DReal* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DReal* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DRichReal* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DRichReal* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DInt8* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DInt8* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DInt16* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DInt16* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DInt32* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DInt32* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( const DInt64* const array, const uint64_t count)
-  : mArray( NULL),
+DArray::DArray (const DInt64* const array, const uint64_t count)
+  : mArray (NULL),
     mArrayRefs (0)
 {
-  wh_array_init( array, count, &mArray);
+  wh_array_init (array, count, &mArray);
 }
 
 
-DArray::DArray( IArrayStrategy& array)
+DArray::DArray (IArrayStrategy& array)
   : mArray (&array),
     mArrayRefs (0)
 {
 }
 
 
-DArray::DArray( const DArray& source)
-  : mArray( NULL),
+DArray::DArray (const DArray& source)
+  : mArray (NULL),
     mArrayRefs (0)
 {
   StrategyRAII s = source.GetStrategyRAII ();
@@ -1127,7 +1127,7 @@ DArray::Type() const
 }
 
 template <class T> inline uint64_t
-add_array_element( const T& value, DArray& array)
+add_array_element (const T& value, DArray& array)
 {
   uint64_t result;
   uint8_t  rawValue[MAX_VALUE_RAW_STORAGE];
@@ -1155,110 +1155,110 @@ add_array_element( const T& value, DArray& array)
 uint64_t
 DArray::Add (const DBool& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DChar& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DDate& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DDateTime& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DHiresTime& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DUInt8& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DUInt16& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DUInt32& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DUInt64& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DReal& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DRichReal& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DInt8& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DInt16& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DInt32& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 uint64_t
 DArray::Add (const DInt64& value)
 {
-  return add_array_element( value, *this);
+  return add_array_element (value, *this);
 }
 
 
 template <class T> void
-get_array_element( const DArray&          array,
+get_array_element (const DArray&          array,
                    const uint64_t         index,
                    T&                     outElement)
 {
@@ -1273,117 +1273,117 @@ get_array_element( const DArray&          array,
       return ;
     }
 
-  Serializer::Load( rawValue, &outElement);
+  Serializer::Load (rawValue, &outElement);
 }
 
 
 void
 DArray::Get (const uint64_t index, DBool& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DChar& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DDate& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DDateTime& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DHiresTime& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DUInt8& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DUInt16& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DUInt32& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DUInt64& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DReal& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DRichReal& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DInt8& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DInt16& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DInt32& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 void
 DArray::Get (const uint64_t index, DInt64& outValue) const
 {
-  get_array_element( *this, index, outValue);
+  get_array_element (*this, index, outValue);
 }
 
 
 template<class T> inline void
-set_array_element( const T&          value,
+set_array_element (const T&          value,
                    const uint64_t    index,
                    DArray&           array)
 {
@@ -1416,105 +1416,105 @@ set_array_element( const T&          value,
 void
 DArray::Set (const uint64_t index, const DBool& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DChar& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DDate& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DDateTime& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DHiresTime& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index,  const DUInt8& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DUInt16& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DUInt32& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DUInt64& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DReal& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DRichReal& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DInt8& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DInt16& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DInt32& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
 void
 DArray::Set (const uint64_t index, const DInt64& newValue)
 {
-  set_array_element( newValue, index, *this);
+  set_array_element (newValue, index, *this);
 }
 
 
@@ -1534,7 +1534,7 @@ DArray::Remove(const uint64_t index)
 
 
 void
-DArray::Sort( bool reverse)
+DArray::Sort (bool reverse)
 {
 
   DArray::StrategyRAII a = GetStrategyRAII ();
@@ -1550,7 +1550,7 @@ DArray::Sort( bool reverse)
 
 
 void
-DArray::MakeMirror( DArray& inoutArray) const
+DArray::MakeMirror (DArray& inoutArray) const
 {
   if (this == &inoutArray)
     return ;

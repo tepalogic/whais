@@ -23,20 +23,20 @@ bool test_bool_array()
 {
   std::cout << "Testing T_BOOL array... ";
   bool result = true;
-  DArray anotherArray( (DBool *)NULL);
+  DArray anotherArray ((DBool *)NULL);
 
   if (result)
     {
-      DArray nullArray( (DBool *)NULL);
+      DArray nullArray ((DBool *)NULL);
       if (! nullArray.IsNull())
         result = false;
 
       if (! anotherArray.IsNull())
         result = false;
 
-      if ( anotherArray.Add(DBool( true)) != 0)
+      if ( anotherArray.Add(DBool (true)) != 0)
         result = false;
-      else if  (anotherArray.Add(DBool( false)) != 1)
+      else if  (anotherArray.Add(DBool (false)) != 1)
         result = false;
 
       if ( ! (anotherArray.IsNull() == false) && (anotherArray.Count() != 2) )
@@ -56,7 +56,7 @@ bool test_bool_array()
     {
 
 
-      anotherArray.Set (1, DBool( true));
+      anotherArray.Set (1, DBool (true));
       DBool tv;
       anotherArray.Get (1,  tv);
       if ((tv.IsNull()) || (tv.mValue == false))
@@ -78,14 +78,14 @@ bool test_bool_array()
 }
 
 template <typename T, typename Tint> bool
-test_integers_array( const char* type)
+test_integers_array (const char* type)
 {
   std::cout << "Testing " << type << " array... ";
   bool result = true;
 
   uint64_t elementsCount = 0;
   T nullValue;
-  DArray testArray( (T *)NULL);
+  DArray testArray ((T *)NULL);
 
   for (uint64_t index = 1; index < 10000; index += 13)
     {
@@ -102,7 +102,7 @@ test_integers_array( const char* type)
 
   if (result)
     {
-      testArray.Remove( 0);
+      testArray.Remove (0);
       testArray.Set (elementsCount - 2, nullValue);
       elementsCount -= 2;
 
@@ -146,7 +146,7 @@ test_dates_array()
   uint_t day = 1;
   uint_t month = 1;
 
-  DArray testArray( (DDate *)NULL);
+  DArray testArray ((DDate *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -155,7 +155,7 @@ test_dates_array()
           result = false;
           break;
         }
-      testArray.Add (DDate( year, month, day));
+      testArray.Add (DDate (year, month, day));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -187,7 +187,7 @@ test_dates_array()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove( 0);
+        testArray.Remove (0);
 
       if (testArray.IsNull() != false)
         result = false;
@@ -211,7 +211,7 @@ test_datetimes_array()
   uint_t mins = 3;
   uint_t sec = 3;
 
-  DArray testArray( (DDateTime *)NULL);
+  DArray testArray ((DDateTime *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -220,7 +220,7 @@ test_datetimes_array()
           result = false;
           break;
         }
-      testArray.Add (DDateTime( year, month, day, hour, mins, sec));
+      testArray.Add (DDateTime (year, month, day, hour, mins, sec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -262,7 +262,7 @@ test_datetimes_array()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove( 0);
+        testArray.Remove (0);
 
       if (testArray.IsNull() != false)
         result = false;
@@ -287,7 +287,7 @@ test_hiresdate_array()
   uint_t sec = 3;
   uint32_t msec = 4;
 
-  DArray testArray( (DHiresTime *)NULL);
+  DArray testArray ((DHiresTime *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -296,7 +296,7 @@ test_hiresdate_array()
           result = false;
           break;
         }
-      testArray.Add (DHiresTime( year, month, day, hour, mins, sec, msec));
+      testArray.Add (DHiresTime (year, month, day, hour, mins, sec, msec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -342,7 +342,7 @@ test_hiresdate_array()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove( 0);
+        testArray.Remove (0);
 
       if (testArray.IsNull() != false)
         result = false;
@@ -446,7 +446,7 @@ test_array_mirroring()
        }
     }
 
-  array2.MakeMirror( array1);
+  array2.MakeMirror (array1);
   if (array2.Count() != array1.Count())
     result = false;
   for (uint_t index = 0; result && (index < array1.Count()); ++index)
@@ -528,7 +528,7 @@ main()
 {
   bool success = true;
 
-  DBSInit( DBSSettings());
+  DBSInit (DBSSettings());
 
   success = success && test_bool_array();
   success = success && test_integers_array<DUInt8, uint8_t> ("T_UINT8");

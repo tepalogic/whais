@@ -43,23 +43,23 @@ namespace wod {
 #define VER_MINOR       0
 
 static inline bool
-isStrEqual( const char* str1, const char* str2)
+isStrEqual (const char* str1, const char* str2)
 {
-  return::strcmp( str1, str2) == 0;
+  return::strcmp (str1, str2) == 0;
 }
 
-CmdLineParser::CmdLineParser( int argc, char ** argv)
-  : mArgCount( argc),
-    mArgs( argv),
-    mSourceFile( NULL),
-    mOutStream( &cout),
-    mShowHelp( false)
+CmdLineParser::CmdLineParser (int argc, char ** argv)
+  : mArgCount (argc),
+    mArgs (argv),
+    mSourceFile (NULL),
+    mOutStream (&cout),
+    mShowHelp (false)
 {
   Parse();
 }
 
 
-CmdLineParser::~CmdLineParser()
+CmdLineParser::~CmdLineParser ()
 {
   if (mOutStream != &cout)
     delete mOutStream;
@@ -72,50 +72,50 @@ CmdLineParser::Parse()
   int index = 1;
   if (index >= mArgCount)
     {
-      throw CmdLineException( 
-                  _EXTRA( 0),
+      throw CmdLineException (
+                  _EXTRA (0),
                   "No arguments provided. Use '--help' for information."
                              );
     }
 
-  while( index < mArgCount)
+  while (index < mArgCount)
     {
-      if (isStrEqual( mArgs[index], "-h") ||
-          isStrEqual( mArgs[index], "--help"))
+      if (isStrEqual (mArgs[index], "-h") ||
+          isStrEqual (mArgs[index], "--help"))
         {
           mShowHelp = true;
           ++index;
         }
-      else if (isStrEqual( mArgs[index], "-o"))
+      else if (isStrEqual (mArgs[index], "-o"))
         {
           if (mOutStream != &cout)
             {
-              throw CmdLineException( 
-                  _EXTRA( 0),
+              throw CmdLineException (
+                  _EXTRA (0),
                   "The output file '-o' is specified multiple times."
                                      );
             }
 
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
-              throw CmdLineException( _EXTRA( 0),
+              throw CmdLineException (_EXTRA (0),
                                       "Missing parameter for argument '-o'.");
             }
           else
-            mOutStream = new ofstream( mArgs[index++]);
+            mOutStream = new ofstream (mArgs[index++]);
         }
       else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
         {
           if ((void *) mSourceFile != NULL)
             {
-              throw CmdLineException( _EXTRA( 0),
+              throw CmdLineException (_EXTRA (0),
                                       "The input file was already specified.");
             }
           mSourceFile = mArgs[index++];
         }
       else
         {
-          throw CmdLineException( _EXTRA( 0),
+          throw CmdLineException (_EXTRA (0),
                                   "Cannot handle argument '%s' Try '--help'!",
                                   mArgs[index]);
         }
@@ -130,10 +130,10 @@ CmdLineParser::CheckArguments()
   if (mShowHelp)
     {
       DisplayUsage();
-      exit( 0);
+      exit (0);
     }
   else if (mSourceFile == NULL)
-    throw CmdLineException( _EXTRA( 0), "The input file was not specified.");
+    throw CmdLineException (_EXTRA (0), "The input file was not specified.");
 }
 
 
@@ -145,12 +145,12 @@ CmdLineParser::DisplayUsage() const
 
   cout << "Whais Object Dumper v" << VER_MAJOR << '.';
 
-  cout.width( 2); cout.fill( '0');
+  cout.width (2); cout.fill ('0');
   cout << VER_MINOR;
-  cout.width( 0);
+  cout.width (0);
 
   cout <<
-    " by Iulian POPA( popaiulian@gmail.com)\n"
+    " by Iulian POPA (popaiulian@gmail.com)\n"
     "Usage: wod [options] input_file\n"
     "Options:\n"
     "-h, --help      Display this help.\n"
@@ -158,20 +158,20 @@ CmdLineParser::DisplayUsage() const
 }
 
 
-CmdLineException::CmdLineException( const uint32_t  code,
+CmdLineException::CmdLineException (const uint32_t  code,
                                     const char*     file,
                                     uint32_t        line,
                                     const char*     fmtMsg,
                                     ...)
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
 }
 
@@ -179,7 +179,7 @@ CmdLineException::CmdLineException( const uint32_t  code,
 Exception*
 CmdLineException::Clone() const
 {
-  return new CmdLineException( *this);
+  return new CmdLineException (*this);
 }
 
 

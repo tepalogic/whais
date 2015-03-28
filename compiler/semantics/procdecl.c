@@ -30,35 +30,35 @@
 #include "vardecl.h"
 
 struct Statement*
-find_proc_decl( struct ParserState* parser,
+find_proc_decl (struct ParserState* parser,
                 const char*         name,
                 const uint_t        nameLength,
                 const bool_t        refer)
 {
   const struct WArray* procs  = &(parser->globalStmt.spec.glb.procsDecls);
-  uint_t               procIt = wh_array_count( procs);
+  uint_t               procIt = wh_array_count (procs);
 
-  while( procIt-- > 0)
+  while (procIt-- > 0)
     {
-      struct Statement* result = (struct Statement*) wh_array_get( procs,
+      struct Statement* result = (struct Statement*) wh_array_get (procs,
                                                                    procIt);
-      assert( result->type == STMT_PROC);
-      assert( result->spec.proc.name != NULL);
-      assert( result->spec.proc.nameLength != 0);
+      assert (result->type == STMT_PROC);
+      assert (result->spec.proc.name != NULL);
+      assert (result->spec.proc.nameLength != 0);
 
       if ((result->spec.proc.nameLength == nameLength)
           && (strncmp( result->spec.proc.name, name, nameLength) == 0))
         {
-          if (refer && ! IS_REFERRED( result->spec.proc.procId))
+          if (refer && ! IS_REFERRED (result->spec.proc.procId))
             {
               const uint32_t id = parser->globalStmt.spec.glb.procsCount++;
 
-              assert( RETRIVE_ID( result->spec.proc.procId) == 0);
-              assert( IS_EXTERNAL( result->spec.proc.procId));
+              assert (RETRIVE_ID( result->spec.proc.procId) == 0);
+              assert (IS_EXTERNAL( result->spec.proc.procId));
 
               result->spec.proc.procId |= id;
 
-              MARK_AS_REFERENCED( result->spec.proc.procId);
+              MARK_AS_REFERENCED (result->spec.proc.procId);
             }
           return result;
         }
@@ -68,15 +68,15 @@ find_proc_decl( struct ParserState* parser,
 
 
 YYSTYPE
-add_proc_param_decl( YYSTYPE    paramsList,
+add_proc_param_decl (YYSTYPE    paramsList,
                      YYSTYPE    id,
                      YYSTYPE    type)
 {
   struct SemTypeSpec typeDesc = type->val.u_tspec;
 
-  assert( paramsList == NULL || paramsList->val_type == VAL_PRCDCL_LIST);
-  assert( id->val_type == VAL_ID);
-  assert( type->val_type == VAL_TYPE_SPEC);
+  assert (paramsList == NULL || paramsList->val_type == VAL_PRCDCL_LIST);
+  assert (id->val_type == VAL_ID);
+  assert (type->val_type == VAL_TYPE_SPEC);
 
   /* Reconverts s_type to a VAL_PRCDCL_LIST */
   type->val_type         = VAL_PRCDCL_LIST;
@@ -85,14 +85,14 @@ add_proc_param_decl( YYSTYPE    paramsList,
   type->val.u_prdcl.next = paramsList;
 
   /* recycle some things */
-  free_sem_value( id);
+  free_sem_value (id);
 
   return type;
 }
 
 
 void
-install_proc_args( struct ParserState* const parser,
+install_proc_args (struct ParserState* const parser,
                    struct SemValue*          paramsList)
 {
   const struct Statement* const cStmt = parser->pCurrentStmt;
@@ -107,14 +107,14 @@ install_proc_args( struct ParserState* const parser,
       identifier.val_type = VAL_ID;
       type.val_type       = VAL_TYPE_SPEC;
 
-      while( paramsList != NULL)
+      while (paramsList != NULL)
         {
-          assert( paramsList->val_type == VAL_PRCDCL_LIST);
+          assert (paramsList->val_type == VAL_PRCDCL_LIST);
 
           identifier.val.u_id = paramsList->val.u_prdcl.id;
           type.val.u_tspec    = paramsList->val.u_prdcl.type;
 
-          add_declaration( parser, &identifier, &type, TRUE, TRUE);
+          add_declaration (parser, &identifier, &type, TRUE, TRUE);
 
           paramsList->val_type = VAL_REUSE;
           paramsList           = paramsList->val.u_prdcl.next;
@@ -144,8 +144,8 @@ install_proc_args( struct ParserState* const parser,
                          sizeof tname,
                          cStmt->spec.proc.nameLength);
 
-          log_message( parser, parser->bufferPos, MSG_PROC_DECL_LESS, tname);
-          log_message( parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
+          log_message (parser, parser->bufferPos, MSG_PROC_DECL_LESS, tname);
+          log_message (parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
           return ;
         }
       else if ((param->labelLength != paramsList->val.u_prdcl.id.length)
@@ -166,12 +166,12 @@ install_proc_args( struct ParserState* const parser,
                          sizeof tname,
                          cStmt->spec.proc.nameLength);
 
-          log_message( parser,
+          log_message (parser,
                        parser->bufferPos,
                        MSG_PROC_DECL_PARAM_NA,
                        tname,
                        paramIndex);
-          log_message( parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
+          log_message (parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
           return ;
         }
 
@@ -188,24 +188,24 @@ install_proc_args( struct ParserState* const parser,
                      sizeof tname,
                      cStmt->spec.proc.nameLength);
 
-      log_message( parser, parser->bufferPos, MSG_PROC_DECL_MORE, tname);
-      log_message( parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
+      log_message (parser, parser->bufferPos, MSG_PROC_DECL_MORE, tname);
+      log_message (parser, cStmt->spec.proc.declarationPos, MSG_DECL_PREV);
     }
 }
 
 void
-install_proc_decl( struct ParserState* const parser,
+install_proc_decl (struct ParserState* const parser,
                    struct SemValue* const    id)
 {
   struct WArray* const procs = &(parser->globalStmt.spec.glb.procsDecls);
   struct Statement*    found = NULL;
   struct Statement     stmt;
 
-  assert( parser->pCurrentStmt->type == STMT_GLOBAL);
-  assert( id->val_type == VAL_ID);
+  assert (parser->pCurrentStmt->type == STMT_GLOBAL);
+  assert (id->val_type == VAL_ID);
 
   if (init_proc_stmt( parser->pCurrentStmt, &stmt) == FALSE)
-    log_message( parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
   stmt.spec.proc.name          = id->val.u_id.name;
   stmt.spec.proc.nameLength    = id->val.u_id.length;
@@ -223,32 +223,32 @@ install_proc_decl( struct ParserState* const parser,
     {
       char tname[128];
 
-      wh_copy_first( tname,
+      wh_copy_first (tname,
                      stmt.spec.proc.name,
                      sizeof tname,
                      stmt.spec.proc.nameLength);
 
-      log_message( parser, parser->bufferPos, MSG_PROC_ADECL, tname);
-      log_message( parser, found->spec.proc.declarationPos, MSG_DECL_PREV);
+      log_message (parser, parser->bufferPos, MSG_PROC_ADECL, tname);
+      log_message (parser, found->spec.proc.declarationPos, MSG_DECL_PREV);
 
-      clear_proc_stmt( &stmt);
+      clear_proc_stmt (&stmt);
     }
   else
     {
       bool_t addProcDefinition = FALSE;
       if ((found == NULL) && parser->externDecl)
         {
-          MARK_AS_EXTERNAL( stmt.spec.proc.procId);
-          MARK_AS_NOT_REFERENCED( stmt.spec.proc.procId);
+          MARK_AS_EXTERNAL (stmt.spec.proc.procId);
+          MARK_AS_NOT_REFERENCED (stmt.spec.proc.procId);
 
-          found = wh_array_add( procs, &stmt);
+          found = wh_array_add (procs, &stmt);
         }
       else
         {
           if (found == NULL)
             {
               stmt.spec.proc.procId = parser->globalStmt.spec.glb.procsCount++;
-              found = wh_array_add( procs, &stmt);
+              found = wh_array_add (procs, &stmt);
               if (parser->globalStmt.spec.glb.procsCount
                   < wh_array_count (procs))
                 {
@@ -266,11 +266,11 @@ install_proc_decl( struct ParserState* const parser,
                              sizeof tname,
                              found->spec.proc.nameLength);
 
-              log_message( parser, parser->bufferPos, MSG_PROC_EXT_LATE, tname);
-              log_message( parser,
+              log_message (parser, parser->bufferPos, MSG_PROC_EXT_LATE, tname);
+              log_message (parser,
                            found->spec.proc.definitionPos,
                            MSG_DECL_PREV);
-              clear_proc_stmt( &stmt);
+              clear_proc_stmt (&stmt);
 
               assert (found->spec.proc.checkParams);
             }
@@ -304,12 +304,12 @@ install_proc_decl( struct ParserState* const parser,
                                                           );
 
               assert (IS_EXTERNAL( movedEntry->spec.proc.procId));
-              assert (! IS_REFERRED( movedEntry->spec.proc.procId));
+              assert (! IS_REFERRED (movedEntry->spec.proc.procId));
 
               memcpy (found, movedEntry, sizeof *movedEntry);
               memcpy (movedEntry, &stmt, sizeof *movedEntry);
 
-              assert (! IS_EXTERNAL( movedEntry->spec.proc.procId));
+              assert (! IS_EXTERNAL (movedEntry->spec.proc.procId));
               assert (IS_REFERRED( movedEntry->spec.proc.procId));
 
               found = movedEntry;
@@ -318,27 +318,27 @@ install_proc_decl( struct ParserState* const parser,
 
       if (found == NULL)
         {
-          log_message( parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
           parser->abortError = TRUE;
         }
       else
         parser->pCurrentStmt = found;
     }
 
-  free_sem_value( id);
+  free_sem_value (id);
 
   return;
 }
 
 
 void
-set_proc_rettype( struct ParserState* const parser,
+set_proc_rettype (struct ParserState* const parser,
                   struct SemValue* const    type)
 {
   struct DeclaredVar* retVar = (struct DeclaredVar*)
-      wh_array_get( &(parser->pCurrentStmt->spec.proc.paramsList), 0);
+      wh_array_get (&(parser->pCurrentStmt->spec.proc.paramsList), 0);
 
-  assert( type->val_type == VAL_TYPE_SPEC);
+  assert (type->val_type == VAL_TYPE_SPEC);
 
   if (parser->pCurrentStmt->spec.proc.checkParams)
     {
@@ -354,8 +354,8 @@ set_proc_rettype( struct ParserState* const parser,
                          sizeof tname,
                          parser->pCurrentStmt->spec.proc.nameLength);
 
-          log_message( parser, parser->bufferPos, MSG_PROC_DECL_RET_NA, tname);
-          log_message( parser,
+          log_message (parser, parser->bufferPos, MSG_PROC_DECL_RET_NA, tname);
+          log_message (parser,
                        parser->pCurrentStmt->spec.proc.declarationPos,
                        MSG_DECL_PREV);
         }
@@ -363,7 +363,7 @@ set_proc_rettype( struct ParserState* const parser,
     }
   parser->pCurrentStmt->spec.proc.checkParams = TRUE;
 
-  memset( retVar, 0, sizeof( *retVar));
+  memset (retVar, 0, sizeof (*retVar));
 
   retVar->type  = type->val.u_tspec.type;
   retVar->extra = type->val.u_tspec.extra;
@@ -376,9 +376,9 @@ set_proc_rettype( struct ParserState* const parser,
         retVar->extra = retVar;
       else
         {
-          while( field->extra != NULL)
+          while (field->extra != NULL)
             {
-              assert( IS_TABLE_FIELD( field->type));
+              assert (IS_TABLE_FIELD( field->type));
 
               field = field->extra;
             }
@@ -386,19 +386,19 @@ set_proc_rettype( struct ParserState* const parser,
         }
     }
 
-  retVar->typeSpecOff = fill_type_spec( &parser->globalStmt.spec.glb.typesDescs,
+  retVar->typeSpecOff = fill_type_spec (&parser->globalStmt.spec.glb.typesDescs,
                                         retVar);
-  free_sem_value( type);
+  free_sem_value (type);
 
   return;
 }
 
 
 void
-finish_proc_decl( struct ParserState* const parser)
+finish_proc_decl (struct ParserState* const parser)
 {
-  assert( parser->pCurrentStmt->type = STMT_PROC);
-  assert( &(parser->globalStmt) == parser->pCurrentStmt->parent);
+  assert (parser->pCurrentStmt->type = STMT_PROC);
+  assert (&(parser->globalStmt) == parser->pCurrentStmt->parent);
 
   parser->pCurrentStmt = &parser->globalStmt;
 

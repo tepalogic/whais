@@ -92,23 +92,23 @@ struct Statement
 
 
 bool_t
-init_glbl_stmt( struct Statement* stmt);
+init_glbl_stmt (struct Statement* stmt);
 
 
 void
-clear_glbl_stmt( struct Statement* stmt);
+clear_glbl_stmt (struct Statement* stmt);
 
 
 bool_t
-init_proc_stmt( struct Statement* parent, struct Statement* outStmt);
+init_proc_stmt (struct Statement* parent, struct Statement* outStmt);
 
 
 void
-clear_proc_stmt( struct Statement* stmt);
+clear_proc_stmt (struct Statement* stmt);
 
 
 struct DeclaredVar*
-stmt_find_declaration( struct Statement* stmt,
+stmt_find_declaration (struct Statement* stmt,
                        const char*       name,
                        const uint_t      nameLength,
                        const bool_t      recursive,
@@ -116,55 +116,55 @@ stmt_find_declaration( struct Statement* stmt,
 
 
 struct DeclaredVar*
-stmt_add_declaration( struct Statement* const   stmt,
+stmt_add_declaration (struct Statement* const   stmt,
                       struct DeclaredVar*       var,
                       const bool_t              procPram);
 
 
 const struct DeclaredVar*
-stmt_get_param( const struct Statement* const stmt, const uint_t param);
+stmt_get_param (const struct Statement* const stmt, const uint_t param);
 
 
 uint_t
-stmt_get_param_count( const struct Statement* const stmt);
+stmt_get_param_count (const struct Statement* const stmt);
 
 
 uint32_t
-stmt_get_import_id( const struct Statement* const proc);
+stmt_get_import_id (const struct Statement* const proc);
 
 
 /* some inline functions to access statement members */
 static INLINE struct WOutputStream*
-stmt_query_instrs( struct Statement* const stmt)
+stmt_query_instrs (struct Statement* const stmt)
 {
-  assert( stmt->type == STMT_PROC);
+  assert (stmt->type == STMT_PROC);
   return &stmt->spec.proc.code;
 }
 
 
 static INLINE struct WArray*
-stmt_query_branch_stack( struct Statement* const stmt)
+stmt_query_branch_stack (struct Statement* const stmt)
 {
-  assert( stmt->type == STMT_PROC);
+  assert (stmt->type == STMT_PROC);
   return &stmt->spec.proc.branchStack;
 }
 
 
 static INLINE struct WArray*
-stmt_query_loop_stack( struct Statement* const stmt)
+stmt_query_loop_stack (struct Statement* const stmt)
 {
-  assert( stmt->type == STMT_PROC);
+  assert (stmt->type == STMT_PROC);
   return &stmt->spec.proc.loopStack;
 }
 
 
 uint_t
-fill_type_spec( struct WOutputStream* const     typeStream,
+fill_type_spec (struct WOutputStream* const     typeStream,
                 const struct DeclaredVar* const var);
 
 
 int
-add_constant_text( struct Statement* const stmt,
+add_constant_text (struct Statement* const stmt,
                    const uint8_t* const    text,
                    const uint_t            textSize);
 

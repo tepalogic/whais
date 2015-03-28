@@ -53,8 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whais_memory.h"
 #include "whais_time.h"
-#if ! (defined( YYTOKENTYPE) || defined( YYBISON))
-/* Avoid some type name redefinition( for Windows) */
+#if ! (defined (YYTOKENTYPE) || defined (YYBISON))
+/* Avoid some type name redefinition (for Windows) */
 #include "whais_fileio.h"
 #include "whais_thread.h"
 #include "whais_net.h"

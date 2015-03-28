@@ -108,26 +108,26 @@ extern "C" {
 
 
 int
-wh_define_basic_type( const DBS_BASIC_TYPE         type,
+wh_define_basic_type (const DBS_BASIC_TYPE         type,
                       struct TypeSpec* const       dest);
 
 
 int
-wh_apply_array_modifier( struct TypeSpec* const ioBuffer);
+wh_apply_array_modifier (struct TypeSpec* const ioBuffer);
 
 
 int
-wh_apply_field_modifier( struct TypeSpec* const ioBuffer);
+wh_apply_field_modifier (struct TypeSpec* const ioBuffer);
 
 int
-wh_apply_table_modifier( struct TypeSpec* const ioBuffer);
+wh_apply_table_modifier (struct TypeSpec* const ioBuffer);
 
 bool_t
-is_type_spec_valid( const struct TypeSpec* spec);
+is_type_spec_valid (const struct TypeSpec* spec);
 
 
 bool_t
-compare_type_spec( const struct TypeSpec* const spec1,
+compare_type_spec (const struct TypeSpec* const spec1,
                    const struct TypeSpec* const spec2);
 
 #ifdef __cplusplus

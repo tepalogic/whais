@@ -54,18 +54,18 @@ enum EXCEPTION_TYPE
 class EXCEP_SHL Exception
 {
 public:
-  Exception( uint32_t      code,
+  Exception (uint32_t      code,
              const char*   file,
              uint32_t      line);
-  Exception( const Exception& source);
+  Exception (const Exception& source);
 
   virtual ~Exception();
 
   uint32_t            Code() const;
 
   const std::string&  Message() const;
-  void                Message( const char* msg, std::va_list vl);
-  void                Message( const char* msg, ...);
+  void                Message (const char* msg, std::va_list vl);
+  void                Message (const char* msg, ...);
 
   const char*         File() const;
 
@@ -79,9 +79,9 @@ public:
 
 private:
 
-#pragma warning(  disable : 4251 )
+#pragma warning ( disable : 4251 )
   std::string       mErrorMessage;
-#pragma warning(  default : 4251)
+#pragma warning ( default : 4251)
 
   const char* const     mFile;
   const uint32_t        mLine;
@@ -92,7 +92,7 @@ private:
 
 
 // Macro used to expand the CMD line
-#define _EXTRA( x)  (x), __FILE__, __LINE__
+#define _EXTRA(x)  (x), __FILE__, __LINE__
 
 #endif /* WEXCEPTION_H_ */
 

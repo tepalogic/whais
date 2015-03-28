@@ -431,17 +431,17 @@ main()
 {
   bool success = true;
   {
-    DBSInit( DBSSettings());
-    DBSCreateDatabase( db_name);
+    DBSInit (DBSSettings());
+    DBSCreateDatabase (db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase( db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   success &= test_text_table (handler);
   success &= test_array_table (handler);
 
-  DBSReleaseDatabase( handler);
-  DBSRemoveDatabase( db_name);
+  DBSReleaseDatabase (handler);
+  DBSRemoveDatabase (db_name);
   DBSShoutdown();
 
 

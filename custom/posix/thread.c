@@ -33,10 +33,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <pthread.h>
 
 uint_t
-wh_lock_init( WH_LOCK* const lock)
+wh_lock_init (WH_LOCK* const lock)
 {
 #ifdef NDEBUG
-  uint_t result = pthread_mutex_init( lock, NULL);
+  uint_t result = pthread_mutex_init (lock, NULL);
 #else
   pthread_mutexattr_t attrs;
 
@@ -49,8 +49,8 @@ wh_lock_init( WH_LOCK* const lock)
     return result;
 
   do
-    result = pthread_mutex_init( lock, &attrs);
-  while( result == EAGAIN);
+    result = pthread_mutex_init (lock, &attrs);
+  while (result == EAGAIN);
 
 
   if (result == 0)
@@ -62,13 +62,13 @@ wh_lock_init( WH_LOCK* const lock)
 
 
 uint_t
-wh_lock_destroy( WH_LOCK* const lock)
+wh_lock_destroy (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_destroy( lock);
-  while( result == EAGAIN);
+    result = pthread_mutex_destroy (lock);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -78,13 +78,13 @@ wh_lock_destroy( WH_LOCK* const lock)
 
 
 uint_t
-wh_lock_acquire( WH_LOCK* const lock)
+wh_lock_acquire (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_lock( lock);
-  while( result == EAGAIN);
+    result = pthread_mutex_lock (lock);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -94,14 +94,14 @@ wh_lock_acquire( WH_LOCK* const lock)
 
 
 uint_t
-wh_lock_try_acquire( WH_LOCK* const lock,
+wh_lock_try_acquire (WH_LOCK* const lock,
                      bool_t* const  outAcquired)
 {
   int result;
 
   do
-    result = pthread_mutex_trylock( lock);
-  while( result == EAGAIN);
+    result = pthread_mutex_trylock (lock);
+  while (result == EAGAIN);
 
   if (result == 0)
     {
@@ -119,13 +119,13 @@ wh_lock_try_acquire( WH_LOCK* const lock,
 
 
 uint_t
-wh_lock_release( WH_LOCK* const lock)
+wh_lock_release (WH_LOCK* const lock)
 {
   uint_t result;
 
   do
-    result = pthread_mutex_unlock( lock);
-  while( result == EAGAIN);
+    result = pthread_mutex_unlock (lock);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -135,25 +135,25 @@ wh_lock_release( WH_LOCK* const lock)
 
 
 uint_t
-wh_thread_create( WH_THREAD*  const             outThread,
+wh_thread_create (WH_THREAD*  const             outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void* const                   args)
 {
   uint_t result;
 
   do
-    result = pthread_create( outThread, NULL, (void* (*)(void*))routine, args);
-  while( result == (uint_t)EAGAIN);
+    result = pthread_create (outThread, NULL, (void* (*)(void*))routine, args);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
-    result = pthread_detach( *outThread);
+    result = pthread_detach (*outThread);
 
   return result;
 }
 
 
 uint_t
-wh_thread_free( WH_THREAD thread)
+wh_thread_free (WH_THREAD thread)
 {
   return WOP_OK;
 }
@@ -167,46 +167,46 @@ wh_yield()
 
 
 void
-wh_sleep( const uint_t millisecs)
+wh_sleep (const uint_t millisecs)
 {
-  usleep( millisecs * 1000);
+  usleep (millisecs * 1000);
 }
 
 
 #ifdef __GNUC__
 
 int16_t
-wh_atomic_inc16 (volatile int16_t* const value)
+wh_atomic_fetch_inc16 (volatile int16_t* const value)
 {
   return __sync_fetch_and_add (value, (int16_t)1);
 }
 
 int16_t
-wh_atomic_dec16 (volatile int16_t* const value)
+wh_atomic_fetch_dec16 (volatile int16_t* const value)
 {
   return __sync_fetch_and_sub (value, (int16_t)1);
 }
 
 int32_t
-wh_atomic_inc32 (volatile int32_t* const value)
+wh_atomic_fetch_inc32 (volatile int32_t* const value)
 {
   return __sync_fetch_and_add (value, (int32_t)1);
 }
 
 int32_t
-wh_atomic_dec32 (volatile int32_t* const value)
+wh_atomic_fetch_dec32 (volatile int32_t* const value)
 {
   return __sync_fetch_and_sub (value, (int32_t)1);
 }
 
 int64_t
-wh_atomic_inc64 (volatile int64_t* const value)
+wh_atomic_fetch_inc64 (volatile int64_t* const value)
 {
   return __sync_fetch_and_add (value, (int64_t)1);
 }
 
 int64_t
-wh_atomic_dec64 (volatile int64_t* const value)
+wh_atomic_fetch_dec64 (volatile int64_t* const value)
 {
   return __sync_fetch_and_sub (value, (int64_t)1);
 }

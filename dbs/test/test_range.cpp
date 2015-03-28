@@ -16,7 +16,7 @@ using namespace whais;
 typedef Interval<uint8_t> INTERVAL;
 typedef Range<uint8_t>    RANGE;
 
-#define _I(x,y) INTERVAL( x, y)
+#define _I(x,y) INTERVAL (x, y)
 
 INTERVAL Rv1_f[] = { _I(5, 30) };
 INTERVAL Rv1_s[] = { _I(4, 10) };
@@ -87,7 +87,7 @@ INTERVAL Rv17_s[] = { _I(0, 1), _I(5, 7), _I(14, 16), _I(77, 99), _I(112, 115), 
 INTERVAL Rv17_r[] = { _I(0, 1), _I(3, 7), _I(10, 66), _I(77, 110),_I(112, 115), _I(220, 230), _I(255, 255) };
 
 
-#if !defined( windows_vc_x86)
+#if !defined (windows_vc_x86)
 INTERVAL Iv1_f[] = { _I(10, 33) };
 INTERVAL Iv1_s[] = { _I(2, 7) };
 INTERVAL Iv1_r[0];
@@ -122,7 +122,7 @@ INTERVAL Iv8_f[] = { _I(10, 33), _I (50, 100) };
 INTERVAL Iv8_s[] = { _I(27, 83) };
 INTERVAL Iv8_r[] = { _I(27, 33), _I (50, 83) };
 
-#if !defined( windows_vc_x86)
+#if !defined (windows_vc_x86)
 INTERVAL Iv9_f[] = { _I(10, 33), _I (50, 100) };
 INTERVAL Iv9_s[] = { _I(34, 49) };
 INTERVAL Iv9_r[0];
@@ -132,7 +132,7 @@ INTERVAL Iv10_f[] = { _I(10, 33), _I (50, 100), _I (110, 121) };
 INTERVAL Iv10_s[] = { _I(9, 120) };
 INTERVAL Iv10_r[] = { _I(10, 33), _I (50, 100), _I(110, 120) };
 
-#if !defined( windows_vc_x86)
+#if !defined (windows_vc_x86)
 INTERVAL Iv11_f[] = { _I(10, 33), _I (50, 100), _I (110, 121) };
 INTERVAL Iv11_s[] = { _I(1, 3), _I(101, 108), _I(234, 236), _I(255, 255) };
 INTERVAL Iv11_r[0];
@@ -167,7 +167,7 @@ INTERVAL Iv18_s[] = { _I(115, 140)  };
 INTERVAL Iv18_r[] = { _I(115, 121), _I (135, 140) };
 
 
-#if !defined( windows_vc_x86)
+#if !defined (windows_vc_x86)
 INTERVAL Cv1_f[0];
 INTERVAL Cv1_r[] = { _I(0, 255) };
 #endif
@@ -204,53 +204,53 @@ INTERVAL Cv11_r[] = { _I(8, 10), _I(57, 200), _I(204, 255) };
 
 
 static RANGE
-range_from_intervals( const INTERVAL intervals[], size_t count)
+range_from_intervals (const INTERVAL intervals[], size_t count)
 {
   RANGE result;
 
   for (size_t i = 0; i < count; ++i)
-    result.Join( intervals[i]);
+    result.Join (intervals[i]);
 
   return result;
 }
 
-#define TO_RANGE( x) range_from_intervals( x, sizeof( x) / sizeof( x[0]))
+#define TO_RANGE(x) range_from_intervals (x, sizeof (x) / sizeof (x[0]))
 
 
 static bool
-test_reunion( const RANGE& f, const RANGE& s, const RANGE& r)
+test_reunion (const RANGE& f, const RANGE& s, const RANGE& r)
 {
   RANGE op1 = f, op2 = s;
-  op1.Join( op2);
+  op1.Join (op2);
 
   if (op1 != r)
     return false;
 
   op1 = f, op2 = s;
 
-  op2.Join( op1);
+  op2.Join (op1);
   if (op2 != r)
     return false;
 
   RANGE all, empty;
 
-  all.Join( INTERVAL( 0, 255));
+  all.Join (INTERVAL (0, 255));
 
-  op1.Join( all);
+  op1.Join (all);
   if (op1 != all)
     return false;
 
-  op1.Join( op2);
+  op1.Join (op2);
   if (op1 != all)
     return false;
 
   op2 = f;
-  op2.Join( empty);
+  op2.Join (empty);
   if (op2 != f)
     return false;
 
   op2 = empty;
-  op2.Join( s);
+  op2.Join (s);
   if (op2 != s)
     return false;
 
@@ -258,41 +258,41 @@ test_reunion( const RANGE& f, const RANGE& s, const RANGE& r)
 }
 
 static bool
-test_match( const RANGE& f, const RANGE& s, const RANGE& r)
+test_match (const RANGE& f, const RANGE& s, const RANGE& r)
 {
   RANGE op1 = f, op2 = s;
 
-  op1.Match( op2);
+  op1.Match (op2);
   if (op1 != r)
     return false;
 
   op1 = f, op2 = s;
 
-  op2.Match( op1);
+  op2.Match (op1);
   if (op2 != r)
     return false;
 
   RANGE all, empty;
 
-  all.Join( INTERVAL( 0, 255));
+  all.Join (INTERVAL (0, 255));
 
   op1 = f;
-  op1.Match( all);
+  op1.Match (all);
   if (op1 != f)
     return false;
 
   op1 = all;
-  op1.Match( op2);
+  op1.Match (op2);
   if (op1 != op2)
     return false;
 
   op2 = f;
-  op2.Match( empty);
+  op2.Match (empty);
   if (op2 != empty)
     return false;
 
   op2 = empty;
-  op2.Match( s);
+  op2.Match (s);
   if (op2 != empty)
     return false;
 
@@ -301,7 +301,7 @@ test_match( const RANGE& f, const RANGE& s, const RANGE& r)
 
 
 static bool
-test_complement( const RANGE& f, const RANGE& r)
+test_complement (const RANGE& f, const RANGE& r)
 {
   RANGE op1 = f, op2 = r;
 
@@ -314,14 +314,14 @@ test_complement( const RANGE& f, const RANGE& r)
 
   RANGE all, empty;
 
-  all.Join( INTERVAL( 0, 255));
+  all.Join (INTERVAL (0, 255));
 
   op1 = f; op2 = r;
-  if (op1.Join( op2) != all)
+  if (op1.Join (op2) != all)
     return false;
 
   op1 = f; op2 = r;
-  if (op1.Match( op2) != empty)
+  if (op1.Match (op2) != empty)
     return false;
 
   return true;
@@ -329,23 +329,23 @@ test_complement( const RANGE& f, const RANGE& r)
 
 
 static bool
-test_complement_rel( const RANGE& r)
+test_complement_rel (const RANGE& r)
 {
   RANGE op1 = r;
 
   RANGE all, empty;
 
-  all.Join( INTERVAL( 0, 255));
+  all.Join (INTERVAL (0, 255));
 
   if (op1.Complement().Complement() != r)
     return false;
 
   op1 = r;
-  if (op1.Complement().Join( r) != all)
+  if (op1.Complement().Join (r) != all)
     return false;
 
   op1 = r;
-  if (op1.Complement().Match( r) != empty)
+  if (op1.Complement().Match (r) != empty)
     return false;
 
   return true;
@@ -359,210 +359,210 @@ main()
 
   std::cout << "Testing range union ... \n";
 
-  success = success & test_reunion( TO_RANGE( Rv1_f), TO_RANGE( Rv1_s), TO_RANGE( Rv1_r));
-  success = success & test_reunion( TO_RANGE( Rv2_f), TO_RANGE( Rv2_s), TO_RANGE( Rv2_r));
-  success = success & test_reunion( TO_RANGE( Rv3_f), TO_RANGE( Rv3_s), TO_RANGE( Rv3_r));
-  success = success & test_reunion( TO_RANGE( Rv4_f), TO_RANGE( Rv4_s), TO_RANGE( Rv4_r));
-  success = success & test_reunion( TO_RANGE( Rv5_f), TO_RANGE( Rv5_s), TO_RANGE( Rv5_r));
-  success = success & test_reunion( TO_RANGE( Rv6_f), TO_RANGE( Rv6_s), TO_RANGE( Rv6_r));
-  success = success & test_reunion( TO_RANGE( Rv7_f), TO_RANGE( Rv7_s), TO_RANGE( Rv7_r));
-  success = success & test_reunion( TO_RANGE( Rv8_f), TO_RANGE( Rv8_s), TO_RANGE( Rv8_r));
-  success = success & test_reunion( TO_RANGE( Rv9_f), TO_RANGE( Rv9_s), TO_RANGE( Rv9_r));
-  success = success & test_reunion( TO_RANGE( Rv10_f), TO_RANGE( Rv10_s), TO_RANGE( Rv10_r));
-  success = success & test_reunion( TO_RANGE( Rv11_f), TO_RANGE( Rv11_s), TO_RANGE( Rv11_r));
-  success = success & test_reunion( TO_RANGE( Rv12_f), TO_RANGE( Rv12_s), TO_RANGE( Rv12_r));
-  success = success & test_reunion( TO_RANGE( Rv13_f), TO_RANGE( Rv13_s), TO_RANGE( Rv13_r));
-  success = success & test_reunion( TO_RANGE( Rv14_f), TO_RANGE( Rv14_s), TO_RANGE( Rv14_r));
-  success = success & test_reunion( TO_RANGE( Rv15_f), TO_RANGE( Rv15_s), TO_RANGE( Rv15_r));
-  success = success & test_reunion( TO_RANGE( Rv16_f), TO_RANGE( Rv16_s), TO_RANGE( Rv16_r));
-  success = success & test_reunion( TO_RANGE( Rv17_f), TO_RANGE( Rv17_s), TO_RANGE( Rv17_r));
+  success = success & test_reunion (TO_RANGE (Rv1_f), TO_RANGE (Rv1_s), TO_RANGE (Rv1_r));
+  success = success & test_reunion (TO_RANGE (Rv2_f), TO_RANGE (Rv2_s), TO_RANGE (Rv2_r));
+  success = success & test_reunion (TO_RANGE (Rv3_f), TO_RANGE (Rv3_s), TO_RANGE (Rv3_r));
+  success = success & test_reunion (TO_RANGE (Rv4_f), TO_RANGE (Rv4_s), TO_RANGE (Rv4_r));
+  success = success & test_reunion (TO_RANGE (Rv5_f), TO_RANGE (Rv5_s), TO_RANGE (Rv5_r));
+  success = success & test_reunion (TO_RANGE (Rv6_f), TO_RANGE (Rv6_s), TO_RANGE (Rv6_r));
+  success = success & test_reunion (TO_RANGE (Rv7_f), TO_RANGE (Rv7_s), TO_RANGE (Rv7_r));
+  success = success & test_reunion (TO_RANGE (Rv8_f), TO_RANGE (Rv8_s), TO_RANGE (Rv8_r));
+  success = success & test_reunion (TO_RANGE (Rv9_f), TO_RANGE (Rv9_s), TO_RANGE (Rv9_r));
+  success = success & test_reunion (TO_RANGE (Rv10_f), TO_RANGE (Rv10_s), TO_RANGE (Rv10_r));
+  success = success & test_reunion (TO_RANGE (Rv11_f), TO_RANGE (Rv11_s), TO_RANGE (Rv11_r));
+  success = success & test_reunion (TO_RANGE (Rv12_f), TO_RANGE (Rv12_s), TO_RANGE (Rv12_r));
+  success = success & test_reunion (TO_RANGE (Rv13_f), TO_RANGE (Rv13_s), TO_RANGE (Rv13_r));
+  success = success & test_reunion (TO_RANGE (Rv14_f), TO_RANGE (Rv14_s), TO_RANGE (Rv14_r));
+  success = success & test_reunion (TO_RANGE (Rv15_f), TO_RANGE (Rv15_s), TO_RANGE (Rv15_r));
+  success = success & test_reunion (TO_RANGE (Rv16_f), TO_RANGE (Rv16_s), TO_RANGE (Rv16_r));
+  success = success & test_reunion (TO_RANGE (Rv17_f), TO_RANGE (Rv17_s), TO_RANGE (Rv17_r));
 
   if (!success)
     goto test_fail;
 
   std::cout << "Testing range match ... \n";
 
-#if !defined( windows_vc_x86)
-  success = success & test_match( TO_RANGE( Iv1_f), TO_RANGE( Iv1_s), TO_RANGE( Iv1_r));
-  success = success & test_match( TO_RANGE( Iv2_f), TO_RANGE( Iv2_s), TO_RANGE( Iv2_r));
+#if !defined (windows_vc_x86)
+  success = success & test_match (TO_RANGE (Iv1_f), TO_RANGE (Iv1_s), TO_RANGE (Iv1_r));
+  success = success & test_match (TO_RANGE (Iv2_f), TO_RANGE (Iv2_s), TO_RANGE (Iv2_r));
 #endif
-  success = success & test_match( TO_RANGE( Iv3_f), TO_RANGE( Iv3_s), TO_RANGE( Iv3_r));
-  success = success & test_match( TO_RANGE( Iv4_f), TO_RANGE( Iv4_s), TO_RANGE( Iv4_r));
-  success = success & test_match( TO_RANGE( Iv5_f), TO_RANGE( Iv5_s), TO_RANGE( Iv5_r));
-  success = success & test_match( TO_RANGE( Iv6_f), TO_RANGE( Iv6_s), TO_RANGE( Iv6_r));
-  success = success & test_match( TO_RANGE( Iv7_f), TO_RANGE( Iv7_s), TO_RANGE( Iv7_r));
-  success = success & test_match( TO_RANGE( Iv8_f), TO_RANGE( Iv8_s), TO_RANGE( Iv8_r));
-#if !defined( windows_vc_x86)
-  success = success & test_match( TO_RANGE( Iv9_f), TO_RANGE( Iv9_s), TO_RANGE( Iv9_r));
+  success = success & test_match (TO_RANGE (Iv3_f), TO_RANGE (Iv3_s), TO_RANGE (Iv3_r));
+  success = success & test_match (TO_RANGE (Iv4_f), TO_RANGE (Iv4_s), TO_RANGE (Iv4_r));
+  success = success & test_match (TO_RANGE (Iv5_f), TO_RANGE (Iv5_s), TO_RANGE (Iv5_r));
+  success = success & test_match (TO_RANGE (Iv6_f), TO_RANGE (Iv6_s), TO_RANGE (Iv6_r));
+  success = success & test_match (TO_RANGE (Iv7_f), TO_RANGE (Iv7_s), TO_RANGE (Iv7_r));
+  success = success & test_match (TO_RANGE (Iv8_f), TO_RANGE (Iv8_s), TO_RANGE (Iv8_r));
+#if !defined (windows_vc_x86)
+  success = success & test_match (TO_RANGE (Iv9_f), TO_RANGE (Iv9_s), TO_RANGE (Iv9_r));
 #endif
-  success = success & test_match( TO_RANGE( Iv10_f), TO_RANGE( Iv10_s), TO_RANGE( Iv10_r));
+  success = success & test_match (TO_RANGE (Iv10_f), TO_RANGE (Iv10_s), TO_RANGE (Iv10_r));
 
-#if !defined( windows_vc_x86)
-  success = success & test_match( TO_RANGE( Iv11_f), TO_RANGE( Iv11_s), TO_RANGE( Iv11_r));
+#if !defined (windows_vc_x86)
+  success = success & test_match (TO_RANGE (Iv11_f), TO_RANGE (Iv11_s), TO_RANGE (Iv11_r));
 #endif
-  success = success & test_match( TO_RANGE( Iv12_f), TO_RANGE( Iv12_s), TO_RANGE( Iv12_r));
-  success = success & test_match( TO_RANGE( Iv13_f), TO_RANGE( Iv13_s), TO_RANGE( Iv13_r));
-  success = success & test_match( TO_RANGE( Iv14_f), TO_RANGE( Iv14_s), TO_RANGE( Iv14_r));
-  success = success & test_match( TO_RANGE( Iv15_f), TO_RANGE( Iv15_s), TO_RANGE( Iv15_r));
-  success = success & test_match( TO_RANGE( Iv16_f), TO_RANGE( Iv16_s), TO_RANGE( Iv16_r));
-  success = success & test_match( TO_RANGE( Iv17_f), TO_RANGE( Iv17_s), TO_RANGE( Iv17_r));
-  success = success & test_match( TO_RANGE( Iv18_f), TO_RANGE( Iv18_s), TO_RANGE( Iv18_r));
+  success = success & test_match (TO_RANGE (Iv12_f), TO_RANGE (Iv12_s), TO_RANGE (Iv12_r));
+  success = success & test_match (TO_RANGE (Iv13_f), TO_RANGE (Iv13_s), TO_RANGE (Iv13_r));
+  success = success & test_match (TO_RANGE (Iv14_f), TO_RANGE (Iv14_s), TO_RANGE (Iv14_r));
+  success = success & test_match (TO_RANGE (Iv15_f), TO_RANGE (Iv15_s), TO_RANGE (Iv15_r));
+  success = success & test_match (TO_RANGE (Iv16_f), TO_RANGE (Iv16_s), TO_RANGE (Iv16_r));
+  success = success & test_match (TO_RANGE (Iv17_f), TO_RANGE (Iv17_s), TO_RANGE (Iv17_r));
+  success = success & test_match (TO_RANGE (Iv18_f), TO_RANGE (Iv18_s), TO_RANGE (Iv18_r));
 
   if (!success)
     goto test_fail;
 
   std::cout << "Testing range complement ... \n";
 
-#if !defined( windows_vc_x86)
-  success = success & test_complement( TO_RANGE( Cv1_f), TO_RANGE( Cv1_r));
+#if !defined (windows_vc_x86)
+  success = success & test_complement (TO_RANGE (Cv1_f), TO_RANGE (Cv1_r));
 #endif
 
-  success = success & test_complement( TO_RANGE( Cv2_f), TO_RANGE( Cv2_r));
-  success = success & test_complement( TO_RANGE( Cv3_f), TO_RANGE( Cv3_r));
-  success = success & test_complement( TO_RANGE( Cv4_f), TO_RANGE( Cv4_r));
-  success = success & test_complement( TO_RANGE( Cv5_f), TO_RANGE( Cv5_r));
-  success = success & test_complement( TO_RANGE( Cv6_f), TO_RANGE( Cv6_r));
-  success = success & test_complement( TO_RANGE( Cv7_f), TO_RANGE( Cv7_r));
-  success = success & test_complement( TO_RANGE( Cv8_f), TO_RANGE( Cv8_r));
-  success = success & test_complement( TO_RANGE( Cv9_f), TO_RANGE( Cv9_r));
-  success = success & test_complement( TO_RANGE( Cv10_f), TO_RANGE( Cv10_r));
-  success = success & test_complement( TO_RANGE( Cv11_f), TO_RANGE( Cv11_r));
+  success = success & test_complement (TO_RANGE (Cv2_f), TO_RANGE (Cv2_r));
+  success = success & test_complement (TO_RANGE (Cv3_f), TO_RANGE (Cv3_r));
+  success = success & test_complement (TO_RANGE (Cv4_f), TO_RANGE (Cv4_r));
+  success = success & test_complement (TO_RANGE (Cv5_f), TO_RANGE (Cv5_r));
+  success = success & test_complement (TO_RANGE (Cv6_f), TO_RANGE (Cv6_r));
+  success = success & test_complement (TO_RANGE (Cv7_f), TO_RANGE (Cv7_r));
+  success = success & test_complement (TO_RANGE (Cv8_f), TO_RANGE (Cv8_r));
+  success = success & test_complement (TO_RANGE (Cv9_f), TO_RANGE (Cv9_r));
+  success = success & test_complement (TO_RANGE (Cv10_f), TO_RANGE (Cv10_r));
+  success = success & test_complement (TO_RANGE (Cv11_f), TO_RANGE (Cv11_r));
 
   if (!success)
     goto test_fail;
 
   std::cout << "Testing range complement relations ... \n";
 
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv1_f));
-  success = success & test_complement_rel( TO_RANGE( Iv2_f));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv1_f));
+  success = success & test_complement_rel (TO_RANGE (Iv2_f));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv3_f));
-  success = success & test_complement_rel( TO_RANGE( Iv4_f));
-  success = success & test_complement_rel( TO_RANGE( Iv5_f));
-  success = success & test_complement_rel( TO_RANGE( Iv6_f));
-  success = success & test_complement_rel( TO_RANGE( Iv7_f));
-  success = success & test_complement_rel( TO_RANGE( Iv8_f));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv9_f));
+  success = success & test_complement_rel (TO_RANGE (Iv3_f));
+  success = success & test_complement_rel (TO_RANGE (Iv4_f));
+  success = success & test_complement_rel (TO_RANGE (Iv5_f));
+  success = success & test_complement_rel (TO_RANGE (Iv6_f));
+  success = success & test_complement_rel (TO_RANGE (Iv7_f));
+  success = success & test_complement_rel (TO_RANGE (Iv8_f));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv9_f));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv10_f));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv11_f));
+  success = success & test_complement_rel (TO_RANGE (Iv10_f));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv11_f));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv12_f));
-  success = success & test_complement_rel( TO_RANGE( Iv13_f));
-  success = success & test_complement_rel( TO_RANGE( Iv14_f));
-  success = success & test_complement_rel( TO_RANGE( Iv15_f));
-  success = success & test_complement_rel( TO_RANGE( Iv16_f));
-  success = success & test_complement_rel( TO_RANGE( Iv17_f));
-  success = success & test_complement_rel( TO_RANGE( Iv18_f));
+  success = success & test_complement_rel (TO_RANGE (Iv12_f));
+  success = success & test_complement_rel (TO_RANGE (Iv13_f));
+  success = success & test_complement_rel (TO_RANGE (Iv14_f));
+  success = success & test_complement_rel (TO_RANGE (Iv15_f));
+  success = success & test_complement_rel (TO_RANGE (Iv16_f));
+  success = success & test_complement_rel (TO_RANGE (Iv17_f));
+  success = success & test_complement_rel (TO_RANGE (Iv18_f));
 
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv1_s));
-  success = success & test_complement_rel( TO_RANGE( Iv2_s));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv1_s));
+  success = success & test_complement_rel (TO_RANGE (Iv2_s));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv3_s));
-  success = success & test_complement_rel( TO_RANGE( Iv4_s));
-  success = success & test_complement_rel( TO_RANGE( Iv5_s));
-  success = success & test_complement_rel( TO_RANGE( Iv6_s));
-  success = success & test_complement_rel( TO_RANGE( Iv7_s));
-  success = success & test_complement_rel( TO_RANGE( Iv8_s));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv9_s));
+  success = success & test_complement_rel (TO_RANGE (Iv3_s));
+  success = success & test_complement_rel (TO_RANGE (Iv4_s));
+  success = success & test_complement_rel (TO_RANGE (Iv5_s));
+  success = success & test_complement_rel (TO_RANGE (Iv6_s));
+  success = success & test_complement_rel (TO_RANGE (Iv7_s));
+  success = success & test_complement_rel (TO_RANGE (Iv8_s));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv9_s));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv10_s));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv11_s));
+  success = success & test_complement_rel (TO_RANGE (Iv10_s));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv11_s));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv12_s));
-  success = success & test_complement_rel( TO_RANGE( Iv13_s));
-  success = success & test_complement_rel( TO_RANGE( Iv14_s));
-  success = success & test_complement_rel( TO_RANGE( Iv15_s));
-  success = success & test_complement_rel( TO_RANGE( Iv16_s));
-  success = success & test_complement_rel( TO_RANGE( Iv17_s));
-  success = success & test_complement_rel( TO_RANGE( Iv18_s));
+  success = success & test_complement_rel (TO_RANGE (Iv12_s));
+  success = success & test_complement_rel (TO_RANGE (Iv13_s));
+  success = success & test_complement_rel (TO_RANGE (Iv14_s));
+  success = success & test_complement_rel (TO_RANGE (Iv15_s));
+  success = success & test_complement_rel (TO_RANGE (Iv16_s));
+  success = success & test_complement_rel (TO_RANGE (Iv17_s));
+  success = success & test_complement_rel (TO_RANGE (Iv18_s));
 
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv1_r));
-  success = success & test_complement_rel( TO_RANGE( Iv2_r));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv1_r));
+  success = success & test_complement_rel (TO_RANGE (Iv2_r));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv3_r));
-  success = success & test_complement_rel( TO_RANGE( Iv4_r));
-  success = success & test_complement_rel( TO_RANGE( Iv5_r));
-  success = success & test_complement_rel( TO_RANGE( Iv6_r));
-  success = success & test_complement_rel( TO_RANGE( Iv7_r));
-  success = success & test_complement_rel( TO_RANGE( Iv8_r));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv9_r));
+  success = success & test_complement_rel (TO_RANGE (Iv3_r));
+  success = success & test_complement_rel (TO_RANGE (Iv4_r));
+  success = success & test_complement_rel (TO_RANGE (Iv5_r));
+  success = success & test_complement_rel (TO_RANGE (Iv6_r));
+  success = success & test_complement_rel (TO_RANGE (Iv7_r));
+  success = success & test_complement_rel (TO_RANGE (Iv8_r));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv9_r));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv10_r));
-#if !defined( windows_vc_x86)
-  success = success & test_complement_rel( TO_RANGE( Iv11_r));
+  success = success & test_complement_rel (TO_RANGE (Iv10_r));
+#if !defined (windows_vc_x86)
+  success = success & test_complement_rel (TO_RANGE (Iv11_r));
 #endif
-  success = success & test_complement_rel( TO_RANGE( Iv12_r));
-  success = success & test_complement_rel( TO_RANGE( Iv13_r));
-  success = success & test_complement_rel( TO_RANGE( Iv14_r));
-  success = success & test_complement_rel( TO_RANGE( Iv15_r));
-  success = success & test_complement_rel( TO_RANGE( Iv16_r));
-  success = success & test_complement_rel( TO_RANGE( Iv17_r));
-  success = success & test_complement_rel( TO_RANGE( Iv18_r));
+  success = success & test_complement_rel (TO_RANGE (Iv12_r));
+  success = success & test_complement_rel (TO_RANGE (Iv13_r));
+  success = success & test_complement_rel (TO_RANGE (Iv14_r));
+  success = success & test_complement_rel (TO_RANGE (Iv15_r));
+  success = success & test_complement_rel (TO_RANGE (Iv16_r));
+  success = success & test_complement_rel (TO_RANGE (Iv17_r));
+  success = success & test_complement_rel (TO_RANGE (Iv18_r));
 
 
 
-  success = success & test_complement_rel( TO_RANGE( Rv1_f));
-  success = success & test_complement_rel( TO_RANGE( Rv2_f));
-  success = success & test_complement_rel( TO_RANGE( Rv3_f));
-  success = success & test_complement_rel( TO_RANGE( Rv4_f));
-  success = success & test_complement_rel( TO_RANGE( Rv5_f));
-  success = success & test_complement_rel( TO_RANGE( Rv6_f));
-  success = success & test_complement_rel( TO_RANGE( Rv7_f));
-  success = success & test_complement_rel( TO_RANGE( Rv8_f));
-  success = success & test_complement_rel( TO_RANGE( Rv9_f));
-  success = success & test_complement_rel( TO_RANGE( Rv10_f));
-  success = success & test_complement_rel( TO_RANGE( Rv11_f));
-  success = success & test_complement_rel( TO_RANGE( Rv12_f));
-  success = success & test_complement_rel( TO_RANGE( Rv13_f));
-  success = success & test_complement_rel( TO_RANGE( Rv14_f));
-  success = success & test_complement_rel( TO_RANGE( Rv15_f));
-  success = success & test_complement_rel( TO_RANGE( Rv16_f));
-  success = success & test_complement_rel( TO_RANGE( Rv17_f));
+  success = success & test_complement_rel (TO_RANGE (Rv1_f));
+  success = success & test_complement_rel (TO_RANGE (Rv2_f));
+  success = success & test_complement_rel (TO_RANGE (Rv3_f));
+  success = success & test_complement_rel (TO_RANGE (Rv4_f));
+  success = success & test_complement_rel (TO_RANGE (Rv5_f));
+  success = success & test_complement_rel (TO_RANGE (Rv6_f));
+  success = success & test_complement_rel (TO_RANGE (Rv7_f));
+  success = success & test_complement_rel (TO_RANGE (Rv8_f));
+  success = success & test_complement_rel (TO_RANGE (Rv9_f));
+  success = success & test_complement_rel (TO_RANGE (Rv10_f));
+  success = success & test_complement_rel (TO_RANGE (Rv11_f));
+  success = success & test_complement_rel (TO_RANGE (Rv12_f));
+  success = success & test_complement_rel (TO_RANGE (Rv13_f));
+  success = success & test_complement_rel (TO_RANGE (Rv14_f));
+  success = success & test_complement_rel (TO_RANGE (Rv15_f));
+  success = success & test_complement_rel (TO_RANGE (Rv16_f));
+  success = success & test_complement_rel (TO_RANGE (Rv17_f));
 
-  success = success & test_complement_rel( TO_RANGE( Rv1_s));
-  success = success & test_complement_rel( TO_RANGE( Rv2_s));
-  success = success & test_complement_rel( TO_RANGE( Rv3_s));
-  success = success & test_complement_rel( TO_RANGE( Rv4_s));
-  success = success & test_complement_rel( TO_RANGE( Rv5_s));
-  success = success & test_complement_rel( TO_RANGE( Rv6_s));
-  success = success & test_complement_rel( TO_RANGE( Rv7_s));
-  success = success & test_complement_rel( TO_RANGE( Rv8_s));
-  success = success & test_complement_rel( TO_RANGE( Rv9_s));
-  success = success & test_complement_rel( TO_RANGE( Rv10_s));
-  success = success & test_complement_rel( TO_RANGE( Rv11_s));
-  success = success & test_complement_rel( TO_RANGE( Rv12_s));
-  success = success & test_complement_rel( TO_RANGE( Rv13_s));
-  success = success & test_complement_rel( TO_RANGE( Rv14_s));
-  success = success & test_complement_rel( TO_RANGE( Rv15_s));
-  success = success & test_complement_rel( TO_RANGE( Rv16_s));
-  success = success & test_complement_rel( TO_RANGE( Rv17_s));
+  success = success & test_complement_rel (TO_RANGE (Rv1_s));
+  success = success & test_complement_rel (TO_RANGE (Rv2_s));
+  success = success & test_complement_rel (TO_RANGE (Rv3_s));
+  success = success & test_complement_rel (TO_RANGE (Rv4_s));
+  success = success & test_complement_rel (TO_RANGE (Rv5_s));
+  success = success & test_complement_rel (TO_RANGE (Rv6_s));
+  success = success & test_complement_rel (TO_RANGE (Rv7_s));
+  success = success & test_complement_rel (TO_RANGE (Rv8_s));
+  success = success & test_complement_rel (TO_RANGE (Rv9_s));
+  success = success & test_complement_rel (TO_RANGE (Rv10_s));
+  success = success & test_complement_rel (TO_RANGE (Rv11_s));
+  success = success & test_complement_rel (TO_RANGE (Rv12_s));
+  success = success & test_complement_rel (TO_RANGE (Rv13_s));
+  success = success & test_complement_rel (TO_RANGE (Rv14_s));
+  success = success & test_complement_rel (TO_RANGE (Rv15_s));
+  success = success & test_complement_rel (TO_RANGE (Rv16_s));
+  success = success & test_complement_rel (TO_RANGE (Rv17_s));
 
-  success = success & test_complement_rel( TO_RANGE( Rv1_r));
-  success = success & test_complement_rel( TO_RANGE( Rv2_r));
-  success = success & test_complement_rel( TO_RANGE( Rv3_r));
-  success = success & test_complement_rel( TO_RANGE( Rv4_r));
-  success = success & test_complement_rel( TO_RANGE( Rv5_r));
-  success = success & test_complement_rel( TO_RANGE( Rv6_r));
-  success = success & test_complement_rel( TO_RANGE( Rv7_r));
-  success = success & test_complement_rel( TO_RANGE( Rv8_r));
-  success = success & test_complement_rel( TO_RANGE( Rv9_r));
-  success = success & test_complement_rel( TO_RANGE( Rv10_r));
-  success = success & test_complement_rel( TO_RANGE( Rv11_r));
-  success = success & test_complement_rel( TO_RANGE( Rv12_r));
-  success = success & test_complement_rel( TO_RANGE( Rv13_r));
-  success = success & test_complement_rel( TO_RANGE( Rv14_r));
-  success = success & test_complement_rel( TO_RANGE( Rv15_r));
-  success = success & test_complement_rel( TO_RANGE( Rv16_r));
-  success = success & test_complement_rel( TO_RANGE( Rv17_r));
+  success = success & test_complement_rel (TO_RANGE (Rv1_r));
+  success = success & test_complement_rel (TO_RANGE (Rv2_r));
+  success = success & test_complement_rel (TO_RANGE (Rv3_r));
+  success = success & test_complement_rel (TO_RANGE (Rv4_r));
+  success = success & test_complement_rel (TO_RANGE (Rv5_r));
+  success = success & test_complement_rel (TO_RANGE (Rv6_r));
+  success = success & test_complement_rel (TO_RANGE (Rv7_r));
+  success = success & test_complement_rel (TO_RANGE (Rv8_r));
+  success = success & test_complement_rel (TO_RANGE (Rv9_r));
+  success = success & test_complement_rel (TO_RANGE (Rv10_r));
+  success = success & test_complement_rel (TO_RANGE (Rv11_r));
+  success = success & test_complement_rel (TO_RANGE (Rv12_r));
+  success = success & test_complement_rel (TO_RANGE (Rv13_r));
+  success = success & test_complement_rel (TO_RANGE (Rv14_r));
+  success = success & test_complement_rel (TO_RANGE (Rv15_r));
+  success = success & test_complement_rel (TO_RANGE (Rv16_r));
+  success = success & test_complement_rel (TO_RANGE (Rv17_r));
 
 
 test_fail:

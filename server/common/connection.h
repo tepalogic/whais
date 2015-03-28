@@ -44,16 +44,16 @@ using namespace whais;
 
 struct UserHandler
 {
-  UserHandler()
-    : mDesc( NULL),
+  UserHandler ()
+    : mDesc (NULL),
       mClientSocket (NULL),
-      mLastReqTick( 0),
-      mThread(),
-      mSocket( INVALID_SOCKET),
-      mRoot( false),
-      mEndConnection( true)
+      mLastReqTick (0),
+      mThread (),
+      mSocket (INVALID_SOCKET),
+      mRoot (false),
+      mEndConnection (true)
   {
-    mThread.IgnoreExceptions( true);
+    mThread.IgnoreExceptions (true);
   }
 
   const DBSDescriptors* mDesc;
@@ -70,7 +70,7 @@ struct UserHandler
 class ConnectionException : public Exception
 {
 public:
-  ConnectionException( const uint32_t  code,
+  ConnectionException (const uint32_t  code,
                        const char*     file,
                        uint32_t        line,
                        const char*     fmtMsg = NULL,
@@ -88,23 +88,23 @@ public:
 class ClientConnection
 {
 public:
-  ClientConnection( UserHandler&                 client,
+  ClientConnection (UserHandler&                 client,
                     std::vector<DBSDescriptors>& databases);
 
   uint_t MaxSize() const;
 
   uint_t DataSize() const;
-  void   DataSize( const uint16_t size);
+  void   DataSize (const uint16_t size);
 
   uint8_t* Data();
 
-  uint32_t ReadCommand();
+  uint32_t ReadCommand ();
 
-  void SendCmdResponse( const uint16_t respType);
+  void SendCmdResponse (const uint16_t respType);
 
   const DBSDescriptors& Dbs ()
   {
-    assert( mUserHandler.mDesc != NULL);
+    assert (mUserHandler.mDesc != NULL);
 
     return *mUserHandler.mDesc;
   }
@@ -124,7 +124,7 @@ private:
 
   void ReciveRawClientFrame();
 
-  void SendRawClientFrame( const uint8_t type);
+  void SendRawClientFrame (const uint8_t type);
 
   UserHandler&                  mUserHandler;
   SessionStack                  mStack;
@@ -142,7 +142,7 @@ private:
     uint8_t  _3K[1];
   }                             mKey;
 
-  ClientConnection( const ClientConnection&);
+  ClientConnection (const ClientConnection&);
   const ClientConnection& operator= (const ClientConnection&);
 };
 

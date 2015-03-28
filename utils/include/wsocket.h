@@ -36,7 +36,7 @@ namespace whais {
 class EXCEP_SHL SocketException : public Exception
 {
 public:
-  SocketException( const uint32_t code,
+  SocketException (const uint32_t code,
                    const char*    file,
                    uint32_t       line,
                    const char*    fmMsg = NULL,
@@ -54,24 +54,24 @@ class EXCEP_SHL Socket
 {
 public:
   //Client server constructors
-  Socket( const char* const   serverHost,
+  Socket (const char* const   serverHost,
           const char* const   service);
 
-  Socket( const char* const   serverHost,
+  Socket (const char* const   serverHost,
           const uint16_t      port);
 
   //Server sockets constructors
-  Socket( const char* const    address,
+  Socket (const char* const    address,
           const char* const    service,
           const uint_t         backLog);
 
-  Socket( const char* const    address,
+  Socket (const char* const    address,
           const uint16_t       port,
           const uint_t         backLog);
 
   //Utility constructors
-  Socket( const WH_SOCKET sd);
-  Socket( const Socket& src);
+  Socket (const WH_SOCKET sd);
+  Socket (const Socket& src);
 
   ~Socket();
 
@@ -79,9 +79,9 @@ public:
 
   Socket  Accept();
 
-  uint_t  Read( uint8_t* const buffer, const uint_t maxCount);
+  uint_t  Read (uint8_t* const buffer, const uint_t maxCount);
 
-  void    Write( const uint8_t* const buffer, const uint_t count);
+  void    Write (const uint8_t* const buffer, const uint_t count);
 
   void    Close();
 
@@ -91,18 +91,18 @@ private:
 
   struct EXCEP_SHL SocketInitialiser
   {
-    SocketInitialiser()
+    SocketInitialiser ()
     {
       if ( ! whs_init())
         {
-          throw SocketException( 
-                          _EXTRA( 0),
+          throw SocketException (
+                          _EXTRA (0),
                           "The network subsystem could not be initialized."
                                 );
         }
     };
 
-    ~SocketInitialiser()
+    ~SocketInitialiser ()
     {
       whs_clean();
     }

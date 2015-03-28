@@ -40,7 +40,7 @@ static const char *MSG_PREFIX[] = {
 
 
 static int
-get_line_from_buffer( const vector<SourceCodeMark>& codeMarks,
+get_line_from_buffer (const vector<SourceCodeMark>& codeMarks,
                       const char*                   buffer,
                       uint_t                        bufferOff,
                       uint_t* const                 mark)
@@ -49,7 +49,7 @@ get_line_from_buffer( const vector<SourceCodeMark>& codeMarks,
     return -1;
 
   *mark = 0;
-  while( *mark + 1 < codeMarks.size())
+  while (*mark + 1 < codeMarks.size())
     {
       if (codeMarks[*mark + 1].mBufferOffset <= bufferOff)
         *mark += 1;
@@ -61,18 +61,18 @@ get_line_from_buffer( const vector<SourceCodeMark>& codeMarks,
   uint_t count  = codeMarks[*mark].mBufferOffset;
   int    result = codeMarks[*mark].mBufferLine;
 
-  while( count < bufferOff)
+  while (count < bufferOff)
     {
       if (buffer[count] == '\n')
         ++result;
 
       else if (buffer[count] == 0)
         {
-          assert( count == bufferOff - 1);
+          assert (count == bufferOff - 1);
 
           if (buffer[count - 1] == '\n')
             {
-              assert( result > 1);
+              assert (result > 1);
 
               return result - 1;
             }
@@ -87,7 +87,7 @@ get_line_from_buffer( const vector<SourceCodeMark>& codeMarks,
 
 
 void
-whc_messenger( WH_MESSENGER_CTXT    data,
+whc_messenger (WH_MESSENGER_CTXT    data,
                uint_t               buffOff,
                uint_t               msgId,
                uint_t               msgType,
@@ -99,51 +99,51 @@ whc_messenger( WH_MESSENGER_CTXT    data,
   const vector<SourceCodeMark>& codeMarks = ctx.mCodeMarks;
 
   uint_t mark     = 0;
-  int    buffLine = get_line_from_buffer( codeMarks, buffer, buffOff, &mark);
+  int    buffLine = get_line_from_buffer (codeMarks, buffer, buffOff, &mark);
 
   if (buffLine >= 0)
     {
-      assert( codeMarks.size() > 0);
+      assert (codeMarks.size() > 0);
 
-      fprintf( stderr,
+      fprintf (stderr,
                "%s: line %d: %s %d: ",
-               codeMarks[mark].mBufferSource.c_str(),
+               codeMarks[mark].mBufferSource.c_str (),
                buffLine,
                MSG_PREFIX[msgType],
                msgId);
-      vfprintf( stderr, msgFormat, args);
+      vfprintf (stderr, msgFormat, args);
 
-      while( codeMarks[mark].mLevel > 0)
+      while (codeMarks[mark].mLevel > 0)
         {
           const uint_t prevLevel = codeMarks[mark].mLevel - 1;
 
-          while( codeMarks[mark].mLevel > prevLevel)
+          while (codeMarks[mark].mLevel > prevLevel)
             {
-              assert( mark > 0);
+              assert (mark > 0);
               --mark;
             }
 
-          assert( codeMarks[mark].mLevel == prevLevel);
+          assert (codeMarks[mark].mLevel == prevLevel);
 
-          fprintf( stderr,
+          fprintf (stderr,
                   "\n\tincluded from '%s' at line %d%c",
-                  codeMarks[mark].mBufferSource.c_str(),
+                  codeMarks[mark].mBufferSource.c_str (),
                   codeMarks[mark].mBufferLine,
                   prevLevel == 0 ? '.' : ';');
         }
     }
   else
     {
-      fprintf( stderr, "%s %d: ", MSG_PREFIX[msgType], msgId);
-      vfprintf( stderr, msgFormat, args);
+      fprintf (stderr, "%s %d: ", MSG_PREFIX[msgType], msgId);
+      vfprintf (stderr, msgFormat, args);
     }
 
-  fprintf( stderr, "\n");
+  fprintf (stderr, "\n");
 }
 
 
 void
-whc_messenger( WH_MESSENGER_CTXT data,
+whc_messenger (WH_MESSENGER_CTXT data,
                uint_t            buffOff,
                uint_t            msgId,
                uint_t            msgType,
@@ -152,9 +152,9 @@ whc_messenger( WH_MESSENGER_CTXT data,
 {
   va_list vl;
 
-  va_start( vl, msgFormat);
-  whc_messenger( data, buffOff, msgId, msgType, msgFormat, vl);
-  va_end( vl);
+  va_start (vl, msgFormat);
+  whc_messenger (data, buffOff, msgId, msgType, msgFormat, vl);
+  va_end (vl);
 
 
 }

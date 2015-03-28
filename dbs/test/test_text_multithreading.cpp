@@ -57,8 +57,8 @@ test_append_char (void* )
         while (resetStart)
           wh_sleep (1);
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -89,8 +89,8 @@ test_append_text (void* )
         while (resetStart)
           wh_sleep (1);
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -136,8 +136,8 @@ test_update_char (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -170,8 +170,8 @@ test_find_in_text (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -205,8 +205,8 @@ test_find_subtext (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -237,8 +237,8 @@ test_to_lower (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -269,8 +269,8 @@ test_to_upper (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -303,7 +303,7 @@ test_compare (void *)
           wh_sleep (1);
 
         if (c)
-          wh_yield();
+          wh_yield ();
       }
   } catch (...)
   {
@@ -337,8 +337,8 @@ test_mirror (void* )
           wh_sleep (1);
 
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   } catch (...)
   {
@@ -395,17 +395,17 @@ reset_text_variables (void *)
 }
 
 int
-main( int argc, char** argv)
+main (int argc, char** argv)
 {
   if (argc > 1)
-    _iterationsCount = atol( argv[1]);
+    _iterationsCount = atol (argv[1]);
 
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit( DBSSettings());
-    DBSCreateDatabase( db_name);
-    IDBSHandler& handler = DBSRetrieveDatabase( db_name);
+    DBSInit (DBSSettings());
+    DBSCreateDatabase (db_name);
+    IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
     refTable = &handler.CreateTempTable (1, fieldsDescs);
 
@@ -453,10 +453,10 @@ main( int argc, char** argv)
     th[0].WaitToEnd (true);
 
     handler.ReleaseTable (*refTable);
-    DBSReleaseDatabase( handler);
+    DBSReleaseDatabase (handler);
   }
 
-  DBSRemoveDatabase( db_name);
+  DBSRemoveDatabase (db_name);
   DBSShoutdown();
 
   if (!testResult)

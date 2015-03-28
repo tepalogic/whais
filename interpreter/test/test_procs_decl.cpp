@@ -135,7 +135,7 @@ static const char *MSG_PREFIX[] = {
                                     };
 
 static uint_t
-get_line_from_buffer( const char * buffer, uint_t buff_pos)
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
   uint_t count = 0;
   int result = 1;
@@ -143,13 +143,13 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
 
-  while( count < buff_pos)
+  while (count < buff_pos)
     {
       if (buffer[count] == '\n')
         ++result;
       else if (buffer[count] == 0)
         {
-          assert( 0);
+          assert (0);
         }
       ++count;
     }
@@ -157,7 +157,7 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
 }
 
 void
-my_postman( WH_MESSENGER_CTXT data,
+my_postman (WH_MESSENGER_CTXT data,
             uint_t            buff_pos,
             uint_t            msg_id,
             uint_t            msgType,
@@ -165,16 +165,16 @@ my_postman( WH_MESSENGER_CTXT data,
             va_list           args)
 {
   const char *buffer = (const char *) data;
-  int buff_line = get_line_from_buffer( buffer, buff_pos);
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
-  fprintf( stderr, MSG_PREFIX[msgType]);
-  fprintf( stderr, "%d : line %d: ", msg_id, buff_line);
-  vfprintf( stderr, pMsgFormat, args);
-  fprintf( stderr, "\n");
+  fprintf (stderr, MSG_PREFIX[msgType]);
+  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
+  vfprintf (stderr, pMsgFormat, args);
+  fprintf (stderr, "\n");
 }
 
 bool
-load_unit( ISession&            session,
+load_unit (ISession&            session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {
@@ -182,14 +182,14 @@ load_unit( ISession&            session,
 
   try
   {
-    CompiledBufferUnit unit( unitCode,
+    CompiledBufferUnit unit (unitCode,
                               unitCodeSize,
                               my_postman,
                               unitCode);
-    session.LoadCompiledUnit( unit);
+    session.LoadCompiledUnit (unit);
     std::cout << "Unit loaded successfully!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unable to load unit!" << std::endl;
       result = false;
@@ -199,13 +199,13 @@ load_unit( ISession&            session,
 }
 
 FieldDesc*
-find_field_desc( const char* name,
+find_field_desc (const char* name,
                  FieldDesc*    fields,
                  const uint_t  fields_count)
 {
   for (uint_t index = 0; index < fields_count; ++index)
     {
-      if (strcmp( fields[index].field_name, name) == 0)
+      if (strcmp (fields[index].field_name, name) == 0)
         {
           if (fields[index].field_visited)
             return NULL;
@@ -217,13 +217,13 @@ find_field_desc( const char* name,
 }
 
 ProcDesc*
-find_proc_desc( const char* name,
+find_proc_desc (const char* name,
                 ProcDesc*     procs,
                 const uint_t  procs_count)
 {
   for (uint_t index = 0; index < procs_count; ++index)
     {
-      if (strcmp( procs[index].name, name) == 0)
+      if (strcmp (procs[index].name, name) == 0)
         {
           if (procs[index].desc_visited)
             return NULL;
@@ -235,24 +235,24 @@ find_proc_desc( const char* name,
 }
 
 bool
-test_fields_are_ok( ISession&          session,
+test_fields_are_ok (ISession&          session,
                     const char*       procName,
                     const uint_t        paramId,
                     FieldDesc*          fields,
                     const uint_t        fields_count)
 {
   for (uint_t index = 0;
-       index < session.ProcedurePameterFieldsCount( procName, paramId);
+       index < session.ProcedurePameterFieldsCount (procName, paramId);
        ++index)
     {
-      FieldDesc* field = find_field_desc( 
-                        session.ProcedurePameterFieldName( procName,
+      FieldDesc* field = find_field_desc (
+                        session.ProcedurePameterFieldName (procName,
                                                            paramId,
                                                            index),
                         fields,
                         fields_count
                                           );
-      const uint_t type = session.ProcedurePameterFieldType( procName,
+      const uint_t type = session.ProcedurePameterFieldType (procName,
                                                              paramId,
                                                              index);
       if (field == NULL)
@@ -271,25 +271,25 @@ test_fields_are_ok( ISession&          session,
 
   try
   {
-      session.ProcedurePameterFieldName( procName, paramId, fields_count);
+      session.ProcedurePameterFieldName (procName, paramId, fields_count);
       return false;
   }
-  catch( DBSException&)
+  catch (DBSException&)
   {
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.ProcedurePameterFieldType( procName, paramId, fields_count);
+      session.ProcedurePameterFieldType (procName, paramId, fields_count);
       return false;
   }
-  catch( DBSException&)
+  catch (DBSException&)
   {
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
@@ -297,13 +297,13 @@ test_fields_are_ok( ISession&          session,
 }
 
 bool
-test_func_paramter( ISession&     session,
+test_func_paramter (ISession&     session,
                     const char*  procName,
                     const uint_t   paramId,
                     ParameterDesc* param)
 {
-  const uint_t type     = session.ProcedurePameterRawType( procName, paramId);
-  const uint_t fields_c = session.ProcedurePameterFieldsCount( procName,
+  const uint_t type     = session.ProcedurePameterRawType (procName, paramId);
+  const uint_t fields_c = session.ProcedurePameterFieldsCount (procName,
                                                                paramId);
 
   if (param->desc_visited)
@@ -314,7 +314,7 @@ test_func_paramter( ISession&     session,
     return false;
   else if (type == T_TABLE_MASK)
     {
-      if (! test_fields_are_ok( session,
+      if (! test_fields_are_ok (session,
                                 procName,
                                 paramId,
                                 param->fields,
@@ -330,7 +330,7 @@ test_func_paramter( ISession&     session,
 }
 
 bool
-test_procedures( ISession&     session,
+test_procedures (ISession&     session,
                  ProcDesc       procedures[],
                  const uint_t   procsCount)
 {
@@ -341,13 +341,13 @@ test_procedures( ISession&     session,
        index < session.ProceduresCount();
        ++index)
     {
-      ProcDesc* desc = find_proc_desc( session.ProcedureName( index),
+      ProcDesc* desc = find_proc_desc (session.ProcedureName (index),
                                        procedures,
                                        procsCount);
       if ((desc == NULL) || (desc->desc_visited))
         return false;
-      else if ((session.ProcedureParametersCount( desc->name) != desc->param_count)
-               || (session.ProcedureParametersCount( index) != desc->param_count)
+      else if ((session.ProcedureParametersCount (desc->name) != desc->param_count)
+               || (session.ProcedureParametersCount (index) != desc->param_count)
                || (desc->param_count <= 0))
         {
           return false;
@@ -355,10 +355,10 @@ test_procedures( ISession&     session,
       desc->desc_visited = true;
 
       for (uint_t param = 0;
-           param < session.ProcedureParametersCount( desc->name);
+           param < session.ProcedureParametersCount (desc->name);
            ++param)
         {
-          if (! test_func_paramter( session,
+          if (! test_func_paramter (session,
                                     desc->name,
                                     param,
                                     &desc->params [param]))
@@ -382,28 +382,28 @@ test_procedures( ISession&     session,
 
   try
   {
-      session.ProcedureName( procsCount);
+      session.ProcedureName (procsCount);
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.ProcedureParametersCount( procsCount);
+      session.ProcedureParametersCount (procsCount);
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.ProcedureParametersCount( "some_weird_name");
+      session.ProcedureParametersCount ("some_weird_name");
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
@@ -415,44 +415,44 @@ main()
 {
   bool success = true;
   {
-    DBSInit( DBSSettings());
+    DBSInit (DBSSettings());
   }
 
-  DBSCreateDatabase( admin);
-  DBSCreateDatabase( test_db1);
-  InitInterpreter();
+  DBSCreateDatabase (admin);
+  DBSCreateDatabase (test_db1);
+  InitInterpreter ();
 
   {
-    ISession& adminSession = GetInstance( NULL);
-    ISession& userSession  = GetInstance( test_db1);
+    ISession& adminSession = GetInstance (NULL);
+    ISession& userSession  = GetInstance (test_db1);
 
     success = true;
-    success = success && load_unit( adminSession,
+    success = success && load_unit (adminSession,
                                     commonCode,
                                     sizeof commonCode);
-    success = success && load_unit( userSession,
+    success = success && load_unit (userSession,
                                     userCode,
                                     sizeof userCode);
 
     std::cout << "Testing admin procedures ... ";
-    success = success && test_procedures( adminSession,
+    success = success && test_procedures (adminSession,
                                           admin_procs,
                                           ADMIN_PROCS_COUNT);
     std::cout << (success ? "OK" : "FAIL") << std::endl;
 
     std::cout << "Testing user procedures ... ";
-    success = success && test_procedures( userSession,
+    success = success && test_procedures (userSession,
                                           user_procs,
                                           USERS_PROCS_COUNT);
     std::cout << (success ? "OK" : "FAIL") << std::endl;
 
-    ReleaseInstance( adminSession);
-    ReleaseInstance( userSession);
+    ReleaseInstance (adminSession);
+    ReleaseInstance (userSession);
   }
 
-  CleanInterpreter();
-  DBSRemoveDatabase( admin);
-  DBSRemoveDatabase( test_db1);
+  CleanInterpreter ();
+  DBSRemoveDatabase (admin);
+  DBSRemoveDatabase (test_db1);
   DBSShoutdown();
 
   if (!success)

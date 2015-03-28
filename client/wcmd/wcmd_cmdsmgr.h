@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 typedef void* ENTRY_CMD_CONTEXT;
-typedef bool( *ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
+typedef bool (*ENTRY_CMD) (const std::string& cmdLine, ENTRY_CMD_CONTEXT);
 
 
 
@@ -52,27 +52,27 @@ struct CmdEntry
 
 
 void
-InitCmdManager();
+InitCmdManager ();
 
 
 void
-RegisterCommand( const CmdEntry& entry);
+RegisterCommand (const CmdEntry& entry);
 
 
 const CmdEntry*
-FindCmdEntry( const char* const pCommand);
+FindCmdEntry (const char* const pCommand);
 
 
 const std::string
-CmdLineNextToken( const std::string& cmdLine, size_t& inoutPosition);
+CmdLineNextToken (const std::string& cmdLine, size_t& inoutPosition);
 
 
 void
-printException( std::ostream& outputStream, const whais::Exception& e);
+printException (std::ostream& outputStream, const whais::Exception& e);
 
 
 std::string
-wcmd_decode_typeinfo( unsigned int type);
+wcmd_decode_typeinfo (unsigned int type);
 
 #endif // WCMD_CMDSMGR_H_
 

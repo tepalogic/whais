@@ -17,8 +17,8 @@
 using namespace std;
 
 extern const char* DefaultDatabaseName();
-extern const uint_t  DefaultUserId();
-extern const char* DefaultUserPassword();
+extern const uint_t  DefaultUserId ();
+extern const char* DefaultUserPassword ();
 
 static const char DEFAULT_HOST_SEREVR[]   = "localhost";
 static const char DEFAULT_PORT_SERVER[]   = "1761";
@@ -33,7 +33,7 @@ static const char ARG_PASSWORD[]          = "-k";
 static const char ARG_FRAMESIZE[]         = "--fs";
 
 static void
-print_usage( const char* cmd)
+print_usage (const char* cmd)
 {
   cout << cmd << ' ';
   cout << ARG_HOST_NAME << " hostname ";
@@ -44,38 +44,38 @@ print_usage( const char* cmd)
 }
 
 bool
-tc_settup_connection( int              argc,
+tc_settup_connection (int              argc,
                       const char**     argv,
                       WH_CONNECTION*   pHnd)
 {
   const char*   host          = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;
   const char*   database      = DefaultDatabaseName();
-  uint_t        userid        = DefaultUserId();
-  const char*   password      = DefaultUserPassword();
+  uint_t        userid        = DefaultUserId ();
+  const char*   password      = DefaultUserPassword ();
   uint_t        frameSize     = DEFAULT_FRAME_SIZE;
 
   uint_t status = WCS_OK;
 
   for (int argi = 1; argi < argc; ++argi)
     {
-      if (strcmp( argv[argi], ARG_ROOT) == 0)
+      if (strcmp (argv[argi], ARG_ROOT) == 0)
         userid = ROOT_ID;
-      else if (strcmp( argv[argi], ARG_HOST_NAME) == 0)
+      else if (strcmp (argv[argi], ARG_HOST_NAME) == 0)
         host = argv[++argi];
-      else if (strcmp( argv[argi], ARG_PORT) == 0)
+      else if (strcmp (argv[argi], ARG_PORT) == 0)
         port = argv[++argi];
-      else if (strcmp( argv[argi], ARG_DATABASE) == 0)
+      else if (strcmp (argv[argi], ARG_DATABASE) == 0)
         database = argv[++argi];
-      else if (strcmp( argv[argi], ARG_PASSWORD) == 0)
+      else if (strcmp (argv[argi], ARG_PASSWORD) == 0)
         password = argv[++argi];
-      else if (strcmp( argv[argi], ARG_FRAMESIZE) == 0)
-        frameSize = atoi( argv[++argi]);
+      else if (strcmp (argv[argi], ARG_FRAMESIZE) == 0)
+        frameSize = atoi (argv[++argi]);
       else
         {
           cout << "Dont't know what to do with argument '";
           cout << argv[argi] << "'\n";
-          print_usage( argv[0]);
+          print_usage (argv[0]);
 
           return false;
         }
@@ -84,7 +84,7 @@ tc_settup_connection( int              argc,
   if (host == NULL)
     {
       cout << "No host name supplied!\n";
-      print_usage( argv[0]);
+      print_usage (argv[0]);
 
       return false;
     }
@@ -97,10 +97,10 @@ tc_settup_connection( int              argc,
   cout << "Frame size: " << frameSize << endl;
   cout << "Connecting ... ";
 
-  status = WConnect( host, port, database, password, userid, frameSize, pHnd);
+  status = WConnect (host, port, database, password, userid, frameSize, pHnd);
   if (status != WCS_OK)
     {
-      cout << "FAIL( 0x" << hex << status << dec << ")\n";
+      cout << "FAIL (0x" << hex << status << dec << ")\n";
       return false;
     }
 
@@ -110,9 +110,9 @@ tc_settup_connection( int              argc,
 
 
 static string
-decode_basic_type( const uint16_t type)
+decode_basic_type (const uint16_t type)
 {
-  switch( GET_BASIC_TYPE( type))
+  switch (GET_BASIC_TYPE (type))
   {
   case T_BOOL:
     return "BOOL";
@@ -166,7 +166,7 @@ decode_basic_type( const uint16_t type)
     return "UNDEFINED";
 
   default:
-    assert( false);
+    assert (false);
   }
 
   return NULL;
@@ -174,12 +174,12 @@ decode_basic_type( const uint16_t type)
 
 
 static string
-decode_array_typeinfo( unsigned int type)
+decode_array_typeinfo (unsigned int type)
 {
   string result;
   bool   arrayDesc = false;
 
-  if (IS_ARRAY( type))
+  if (IS_ARRAY (type))
     {
       result    += "ARRAY";
       arrayDesc  = true;
@@ -187,45 +187,45 @@ decode_array_typeinfo( unsigned int type)
 
   if (arrayDesc)
     {
-      if (GET_BASIC_TYPE( type) == WHC_TYPE_NOTSET)
+      if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
         return result;
 
       result += " OF ";
-      result += decode_basic_type( GET_BASIC_TYPE( type));
+      result += decode_basic_type (GET_BASIC_TYPE (type));
 
       return result;
     }
 
-  return decode_basic_type( GET_BASIC_TYPE( type));
+  return decode_basic_type (GET_BASIC_TYPE (type));
 }
 
 static string
-decode_field_typeinfo( unsigned int type)
+decode_field_typeinfo (unsigned int type)
 {
   string result;
 
-  if (GET_FIELD_TYPE( type) == T_UNDETERMINED)
+  if (GET_FIELD_TYPE (type) == T_UNDETERMINED)
     return "FIELD";
 
-  return "FIELD OF " + decode_array_typeinfo( GET_FIELD_TYPE( type));
+  return "FIELD OF " + decode_array_typeinfo (GET_FIELD_TYPE (type));
 }
 
 
 string
-decode_typeinfo( unsigned int type)
+decode_typeinfo (unsigned int type)
 {
   string result;
 
-  if (IS_TABLE( type))
+  if (IS_TABLE (type))
     return "TABLE";
 
-  else if (IS_FIELD( type))
-    return decode_field_typeinfo( type);
+  else if (IS_FIELD (type))
+    return decode_field_typeinfo (type);
 
-  else if (IS_ARRAY( type))
-    return decode_array_typeinfo( type);
+  else if (IS_ARRAY (type))
+    return decode_array_typeinfo (type);
 
-  return decode_basic_type( type);
+  return decode_basic_type (type);
 }
 
 

@@ -33,13 +33,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 template<typename TE, typename TC> int64_t
-partition( int64_t      from,
+partition (int64_t      from,
            int64_t      to,
            TC&          inoutContainer,
            bool* const  outAlreadySorted)
 {
-  assert( from < to);
-  assert( to < _SC (int64_t, inoutContainer.Count()));
+  assert (from < to);
+  assert (to < _SC (int64_t, inoutContainer.Count()));
 
   *outAlreadySorted = true;
 
@@ -99,13 +99,13 @@ partition( int64_t      from,
 
 
 template<typename TE, typename TC> int64_t
-partition_reverse( int64_t      from,
+partition_reverse (int64_t      from,
                    int64_t      to,
                    TC&          inoutContainer,
                    bool* const  outAlreadySorted)
 {
-  assert( from < to);
-  assert( to < _SC (int64_t, inoutContainer.Count()));
+  assert (from < to);
+  assert (to < _SC (int64_t, inoutContainer.Count()));
 
   *outAlreadySorted = true;
 
@@ -165,8 +165,8 @@ partition_reverse( int64_t      from,
 
 struct _partition_t
 {
-  _partition_t( int64_t from, int64_t to)
-    : mFrom( from),
+  _partition_t (int64_t from, int64_t to)
+    : mFrom (from),
       mTo (to)
   {
     assert (from < to);
@@ -177,18 +177,18 @@ struct _partition_t
 
 
 template<typename TE, typename TC> void
-quick_sort( int64_t           from,
+quick_sort (int64_t           from,
             int64_t           to,
             const bool        reverse,
             TC&               inoutContainer)
 {
-  assert( from <= to);
+  assert (from <= to);
 
   if (from == to)
     return ;
 
   std::vector<_partition_t> partStack;
-  partStack.push_back(  _partition_t( from, to));
+  partStack.push_back ( _partition_t (from, to));
 
   do
     {
@@ -216,13 +216,13 @@ quick_sort( int64_t           from,
       if ( ! alreadySorted)
         {
           if (pivot < current.mTo)
-            partStack.push_back( _partition_t( pivot, current.mTo));
+            partStack.push_back (_partition_t (pivot, current.mTo));
 
           if (current.mFrom < pivot - 1)
-            partStack.push_back( _partition_t( current.mFrom, pivot - 1));
+            partStack.push_back (_partition_t (current.mFrom, pivot - 1));
         }
     }
-  while( partStack.size() > 0);
+  while (partStack.size() > 0);
 }
 
 

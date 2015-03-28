@@ -34,13 +34,13 @@ static uint64_t _current = XORSHIFT_DEFAULT_SEED;
 uint64_t
 wh_rnd_seed()
 {
-  assert( _seed != 0);
+  assert (_seed != 0);
   return _seed;
 }
 
 
 void
-wh_rnd_set_seed( uint64_t seed)
+wh_rnd_set_seed (uint64_t seed)
 {
   if (seed == 0)
     _seed = XORSHIFT_DEFAULT_SEED;
@@ -58,7 +58,7 @@ wh_rnd()
   current ^= current >> 7;
   current ^= current << 9;
 
-  assert( current != 0);
+  assert (current != 0);
   _current = current;
 
   return current - 1;

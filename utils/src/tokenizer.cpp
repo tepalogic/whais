@@ -31,11 +31,11 @@ namespace whais
 {
 
 const std::string
-NextToken( const std::string&     text,
+NextToken (const std::string&     text,
            size_t&                inoutOff,
            const string&          delims)
 {
-  inoutOff = text.find_first_not_of( delims, inoutOff);
+  inoutOff = text.find_first_not_of (delims, inoutOff);
 
   if (inoutOff == string::npos)
     {
@@ -43,10 +43,10 @@ NextToken( const std::string&     text,
       return string();
     }
 
-  assert( inoutOff != string::npos);
-  assert( inoutOff < text.length());
+  assert (inoutOff != string::npos);
+  assert (inoutOff < text.length());
 
-  size_t lastPos = text.find_first_of( delims, inoutOff);
+  size_t lastPos = text.find_first_of (delims, inoutOff);
 
   if (lastPos == string::npos)
     lastPos = text.length() - 1;
@@ -54,9 +54,9 @@ NextToken( const std::string&     text,
   else
     --lastPos;
 
-  assert( inoutOff <= lastPos);
+  assert (inoutOff <= lastPos);
 
-  string result = text.substr( inoutOff, lastPos - inoutOff + 1);
+  string result = text.substr (inoutOff, lastPos - inoutOff + 1);
 
   inoutOff = lastPos + 1;
 

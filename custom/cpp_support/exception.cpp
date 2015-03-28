@@ -34,22 +34,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace whais {
 
-Exception::Exception( uint32_t        code,
+Exception::Exception (uint32_t        code,
                       const char*     file,
                       uint32_t        line)
   : mErrorMessage(),
-    mFile( file),
-    mLine( line),
-    mCode( code)
+    mFile (file),
+    mLine (line),
+    mCode (code)
 {
 }
 
 
-Exception::Exception( const Exception& source)
-  : mErrorMessage( source.mErrorMessage),
-    mFile( source.mFile),
-    mLine( source.mLine),
-    mCode( source.mCode)
+Exception::Exception (const Exception& source)
+  : mErrorMessage (source.mErrorMessage),
+    mFile (source.mFile),
+    mLine (source.mLine),
+    mCode (source.mCode)
 {
 }
 
@@ -74,7 +74,7 @@ Exception::Message() const
 
 
 void
-Exception::Message( const char* fmtMsg, std::va_list vl)
+Exception::Message (const char* fmtMsg, std::va_list vl)
 {
   char errMsg[512];
 
@@ -86,18 +86,18 @@ Exception::Message( const char* fmtMsg, std::va_list vl)
 
 
 void
-Exception::Message( const char* fmtMsg, ... )
+Exception::Message (const char* fmtMsg, ... )
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
   else
-    mErrorMessage.clear();
+    mErrorMessage.clear ();
 }
 
 
@@ -117,20 +117,20 @@ Exception::Line() const
 
 
 
-FileException::FileException( const uint32_t    code,
+FileException::FileException (const uint32_t    code,
                               const char*       file,
                               uint32_t          line,
                               const char*       fmtMsg,
                               ...)
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
 }
 
@@ -138,7 +138,7 @@ FileException::FileException( const uint32_t    code,
 Exception*
 FileException::Clone() const
 {
-  return new FileException( *this);
+  return new FileException (*this);
 }
 
 
@@ -157,20 +157,20 @@ FileException::Description() const
 
 
 
-LockException::LockException( const uint32_t    code,
+LockException::LockException (const uint32_t    code,
                               const char*       file,
                               uint32_t          line,
                               const char*       fmtMsg,
                               ...)
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
 }
 
@@ -178,7 +178,7 @@ LockException::LockException( const uint32_t    code,
 Exception*
 LockException::Clone() const
 {
-  return new LockException( *this);
+  return new LockException (*this);
 }
 
 
@@ -197,20 +197,20 @@ LockException::Description() const
 
 
 
-ThreadException::ThreadException( const uint32_t    code,
+ThreadException::ThreadException (const uint32_t    code,
                                   const char*       file,
                                   uint32_t          line,
                                   const char*       fmtMsg,
                                   ... )
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
 }
 
@@ -218,7 +218,7 @@ ThreadException::ThreadException( const uint32_t    code,
 Exception*
 ThreadException::Clone() const
 {
-  return new ThreadException( *this);
+  return new ThreadException (*this);
 }
 
 
@@ -238,20 +238,20 @@ ThreadException::Description() const
 
 
 
-SocketException::SocketException( const uint32_t        code,
+SocketException::SocketException (const uint32_t        code,
                                   const char*           file,
                                   uint32_t              line,
                                   const char*           fmtMsg,
                                   ...)
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
     if (fmtMsg != NULL)
       {
         va_list vl;
 
-        va_start( vl, fmtMsg);
-        this->Message( fmtMsg, vl);
-        va_end( vl);
+        va_start (vl, fmtMsg);
+        this->Message (fmtMsg, vl);
+        va_end (vl);
       }
 }
 
@@ -259,7 +259,7 @@ SocketException::SocketException( const uint32_t        code,
 Exception*
 SocketException::Clone() const
 {
-  return new SocketException( *this);
+  return new SocketException (*this);
 }
 
 

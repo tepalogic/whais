@@ -34,7 +34,7 @@ namespace pastra {
 
 
 bool
-prototype_fix_table( DbsHandler&                  dbs,
+prototype_fix_table (DbsHandler&                  dbs,
                      const std::string&           name,
                      FIX_ERROR_CALLBACK           fixCallback);
 
@@ -42,14 +42,14 @@ prototype_fix_table( DbsHandler&                  dbs,
 class PersistentTable : public PrototypeTable
 {
 public:
-  PersistentTable( DbsHandler& dbs, const std::string& name);
+  PersistentTable (DbsHandler& dbs, const std::string& name);
 
-  PersistentTable( DbsHandler&                     dbs,
+  PersistentTable (DbsHandler&                     dbs,
                    const std::string&              name,
                    const DBSFieldDescriptor* const fields,
                    const uint_t                    fieldsCount);
 
-  PersistentTable( const PrototypeTable& prototype);
+  PersistentTable (const PrototypeTable& prototype);
 
   virtual ~PersistentTable();
 
@@ -64,11 +64,11 @@ public:
 protected:
   virtual void MakeHeaderPersistent();
 
-  virtual IDataContainer* CreateIndexContainer( const FIELD_INDEX field);
+  virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
 
-  virtual IDataContainer& RowsContainer();
+  virtual IDataContainer& RowsContainer ();
 
-  virtual IDataContainer& TableContainer();
+  virtual IDataContainer& TableContainer ();
 
   virtual VariableSizeStore& VSStore();
 
@@ -82,19 +82,19 @@ protected:
   bool                         mRemoved;
 
 private:
-  void InitFromFile( const std::string& tableName);
+  void InitFromFile (const std::string& tableName);
 
   void InitIndexedFields();
 
   void InitVariableStorages();
 
-  void CheckTableValues( FIX_ERROR_CALLBACK fixCallback);
+  void CheckTableValues (FIX_ERROR_CALLBACK fixCallback);
 
 public:
-  static bool ValidateTable( const std::string&         path,
+  static bool ValidateTable (const std::string&         path,
                              const std::string&         name);
 
-  static bool RepairTable( DbsHandler&                 dbs,
+  static bool RepairTable (DbsHandler&                 dbs,
                            const std::string&          name,
                            const std::string&          path,
                            FIX_ERROR_CALLBACK          fixCallback);
@@ -106,10 +106,10 @@ class TemporalTable : public PrototypeTable
 {
 public:
 
-  TemporalTable( DbsHandler&                     dbs,
+  TemporalTable (DbsHandler&                     dbs,
                  const DBSFieldDescriptor* const fields,
                  const FIELD_INDEX               fieldsCount);
-  TemporalTable( const PrototypeTable& protoype);
+  TemporalTable (const PrototypeTable& protoype);
 
   virtual ~TemporalTable();
 
@@ -123,11 +123,11 @@ protected:
 
   virtual void MakeHeaderPersistent();
 
-  virtual IDataContainer* CreateIndexContainer( const FIELD_INDEX field);
+  virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
 
-  virtual IDataContainer& RowsContainer();
+  virtual IDataContainer& RowsContainer ();
 
-  virtual IDataContainer& TableContainer();
+  virtual IDataContainer& TableContainer ();
 
   virtual VariableSizeStore& VSStore();
 

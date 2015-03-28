@@ -93,17 +93,17 @@ GlobalValueEntry no_fileds_types[] =
     };
 
 static bool
-test_global_name_match( const char* glb_name)
+test_global_name_match (const char* glb_name)
 {
   const char suffix[] = "global_var_this_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   char buffer[1024];
-  const uint_t glbsCount = sizeof( no_fileds_types)/sizeof( no_fileds_types[0]);
+  const uint_t glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   for (uint_t i = 0; i < glbsCount; ++i)
     {
-      strcpy( buffer, no_fileds_types[i].name);
-      strcat( buffer, suffix);
-      if (strcmp( buffer, glb_name) == 0)
+      strcpy (buffer, no_fileds_types[i].name);
+      strcat (buffer, suffix);
+      if (strcmp (buffer, glb_name) == 0)
         {
           if (no_fileds_types[i].visited)
             return false;
@@ -119,17 +119,17 @@ test_global_name_match( const char* glb_name)
 }
 
 static bool
-test_global_values_list( WH_CONNECTION hnd)
+test_global_values_list (WH_CONNECTION hnd)
 {
   const char* recvGlbName = NULL;
-  const uint_t  glbsCount = sizeof( no_fileds_types)/sizeof( no_fileds_types[0]);
+  const uint_t  glbsCount = sizeof (no_fileds_types)/sizeof (no_fileds_types[0]);
 
   uint_t globalsCount;
   uint_t index = 0;
 
   cout << "Testing the global values listing ... ";
 
-  if ((WStartGlobalsList( hnd, &globalsCount) != WCS_OK)
+  if ((WStartGlobalsList (hnd, &globalsCount) != WCS_OK)
       || (globalsCount != glbsCount))
     {
       goto test_global_values_list_error;
@@ -137,17 +137,17 @@ test_global_values_list( WH_CONNECTION hnd)
 
   do
     {
-      if (WFetchGlobal( hnd, &recvGlbName) != WCS_OK)
+      if (WFetchGlobal (hnd, &recvGlbName) != WCS_OK)
         goto test_global_values_list_error;
       else if ((recvGlbName != NULL)
-               && ! test_global_name_match( recvGlbName))
+               && ! test_global_name_match (recvGlbName))
         {
           goto test_global_values_list_error;
         }
 
       ++index; //Only good for conditional breakpoints.
     }
-  while( recvGlbName != NULL);
+  while (recvGlbName != NULL);
 
   for (index = 0; index < glbsCount; ++index)
     {
@@ -165,29 +165,29 @@ test_global_values_list_error:
 }
 
 static bool
-test_for_errors( WH_CONNECTION hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t          glbsCount;
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WStartGlobalsList( NULL, &glbsCount) != WCS_INVALID_ARGS)
-      || (WStartGlobalsList( hnd, NULL) != WCS_INVALID_ARGS)
-      || (WStartGlobalsList( NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartGlobalsList (NULL, &glbsCount) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList (NULL, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WFetchGlobal( hnd, &nameFetched) != WCS_INVALID_ARGS)
+  else if (WFetchGlobal (hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
-  else if (WStartGlobalsList( hnd, &glbsCount) != WCS_OK)
+  else if (WStartGlobalsList (hnd, &glbsCount) != WCS_OK)
     goto test_for_errors_fail;
-  else if ((WFetchGlobal( NULL, NULL) != WCS_INVALID_ARGS)
-            || (WFetchGlobal( NULL, &nameFetched) != WCS_INVALID_ARGS)
-            || (WFetchGlobal( hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchGlobal (NULL, NULL) != WCS_INVALID_ARGS)
+            || (WFetchGlobal (NULL, &nameFetched) != WCS_INVALID_ARGS)
+            || (WFetchGlobal (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WFetchGlobal( hnd, &nameFetched) != WCS_OK)
+  else if (WFetchGlobal (hnd, &nameFetched) != WCS_OK)
     goto test_for_errors_fail;
 
   cout << "OK\n";
@@ -207,28 +207,28 @@ DefaultDatabaseName()
 }
 
 const uint_t
-DefaultUserId()
+DefaultUserId ()
 {
   return 0;
 }
 
 const char*
-DefaultUserPassword()
+DefaultUserPassword ()
 {
   return "root_test_password";
 }
 
 int
-main( int argc, const char** argv)
+main (int argc, const char** argv)
 {
   WH_CONNECTION       hnd = NULL;
 
-  bool success = tc_settup_connection( argc, argv, &hnd);
+  bool success = tc_settup_connection (argc, argv, &hnd);
 
-  success = success && test_for_errors( hnd);
-  success = success && test_global_values_list( hnd);
+  success = success && test_for_errors (hnd);
+  success = success && test_global_values_list (hnd);
 
-  WClose( hnd);
+  WClose (hnd);
 
   if (!success)
     {

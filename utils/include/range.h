@@ -22,13 +22,13 @@
 namespace whais {
 
 template<typename T>
-static inline T Prev( const T& t)
+static inline T Prev (const T& t)
 {
   return t.Prev();
 }
 
 template<typename T>
-static inline T Next( const T& t)
+static inline T Next (const T& t)
 {
   return t.Next();
 }
@@ -56,13 +56,13 @@ struct Interval
   {
   }
 
-  explicit Interval( const T& val)
-    : mFrom( val),
+  explicit Interval (const T& val)
+    : mFrom (val),
       mTo   (val)
   {
   }
 
-  Interval( const T& from, const T& to)
+  Interval (const T& from, const T& to)
   {
     if (from <= to)
       mFrom = from, mTo = to;
@@ -74,7 +74,7 @@ struct Interval
 
   bool operator== (const Interval& val) const
   {
-    return( mFrom == val.mFrom) && (mTo == val.mTo);
+    return (mFrom == val.mFrom) && (mTo == val.mTo);
   }
 
 
@@ -365,17 +365,17 @@ Next<uint64_t> (const uint64_t& t)
 template<class T>
 struct Range
 {
-  void Join( const Interval<T>& v)
+  void Join (const Interval<T>& v)
   {
-    size_t bOffset = FindJoinInsertPlace( v.mFrom);
+    size_t bOffset = FindJoinInsertPlace (v.mFrom);
 
     if (bOffset == mIntervals.size())
-      mIntervals.push_back( v);
+      mIntervals.push_back (v);
 
     else if (v.mFrom < mIntervals[bOffset].mFrom)
       {
-        if (v.mTo < Prev( mIntervals[bOffset].mFrom))
-          mIntervals.insert( mIntervals.begin() + bOffset, v);
+        if (v.mTo < Prev (mIntervals[bOffset].mFrom))
+          mIntervals.insert (mIntervals.begin() + bOffset, v);
 
         else
           mIntervals[bOffset].mFrom = v.mFrom;
@@ -383,47 +383,47 @@ struct Range
 
     if (bOffset > 0)
       {
-        if (mIntervals[bOffset - 1].mTo  == Prev( mIntervals[bOffset].mFrom))
+        if (mIntervals[bOffset - 1].mTo  == Prev (mIntervals[bOffset].mFrom))
           {
             mIntervals[bOffset - 1].mTo = mIntervals[bOffset].mTo;
-            mIntervals.erase(  mIntervals.begin() + bOffset--);
+            mIntervals.erase ( mIntervals.begin() + bOffset--);
           }
       }
 
 
-    size_t lOffset = FindJoinInsertPlace( v.mTo);
+    size_t lOffset = FindJoinInsertPlace (v.mTo);
 
     if (lOffset == mIntervals.size())
       {
         mIntervals[bOffset].mTo = v.mTo;
-        mIntervals.resize( bOffset + 1);
+        mIntervals.resize (bOffset + 1);
       }
-    else if (Prev( mIntervals[lOffset].mFrom) <= v.mTo)
+    else if (Prev (mIntervals[lOffset].mFrom) <= v.mTo)
       {
         mIntervals[bOffset].mTo = mIntervals[lOffset].mTo;
 
-        mIntervals.erase( mIntervals.begin() + (bOffset + 1),
+        mIntervals.erase (mIntervals.begin() + (bOffset + 1),
                           mIntervals.begin() + (lOffset + 1));
       }
     else
       {
         mIntervals[bOffset].mTo = v.mTo;
-        mIntervals.erase( mIntervals.begin() + (bOffset + 1),
+        mIntervals.erase (mIntervals.begin() + (bOffset + 1),
                           mIntervals.begin() + lOffset);
       }
   }
 
-  Range& Join( const Range& r)
+  Range& Join (const Range& r)
   {
     const size_t count = r.mIntervals.size();
 
     for (size_t i = 0; i < count; ++i)
-      Join( r.mIntervals[i]);
+      Join (r.mIntervals[i]);
 
     return *this;
   }
 
-  Range& Match( const Range& r)
+  Range& Match (const Range& r)
   {
     size_t offset  = mIntervals.size();
     size_t offsetR = r.mIntervals.size();
@@ -433,12 +433,12 @@ struct Range
 
     else if (offsetR == 0)
       {
-        mIntervals.resize( 0);
+        mIntervals.resize (0);
 
         return  *this;
       }
 
-    while( (offsetR > 0) && (offset > 0))
+    while ((offsetR > 0) && (offset > 0))
       {
         --offsetR, --offset;
 
@@ -450,19 +450,19 @@ struct Range
 
         else if (v.mTo < curr.mFrom)
           {
-            mIntervals.erase( mIntervals.begin() + offset);
+            mIntervals.erase (mIntervals.begin() + offset);
             ++offsetR;
           }
         else
           {
-            Isolate( offset, v);
+            Isolate (offset, v);
             ++offsetR;
           }
       }
 
-     assert( offset <= mIntervals.size());
+     assert (offset <= mIntervals.size());
 
-     mIntervals.erase( mIntervals.begin(), mIntervals.begin() + offset);
+     mIntervals.erase (mIntervals.begin(), mIntervals.begin() + offset);
 
      return *this;
   }
@@ -479,15 +479,15 @@ struct Range
 
     if (rangeSize == 0)
       {
-        mIntervals.push_back( v);
+        mIntervals.push_back (v);
 
         return *this;
       }
     else if ((mIntervals[0].mFrom == min) && (mIntervals[0].mTo == max))
       {
-        assert( rangeSize == 1);
+        assert (rangeSize == 1);
 
-        mIntervals.resize( 0);
+        mIntervals.resize (0);
 
         return *this;
       }
@@ -495,21 +495,21 @@ struct Range
       {
         size_t offset = 0;
 
-        while( offset < rangeSize)
+        while (offset < rangeSize)
           {
             if (mIntervals[offset].mTo == max)
               {
-                assert( offset == rangeSize - 1);
+                assert (offset == rangeSize - 1);
 
                 mIntervals.pop_back();
 
                 break;
               }
 
-            v.mFrom = Next( mIntervals[offset].mTo);
+            v.mFrom = Next (mIntervals[offset].mTo);
 
             if (offset < rangeSize - 1)
-              v.mTo = Prev( mIntervals[offset + 1].mFrom);
+              v.mTo = Prev (mIntervals[offset + 1].mFrom);
 
             else
               v.mTo = max;
@@ -522,31 +522,31 @@ struct Range
         T      last;
         size_t offset   = 0;
 
-        while( offset < rangeSize)
+        while (offset < rangeSize)
           {
-            v.mTo = Prev( mIntervals[offset].mFrom);
+            v.mTo = Prev (mIntervals[offset].mFrom);
 
             last = mIntervals[offset].mTo;
 
             mIntervals[offset] = v;
             if (last == max)
               {
-                assert( offset == (rangeSize - 1));
+                assert (offset == (rangeSize - 1));
 
                 break;
               }
             else
-              v.mFrom = Next( last);
+              v.mFrom = Next (last);
 
             ++offset;
           }
 
         if (last != max)
           {
-            assert( v.mFrom == Next( last));
+            assert (v.mFrom == Next (last));
 
             v.mTo   = max;
-            mIntervals.push_back( v);
+            mIntervals.push_back (v);
           }
       }
 
@@ -577,12 +577,12 @@ struct Range
   }
 
 
-  void Clear()
+  void Clear ()
   {
-    mIntervals.resize( 0);
+    mIntervals.resize (0);
   }
 
-  size_t FindJoinInsertPlace( const T& v)
+  size_t FindJoinInsertPlace (const T& v)
   {
     size_t offset = mIntervals.size();
 
@@ -606,26 +606,26 @@ struct Range
 
         offset = (last + first) / 2;
       }
-    while( first < last);
+    while (first < last);
 
-    assert( offset == mIntervals.size() ||
+    assert (offset == mIntervals.size() ||
             (v <= mIntervals[offset].mTo));
-    assert( (offset == 0)
+    assert ((offset == 0)
             || (mIntervals[offset - 1].mTo < v));
 
     return offset;
   }
 
-  void Isolate( size_t& offset, const Interval<T>& v)
+  void Isolate (size_t& offset, const Interval<T>& v)
   {
-    assert( v.mFrom <= v.mTo);
-    assert( offset < mIntervals.size());
+    assert (v.mFrom <= v.mTo);
+    assert (offset < mIntervals.size());
 
     Interval<T> curr = mIntervals[offset];
 
-    assert( curr.mFrom <= curr.mTo);
-    assert( v.mTo >= curr.mFrom);
-    assert( v.mFrom <= curr.mTo);
+    assert (curr.mFrom <= curr.mTo);
+    assert (v.mTo >= curr.mFrom);
+    assert (v.mFrom <= curr.mTo);
 
     if (v.mFrom <= curr.mFrom)
       {
@@ -634,9 +634,9 @@ struct Range
       }
     else
       {
-        assert( v.mFrom <= curr.mTo);
+        assert (v.mFrom <= curr.mTo);
 
-        curr.mTo = Prev( v.mFrom);
+        curr.mTo = Prev (v.mFrom);
 
         if (mIntervals[offset].mTo <= v.mTo)
             mIntervals[offset].mFrom = v.mFrom;
@@ -644,7 +644,7 @@ struct Range
         else
           mIntervals[offset] = v;
 
-        mIntervals.insert( mIntervals.begin() + offset, curr);
+        mIntervals.insert (mIntervals.begin() + offset, curr);
         ++offset;
       }
   }

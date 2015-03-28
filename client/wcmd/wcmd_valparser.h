@@ -40,19 +40,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 struct FieldValuesUpdate
 {
   template<typename T>
-  FieldValuesUpdate( const uint_t field, const uint_t type, const T& value)
-    : mFieldId( field),
-      mFieldType( type)
+  FieldValuesUpdate (const uint_t field, const uint_t type, const T& value)
+    : mFieldId (field),
+      mFieldType (type)
   {
-    assert( sizeof( value) <= sizeof( mValue));
-    _placement_new( mValue, value);
+    assert (sizeof (value) <= sizeof (mValue));
+    _placement_new (mValue, value);
   }
 
-  FieldValuesUpdate( const FieldValuesUpdate& src)
-    : mFieldId( src.mFieldId),
-      mFieldType( src.mFieldType)
+  FieldValuesUpdate (const FieldValuesUpdate& src)
+    : mFieldId (src.mFieldId),
+      mFieldType (src.mFieldType)
   {
-    memcpy( mValue, src.mValue, sizeof( mValue));
+    memcpy (mValue, src.mValue, sizeof (mValue));
 
     _CC (uint_t&, src.mFieldType) = T_UNKNOWN;
   }
@@ -62,7 +62,7 @@ struct FieldValuesUpdate
     if (this != &src)
     {
       this->~FieldValuesUpdate();
-      _placement_new( this, src);
+      _placement_new (this, src);
     }
 
     return *this;
@@ -83,11 +83,11 @@ struct FieldValuesSelection
   FieldValuesSelection();
   ~FieldValuesSelection();
 
-  FieldValuesSelection( const FieldValuesSelection& src)
-    : mFieldId( src.mFieldId),
-      mFieldType( src.mFieldType),
-      mSearchNull( src.mSearchNull),
-      mRange( src.mRange)
+  FieldValuesSelection (const FieldValuesSelection& src)
+    : mFieldId (src.mFieldId),
+      mFieldType (src.mFieldType),
+      mSearchNull (src.mSearchNull),
+      mRange (src.mRange)
     {
       _CC (void*&, src.mRange) = NULL;
     }
@@ -97,7 +97,7 @@ struct FieldValuesSelection
     if (this != &src)
       {
         this->~FieldValuesSelection();
-        _placement_new( this, src);
+        _placement_new (this, src);
       }
 
     return *this;
@@ -120,7 +120,7 @@ struct RowsSelection
 
 
 bool
-ParseRowsSelectionClause( std::ostream* const    os,
+ParseRowsSelectionClause (std::ostream* const    os,
                           whais::ITable&       table,
                           const char*            str,
                           RowsSelection&         outRowsSelection);
@@ -128,26 +128,26 @@ ParseRowsSelectionClause( std::ostream* const    os,
 
 
 bool
-ParseFieldUpdateValues( std::ostream* const              os,
+ParseFieldUpdateValues (std::ostream* const              os,
                         whais::ITable&                 table,
                         const char*                      str,
                         size_t*                          outSize,
                         std::vector<FieldValuesUpdate>&  outUpdates);
 
 bool
-UpdateTableRow( std::ostream const*                   os,
+UpdateTableRow (std::ostream const*                   os,
                 whais::ITable&                      table,
                 const ROW_INDEX                       row,
                 const std::vector<FieldValuesUpdate>& fieldVals);
 
 
 void
-MatchSelectedRows( whais::ITable&    table,
+MatchSelectedRows (whais::ITable&    table,
                    RowsSelection&      select);
 
 
 void
-PrintFieldValue( std::ostream&        os,
+PrintFieldValue (std::ostream&        os,
                  whais::ITable&     table,
                  const ROW_INDEX      row,
                  const FIELD_INDEX    field);

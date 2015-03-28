@@ -29,20 +29,20 @@
 
 using namespace whais;
 
-DBSException::DBSException( const uint32_t  code,
+DBSException::DBSException (const uint32_t  code,
                             const char*     file,
                             uint32_t        line,
                             const char*     fmtMsg,
                             ...)
-  : Exception( code, file, line)
+  : Exception (code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start( vl, fmtMsg);
-      this->Message( fmtMsg, vl);
-      va_end( vl);
+      va_start (vl, fmtMsg);
+      this->Message (fmtMsg, vl);
+      va_end (vl);
     }
 }
 
@@ -55,7 +55,7 @@ DBSException::~DBSException()
 Exception*
 DBSException::Clone() const
 {
-  return new DBSException( *this);
+  return new DBSException (*this);
 }
 
 
@@ -70,7 +70,7 @@ const char*
 DBSException::Description() const
 {
 
-  switch( Code())
+  switch (Code())
   {
   case OPER_NOT_SUPPORTED:
     return "A requested operation is not supported.";
@@ -172,6 +172,6 @@ DBSException::Description() const
     return "GENERAL FAILURE: Program execution must be stopped due to a DBS internal error.";
   }
 
-  assert( false);
+  assert (false);
   return "An unknown DBS framework exception was thrown";
 };

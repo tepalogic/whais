@@ -26,28 +26,28 @@ uint_t _elemsCount = 1000000;
 DDateTime
 get_random_datetime()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
-  uint8_t hour  = wh_rnd() % 24;
-  uint8_t mins  = wh_rnd() % 60;
-  uint8_t secs  = wh_rnd() % 60;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
 
-  return DDateTime( year, month, day, hour, mins, secs);
+  return DDateTime (year, month, day, hour, mins, secs);
 }
 
 DHiresTime
 get_random_hirestime()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
-  uint8_t hour  = wh_rnd() % 24;
-  uint8_t mins  = wh_rnd() % 60;
-  uint8_t secs  = wh_rnd() % 60;
-  uint32_t  mic = wh_rnd() % 1000000;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
+  uint32_t  mic = wh_rnd () % 1000000;
 
-  return DHiresTime( year, month, day, hour, mins, secs, mic);
+  return DHiresTime (year, month, day, hour, mins, secs, mic);
 }
 
 
@@ -55,18 +55,18 @@ get_random_hirestime()
 DDate
 get_random_date()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
 
-  return DDate( year, month, day);
+  return DDate (year, month, day);
 }
 
 void
-test_array_with_dates( void *)
+test_array_with_dates (void *)
 {
   std::cout << "Testing array sort with dates ...\n";
-  DArray array( _SC (DDate*, NULL));
+  DArray array (_SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_date());
@@ -91,10 +91,10 @@ test_array_with_dates( void *)
 }
 
 void
-test_array_with_datetimes( void *)
+test_array_with_datetimes (void *)
 {
   std::cout << "Testing array sort with datetimes ...\n";
-  DArray array( _SC (DDateTime*, NULL));
+  DArray array (_SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_datetime());
@@ -119,10 +119,10 @@ test_array_with_datetimes( void *)
 }
 
 void
-test_array_with_hirestimes( void *)
+test_array_with_hirestimes (void *)
 {
   std::cout << "Testing array sort with hirestimes ...\n";
-  DArray array( _SC (DHiresTime*, NULL));
+  DArray array (_SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_hirestime());
@@ -150,10 +150,10 @@ void
 test_array_with_int8 (void *)
 {
   std::cout << "Testing array sort with int8 ...\n";
-  DArray array( _SC (DUInt8*, NULL));
+  DArray array (_SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (DUInt8 ( wh_rnd() & 0xFF));
+    array.Add (DUInt8 ( wh_rnd () & 0xFF));
 
   array.Sort();
 
@@ -176,15 +176,15 @@ test_array_with_int8 (void *)
 
 
 void
-test_array_with_dates_r( void *)
+test_array_with_dates_r (void *)
 {
   std::cout << "Testing array reverse sort with dates ...\n";
-  DArray array( _SC (DDate*, NULL));
+  DArray array (_SC (DDate*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_date());
 
-  array.Sort( true);
+  array.Sort (true);
 
   if (array.Count() != _elemsCount)
     throw 8;
@@ -205,15 +205,15 @@ test_array_with_dates_r( void *)
 }
 
 void
-test_array_with_datetimes_r( void *)
+test_array_with_datetimes_r (void *)
 {
   std::cout << "Testing array reverse sort with datetimes ...\n";
-  DArray array( _SC (DDateTime*, NULL));
+  DArray array (_SC (DDateTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_datetime());
 
-  array.Sort( true);
+  array.Sort (true);
 
   if (array.Count() != _elemsCount)
     throw 10;
@@ -233,15 +233,15 @@ test_array_with_datetimes_r( void *)
 }
 
 void
-test_array_with_hirestimes_r( void *)
+test_array_with_hirestimes_r (void *)
 {
   std::cout << "Testing array reverse sort with hirestimes ...\n";
-  DArray array( _SC (DHiresTime*, NULL));
+  DArray array (_SC (DHiresTime*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add (get_random_hirestime());
 
-  array.Sort( true);
+  array.Sort (true);
 
   if (array.Count() != _elemsCount)
     throw 12;
@@ -265,12 +265,12 @@ void
 test_array_with_int8_r (void *)
 {
   std::cout << "Testing array reverse sort with int8 ...\n";
-  DArray array( _SC (DUInt8*, NULL));
+  DArray array (_SC (DUInt8*, NULL));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
-    array.Add (DUInt8 (wh_rnd() & 0xFF));
+    array.Add (DUInt8 (wh_rnd () & 0xFF));
 
-  array.Sort( true);
+  array.Sort (true);
 
   if (array.Count() != _elemsCount)
     throw 14;
@@ -290,17 +290,17 @@ test_array_with_int8_r (void *)
 }
 
 int
-main( int argc, char** argv)
+main (int argc, char** argv)
 {
   bool success = true;
 
   if (argc > 1)
-    _elemsCount = atol( argv[1]);
+    _elemsCount = atol (argv[1]);
 
 
   std::cout << "Sorting array with " << _elemsCount << " elements.\n";
 
-  DBSInit( DBSSettings());
+  DBSInit (DBSSettings());
 
   {
     Thread th[8];
@@ -314,14 +314,14 @@ main( int argc, char** argv)
     th[6].Run (test_array_with_int8, NULL);
     th[7].Run (test_array_with_int8_r, NULL);
 
-    th[0].WaitToEnd( true);
-    th[1].WaitToEnd( true);
-    th[2].WaitToEnd( true);
-    th[3].WaitToEnd( true);
-    th[4].WaitToEnd( true);
-    th[5].WaitToEnd( true);
-    th[6].WaitToEnd( true);
-    th[7].WaitToEnd( true);
+    th[0].WaitToEnd (true);
+    th[1].WaitToEnd (true);
+    th[2].WaitToEnd (true);
+    th[3].WaitToEnd (true);
+    th[4].WaitToEnd (true);
+    th[5].WaitToEnd (true);
+    th[6].WaitToEnd (true);
+    th[7].WaitToEnd (true);
   }
 
   DBSShoutdown();

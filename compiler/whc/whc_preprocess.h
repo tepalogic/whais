@@ -38,9 +38,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct ReplacementTag
 {
-  ReplacementTag( const std::string& tagName, const std::string& tagValue)
-    : mTagName( tagName),
-      mTagValue( tagValue)
+  ReplacementTag (const std::string& tagName, const std::string& tagValue)
+    : mTagName (tagName),
+      mTagValue (tagValue)
   {
   }
 
@@ -50,7 +50,7 @@ struct ReplacementTag
 
 
 bool
-preprocess_source( const std::string&                  sourceFile,
+preprocess_source (const std::string&                  sourceFile,
                    const std::vector<std::string>&     inclusionPaths,
                    const std::vector<ReplacementTag>&  tagPairs,
                    std::ostringstream&                 sourceCode,

@@ -87,11 +87,11 @@ static const uint32_t PS_TABLE_TO_REPAIR_MASK      = 2;
 
 
 static const char*
-field_type_to_text( const uint_t type)
+field_type_to_text (const uint_t type)
 {
-  if (IS_ARRAY( type))
+  if (IS_ARRAY (type))
     {
-      switch( GET_BASIC_TYPE( type))
+      switch (GET_BASIC_TYPE (type))
       {
       case T_BOOL:
         return "ARRAY OF BOOL";
@@ -139,12 +139,12 @@ field_type_to_text( const uint_t type)
         return "ARRAY OF RICHREAL";
 
       default:
-        assert( false);
+        assert (false);
       }
     }
   else
     {
-      switch( GET_BASIC_TYPE( type))
+      switch (GET_BASIC_TYPE (type))
       {
       case T_BOOL:
         return "BOOL";
@@ -195,24 +195,24 @@ field_type_to_text( const uint_t type)
         return "TEXT";
 
       default:
-        assert( false);
+        assert (false);
       }
     }
 
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR),
-                      "Unexpected field type encountered( %u).",
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR),
+                      "Unexpected field type encountered (%u).",
                       type);
 }
 
 
 static uint_t
-get_fields_names_len( const DBSFieldDescriptor* fields, uint_t count)
+get_fields_names_len (const DBSFieldDescriptor* fields, uint_t count)
 {
   uint_t result = 0;
 
-  while( count-- > 0)
+  while (count-- > 0)
     {
-      result += strlen( fields[0].name) + 1;
+      result += strlen (fields[0].name) + 1;
       ++fields;
     }
 
@@ -221,10 +221,10 @@ get_fields_names_len( const DBSFieldDescriptor* fields, uint_t count)
 
 
 static bool
-validate_field_name( const char* name, bool failException = true)
+validate_field_name (const char* name, bool failException = true)
 {
 
-  while( name[0])
+  while (name[0])
     {
       if (! (((name[0] >= 'a') && (name[0] <= 'z'))
               || ((name[0] >= 'A') && (name[0] <= 'Z'))
@@ -233,7 +233,7 @@ validate_field_name( const char* name, bool failException = true)
         {
           if (failException )
             {
-              throw DBSException( _EXTRA( DBSException::FIELD_NAME_INVALID),
+              throw DBSException (_EXTRA (DBSException::FIELD_NAME_INVALID),
                                  "Cannot use '%s' as a field name.",
                                  name);
             }
@@ -248,21 +248,21 @@ validate_field_name( const char* name, bool failException = true)
 
 
 static void
-validate_field_descriptors( const DBSFieldDescriptor* const fields,
+validate_field_descriptors (const DBSFieldDescriptor* const fields,
                             const uint_t                    fieldsCount)
 {
-  assert( (fieldsCount > 0) && (fields != NULL));
+  assert ((fieldsCount > 0) && (fields != NULL));
 
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
-      validate_field_name( fields[i].name);
+      validate_field_name (fields[i].name);
 
       // Check that all fields have different names.
       for (uint_t j = i + 1; j < fieldsCount; ++j)
         {
-          if (strcmp( fields[i].name, fields[j].name) == 0)
+          if (strcmp (fields[i].name, fields[j].name) == 0)
             {
-              throw DBSException( _EXTRA( DBSException::FIELD_NAME_INVALID),
+              throw DBSException (_EXTRA (DBSException::FIELD_NAME_INVALID),
                                   "Table field name '%s' is duplicated.",
                                   fields[i].name);
             }
@@ -270,7 +270,7 @@ validate_field_descriptors( const DBSFieldDescriptor* const fields,
 
       if ((fields[i].type == T_UNKNOWN) || (fields[i].type >= T_END_OF_TYPES))
         {
-          throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID),
+          throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID),
                              "Table field '%s' has invalid type '%X'.",
                              fields[i].name,
                              fields[i].type);
@@ -279,7 +279,7 @@ validate_field_descriptors( const DBSFieldDescriptor* const fields,
 
       if (fields[i].isArray && (fields[i].type == T_TEXT))
         {
-          throw DBSException( _EXTRA( DBSException::FIELD_TYPE_INVALID),
+          throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID),
                              "This implementation does not support array of "
                                "text type for field '%s'.",
                              fields[i].name);
@@ -289,58 +289,58 @@ validate_field_descriptors( const DBSFieldDescriptor* const fields,
 
 
 static bool
-compare_fields( const DBSFieldDescriptor& f1, const DBSFieldDescriptor& f2)
+compare_fields (const DBSFieldDescriptor& f1, const DBSFieldDescriptor& f2)
 {
-  assert( strcmp( f1.name, f2.name) != 0);
+  assert (strcmp (f1.name, f2.name) != 0);
 
-  return strcmp( f1.name, f2.name) < 0;
+  return strcmp (f1.name, f2.name) < 0;
 }
 
 
 static void
-normalize_fields( vector<DBSFieldDescriptor>&   fields,
+normalize_fields (vector<DBSFieldDescriptor>&   fields,
                   uint_t* const                 outRowsSize,
                   uint8_t* const                outFields)
 {
   const uint_t fieldsCount = fields.size();
 
-  assert( fieldsCount > 0);
+  assert (fieldsCount > 0);
 
   FieldDescriptor* const fieldsDesc   = _RC (FieldDescriptor*, outFields);
-  uint_t                 fieldNameOff = sizeof( fieldsDesc[0]) * fieldsCount;
+  uint_t                 fieldNameOff = sizeof (fieldsDesc[0]) * fieldsCount;
 
-  memset( outFields, 0, sizeof( fieldsDesc[0]) * fieldsCount);
-  sort( fields.begin(), fields.end (), compare_fields);
+  memset (outFields, 0, sizeof (fieldsDesc[0]) * fieldsCount);
+  sort (fields.begin(), fields.end (), compare_fields);
 
   *outRowsSize = (fieldsCount + 7) / 8;
 
   for (uint_t i = 0; i <fieldsCount; i++)
     {
-      fieldsDesc[i].NullBitIndex( i);
-      fieldsDesc[i].RowDataOff( *outRowsSize);
-      fieldsDesc[i].NameOffset( fieldNameOff);
+      fieldsDesc[i].NullBitIndex (i);
+      fieldsDesc[i].RowDataOff (*outRowsSize);
+      fieldsDesc[i].NameOffset (fieldNameOff);
 
       if (fields[i].isArray)
-        fieldsDesc[i].Type( fields[i].type | PS_TABLE_ARRAY_MASK);
+        fieldsDesc[i].Type (fields[i].type | PS_TABLE_ARRAY_MASK);
 
       else
-        fieldsDesc[i].Type( fields[i].type);
+        fieldsDesc[i].Type (fields[i].type);
 
 
-      const uint_t nameLen = strlen( fields[i].name) + 1;
+      const uint_t nameLen = strlen (fields[i].name) + 1;
 
-      assert( nameLen > 1);
+      assert (nameLen > 1);
 
-      memcpy( outFields + fieldNameOff, fields[i].name, nameLen);
+      memcpy (outFields + fieldNameOff, fields[i].name, nameLen);
       fieldNameOff += nameLen;
 
-      *outRowsSize += Serializer::Size( fields[i].type, fields[i].isArray);
+      *outRowsSize += Serializer::Size (fields[i].type, fields[i].isArray);
     }
 }
 
 
 static void
-create_table_file( const uint64_t                  maxFileSize,
+create_table_file (const uint64_t                  maxFileSize,
                    const char* const               filePrefix,
                    const DBSFieldDescriptor* const fields,
                    const uint_t                    fieldsCount)
@@ -349,30 +349,30 @@ create_table_file( const uint64_t                  maxFileSize,
   if ((fields == NULL) || (fieldsCount == 0) || (fieldsCount > 0xFFFFu))
     {
       throw DBSException(
-          _EXTRA( DBSException::OPER_NOT_SUPPORTED),
+          _EXTRA (DBSException::OPER_NOT_SUPPORTED),
           "Could not create a persistent table with %d fields count.",
           (fields == NULL ) ? 0 : fieldsCount
                          );
     }
 
   //Compute the table header descriptor size
-  const uint32_t descriptorsSize = sizeof( FieldDescriptor) * fieldsCount +
-                                   get_fields_names_len( fields, fieldsCount);
+  const uint32_t descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
+                                   get_fields_names_len (fields, fieldsCount);
 
-  validate_field_descriptors( fields, fieldsCount);
+  validate_field_descriptors (fields, fieldsCount);
 
-  vector<DBSFieldDescriptor> vect( fields + 0, fields + fieldsCount);
-  auto_ptr<uint8_t>          fieldsDescs( new uint8_t[descriptorsSize]);
+  vector<DBSFieldDescriptor> vect (fields + 0, fields + fieldsCount);
+  auto_ptr<uint8_t>          fieldsDescs (new uint8_t[descriptorsSize]);
   uint_t                     rowSize;
 
-  normalize_fields( vect, &rowSize, fieldsDescs.get ());
+  normalize_fields (vect, &rowSize, fieldsDescs.get ());
 
-  File tableFile( filePrefix, WH_FILECREATE_NEW | WH_FILERDWR);
+  File tableFile (filePrefix, WH_FILECREATE_NEW | WH_FILERDWR);
 
-  auto_ptr<uint8_t> tableHeader( new uint8_t[PS_HEADER_SIZE]);
+  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
 
-  memcpy( header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
+  memcpy (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
   store_le_int32 (fieldsCount,     header + PS_TABLE_FIELDS_COUNT_OFF);
   store_le_int32 (descriptorsSize, header + PS_TABLE_ELEMS_SIZE_OFF);
@@ -385,32 +385,32 @@ create_table_file( const uint64_t                  maxFileSize,
   store_le_int64 (~(uint64_t)0,    header + PS_TABLE_MAINTABLE_SIZE_OFF);
   store_le_int32 (0,               header + PS_TABLE_FLAGS_OFF);
 
-  assert( sizeof( NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
-  assert( sizeof( NODE_INDEX) == PS_TABLE_BT_ROOT_LEN);
+  assert (sizeof (NODE_INDEX) == PS_TABLE_BT_HEAD_LEN);
+  assert (sizeof (NODE_INDEX) == PS_TABLE_BT_ROOT_LEN);
 
-  memset( header + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
+  memset (header + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
   //Write the first header part to reserve the space!
-  tableFile.Write( header, PS_HEADER_SIZE);
+  tableFile.Write (header, PS_HEADER_SIZE);
 
   //Write the field descriptors;
-  tableFile.Write( fieldsDescs.get(), descriptorsSize);
+  tableFile.Write (fieldsDescs.get(), descriptorsSize);
 
   uint64_t minFileSize = (tableFile.Tell() + TableRmNode::RAW_NODE_SIZE - 1);
   minFileSize /= TableRmNode::RAW_NODE_SIZE;
   minFileSize *= TableRmNode::RAW_NODE_SIZE;
 
-  tableFile.Size( minFileSize);
+  tableFile.Size (minFileSize);
 
   store_le_int64 (tableFile.Size(), header + PS_TABLE_MAINTABLE_SIZE_OFF);
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Write( header, PS_HEADER_SIZE);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Write (header, PS_HEADER_SIZE);
 }
 
 
 static uint_t
-repair_table_fields( FieldDescriptor* const           fields,
+repair_table_fields (FieldDescriptor* const           fields,
                      uint_t                           fieldsCount,
                      const FIX_ERROR_CALLBACK         fixCallback)
 {
@@ -426,12 +426,12 @@ repair_table_fields( FieldDescriptor* const           fields,
 
       if (fields[i].NullBitIndex() != i)
         {
-          bool toFix = fixCallback( FIX_QUESTION,
+          bool toFix = fixCallback (FIX_QUESTION,
                                     "Detecting invalid null bit index for"
                                     " field '%s'.",
                                     fieldName);
           if (toFix)
-            fields[i].NullBitIndex( i);
+            fields[i].NullBitIndex (i);
 
           else
             return NOT_FIXED;
@@ -439,28 +439,28 @@ repair_table_fields( FieldDescriptor* const           fields,
 
       if (fields[i].RowDataOff() != rowSize)
         {
-          bool toFix = fixCallback( FIX_QUESTION,
+          bool toFix = fixCallback (FIX_QUESTION,
                                     "Detected invalid data offset for field"
                                     " '%s'. It should be set at %u.",
                                     fieldName,
                                     rowSize);
           if (toFix)
-            fields[i].RowDataOff( rowSize);
+            fields[i].RowDataOff (rowSize);
 
           else
             return NOT_FIXED;
         }
       else
         {
-          fixCallback( INFORMATION,
+          fixCallback (INFORMATION,
                        "Field '%s' data offset set at '%u'.",
                        fieldName,
                        rowSize);
         }
 
-      rowSize += Serializer::Size( _SC (DBS_FIELD_TYPE,
-                                        GET_BASIC_TYPE( fields[i].Type())),
-                                   IS_ARRAY( fields[i].Type()));
+      rowSize += Serializer::Size (_SC (DBS_FIELD_TYPE,
+                                        GET_BASIC_TYPE (fields[i].Type())),
+                                   IS_ARRAY (fields[i].Type()));
     }
 
   return rowSize;
@@ -468,39 +468,39 @@ repair_table_fields( FieldDescriptor* const           fields,
 
 
 static bool
-repair_table_header( const string&             name,
+repair_table_header (const string&             name,
                      const string&             fileNamePrefix,
                      const uint64_t            maxFileSize,
                      const FIX_ERROR_CALLBACK  fixCallback)
 
 {
-  File tableFile( fileNamePrefix.c_str(),
+  File tableFile (fileNamePrefix.c_str (),
                   WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
   const uint64_t tableFileSize = tableFile.Size();
 
   if (tableFileSize < PS_HEADER_SIZE)
     {
-      fixCallback( CRITICAL,
+      fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. Its header file is"
                    " too damaged.",
-                   name.c_str());
+                   name.c_str ());
 
       return false;
     }
 
-  auto_ptr<uint8_t> tableHeader( new uint8_t[PS_HEADER_SIZE]);
+  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Read( header, PS_HEADER_SIZE);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Read (header, PS_HEADER_SIZE);
 
-  if (memcmp( header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE) != 0)
+  if (memcmp (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE) != 0)
     {
-      fixCallback( CRITICAL,
+      fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. Cannot find the table"
                    " file's signature.",
-                   name.c_str());
+                   name.c_str ());
       return false;
     }
 
@@ -517,53 +517,53 @@ repair_table_header( const string&             name,
 
   if ((fieldsCount == 0)
       || (fieldsCount > 0xFFFFu)
-      || (fieldsCount * sizeof( FieldDescriptor) >= descSize))
+      || (fieldsCount * sizeof (FieldDescriptor) >= descSize))
     {
-      fixCallback( CRITICAL,
+      fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. The field"
                    " descriptors are too damaged.",
-                   name.c_str());
+                   name.c_str ());
       return false;
     }
 
-  auto_ptr<uint8_t>  fieldsDescs( new uint8_t[descSize]);
+  auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
   uint8_t* const     descriptors = fieldsDescs.get ();
 
   if (tableFile.Size() < PS_HEADER_SIZE + descSize)
     {
-      fixCallback( CRITICAL,
+      fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. The header file is"
                    " too damaged.",
-                   name.c_str());
+                   name.c_str ());
       return false;
     }
 
-  tableFile.Read( descriptors, descSize);
+  tableFile.Read (descriptors, descSize);
 
-  uint_t nameOffset = fieldsCount * sizeof( FieldDescriptor);
+  uint_t nameOffset = fieldsCount * sizeof (FieldDescriptor);
   FieldDescriptor* const fds = _RC (FieldDescriptor*, descriptors);
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
       if (fds[i].NameOffset() != nameOffset)
         {
-          bool toFix = fixCallback( FIX_QUESTION,
+          bool toFix = fixCallback (FIX_QUESTION,
                                     "The table field '%u' is damaged. Its name"
                                     " should be '%s'.",
                                     i,
                                     descriptors + nameOffset);
           if (toFix)
             {
-              fds[i].NameOffset( nameOffset);
-              if (validate_field_name( _RC (const char*,
+              fds[i].NameOffset (nameOffset);
+              if (validate_field_name (_RC (const char*,
                                             descriptors + nameOffset)))
                 {
-                  fixCallback( INFORMATION,
+                  fixCallback (INFORMATION,
                                "Field name set to '%s'.",
                                descriptors + nameOffset);
                 }
               else
                 {
-                  fixCallback( CRITICAL,
+                  fixCallback (CRITICAL,
                                "The restored field name is not valid.");
 
                   return false;
@@ -573,42 +573,42 @@ repair_table_header( const string&             name,
             return false;
         }
 
-      fixCallback( INFORMATION,
+      fixCallback (INFORMATION,
                    "Found field '%s' of type '%s'.",
                    _RC (const char*, descriptors + nameOffset),
-                   field_type_to_text( fds[i].Type()));
+                   field_type_to_text (fds[i].Type()));
 
-      nameOffset += strlen( _RC (const char*, descriptors + nameOffset)) + 1;
+      nameOffset += strlen (_RC (const char*, descriptors + nameOffset)) + 1;
 
       if (nameOffset > descSize)
         {
-          fixCallback( CRITICAL,
+          fixCallback (CRITICAL,
                        "The table '%s' cannot be repaired. Its field"
                        " descriptor is too damaged.",
-                       name.c_str());
+                       name.c_str ());
           return false;
         }
     }
 
   if (nameOffset != descSize)
     {
-      fixCallback( CRITICAL,
+      fixCallback (CRITICAL,
                    "The table '%s' cannot be repaired. The field"
                    " descriptors are too damaged.",
-                   name.c_str());
+                   name.c_str ());
       return false;
     }
 
-  const uint_t rowSize = repair_table_fields( fds, fieldsCount, fixCallback);
+  const uint_t rowSize = repair_table_fields (fds, fieldsCount, fixCallback);
   if (rowSize == 0)
     return false;
 
   else if (rowSize != load_le_int32 (header + PS_TABLE_ROW_SIZE_OFF))
     {
-      bool toFix = fixCallback( FIX_QUESTION,
+      bool toFix = fixCallback (FIX_QUESTION,
                                 "The table '%s' row size is set at %u"
                                 " bytes instead of %u.",
-                                name.c_str(),
+                                name.c_str (),
                                 load_le_int32 (header + PS_TABLE_ROW_SIZE_OFF),
                                 rowSize);
 
@@ -620,9 +620,9 @@ repair_table_header( const string&             name,
     }
   else
     {
-      fixCallback( INFORMATION,
+      fixCallback (INFORMATION,
                    "The row size of table '%s' is %u bytes long.",
-                   name.c_str(),
+                   name.c_str (),
                    rowSize);
     }
 
@@ -633,20 +633,20 @@ repair_table_header( const string&             name,
 
   uint64_t vsSize = load_le_int64 (header + PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  vsSize /= sizeof( StoreEntry);
-  vsSize *= sizeof( StoreEntry);
+  vsSize /= sizeof (StoreEntry);
+  vsSize *= sizeof (StoreEntry);
 
   store_le_int64 (vsSize, header + PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Write( header, PS_HEADER_SIZE);
-  tableFile.Write( descriptors, descSize);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Write (header, PS_HEADER_SIZE);
+  tableFile.Write (descriptors, descSize);
 
-  tableFile.Size( fileSize);
+  tableFile.Size (fileSize);
   tableFile.Close();
 
-  FileContainer::Fix (fileNamePrefix.c_str(), maxFileSize, fileSize);
-  FileContainer::Fix ((fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(),
+  FileContainer::Fix (fileNamePrefix.c_str (), maxFileSize, fileSize);
+  FileContainer::Fix ((fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str (),
                       maxFileSize,
                       vsSize);
   return true;
@@ -659,14 +659,14 @@ class RepairTableNodeManager : public TemporalTable
    *  the index of a table removed rows. Nothing else! */
 
 public:
-  RepairTableNodeManager( DbsHandler& dbs, IDataContainer& container)
-    : TemporalTable( dbs, &RepairTableNodeManager::field, 1),
-      mContainer( container),
-      mCurrentRoot( NIL_NODE)
+  RepairTableNodeManager (DbsHandler& dbs, IDataContainer& container)
+    : TemporalTable (dbs, &RepairTableNodeManager::field, 1),
+      mContainer (container),
+      mCurrentRoot (NIL_NODE)
   {
   }
 
-  ~RepairTableNodeManager()
+  ~RepairTableNodeManager ()
   {
     FlushInternal();
   }
@@ -676,44 +676,44 @@ public:
     return TableRmNode::RAW_NODE_SIZE;
   }
 
-  virtual NODE_INDEX AllocateNode( const NODE_INDEX parrent,
+  virtual NODE_INDEX AllocateNode (const NODE_INDEX parrent,
                                    const KEY_INDEX  parrentKey)
   {
-    assert( mContainer.Size() % NodeRawSize() == 0);
+    assert (mContainer.Size() % NodeRawSize() == 0);
 
     return NodeRawSize() / TableRmNode::RAW_NODE_SIZE;
   }
 
 
-  virtual void FreeNode( const NODE_INDEX nodeId)
+  virtual void FreeNode (const NODE_INDEX nodeId)
   {
     //For the purposes of this class,
     //this member function should not be called
-    assert( false);
+    assert (false);
 
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR),
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR),
                         "Asked to execute an unexpected function.");
   }
 
-  virtual NODE_INDEX RootNodeId()
+  virtual NODE_INDEX RootNodeId ()
   {
     if (mCurrentRoot == NIL_NODE)
       {
-        BTreeNodeRAII rootNode( RetrieveNode( AllocateNode( NIL_NODE, 0)));
+        BTreeNodeRAII rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
 
-        rootNode->Next( NIL_NODE);
-        rootNode->Prev( NIL_NODE);
-        rootNode->KeysCount( 0);
-        rootNode->Leaf( true);
-        rootNode->InsertKey( rootNode->SentinelKey());
+        rootNode->Next (NIL_NODE);
+        rootNode->Prev (NIL_NODE);
+        rootNode->KeysCount (0);
+        rootNode->Leaf (true);
+        rootNode->InsertKey (rootNode->SentinelKey());
 
-        RootNodeId( rootNode->NodeId());
+        RootNodeId (rootNode->NodeId ());
       }
 
     return mCurrentRoot;
   }
 
-  virtual void RootNodeId( const NODE_INDEX nodeId)
+  virtual void RootNodeId (const NODE_INDEX nodeId)
   {
     mCurrentRoot = nodeId;
   }
@@ -725,38 +725,38 @@ private:
     return 0;
   }
 
-  virtual IBTreeNode* LoadNode( const NODE_INDEX nodeId)
+  virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId)
   {
-    auto_ptr<TableRmNode> node( new TableRmNode( *this, nodeId));
+    auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
 
     if (nodeId < mContainer.Size() / NodeRawSize())
       {
-        mContainer.Read( nodeId * NodeRawSize(),
+        mContainer.Read (nodeId * NodeRawSize(),
                         NodeRawSize(),
                         node->RawData());
       }
     else
       {
-        assert( nodeId == mContainer.Size() / NodeRawSize());
+        assert (nodeId == mContainer.Size() / NodeRawSize());
 
-        mContainer.Write( nodeId * NodeRawSize(),
+        mContainer.Write (nodeId * NodeRawSize(),
                           NodeRawSize(),
                           node->RawData());
       }
 
     node->MarkClean();
 
-    assert( node->NodeId() == nodeId);
+    assert (node->NodeId () == nodeId);
 
     return node.release();
   }
 
-  virtual void SaveNode( IBTreeNode* const node)
+  virtual void SaveNode (IBTreeNode* const node)
   {
     if (node->IsDirty() == false)
       return ;
 
-    mContainer.Write( node->NodeId() * NodeRawSize(),
+    mContainer.Write (node->NodeId () * NodeRawSize(),
                      NodeRawSize(),
                      node->RawData());
 
@@ -772,79 +772,79 @@ private:
 
 
 
-PersistentTable::PersistentTable( DbsHandler&       dbs,
+PersistentTable::PersistentTable (DbsHandler&       dbs,
                                   const string&     name)
-  : PrototypeTable( dbs),
-    mDbsSettings( DBSGetSeettings()),
-    mMaxFileSize( 0),
-    mVSDataSize( 0),
-    mFileNamePrefix( dbs.WorkingDir() + name),
-    mTableData( NULL),
-    mRowsData( NULL),
-    mVSData( NULL),
-    mRemoved( false)
+  : PrototypeTable (dbs),
+    mDbsSettings (DBSGetSeettings()),
+    mMaxFileSize (0),
+    mVSDataSize (0),
+    mFileNamePrefix (dbs.WorkingDir () + name),
+    mTableData (NULL),
+    mRowsData (NULL),
+    mVSData (NULL),
+    mRemoved (false)
 {
-  InitFromFile( name);
+  InitFromFile (name);
 
   if (mMaxFileSize != dbs.MaxFileSize())
     {
-      throw DBSException( _EXTRA( DBSException::TABLE_INCONSITENCY),
+      throw DBSException (_EXTRA (DBSException::TABLE_INCONSITENCY),
                           "Persistent table '%s' is set to use a different "
                             "maximum file size than what is parameterized "
                             "(%lu vs. %lu).",
-                          name.c_str(),
+                          name.c_str (),
                           _SC (long, mMaxFileSize),
                           _SC (long, dbs.MaxFileSize()));
     }
 
-  assert( mTableData.get () != NULL);
+  assert (mTableData.get () != NULL);
 
   uint_t       blkSize  = DBSSettings().mTableCacheBlkSize;
   const uint_t blkCount = DBSSettings().mTableCacheBlkCount;
 
-  assert( (blkSize != 0) && (blkCount != 0));
+  assert ((blkSize != 0) && (blkCount != 0));
 
-  while( blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
-  mRowCache.Init( *this, mRowSize, blkSize, blkCount, false);
+  mRowCache.Init (*this, mRowSize, blkSize, blkCount, false);
 
   InitVariableStorages();
   InitIndexedFields();
 }
 
 
-PersistentTable::PersistentTable( DbsHandler&                     dbs,
+PersistentTable::PersistentTable (DbsHandler&                     dbs,
                                   const string&                   name,
                                   const DBSFieldDescriptor* const fields,
                                   const uint_t                    fieldsCount)
-  : PrototypeTable( dbs),
-    mDbsSettings( DBSGetSeettings()),
-    mMaxFileSize( 0),
-    mVSDataSize( 0),
-    mFileNamePrefix( dbs.WorkingDir() + name),
-    mTableData( NULL),
-    mRowsData( NULL),
-    mVSData( NULL),
-    mRemoved( false)
+  : PrototypeTable (dbs),
+    mDbsSettings (DBSGetSeettings()),
+    mMaxFileSize (0),
+    mVSDataSize (0),
+    mFileNamePrefix (dbs.WorkingDir () + name),
+    mTableData (NULL),
+    mRowsData (NULL),
+    mVSData (NULL),
+    mRemoved (false)
 {
-  create_table_file( dbs.MaxFileSize(),
-                     mFileNamePrefix.c_str(),
+  create_table_file (dbs.MaxFileSize(),
+                     mFileNamePrefix.c_str (),
                      fields,
                      fieldsCount);
-  InitFromFile( name);
+  InitFromFile (name);
 
-  assert( mTableData.get () != NULL);
+  assert (mTableData.get () != NULL);
 
   uint_t       blkSize  = DBSSettings().mTableCacheBlkSize;
   const uint_t blkCount = DBSSettings().mTableCacheBlkCount;
 
-  assert( (blkSize != 0) && (blkCount != 0));
+  assert ((blkSize != 0) && (blkCount != 0));
 
-  while( blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
-  mRowCache.Init( *this, mRowSize, blkSize, blkCount, false);
+  mRowCache.Init (*this, mRowSize, blkSize, blkCount, false);
 
   InitVariableStorages();
   InitIndexedFields();
@@ -859,14 +859,14 @@ PersistentTable::~PersistentTable()
     {
       if (mvIndexNodeMgrs[fieldIndex] != NULL)
         {
-          FieldDescriptor& field = GetFieldDescriptorInternal( fieldIndex);
+          FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
           uint64_t unitsCount = mMaxFileSize - 1;
 
           unitsCount += mvIndexNodeMgrs[fieldIndex]->IndexRawSize();
           unitsCount /= mMaxFileSize;
 
-          field.IndexUnitsCount( unitsCount);
+          field.IndexUnitsCount (unitsCount);
           delete mvIndexNodeMgrs [fieldIndex];
         }
     }
@@ -887,7 +887,7 @@ PersistentTable::IsTemporal() const
 ITable&
 PersistentTable::Spawn() const
 {
-  ITable* const result = new TemporalTable( *this);
+  ITable* const result = new TemporalTable (*this);
 
   mDbs.RegisterTableSpawn();
 
@@ -896,23 +896,23 @@ PersistentTable::Spawn() const
 
 
 void
-PersistentTable::InitFromFile( const string& tableName)
+PersistentTable::InitFromFile (const string& tableName)
 {
   uint64_t   mainTableSize = 0;
   uint8_t    tableHdr[PS_HEADER_SIZE];
 
-  File mainTableFile( mFileNamePrefix.c_str(),
+  File mainTableFile (mFileNamePrefix.c_str (),
                       WH_FILEOPEN_EXISTING | WH_FILEREAD);
 
-  mainTableFile.Seek( 0, WH_SEEK_BEGIN);
-  mainTableFile.Read( tableHdr, PS_HEADER_SIZE);
+  mainTableFile.Seek (0, WH_SEEK_BEGIN);
+  mainTableFile.Read (tableHdr, PS_HEADER_SIZE);
 
-  if (memcmp( tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
+  if (memcmp (tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
     {
       throw DBSException(
-          _EXTRA( DBSException::TABLE_INVALID),
+          _EXTRA (DBSException::TABLE_INVALID),
           "Persistent table file '%s' has an invalid signature.",
-          mFileNamePrefix.c_str());
+          mFileNamePrefix.c_str ());
     }
 
   mFieldsCount     = load_le_int32 (tableHdr + PS_TABLE_FIELDS_COUNT_OFF);
@@ -926,32 +926,32 @@ PersistentTable::InitFromFile( const string& tableName)
   mainTableSize    = load_le_int64 (tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF);
 
   if ((mFieldsCount == 0) ||
-      (mDescriptorsSize < (sizeof( FieldDescriptor) * mFieldsCount)) ||
+      (mDescriptorsSize < (sizeof (FieldDescriptor) * mFieldsCount)) ||
       (mainTableSize < PS_HEADER_SIZE))
     {
       throw DBSException(
-          _EXTRA( DBSException::TABLE_INVALID),
+          _EXTRA (DBSException::TABLE_INVALID),
           "Persistent table file '%s' has an invalid signature.",
-          mFileNamePrefix.c_str());
+          mFileNamePrefix.c_str ());
     }
   else if (load_le_int32 (tableHdr + PS_TABLE_FLAGS_OFF) &
             PS_TABLE_MODIFIED_MASK)
     {
-      throw DBSException( _EXTRA( DBSException::TABLE_IN_USE),
+      throw DBSException (_EXTRA (DBSException::TABLE_IN_USE),
                           "Cannot open table '%s' as is already in use or"
                           " was not closed properly last time.",
-                          tableName.c_str());
+                          tableName.c_str ());
 
     }
 
   //Cache the field descriptors in memory
-  mFieldsDescriptors.reset( new uint8_t[mDescriptorsSize]);
-  mainTableFile.Read( _CC (uint8_t*, mFieldsDescriptors.get ()),
+  mFieldsDescriptors.reset (new uint8_t[mDescriptorsSize]);
+  mainTableFile.Read (_CC (uint8_t*, mFieldsDescriptors.get ()),
                      mDescriptorsSize);
   mainTableFile.Close();
 
-  mTableData.reset( new FileContainer(
-                          mFileNamePrefix.c_str(),
+  mTableData.reset (new FileContainer(
+                          mFileNamePrefix.c_str (),
                           mMaxFileSize,
                           (mainTableSize + mMaxFileSize - 1) / mMaxFileSize
                                          ));
@@ -964,7 +964,7 @@ PersistentTable::InitVariableStorages()
   // Loading the rows regular should be done up front.
   mRowsData.reset(
               new FileContainer(
-                (mFileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str(),
+                (mFileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str (),
                 mMaxFileSize,
                 ((mRowSize * mRowsCount) + mMaxFileSize - 1) / mMaxFileSize
                         )
@@ -973,16 +973,16 @@ PersistentTable::InitVariableStorages()
   //Check if are fields demanding variable size store.
   for (FIELD_INDEX i = 0; i < mFieldsCount; ++i)
     {
-        DBSFieldDescriptor fieldDesc = DescribeField( i);
+        DBSFieldDescriptor fieldDesc = DescribeField (i);
 
-        assert( (fieldDesc.type > T_UNKNOWN)
+        assert ((fieldDesc.type > T_UNKNOWN)
                 && (fieldDesc.type < T_UNDETERMINED));
 
         if (fieldDesc.isArray || (fieldDesc.type == T_TEXT))
           {
-            auto_ptr<VariableSizeStore> hold( new VariableSizeStore);
+            auto_ptr<VariableSizeStore> hold (new VariableSizeStore);
 
-            hold->Init( (mFileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(),
+            hold->Init ((mFileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str (),
                         mVSDataSize,
                         mMaxFileSize);
 
@@ -1002,13 +1002,13 @@ PersistentTable::InitIndexedFields()
 {
   for (FIELD_INDEX fieldIndex = 0; fieldIndex < mFieldsCount; ++fieldIndex)
     {
-      FieldDescriptor& field = GetFieldDescriptorInternal( fieldIndex);
+      FieldDescriptor& field = GetFieldDescriptorInternal (fieldIndex);
 
       if (field.IndexNodeSizeKB() == 0)
         {
-          assert( field.IndexUnitsCount() == 0);
+          assert (field.IndexUnitsCount() == 0);
 
-          mvIndexNodeMgrs.push_back( NULL);
+          mvIndexNodeMgrs.push_back (NULL);
           continue;
         }
 
@@ -1020,12 +1020,12 @@ PersistentTable::InitIndexedFields()
       containerName += "_bt";
 
       auto_ptr<IDataContainer> indexContainer(
-                             new FileContainer( containerName.c_str(),
+                             new FileContainer (containerName.c_str (),
                                                 mMaxFileSize,
                                                 field.IndexUnitsCount() )
                                                );
       mvIndexNodeMgrs.push_back(
-            new FieldIndexNodeManager( indexContainer,
+            new FieldIndexNodeManager (indexContainer,
                                        field.IndexNodeSizeKB() * 1024,
                                        0x400000, //4MB
                                        _SC (DBS_FIELD_TYPE, field.Type()),
@@ -1048,7 +1048,7 @@ PersistentTable::MakeHeaderPersistent()
 
   uint8_t tableHdr[PS_HEADER_SIZE];
 
-  memcpy( tableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
+  memcpy (tableHdr, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
 
   store_le_int32 (mFieldsCount,        tableHdr + PS_TABLE_FIELDS_COUNT_OFF);
   store_le_int32 (mDescriptorsSize,    tableHdr + PS_TABLE_ELEMS_SIZE_OFF);
@@ -1063,10 +1063,10 @@ PersistentTable::MakeHeaderPersistent()
   store_le_int64 ((mVSData != NULL) ? mVSData->Size() : 0,
                   tableHdr + PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  memset( tableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
+  memset (tableHdr + PS_RESEVED_FOR_FUTURE_OFF, 0, PS_RESEVED_FOR_FUTURE_LEN);
 
-  mTableData->Write( 0, sizeof tableHdr, tableHdr);
-  mTableData->Write( sizeof tableHdr,
+  mTableData->Write (0, sizeof tableHdr, tableHdr);
+  mTableData->Write (sizeof tableHdr,
                      mDescriptorsSize,
                      mFieldsDescriptors.get ());
 }
@@ -1093,11 +1093,11 @@ PersistentTable::RemoveFromDatabase()
 
 
 IDataContainer*
-PersistentTable::CreateIndexContainer( const FIELD_INDEX field)
+PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 {
-  assert( mFileNamePrefix.size() > 0);
+  assert (mFileNamePrefix.size() > 0);
 
-  DBSFieldDescriptor desc = DescribeField( field);
+  DBSFieldDescriptor desc = DescribeField (field);
 
   string containerNameBase = mFileNamePrefix;
 
@@ -1105,7 +1105,7 @@ PersistentTable::CreateIndexContainer( const FIELD_INDEX field)
   containerNameBase += desc.name;
   containerNameBase += "_bt";
 
-  return new FileContainer( containerNameBase.c_str(),
+  return new FileContainer (containerNameBase.c_str (),
                             mDbsSettings.mMaxFileSize,
                             0);
 }
@@ -1126,18 +1126,18 @@ PersistentTable::FlushEpilog()
 
 
 IDataContainer&
-PersistentTable::RowsContainer()
+PersistentTable::RowsContainer ()
 {
-  assert( mRowsData.get () != NULL);
+  assert (mRowsData.get () != NULL);
 
   return *mRowsData.get ();
 }
 
 
 IDataContainer&
-PersistentTable::TableContainer()
+PersistentTable::TableContainer ()
 {
-  assert( mTableData.get () != NULL);
+  assert (mTableData.get () != NULL);
 
   return *mTableData.get ();
 }
@@ -1146,14 +1146,14 @@ PersistentTable::TableContainer()
 VariableSizeStore&
 PersistentTable::VSStore()
 {
-  assert( mVSData != NULL);
+  assert (mVSData != NULL);
 
   return *mVSData;
 }
 
 
 bool
-PersistentTable::ValidateTable( const std::string&         path,
+PersistentTable::ValidateTable (const std::string&         path,
                                 const std::string&         name)
 {
   uint8_t tableHdr[PS_HEADER_SIZE];
@@ -1161,18 +1161,18 @@ PersistentTable::ValidateTable( const std::string&         path,
 
   const string tableFileName = path + name;
 
-  File tableFile( tableFileName.c_str(), WH_FILEOPEN_EXISTING | WH_FILERDWR);
+  File tableFile (tableFileName.c_str (), WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Read( tableHdr, PS_HEADER_SIZE);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Read (tableHdr, PS_HEADER_SIZE);
 
   const uint32_t fieldsCount = load_le_int32 (tableHdr +
                                               PS_TABLE_FIELDS_COUNT_OFF);
 
-  if ((memcmp( tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
+  if ((memcmp (tableHdr, PS_TABLE_SIGNATURE, PS_TABLES_SIG_LEN) != 0)
       || (load_le_int32 (tableHdr + PS_TABLE_FIELDS_COUNT_OFF) == 0)
       || (load_le_int32 (tableHdr + PS_TABLE_ELEMS_SIZE_OFF) <
-          (sizeof( FieldDescriptor) * fieldsCount))
+          (sizeof (FieldDescriptor) * fieldsCount))
       || (load_le_int64 (tableHdr + PS_TABLE_MAINTABLE_SIZE_OFF) <
           PS_HEADER_SIZE))
     {
@@ -1189,10 +1189,10 @@ PersistentTable::ValidateTable( const std::string&         path,
       store_le_int32 (tableFlags, tableHdr + PS_TABLE_FLAGS_OFF);
     }
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Write( tableHdr, sizeof tableHdr);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Write (tableHdr, sizeof tableHdr);
 
-  return( toFix == false);
+  return (toFix == false);
 }
 
 
@@ -1200,30 +1200,30 @@ DBSFieldDescriptor RepairTableNodeManager::field = {"dummy", T_BOOL, FALSE};
 
 
 static bool
-check_array_buffer( const uint8_t* const        buffer,
+check_array_buffer (const uint8_t* const        buffer,
                     const uint_t                bufferSize,
                     const DBS_FIELD_TYPE        itemType)
 {
-  assert( 2 * sizeof( uint64_t) == Serializer::Size( T_RICHREAL, true));
+  assert (2 * sizeof (uint64_t) == Serializer::Size (T_RICHREAL, true));
 
-  if ((bufferSize >= 2 * sizeof( uint64_t)) || (bufferSize == 0))
+  if ((bufferSize >= 2 * sizeof (uint64_t)) || (bufferSize == 0))
     return false;
 
-  else if (bufferSize != (buffer[2 * sizeof( uint64_t) - 1] & 0x7F))
+  else if (bufferSize != (buffer[2 * sizeof (uint64_t) - 1] & 0x7F))
     return false;
 
-  const uint_t itemSize = Serializer::Size( itemType, false);
+  const uint_t itemSize = Serializer::Size (itemType, false);
 
   if (bufferSize % itemSize != 0)
     return false;
 
   const Serializer::VALUE_VALIDATOR validator =
-      Serializer::SelectValidator( itemType);
+      Serializer::SelectValidator (itemType);
 
   uint_t itemOffset = 0;
-  while( itemOffset < bufferSize)
+  while (itemOffset < bufferSize)
     {
-      if ( ! validator( buffer + itemOffset))
+      if ( ! validator (buffer + itemOffset))
         return false;
 
       itemOffset += itemSize;
@@ -1234,33 +1234,33 @@ check_array_buffer( const uint8_t* const        buffer,
 
 
 static bool
-check_text_buffer( const uint8_t* const utf8buffer, const uint_t bufferSize)
+check_text_buffer (const uint8_t* const utf8buffer, const uint_t bufferSize)
 {
-  assert( 2 * sizeof( uint64_t) == Serializer::Size( T_TEXT, false));
+  assert (2 * sizeof (uint64_t) == Serializer::Size (T_TEXT, false));
 
-  if ((bufferSize >= 2 * sizeof( uint64_t)) || (bufferSize == 0))
+  if ((bufferSize >= 2 * sizeof (uint64_t)) || (bufferSize == 0))
     return false;
 
-  else if (bufferSize != (utf8buffer[2 * sizeof( uint64_t) - 1] & 0x7F))
+  else if (bufferSize != (utf8buffer[2 * sizeof (uint64_t) - 1] & 0x7F))
     return false;
 
   uint_t verified = 0;
-  while( verified < bufferSize)
+  while (verified < bufferSize)
     {
       try
       {
-        const uint_t unitsCount = wh_utf8_cu_count( utf8buffer[verified]);
+        const uint_t unitsCount = wh_utf8_cu_count (utf8buffer[verified]);
 
         if (unitsCount == 0)
           return false;
 
         uint32_t cp;
         wh_load_utf8_cp (utf8buffer + verified, &cp);
-        DChar chk_cp_valid( cp);
+        DChar chk_cp_valid (cp);
 
         verified += unitsCount;
       }
-      catch( ...)
+      catch (...)
       {
           return false;
       }
@@ -1271,7 +1271,7 @@ check_text_buffer( const uint8_t* const utf8buffer, const uint_t bufferSize)
 
 
 bool
-PersistentTable::RepairTable( DbsHandler&                 dbs,
+PersistentTable::RepairTable (DbsHandler&                 dbs,
                               const std::string&          name,
                               const std::string&          path,
                               FIX_ERROR_CALLBACK          fixCallback)
@@ -1280,7 +1280,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
   const string fileNamePrefix = path + name;
 
-  if ( ! repair_table_header( name,
+  if ( ! repair_table_header (name,
                               fileNamePrefix,
                               settings.mMaxFileSize,
                               fixCallback))
@@ -1288,17 +1288,17 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
       return false;
     }
 
-  File tableFile( fileNamePrefix.c_str(),
+  File tableFile (fileNamePrefix.c_str (),
                    WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  assert( tableFile.Size() >= TableRmNode::RAW_NODE_SIZE);
+  assert (tableFile.Size() >= TableRmNode::RAW_NODE_SIZE);
 
-  auto_ptr<uint8_t> tableHeader( new uint8_t[PS_HEADER_SIZE]);
+  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
 
-  tableFile.Seek( 0, WH_SEEK_BEGIN);
-  tableFile.Read( tableHeader.get (), PS_HEADER_SIZE);
+  tableFile.Seek (0, WH_SEEK_BEGIN);
+  tableFile.Read (tableHeader.get (), PS_HEADER_SIZE);
 
-  assert( memcmp( tableHeader.get (),
+  assert (memcmp (tableHeader.get (),
           PS_TABLE_SIGNATURE,
           sizeof PS_TABLE_SIGNATURE) == 0);
 
@@ -1316,11 +1316,11 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
   uint64_t vsDataSize = load_le_int64 (tableHeader.get () +
                                        PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  auto_ptr<uint8_t>  fieldsDescs( new uint8_t[descSize]);
+  auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
 
-  assert( tableFile.Size() >= PS_HEADER_SIZE + descSize);
+  assert (tableFile.Size() >= PS_HEADER_SIZE + descSize);
 
-  tableFile.Read( fieldsDescs.get (), descSize);
+  tableFile.Read (fieldsDescs.get (), descSize);
   tableFile.Close();
 
   FieldDescriptor* const fds = _RC (FieldDescriptor*, fieldsDescs.get ());
@@ -1332,14 +1332,14 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
       if ((fds[i].IndexNodeSizeKB() == 0)
           || (fds[i].IndexUnitsCount() == 0))
         {
-          fds[i].IndexNodeSizeKB( 0);
-          fds[i].IndexUnitsCount( 0);
+          fds[i].IndexNodeSizeKB (0);
+          fds[i].IndexUnitsCount (0);
 
-          indexNodeMgrs.push_back( NULL);
+          indexNodeMgrs.push_back (NULL);
           continue;
         }
 
-      fds[i].IndexUnitsCount( 0);
+      fds[i].IndexUnitsCount (0);
 
       string containerName = fileNamePrefix;
 
@@ -1347,15 +1347,15 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
       containerName += _RC (const char*, fds) + fds[i].NameOffset();
       containerName += "_bt";
 
-      FileContainer::Fix (containerName.c_str(), settings.mMaxFileSize, 0);
+      FileContainer::Fix (containerName.c_str (), settings.mMaxFileSize, 0);
 
       auto_ptr<IDataContainer> indexContainer(
-                             new FileContainer( containerName.c_str(),
+                             new FileContainer (containerName.c_str (),
                                                 settings.mMaxFileSize,
                                                 0 )
                                               );
       indexNodeMgrs.push_back(
-            new FieldIndexNodeManager( indexContainer,
+            new FieldIndexNodeManager (indexContainer,
                                        fds[i].IndexNodeSizeKB() * 1024,
                                        0x400000, //4MB
                                        _SC (DBS_FIELD_TYPE, fds[i].Type()),
@@ -1363,13 +1363,13 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                                 );
     }
 
-  FileContainer tableData( fileNamePrefix.c_str(), settings.mMaxFileSize, 1);
-  FileContainer rowsData( (fileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str(),
+  FileContainer tableData (fileNamePrefix.c_str (), settings.mMaxFileSize, 1);
+  FileContainer rowsData ((fileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str (),
                           settings.mMaxFileSize,
                           ((rowSize * rowsCount) + settings.mMaxFileSize - 1) /
                           settings.mMaxFileSize);
 
-  RepairTableNodeManager tableNodeMgr( dbs, tableData);
+  RepairTableNodeManager tableNodeMgr (dbs, tableData);
 
   if (rowSize * rowsCount != rowsData.Size())
     {
@@ -1383,25 +1383,25 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
       rowsCount = min<uint64_t> (rowsData.Size() / rowSize, rowsCount);
 
-      fixCallback( INFORMATION,
+      fixCallback (INFORMATION,
                    "Set the table rows count at '%u'.",
                    rowsCount);
 
-      rowsData.Colapse( rowsCount * rowSize, rowsData.Size());
+      rowsData.Colapse (rowsCount * rowSize, rowsData.Size());
     }
   else
     {
-      fixCallback( INFORMATION,
+      fixCallback (INFORMATION,
                    "Table '%s' has %u row(s) allocated.",
-                   name.c_str(),
+                   name.c_str (),
                    rowsCount);
     }
 
 
-  auto_ptr<VariableSizeStore> vsData( new VariableSizeStore);
+  auto_ptr<VariableSizeStore> vsData (new VariableSizeStore);
   if (vsDataSize > 0)
     {
-      vsData->Init( (fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(),
+      vsData->Init ((fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str (),
                     vsDataSize,
                     settings.mMaxFileSize);
       vsData->PrepareToCheckStorage();
@@ -1416,7 +1416,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
       bool allFieldsAreNull = true;
 
-      rowsData.Read( row * rowSize, rowSize, rowData);
+      rowsData.Read (row * rowSize, rowSize, rowData);
 
       for (FIELD_INDEX field = 0; field < fieldsCount; ++field)
         {
@@ -1426,11 +1426,11 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
           bool isNullValue = ((rowData[byteOff] & (1 << bitOff)) != 0);
 
-          if (IS_ARRAY( fds[field].Type()) && ! isNullValue)
+          if (IS_ARRAY (fds[field].Type()) && ! isNullValue)
             {
               const uint64_t fieldEntry  = load_le_int64 (fieldData);
               const uint64_t fieldSize   = load_le_int64 (
-                                                  fieldData + sizeof( uint64_t)
+                                                  fieldData + sizeof (uint64_t)
                                                         );
               if ((fieldSize & 0x8000000000000000ull) != 0)
                 {
@@ -1438,11 +1438,11 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                                 fieldData,
                                 (fieldSize >> 56) & 0x7F,
                                 _SC (DBS_FIELD_TYPE,
-                                     GET_BASIC_TYPE( fds[field].Type()))
+                                     GET_BASIC_TYPE (fds[field].Type()))
                                              ))
 
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1456,10 +1456,10 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                                      fieldEntry,
                                      fieldSize,
                                      _SC (DBS_FIELD_TYPE,
-                                          GET_BASIC_TYPE( fds[field].Type()))
+                                          GET_BASIC_TYPE (fds[field].Type()))
                                                  ))
                 {
-                  fixCallback( FIX_INFO,
+                  fixCallback (FIX_INFO,
                                "Detected invalid value of field '%s' at row"
                                " %u. Set to NULL.",
                                fieldsDescs.get () + fds[field].NameOffset(),
@@ -1467,19 +1467,19 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   isNullValue = true;
                 }
             }
-          else if ((GET_BASIC_TYPE( fds[field].Type()) == T_TEXT)
+          else if ((GET_BASIC_TYPE (fds[field].Type()) == T_TEXT)
                    && ! isNullValue)
             {
               const uint64_t fieldEntry = load_le_int64 (fieldData);
               const uint64_t fieldSize  = load_le_int64 (
-                                                 fieldData + sizeof( uint64_t)
+                                                 fieldData + sizeof (uint64_t)
                                                         );
               if ((fieldSize & 0x8000000000000000ull) != 0)
                 {
-                  if ( ! check_text_buffer( fieldData,
+                  if ( ! check_text_buffer (fieldData,
                                             (fieldSize >> 56) & 0x7F))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1489,9 +1489,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                       isNullValue = true;
                     }
                 }
-              else if ( ! vsData->CheckTextEntry( fieldEntry, fieldSize))
+              else if ( ! vsData->CheckTextEntry (fieldEntry, fieldSize))
                 {
-                  fixCallback( FIX_INFO,
+                  fixCallback (FIX_INFO,
                                "Detected invalid value of field '%s' at row"
                                " %u. Set to NULL.",
                                fieldsDescs.get () + fds[field].NameOffset(),
@@ -1501,7 +1501,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
             }
           else if ((indexNodeMgrs[field] != NULL))
             {
-              switch( GET_BASIC_TYPE( fds[field].Type()))
+              switch (GET_BASIC_TYPE (fds[field].Type()))
               {
               case T_BOOL:
                 {
@@ -1510,7 +1510,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DBool> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1520,9 +1520,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DBool> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1537,7 +1537,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DChar> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1547,9 +1547,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DChar> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1564,7 +1564,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DDate> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1574,9 +1574,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DDate> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1591,7 +1591,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DDateTime> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1601,9 +1601,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DDateTime> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1618,7 +1618,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DHiresTime> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1628,9 +1628,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DHiresTime> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1645,7 +1645,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt8> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1655,9 +1655,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt8> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1672,7 +1672,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt16> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1682,9 +1682,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt16> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1699,7 +1699,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt32> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1709,9 +1709,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt32> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1726,7 +1726,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DInt64> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1736,9 +1736,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt64> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1753,7 +1753,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DReal> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1763,9 +1763,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DReal> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1780,7 +1780,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DRichReal> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () + fds[field].NameOffset(),
@@ -1789,9 +1789,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DRichReal> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1806,7 +1806,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt8> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1816,9 +1816,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt8> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1833,7 +1833,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt16> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1843,9 +1843,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt16> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1860,7 +1860,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt32> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1870,9 +1870,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt32> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1887,7 +1887,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                   if ( ! isNullValue
                       && ! Serializer::ValidateBuffer<DUInt64> (fieldData))
                     {
-                      fixCallback( FIX_INFO,
+                      fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
                                    " %u. Set to NULL.",
                                    fieldsDescs.get () +
@@ -1897,9 +1897,9 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
                     }
 
                   if ( ! isNullValue)
-                    Serializer::Load( fieldData, &value);
+                    Serializer::Load (fieldData, &value);
 
-                  BTree( *indexNodeMgrs[field]).InsertKey(
+                  BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DUInt64> (value, row),
                                   &dummyNode,
                                   &dummyKey
@@ -1918,14 +1918,14 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
 
           allFieldsAreNull &= isNullValue;
         }
-      rowsData.Write( row * rowSize, rowSize, rowData);
+      rowsData.Write (row * rowSize, rowSize, rowData);
 
       if (allFieldsAreNull)
         {
-          BTree        removedNodes( tableNodeMgr);
+          BTree        removedNodes (tableNodeMgr);
           TableRmKey   key (row);
 
-          removedNodes.InsertKey( key, &dummyNode, &dummyKey);
+          removedNodes.InsertKey (key, &dummyNode, &dummyKey);
 
         }
     }
@@ -1939,7 +1939,7 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
   store_le_int64 (rowsCount, tableHeader.get () + PS_TABLE_ROWS_COUNT_OFF);
   store_le_int64 (vsDataSize,
                   tableHeader.get () + PS_TABLE_VARSTORAGE_SIZE_OFF);
-  store_le_int32 (tableNodeMgr.RootNodeId(),
+  store_le_int32 (tableNodeMgr.RootNodeId (),
                   tableHeader.get () + PS_TABLE_BT_ROOT_OFF);
   store_le_int64 (tableData.Size(),
                   tableHeader.get () + PS_TABLE_MAINTABLE_SIZE_OFF);
@@ -1950,39 +1950,39 @@ PersistentTable::RepairTable( DbsHandler&                 dbs,
     {
       if (indexNodeMgrs[field] == NULL)
         {
-          assert( fds[field].IndexNodeSizeKB() == 0);
-          assert( fds[field].IndexUnitsCount() == 0);
+          assert (fds[field].IndexNodeSizeKB() == 0);
+          assert (fds[field].IndexUnitsCount() == 0);
 
           continue;
         }
 
-      assert( indexNodeMgrs[field]->IndexRawSize() > 0);
-      assert( fds[field].IndexNodeSizeKB() > 0);
-      assert( fds[field].IndexUnitsCount() == 0);
+      assert (indexNodeMgrs[field]->IndexRawSize() > 0);
+      assert (fds[field].IndexNodeSizeKB() > 0);
+      assert (fds[field].IndexUnitsCount() == 0);
 
       uint64_t unitsCount = indexNodeMgrs[field]->IndexRawSize();
       unitsCount += settings.mMaxFileSize - 1;
       unitsCount /= settings.mMaxFileSize;
 
-      fds[field].IndexUnitsCount( unitsCount);
+      fds[field].IndexUnitsCount (unitsCount);
       delete indexNodeMgrs[field];
     }
 
-  tableData.Write( 0, PS_HEADER_SIZE, tableHeader.get ());
-  tableData.Write( PS_HEADER_SIZE, descSize, fieldsDescs.get ());
+  tableData.Write (0, PS_HEADER_SIZE, tableHeader.get ());
+  tableData.Write (PS_HEADER_SIZE, descSize, fieldsDescs.get ());
 
   return true;
 }
 
 
 
-TemporalTable::TemporalTable( DbsHandler&                     dbs,
+TemporalTable::TemporalTable (DbsHandler&                     dbs,
                               const DBSFieldDescriptor* const fields,
                               const FIELD_INDEX               fieldsCount)
-  : PrototypeTable( dbs),
-    mTableData( NULL),
-    mRowsData( NULL),
-    mVSData( NULL)
+  : PrototypeTable (dbs),
+    mTableData (NULL),
+    mRowsData (NULL),
+    mVSData (NULL)
 {
 
   //Check the arguments
@@ -1991,62 +1991,62 @@ TemporalTable::TemporalTable( DbsHandler&                     dbs,
       || (fieldsCount > 0xFFFFu))
     {
       throw DBSException(
-          _EXTRA( DBSException::OPER_NOT_SUPPORTED),
+          _EXTRA (DBSException::OPER_NOT_SUPPORTED),
           "Could not create a temporal table with %d fields count.",
           (fields == NULL ) ? 0 : fieldsCount
                          );
     }
 
   //Compute the table header descriptor size
-  const uint32_t descriptorsSize = sizeof( FieldDescriptor) * fieldsCount +
-                                     get_fields_names_len( fields, fieldsCount);
+  const uint32_t descriptorsSize = sizeof (FieldDescriptor) * fieldsCount +
+                                     get_fields_names_len (fields, fieldsCount);
 
-  validate_field_descriptors( fields, fieldsCount);
+  validate_field_descriptors (fields, fieldsCount);
 
-  vector<DBSFieldDescriptor> vect( fields + 0, fields + fieldsCount);
-  auto_ptr<uint8_t> fieldDescs( new uint8_t[descriptorsSize]);
+  vector<DBSFieldDescriptor> vect (fields + 0, fields + fieldsCount);
+  auto_ptr<uint8_t> fieldDescs (new uint8_t[descriptorsSize]);
 
   uint_t rowSize;
 
-  normalize_fields( vect, &rowSize, fieldDescs.get());
+  normalize_fields (vect, &rowSize, fieldDescs.get());
 
   mFieldsCount     = fieldsCount;
   mDescriptorsSize = descriptorsSize;
   mRowSize         = rowSize;
-  mFieldsDescriptors.reset( fieldDescs.release());
+  mFieldsDescriptors.reset (fieldDescs.release());
 
-  mvIndexNodeMgrs.insert( mvIndexNodeMgrs.begin(), mFieldsCount, NULL);
+  mvIndexNodeMgrs.insert (mvIndexNodeMgrs.begin(), mFieldsCount, NULL);
 
   uint_t       blkSize  = DBSSettings().mTableCacheBlkSize;
   const uint_t blkCount = DBSSettings().mTableCacheBlkCount;
 
-  assert( (blkSize != 0) && (blkCount != 0));
+  assert ((blkSize != 0) && (blkCount != 0));
 
-  while( blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
-  mRowCache.Init( *this, mRowSize, blkSize, blkCount, true);
+  mRowCache.Init (*this, mRowSize, blkSize, blkCount, true);
 }
 
 
-TemporalTable::TemporalTable( const PrototypeTable& prototype)
-  : PrototypeTable( prototype),
-    mTableData( NULL),
-    mRowsData( NULL),
-    mVSData( NULL)
+TemporalTable::TemporalTable (const PrototypeTable& prototype)
+  : PrototypeTable (prototype),
+    mTableData (NULL),
+    mRowsData (NULL),
+    mVSData (NULL)
 {
 
-  mvIndexNodeMgrs.insert( mvIndexNodeMgrs.begin(), mFieldsCount, NULL);
+  mvIndexNodeMgrs.insert (mvIndexNodeMgrs.begin(), mFieldsCount, NULL);
 
   uint_t       blkSize  = DBSSettings().mTableCacheBlkSize;
   const uint_t blkCount = DBSSettings().mTableCacheBlkCount;
 
-  assert( (blkSize != 0) && (blkCount != 0));
+  assert ((blkSize != 0) && (blkCount != 0));
 
-  while( blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
-  mRowCache.Init( *this, mRowSize, blkSize, blkCount, true);
+  mRowCache.Init (*this, mRowSize, blkSize, blkCount, true);
 }
 
 
@@ -2070,7 +2070,7 @@ TemporalTable::IsTemporal() const
 ITable&
 TemporalTable::Spawn() const
 {
-  ITable* const result = new TemporalTable( *this);
+  ITable* const result = new TemporalTable (*this);
 
   mDbs.RegisterTableSpawn();
 
@@ -2094,28 +2094,28 @@ TemporalTable::MakeHeaderPersistent()
 
 
 IDataContainer*
-TemporalTable::CreateIndexContainer( const FIELD_INDEX)
+TemporalTable::CreateIndexContainer (const FIELD_INDEX)
 {
-  return new TemporalContainer();
+  return new TemporalContainer ();
 }
 
 
 IDataContainer&
-TemporalTable::TableContainer()
+TemporalTable::TableContainer ()
 {
 
   if (mTableData.get () == NULL)
-    mTableData.reset( new TemporalContainer());
+    mTableData.reset (new TemporalContainer ());
 
   return *mTableData.get ();
 }
 
 
 IDataContainer&
-TemporalTable::RowsContainer()
+TemporalTable::RowsContainer ()
 {
   if (mRowsData.get () == NULL)
-    mRowsData.reset( new TemporalContainer());
+    mRowsData.reset (new TemporalContainer ());
 
   return *mRowsData.get ();
 }
@@ -2126,9 +2126,9 @@ TemporalTable::VSStore()
 {
   if (mVSData == NULL)
     {
-      auto_ptr<VariableSizeStore> hold( new VariableSizeStore());
+      auto_ptr<VariableSizeStore> hold (new VariableSizeStore());
 
-      hold->Init( mDbs.WorkingDir().c_str(), 4096);
+      hold->Init (mDbs.WorkingDir ().c_str (), 4096);
 
       mVSData = hold.release();
       mVSData->RegisterReference();

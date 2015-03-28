@@ -53,12 +53,12 @@ public:
 
   StoreEntry()
   {
-    memset( mPrevEntry, 0xFF, sizeof mPrevEntry);
-    memset( mNextEntry, 0xFF, sizeof mPrevEntry);
-    memset( mRawData,   0xFF, sizeof mRawData);
+    memset (mPrevEntry, 0xFF, sizeof mPrevEntry);
+    memset (mNextEntry, 0xFF, sizeof mPrevEntry);
+    memset (mRawData,   0xFF, sizeof mRawData);
   }
 
-  void MarkAsDeleted( const bool deleted)
+  void MarkAsDeleted (const bool deleted)
   {
     uint64_t entry = load_le_int64 (mNextEntry);
 
@@ -67,7 +67,7 @@ public:
     store_le_int64 (entry, mNextEntry);
   }
 
-  void MarkAsFirstEntry( const bool first)
+  void MarkAsFirstEntry (const bool first)
   {
     uint64_t entry = load_le_int64 (mNextEntry);
 
@@ -76,14 +76,14 @@ public:
     store_le_int64 (entry, mNextEntry);
   }
 
-  bool IsDeleted() const
+  bool IsDeleted () const
   {
-    return( load_le_int64 (mNextEntry) & ENTRY_DELETED_MASK) != 0;
+    return (load_le_int64 (mNextEntry) & ENTRY_DELETED_MASK) != 0;
   }
 
   bool IsFirstEntry() const
   {
-    return( load_le_int64 (mNextEntry) & FIRST_RECORD_ENTRY) != 0;
+    return (load_le_int64 (mNextEntry) & FIRST_RECORD_ENTRY) != 0;
   }
 
   uint64_t PrevEntry() const
@@ -91,7 +91,7 @@ public:
     return load_le_int64 (mPrevEntry);
   }
 
-  void PrevEntry( const uint64_t content)
+  void PrevEntry (const uint64_t content)
   {
     store_le_int64 (content, mPrevEntry);
   }
@@ -102,7 +102,7 @@ public:
              ~(ENTRY_DELETED_MASK | FIRST_RECORD_ENTRY);
   }
 
-  void NextEntry( const uint64_t content)
+  void NextEntry (const uint64_t content)
   {
     uint64_t entry = load_le_int64 (mNextEntry);
 
@@ -112,9 +112,9 @@ public:
     store_le_int64 (entry, mNextEntry);
   }
 
-  uint_t Read( uint_t offset, uint_t count, uint8_t* buffer) const;
+  uint_t Read (uint_t offset, uint_t count, uint8_t* buffer) const;
 
-  uint_t Write( uint_t offset, uint_t count, const uint8_t* buffer);
+  uint_t Write (uint_t offset, uint_t count, const uint8_t* buffer);
 
   static uint8_t Size()
   {
@@ -138,10 +138,10 @@ public:
 
   void ReleaseReference();
 
-  void Init( const char*       tempDir,
+  void Init (const char*       tempDir,
              const uint32_t    reservedMem);
 
-  void Init( const char*        baseName,
+  void Init (const char*        baseName,
              const uint64_t     storeSize,
              const uint64_t     maxFileSize);
 
@@ -149,77 +149,77 @@ public:
 
   void MarkForRemoval();
 
-  uint64_t AddRecord( const uint8_t*      buffer,
+  uint64_t AddRecord (const uint8_t*      buffer,
                       const uint64_t      size);
 
-  uint64_t AddRecord( VariableSizeStore& sourceStore,
+  uint64_t AddRecord (VariableSizeStore& sourceStore,
                       uint64_t           sourceFirstEntry,
                       uint64_t           sourceFrom,
                       uint64_t           sourceSize);
 
-  uint64_t AddRecord( IDataContainer&  sourceContainer,
+  uint64_t AddRecord (IDataContainer&  sourceContainer,
                       uint64_t         sourceFrom,
                       uint64_t         sourceSize);
 
-  void GetRecord( uint64_t    recordFirstEntry,
+  void GetRecord (uint64_t    recordFirstEntry,
                   uint64_t    offset,
                   uint64_t    size,
                   uint8_t*    buffer);
 
-  void UpdateRecord( uint64_t          recordFirstEntry,
+  void UpdateRecord (uint64_t          recordFirstEntry,
                      uint64_t          offset,
                      uint64_t          size,
                      const uint8_t*    source);
 
-  void UpdateRecord( uint64_t           recordFirstEntry,
+  void UpdateRecord (uint64_t           recordFirstEntry,
                      uint64_t           offset,
                      VariableSizeStore& sourceStore,
                      uint64_t           sourceFirstEntry,
                      uint64_t           sourceOffset,
                      uint64_t           sourceCount);
 
-  void UpdateRecord( uint64_t           recordFirstEntry,
+  void UpdateRecord (uint64_t           recordFirstEntry,
                      uint64_t           offset,
                      IDataContainer&    sourceContainer,
                      uint64_t           sourceOffset,
                      uint64_t           sourceCount);
 
-  void IncrementRecordRef( const uint64_t recordFirstEntry);
-  void DecrementRecordRef( const uint64_t recordFirstEntry);
+  void IncrementRecordRef (const uint64_t recordFirstEntry);
+  void DecrementRecordRef (const uint64_t recordFirstEntry);
 
   uint64_t Size() const;
 
-  virtual void StoreItems( uint64_t          firstItem,
+  virtual void StoreItems (uint64_t          firstItem,
                            uint_t            itemsCount,
                            const uint8_t*    from);
 
-  virtual void RetrieveItems( uint64_t       firstItem,
+  virtual void RetrieveItems (uint64_t       firstItem,
                               uint_t         itemsCount,
                               uint8_t*       to);
 
   void PrepareToCheckStorage();
 
-  bool CheckArrayEntry( const uint64_t          recordFirstEntry,
+  bool CheckArrayEntry (const uint64_t          recordFirstEntry,
                         const uint64_t          recordSize,
                         const DBS_FIELD_TYPE    itemSize);
 
-  bool CheckTextEntry( const uint64_t   recordFirstEntry,
+  bool CheckTextEntry (const uint64_t   recordFirstEntry,
                        const uint64_t   recordSize);
 
   void ConcludeStorageCheck();
 
 private:
-  void FinishInit( const bool nonPersitentData);
+  void FinishInit (const bool nonPersitentData);
 
-  uint64_t AllocateEntry( const uint64_t prevEntryId);
+  uint64_t AllocateEntry (const uint64_t prevEntryId);
 
   uint64_t ExtentFreeList();
 
-  void RemoveRecord( uint64_t recordFirstEntry);
+  void RemoveRecord (uint64_t recordFirstEntry);
 
-  void ExtractFromFreeList( const uint64_t entryId);
+  void ExtractFromFreeList (const uint64_t entryId);
 
-  void AddToFreeList( const uint64_t entryId);
+  void AddToFreeList (const uint64_t entryId);
 
   std::auto_ptr<IDataContainer> mEntriesContainer;
   BlockCache                    mEntriesCache;

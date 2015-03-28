@@ -206,11 +206,11 @@ static const struct MsgCodeEntry messages[] = {
 };
 
 static const struct MsgCodeEntry*
-find_string( uint_t msgCode)
+find_string (uint_t msgCode)
 {
   uint_t i = 0;
 
-  while( (msgCode != messages[i].id) && (messages[i].id != 0))
+  while ((msgCode != messages[i].id) && (messages[i].id != 0))
       ++i;
 
   if (messages[i].msg == NULL)
@@ -220,19 +220,19 @@ find_string( uint_t msgCode)
 }
 
 void
-log_message( struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
+log_message (struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
 {
-  const struct MsgCodeEntry* entry = find_string( msgCode);
+  const struct MsgCodeEntry* entry = find_string (msgCode);
 
   va_list args;
 
   if (entry == NULL)
     {
-      log_message( parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
+      log_message (parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
       return;
     }
 
-  va_start( args, msgCode);
+  va_start (args, msgCode);
   if (parser->messenger != NULL)
     {
       parser->messenger( parser->messengerCtxt,
@@ -245,7 +245,7 @@ log_message( struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
   else
     {
       /* Just don't send the message. */
-      assert( parser->messengerCtxt == NULL);
+      assert (parser->messengerCtxt == NULL);
     }
 
   if ((entry->type == MSG_ERROR_EVENT)
@@ -255,6 +255,6 @@ log_message( struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
       parser->abortError = TRUE;
     }
 
-  va_end( args);
+  va_end (args);
 }
 

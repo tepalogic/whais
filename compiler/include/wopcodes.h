@@ -207,7 +207,7 @@ extern "C"
 #endif
 
 COMPILER_SHL uint_t
-wh_compiler_decode_op( const uint8_t*        instrs,
+wh_compiler_decode_op (const uint8_t*        instrs,
                        enum W_OPCODE* const  outOpcode);
 #ifdef __cplusplus
 }

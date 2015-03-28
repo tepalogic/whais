@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static BOOL_R
-is_leap_year( const int year)
+is_leap_year (const int year)
 {
   if ((year % 4) == 0)
     {

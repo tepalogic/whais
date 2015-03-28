@@ -61,8 +61,8 @@ const uint_t WHC_PROC_ENTRY_NPARMS_OFF = 14;
 const uint_t WHC_PROC_ENTRY_CODE_SIZE  = 16;
 const uint_t WHC_PROC_ENTRY_SIZE       = 20;
 
-const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof( uint32_t);
-const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof( uint8_t);
+const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof (uint32_t);
+const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof (uint8_t);
 
 #endif /* WO_FORMAT_H_ */
 

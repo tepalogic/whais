@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 void
-StartServer( whais::FileLogger& log, std::vector<DBSDescriptors>& databases);
+StartServer (whais::FileLogger& log, std::vector<DBSDescriptors>& databases);
 
 void
-StopServer();
+StopServer ();
 
 
 #endif /* SERVER_H_ */

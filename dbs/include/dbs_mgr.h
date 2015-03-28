@@ -48,41 +48,41 @@ static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
 class DBS_SHL IDBSHandler
 {
 public:
-  virtual ~IDBSHandler() {}
+  virtual ~IDBSHandler () {}
 
   virtual TABLE_INDEX PersistentTablesCount() = 0;
 
-  virtual ITable& RetrievePersistentTable( const TABLE_INDEX index) = 0;
+  virtual ITable& RetrievePersistentTable (const TABLE_INDEX index) = 0;
 
-  virtual ITable& RetrievePersistentTable( const char* const name) = 0;
+  virtual ITable& RetrievePersistentTable (const char* const name) = 0;
 
-  virtual void AddTable( const char* const   name,
+  virtual void AddTable (const char* const   name,
                          const FIELD_INDEX   fieldsCount,
                          DBSFieldDescriptor* inoutFields) = 0;
-  virtual void DeleteTable( const char* const name) = 0;
+  virtual void DeleteTable (const char* const name) = 0;
 
-  virtual void SyncTableContent( const TABLE_INDEX index) = 0;
+  virtual void SyncTableContent (const TABLE_INDEX index) = 0;
 
-  virtual ITable& CreateTempTable( const FIELD_INDEX   fieldsCount,
+  virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields) = 0;
 
-  virtual void ReleaseTable( ITable&) = 0;
+  virtual void ReleaseTable (ITable&) = 0;
 
-  virtual const char* TableName( const TABLE_INDEX index) = 0;
+  virtual const char* TableName (const TABLE_INDEX index) = 0;
 
 };
 
 struct DBSSettings
 {
   DBSSettings()
-    : mWorkDir( whf_current_dir()),
-      mTempDir( whf_current_dir()),
-      mMaxFileSize( DEFAULT_MAX_FILE_SIZE),
-      mTableCacheBlkSize( DEFAULT_TABLE_CACHE_BLK_SIZE),
-      mTableCacheBlkCount( DEFAULT_TABLE_CACHE_BLK_COUNT),
-      mVLStoreCacheBlkSize( DEFAULT_VLSTORE_CACHE_BLK_SIZE),
-      mVLStoreCacheBlkCount( DEFAULT_VLSTORE_CACHE_BLK_COUNT),
-      mVLValueCacheSize( DEFAULT_VLVALUE_CACHE_SIZE)
+    : mWorkDir (whf_current_dir ()),
+      mTempDir (whf_current_dir ()),
+      mMaxFileSize (DEFAULT_MAX_FILE_SIZE),
+      mTableCacheBlkSize (DEFAULT_TABLE_CACHE_BLK_SIZE),
+      mTableCacheBlkCount (DEFAULT_TABLE_CACHE_BLK_COUNT),
+      mVLStoreCacheBlkSize (DEFAULT_VLSTORE_CACHE_BLK_SIZE),
+      mVLStoreCacheBlkCount (DEFAULT_VLSTORE_CACHE_BLK_COUNT),
+      mVLValueCacheSize (DEFAULT_VLVALUE_CACHE_SIZE)
   {
   }
 
@@ -107,12 +107,12 @@ enum FIX_ERROR_CALLBACK_TYPE {
   CRITICAL
 };
 
-typedef bool( *FIX_ERROR_CALLBACK) (const FIX_ERROR_CALLBACK_TYPE type,
+typedef bool (*FIX_ERROR_CALLBACK) (const FIX_ERROR_CALLBACK_TYPE type,
                                     const char* const             format,
                                     ... );
 
 DBS_SHL void
-DBSInit( const DBSSettings& setup);
+DBSInit (const DBSSettings& setup);
 
 
 DBS_SHL void
@@ -124,29 +124,29 @@ DBSGetSeettings();
 
 
 DBS_SHL void
-DBSCreateDatabase( const char* const name,
+DBSCreateDatabase (const char* const name,
                    const char*       path = NULL);
 
 
 DBS_SHL bool
-DBSValidateDatabase( const char* const name,
+DBSValidateDatabase (const char* const name,
                      const char*       path = NULL);
 
 DBS_SHL bool
-DBSRepairDatabase( const char* const            name,
+DBSRepairDatabase (const char* const            name,
                    const char*                  path        = NULL,
                    FIX_ERROR_CALLBACK           fixCallback = NULL);
 
 DBS_SHL IDBSHandler&
-DBSRetrieveDatabase( const char* const name,
+DBSRetrieveDatabase (const char* const name,
                      const char*       path = NULL);
 
 DBS_SHL void
-DBSReleaseDatabase( IDBSHandler& hnd);
+DBSReleaseDatabase (IDBSHandler& hnd);
 
 
 DBS_SHL void
-DBSRemoveDatabase( const char* const     name,
+DBSRemoveDatabase (const char* const     name,
                    const char* const     path = NULL);
 
 

@@ -25,23 +25,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 
 WH_SHLIB
-wh_shl_load( const char* const library)
+wh_shl_load (const char* const library)
 {
-  HMODULE hnd = LoadLibrary( library);
+  HMODULE hnd = LoadLibrary (library);
 
   return hnd;
 }
 
 
 void
-wh_shl_release( WH_SHLIB shl)
+wh_shl_release (WH_SHLIB shl)
 {
-  FreeLibrary( shl);
+  FreeLibrary (shl);
 }
 
 
 void*
-wh_shl_symbol( WH_SHLIB shl, const char* const symbol)
+wh_shl_symbol (WH_SHLIB shl, const char* const symbol)
 {
   void* const result = (void*)GetProcAddress( shl, symbol);
 

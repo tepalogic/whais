@@ -50,19 +50,19 @@ static Lock                        sClosingLock;
 class Listener
 {
 public:
-  Listener()
-    : mInterface( NULL),
-      mPort( NULL),
-      mListenThread(),
-      mSocket( INVALID_SOCKET),
-      mUsersPool( GetAdminSettings().mMaxConnections)
+  Listener ()
+    : mInterface (NULL),
+      mPort (NULL),
+      mListenThread (),
+      mSocket (INVALID_SOCKET),
+      mUsersPool (GetAdminSettings().mMaxConnections)
   {
-    mListenThread.IgnoreExceptions( true);
+    mListenThread.IgnoreExceptions (true);
   }
 
   bool SearchFreeUser(void (*task)( void* args), Socket& socket)
   {
-    assert( mUsersPool.Size() > 0);
+    assert (mUsersPool.Size() > 0);
 
     for (uint_t index = 0; index < mUsersPool.Size(); ++index)
       {
@@ -88,7 +88,7 @@ public:
   {
     //If no exception has be thrown by now, there is
     //no point to do it now when we are about to close.
-    mListenThread.IgnoreExceptions( true);
+    mListenThread.IgnoreExceptions (true);
     mListenThread.DiscardException();
 
     //Cancel any pending IO operations.
@@ -96,12 +96,12 @@ public:
 
     for (uint_t index = 0; index < mUsersPool.Size(); ++index)
       {
-        mUsersPool[index].mThread.IgnoreExceptions( true);
+        mUsersPool[index].mThread.IgnoreExceptions (true);
         mUsersPool[index].mThread.DiscardException();
 
         mUsersPool[index].mEndConnection = true;
         mUsersPool[index].mSocket.Close();
-        mUsersPool[index].mThread.WaitToEnd( false);
+        mUsersPool[index].mThread.WaitToEnd (false);
       }
   }
 
@@ -115,7 +115,7 @@ public:
         if (mUsersPool[c].mDesc == NULL)
           {
             if ((wh_msec_ticks() - mUsersPool[c].mLastReqTick) <
-                _SC( uint_t, GetAdminSettings().mAuthTMO))
+                _SC (uint_t, GetAdminSettings().mAuthTMO))
               {
                 continue ;
               }
@@ -126,7 +126,7 @@ public:
             continue ;
           }
         else if ((wh_msec_ticks() - mUsersPool[c].mLastReqTick) <
-                 _SC( uint_t, mUsersPool[c].mDesc->mWaitReqTmo))
+                 _SC (uint_t, mUsersPool[c].mDesc->mWaitReqTmo))
           {
             continue;
           }
@@ -146,7 +146,7 @@ public:
   auto_array<UserHandler> mUsersPool;
 
 private:
-  Listener( const Listener& );
+  Listener (const Listener& );
   Listener& operator= (const Listener&);
 
   static const uint_t MAX_AUTH_TMO_MS = 200;
@@ -156,7 +156,7 @@ static auto_array<Listener>*       sListeners;
 
 
 void
-client_handler_routine( void* args)
+client_handler_routine (void* args)
 {
   UserHandler* const client = _RC (UserHandler*, args);
 
@@ -165,19 +165,19 @@ client_handler_routine( void* args)
   client->mClientSocket  = NULL;
   client->mEndConnection = false;
 
-  assert( sDbsDescriptors != NULL);
+  assert (sDbsDescriptors != NULL);
 
   try
   {
       client->mLastReqTick = wh_msec_ticks(); //Start authentication timer.
-      ClientConnection connection( *client, *sDbsDescriptors);
+      ClientConnection connection (*client, *sDbsDescriptors);
 
-      while( true)
+      while (true)
         {
           const COMMAND_HANDLER* cmds;
 
           client->mLastReqTick = wh_msec_ticks(); //Start request timer!
-          uint16_t cmdType = connection.ReadCommand();
+          uint16_t cmdType = connection.ReadCommand ();
           client->mLastReqTick = 0;                //Stop request timer!
 
           if (cmdType == CMD_CLOSE_CONN)
@@ -185,7 +185,7 @@ client_handler_routine( void* args)
 
           if ((cmdType & 1) != 0)
             {
-              throw ConnectionException( _EXTRA( cmdType),
+              throw ConnectionException (_EXTRA (cmdType),
                                          "Invalid command requested.");
             }
           if (cmdType >= USER_CMD_BASE)
@@ -194,7 +194,7 @@ client_handler_routine( void* args)
               cmdType /= 2;
               if (cmdType >= USER_CMDS_COUNT)
                 {
-                  throw ConnectionException( _EXTRA( cmdType),
+                  throw ConnectionException (_EXTRA (cmdType),
                                              "Invalid user command received.");
                 }
               cmds = gpUserCommands;
@@ -205,14 +205,14 @@ client_handler_routine( void* args)
               if (cmdType >= ADMIN_CMDS_COUNT)
                 {
                   throw ConnectionException(
-                                  _EXTRA( cmdType),
+                                  _EXTRA (cmdType),
                                   "Invalid administrator command received."
                                             );
                 }
               else if (! connection.IsAdmin())
                 {
                   throw ConnectionException(
-                      _EXTRA( cmdType),
+                      _EXTRA (cmdType),
                       "Regular user wants to execute an administrator command."
                                             );
                 }
@@ -221,9 +221,9 @@ client_handler_routine( void* args)
           cmds[cmdType] (connection);
         }
   }
-  catch( SocketException& e)
+  catch (SocketException& e)
   {
-      assert( e.Description() != NULL);
+      assert (e.Description() != NULL);
 
       ostringstream logEntry;
 
@@ -237,7 +237,7 @@ client_handler_routine( void* args)
 
       sMainLog->Log (LOG_ERROR, logEntry.str ());
   }
-  catch( ConnectionException& e)
+  catch (ConnectionException& e)
   {
       if (client->mDesc != NULL)
         client->mDesc->mLogger->Log (LOG_ERROR, e.Message());
@@ -245,7 +245,7 @@ client_handler_routine( void* args)
       else
         sMainLog->Log (LOG_ERROR, e.Message());
   }
-  catch( FileException& e)
+  catch (FileException& e)
   {
       ostringstream logEntry;
 
@@ -262,9 +262,9 @@ client_handler_routine( void* args)
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
-      StopServer();
+      StopServer ();
   }
-  catch( Exception& e)
+  catch (Exception& e)
   {
       ostringstream logEntry;
 
@@ -280,13 +280,13 @@ client_handler_routine( void* args)
 
       client->mDesc->mLogger->Log (LOG_ERROR, logEntry.str ());
   }
-  catch( std::bad_alloc&)
+  catch (std::bad_alloc&)
   {
       sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
-      StopServer();
+      StopServer ();
   }
-  catch( std::exception& e)
+  catch (std::exception& e)
   {
       ostringstream logEntry;
 
@@ -294,12 +294,12 @@ client_handler_routine( void* args)
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
-      StopServer();
+      StopServer ();
   }
-  catch( ...)
+  catch (...)
   {
       sMainLog->Log (LOG_CRITICAL, "Unknown exception!");
-      StopServer();
+      StopServer ();
   }
 
   client->mSocket.Close();
@@ -320,7 +320,7 @@ ticks_routine()
       if (sServerStopped)
         return ;
 
-      wh_sleep( SLEEP_TICK_RESOLUTION);
+      wh_sleep (SLEEP_TICK_RESOLUTION);
       syncElapsedTicks    += SLEEP_TICK_RESOLUTION;
       reqCheckElapsedTics += SLEEP_TICK_RESOLUTION;
       if ((syncElapsedTicks < syncWakeup)
@@ -349,7 +349,7 @@ ticks_routine()
               if (sServerStopped)
                 return ;
 
-              hnd.SyncTableContent( t);
+              hnd.SyncTableContent (t);
             }
           (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks();
         }
@@ -371,17 +371,17 @@ ticks_routine()
         if (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
           reqCheckElapsedTics = 0;
     }
-  while( true);
+  while (true);
 }
 
 void
-listener_routine( void* args)
+listener_routine (void* args)
 {
   Listener* const listener = _RC (Listener*, args);
 
-  assert( listener->mUsersPool.Size() > 0);
-  assert( listener->mListenThread.HasExceptionPending() == false);
-  assert( listener->mPort != NULL);
+  assert (listener->mUsersPool.Size() > 0);
+  assert (listener->mListenThread.HasExceptionPending() == false);
+  assert (listener->mPort != NULL);
 
   try
   {
@@ -397,13 +397,13 @@ listener_routine( void* args)
         sMainLog->Log (LOG_INFO, logEntry.str ());
       }
 
-    listener->mSocket = Socket( listener->mInterface,
+    listener->mSocket = Socket (listener->mInterface,
                                 listener->mPort,
                                 SOCKET_BACK_LOG);
 
     bool acceptUserConnections = sAcceptUsersConnections;
 
-    while( acceptUserConnections)
+    while (acceptUserConnections)
       {
         try
         {
@@ -412,7 +412,7 @@ listener_routine( void* args)
           if ( ! listener->SearchFreeUser (client_handler_routine, client))
             {
               static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
-              client.Write( busyResp, sizeof busyResp);
+              client.Write (busyResp, sizeof busyResp);
 
               sMainLog->Log (
                     LOG_INFO,
@@ -420,11 +420,11 @@ listener_routine( void* args)
                             );
             }
         }
-        catch( SocketException& e)
+        catch (SocketException& e)
         {
             if (sAcceptUsersConnections)
               {
-                assert( e.Description() != NULL);
+                assert (e.Description() != NULL);
                 ostringstream logEntry;
 
                 logEntry << "Description:\n\t" << e.Description() << endl;
@@ -441,9 +441,9 @@ listener_routine( void* args)
         acceptUserConnections = sAcceptUsersConnections;
       }
   }
-  catch( Exception& e)
+  catch (Exception& e)
   {
-      assert( e.Description() != NULL);
+      assert (e.Description() != NULL);
 
       ostringstream logEntry;
 
@@ -458,15 +458,15 @@ listener_routine( void* args)
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
-      StopServer();
+      StopServer ();
   }
-  catch( std::bad_alloc&)
+  catch (std::bad_alloc&)
   {
       sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
 
-      StopServer();
+      StopServer ();
   }
-  catch( std::exception& e)
+  catch (std::exception& e)
   {
       ostringstream logEntry;
 
@@ -474,29 +474,29 @@ listener_routine( void* args)
 
       sMainLog->Log (LOG_CRITICAL, logEntry.str ());
 
-      StopServer();
+      StopServer ();
   }
-  catch( ...)
+  catch (...)
   {
       sMainLog->Log (LOG_CRITICAL, "Listener received unexpected exception!");
-      StopServer();
+      StopServer ();
   }
 }
 
 
 void
-StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
+StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
 {
   sDbsDescriptors = &databases;
   sMainLog        = &log;
 
   log.Log (LOG_DEBUG, "Server started!");
 
-  assert( databases.size() > 0);
+  assert (databases.size() > 0);
 
   const ServerSettings& server = GetAdminSettings();
 
-  auto_array<Listener> listeners( server.mListens.size());
+  auto_array<Listener> listeners (server.mListens.size());
 
   sListeners = &listeners;
 
@@ -509,8 +509,8 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
 
       listener->mInterface = (server.mListens[index].mInterface.size() == 0)
                               ? NULL
-                              : server.mListens[index].mInterface.c_str();
-      listener->mPort = server.mListens[index].mService.c_str();
+                              : server.mListens[index].mInterface.c_str ();
+      listener->mPort = server.mListens[index].mService.c_str ();
       if ( ! listener->mListenThread.Run (listener_routine, listener))
         {
           ostringstream logBuffer;
@@ -524,9 +524,9 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
   log.Log (LOG_DEBUG, "Ticks routine has stopped.");
 
   for (uint_t index = 0; index < listeners.Size(); ++index)
-    listeners[index].mListenThread.WaitToEnd( false);
+    listeners[index].mListenThread.WaitToEnd (false);
 
-  LockRAII<Lock> holder( sClosingLock);
+  LockRAII<Lock> holder (sClosingLock);
   sListeners = NULL;
 
   log.Log (LOG_DEBUG, "Server stopped!");
@@ -534,9 +534,9 @@ StartServer( FileLogger& log, vector<DBSDescriptors>& databases)
 
 
 void
-StopServer()
+StopServer ()
 {
-  LockRAII<Lock> holder( sClosingLock);
+  LockRAII<Lock> holder (sClosingLock);
 
   if ((sListeners == NULL)  || (sMainLog == NULL))
     return; //Ignore! The server probably did not even start.

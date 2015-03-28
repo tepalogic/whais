@@ -54,7 +54,7 @@ struct DBSFieldDescriptor fieldsDescs[] =
     {"t", T_TEXT, false}
 };
 
-#define FIELDS_COUNT (sizeof( fieldsDescs) / sizeof( fieldsDescs[0]))
+#define FIELDS_COUNT (sizeof (fieldsDescs) / sizeof (fieldsDescs[0]))
 
 uint_t _elemsCount = 10000;
 
@@ -80,120 +80,120 @@ FIELD_INDEX f_t;
 DDateTime
 get_random_datetime()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
-  uint8_t hour  = wh_rnd() % 24;
-  uint8_t mins  = wh_rnd() % 60;
-  uint8_t secs  = wh_rnd() % 60;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
 
-  return DDateTime( year, month, day, hour, mins, secs);
+  return DDateTime (year, month, day, hour, mins, secs);
 }
 
 DHiresTime
 get_random_hirestime()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
-  uint8_t hour  = wh_rnd() % 24;
-  uint8_t mins  = wh_rnd() % 60;
-  uint8_t secs  = wh_rnd() % 60;
-  uint32_t  mic = wh_rnd() % 1000000;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
+  uint8_t hour  = wh_rnd () % 24;
+  uint8_t mins  = wh_rnd () % 60;
+  uint8_t secs  = wh_rnd () % 60;
+  uint32_t  mic = wh_rnd () % 1000000;
 
-  return DHiresTime( year, month, day, hour, mins, secs, mic);
+  return DHiresTime (year, month, day, hour, mins, secs, mic);
 }
 
 DDate
 get_random_date()
 {
-  int16_t year  = wh_rnd() & 0xFFFF;
-  uint8_t month = wh_rnd() % 12 + 1;
-  uint8_t day   = wh_rnd() % 27 + 1;
+  int16_t year  = wh_rnd () & 0xFFFF;
+  uint8_t month = wh_rnd () % 12 + 1;
+  uint8_t day   = wh_rnd () % 27 + 1;
 
-  return DDate( year, month, day);
+  return DDate (year, month, day);
 }
 
 DText
-get_random_text( uint_t count)
+get_random_text (uint_t count)
 {
   DText result;
 
-  while( count-- != 0)
-    result.Append( DChar( wh_rnd() % 300 + 1));
+  while (count-- != 0)
+    result.Append (DChar (wh_rnd () % 300 + 1));
 
   return result;
 }
 
 
 static ITable&
-build_reference_table( IDBSHandler& dbs, const uint_t rowsCount)
+build_reference_table (IDBSHandler& dbs, const uint_t rowsCount)
 {
-  ITable& result = dbs.CreateTempTable( FIELDS_COUNT, fieldsDescs);
+  ITable& result = dbs.CreateTempTable (FIELDS_COUNT, fieldsDescs);
 
   std::cout << "Building a " << rowsCount << " rows table ... ";
 
-  f_a   = result.RetrieveField( "a");
-  f_c   = result.RetrieveField( "c");
-  f_d   = result.RetrieveField( "d");
-  f_dt  = result.RetrieveField( "dt");
-  f_ht  = result.RetrieveField( "ht");
-  f_r   = result.RetrieveField( "r");
-  f_rr  = result.RetrieveField( "rr");
-  f_i8  = result.RetrieveField( "i8");
-  f_i16 = result.RetrieveField( "i16");
-  f_i32 = result.RetrieveField( "i32");
-  f_i64 = result.RetrieveField( "i64");
-  f_u8  = result.RetrieveField( "u8");
-  f_u16 = result.RetrieveField( "u16");
-  f_u32 = result.RetrieveField( "u32");
-  f_u64 = result.RetrieveField( "u64");
-  f_t   = result.RetrieveField( "t");
+  f_a   = result.RetrieveField ("a");
+  f_c   = result.RetrieveField ("c");
+  f_d   = result.RetrieveField ("d");
+  f_dt  = result.RetrieveField ("dt");
+  f_ht  = result.RetrieveField ("ht");
+  f_r   = result.RetrieveField ("r");
+  f_rr  = result.RetrieveField ("rr");
+  f_i8  = result.RetrieveField ("i8");
+  f_i16 = result.RetrieveField ("i16");
+  f_i32 = result.RetrieveField ("i32");
+  f_i64 = result.RetrieveField ("i64");
+  f_u8  = result.RetrieveField ("u8");
+  f_u16 = result.RetrieveField ("u16");
+  f_u32 = result.RetrieveField ("u32");
+  f_u64 = result.RetrieveField ("u64");
+  f_t   = result.RetrieveField ("t");
 
   for (uint_t row = 0; row < rowsCount; ++row)
     {
-      const DChar c (wh_rnd() % 0x300 + 1);
+      const DChar c (wh_rnd () % 0x300 + 1);
       const DDate d (get_random_date());
       const DDateTime dt (get_random_datetime());
       const DHiresTime ht (get_random_hirestime());
 
-      const DReal r (DBS_REAL_T( wh_rnd() % 100000,
-                                 wh_rnd() % 100000,
+      const DReal r (DBS_REAL_T (wh_rnd () % 100000,
+                                 wh_rnd () % 100000,
                                  DBS_REAL_PREC));
-      const DRichReal rr (DBS_RICHREAL_T( wh_rnd() % 10000000,
-                                          wh_rnd() % 10000000,
+      const DRichReal rr (DBS_RICHREAL_T (wh_rnd () % 10000000,
+                                          wh_rnd () % 10000000,
                                           DBS_RICHREAL_PREC));
-      const DInt8  i8 (wh_rnd());
-      const DInt16 i16 (wh_rnd());
-      const DInt32 i32 (wh_rnd());
-      const DInt64 i64 (wh_rnd());
+      const DInt8  i8 (wh_rnd ());
+      const DInt16 i16 (wh_rnd ());
+      const DInt32 i32 (wh_rnd ());
+      const DInt64 i64 (wh_rnd ());
 
-      const DUInt8  u8 (wh_rnd());
-      const DUInt16 u16 (wh_rnd());
-      const DUInt32 u32 (wh_rnd());
-      const DUInt64 u64 (wh_rnd());
+      const DUInt8  u8 (wh_rnd ());
+      const DUInt16 u16 (wh_rnd ());
+      const DUInt32 u32 (wh_rnd ());
+      const DUInt64 u64 (wh_rnd ());
 
-      const DText t (get_random_text( wh_rnd() % 32));
+      const DText t (get_random_text (wh_rnd () % 32));
 
       result.Set (row, f_a, DUInt32 (row));
-      result.Set (row, f_c, (row % (wh_rnd() % 4 + 1)) ? DChar() : c);
+      result.Set (row, f_c, (row % (wh_rnd () % 4 + 1)) ? DChar () : c);
 
-      result.Set (row, f_d, (row % (wh_rnd() % 4 + 1)) ? DDate() : d);
-      result.Set (row, f_dt, (row % (wh_rnd() % 4 + 1)) ? DDateTime() : dt);
-      result.Set (row, f_ht, (row % (wh_rnd() % 4 + 1)) ? DHiresTime() : ht);
+      result.Set (row, f_d, (row % (wh_rnd () % 4 + 1)) ? DDate() : d);
+      result.Set (row, f_dt, (row % (wh_rnd () % 4 + 1)) ? DDateTime() : dt);
+      result.Set (row, f_ht, (row % (wh_rnd () % 4 + 1)) ? DHiresTime() : ht);
 
-      result.Set (row, f_i8, (row % (wh_rnd() % 4 + 1)) ? DInt8 () : i8);
-      result.Set (row, f_i16, (row % (wh_rnd() % 4 + 1)) ? DInt16 () : i16);
-      result.Set (row, f_i32, (row % (wh_rnd() % 4 + 1)) ? DInt32 () : i32);
-      result.Set (row, f_i64, (row % (wh_rnd() % 4 + 1)) ? DInt64 () : i64);
+      result.Set (row, f_i8, (row % (wh_rnd () % 4 + 1)) ? DInt8 () : i8);
+      result.Set (row, f_i16, (row % (wh_rnd () % 4 + 1)) ? DInt16 () : i16);
+      result.Set (row, f_i32, (row % (wh_rnd () % 4 + 1)) ? DInt32 () : i32);
+      result.Set (row, f_i64, (row % (wh_rnd () % 4 + 1)) ? DInt64 () : i64);
 
-      result.Set (row, f_r, (row % (wh_rnd() % 4 + 1)) ? DReal() : r);
-      result.Set (row, f_rr, (row % (wh_rnd() % 4 + 1)) ? DRichReal() : rr);
+      result.Set (row, f_r, (row % (wh_rnd () % 4 + 1)) ? DReal() : r);
+      result.Set (row, f_rr, (row % (wh_rnd () % 4 + 1)) ? DRichReal() : rr);
 
-      result.Set (row, f_u8, (row % (wh_rnd() % 4 + 1)) ? DUInt8 () : u8);
-      result.Set (row, f_u16, (row % (wh_rnd() % 4 + 1)) ? DUInt16 () : u16);
-      result.Set (row, f_u32, (row % (wh_rnd() % 4 + 1)) ? DUInt32 () : u32);
-      result.Set (row, f_u64, (row % (wh_rnd() % 4 + 1)) ? DUInt64 () : u64);
+      result.Set (row, f_u8, (row % (wh_rnd () % 4 + 1)) ? DUInt8 () : u8);
+      result.Set (row, f_u16, (row % (wh_rnd () % 4 + 1)) ? DUInt16 () : u16);
+      result.Set (row, f_u32, (row % (wh_rnd () % 4 + 1)) ? DUInt32 () : u32);
+      result.Set (row, f_u64, (row % (wh_rnd () % 4 + 1)) ? DUInt64 () : u64);
 
       result.Set (row, f_t, t);
     }
@@ -204,11 +204,11 @@ build_reference_table( IDBSHandler& dbs, const uint_t rowsCount)
 }
 
 static ITable&
-copy_table( IDBSHandler& dbs, ITable& originalTable)
+copy_table (IDBSHandler& dbs, ITable& originalTable)
 {
   const uint_t rowsCount = originalTable.AllocatedRows();
 
-  ITable& result = dbs.CreateTempTable( FIELDS_COUNT, fieldsDescs);
+  ITable& result = dbs.CreateTempTable (FIELDS_COUNT, fieldsDescs);
 
   for (uint_t row = 0; row < rowsCount; ++row)
     {
@@ -284,7 +284,7 @@ copy_table( IDBSHandler& dbs, ITable& originalTable)
 }
 
 template<typename T> bool
-test_table_sort( ITable&           tableSorted,
+test_table_sort (ITable&           tableSorted,
                  ITable&           tableOriginal,
                  const FIELD_INDEX field,
                  const bool        reverseSort)
@@ -349,26 +349,26 @@ test_table_sort( ITable&           tableSorted,
 
 
 static bool
-check_field_sort( IDBSHandler&      dbs,
+check_field_sort (IDBSHandler&      dbs,
                   ITable&           originalTable,
                   const FIELD_INDEX field,
                   const bool        reverseSort)
 {
-  const DBSFieldDescriptor fd = originalTable.DescribeField( field);
+  const DBSFieldDescriptor fd = originalTable.DescribeField (field);
 
   bool result = true;
 
   if (fd.isArray)
     return false;
 
-  ITable& table = copy_table( dbs, originalTable);
+  ITable& table = copy_table (dbs, originalTable);
   if (reverseSort)
     std::cout << "Starting the sort of field '" << fd.name << "' (reverse).\n";
 
   else
     std::cout << "Starting the sort of field '" << fd.name << "'.\n";
 
-  table.Sort( field, 0, table.AllocatedRows() - 1, reverseSort);
+  table.Sort (field, 0, table.AllocatedRows() - 1, reverseSort);
 
   if (reverseSort)
     std::cout << "Ending the sort of field '" << fd.name << "' (reverse).\n";
@@ -377,7 +377,7 @@ check_field_sort( IDBSHandler&      dbs,
     std::cout << "Ending the sort of field '" << fd.name << "'.\n";
 
 
-  switch( fd.type)
+  switch (fd.type)
     {
     case T_CHAR:
       result = test_table_sort<DChar> (table,
@@ -488,18 +488,18 @@ check_field_sort( IDBSHandler&      dbs,
       result = false;
     }
 
-  dbs.ReleaseTable( table);
+  dbs.ReleaseTable (table);
 
   return result;
 }
 
 
 void
-test_field_sort( void* ctxt)
+test_field_sort (void* ctxt)
 {
   const TestContext* testCtxt = _SC (TestContext*, ctxt);
 
-  if (! check_field_sort( *testCtxt->dbs,
+  if (! check_field_sort (*testCtxt->dbs,
                           *testCtxt->originalTable,
                           testCtxt->field,
                           testCtxt->reverseSort))
@@ -510,30 +510,30 @@ test_field_sort( void* ctxt)
 
 
 int
-main( int argc, char** argv)
+main (int argc, char** argv)
 {
   bool success = true;
 
-  test_set_mem_max( 1024 * 1024 * 1024);
+  test_set_mem_max (1024 * 1024 * 1024);
 
   if (argc > 1)
-    _elemsCount = atol( argv[1]);
+    _elemsCount = atol (argv[1]);
 
   {
-    DBSInit( DBSSettings());
-    DBSCreateDatabase( db_name);
+    DBSInit (DBSSettings());
+    DBSCreateDatabase (db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase( db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
   {
-    ITable& originalTable = build_reference_table( handler, _elemsCount);
+    ITable& originalTable = build_reference_table (handler, _elemsCount);
 
     TestContext tc[30] = { {&handler, &originalTable, f_c, false}, };
 
 #if 0
     tc[0] = tc[0], tc[0].field = f_i8, tc[0].reverseSort = false;
-    test_field_sort( tc + 0);
+    test_field_sort (tc + 0);
 #endif
 
     Thread th[30];
@@ -629,42 +629,42 @@ main( int argc, char** argv)
     th[29].Run (test_field_sort, tc + 29);
 
 
-    th[0].WaitToEnd( true);
-    th[1].WaitToEnd( true);
-    th[2].WaitToEnd( true);
-    th[3].WaitToEnd( true);
-    th[4].WaitToEnd( true);
-    th[5].WaitToEnd( true);
-    th[6].WaitToEnd( true);
-    th[7].WaitToEnd( true);
-    th[8].WaitToEnd( true);
-    th[9].WaitToEnd( true);
-    th[10].WaitToEnd( true);
-    th[11].WaitToEnd( true);
-    th[12].WaitToEnd( true);
-    th[13].WaitToEnd( true);
-    th[14].WaitToEnd( true);
-    th[15].WaitToEnd( true);
-    th[16].WaitToEnd( true);
-    th[17].WaitToEnd( true);
-    th[18].WaitToEnd( true);
-    th[19].WaitToEnd( true);
-    th[20].WaitToEnd( true);
-    th[21].WaitToEnd( true);
-    th[22].WaitToEnd( true);
-    th[23].WaitToEnd( true);
-    th[24].WaitToEnd( true);
-    th[25].WaitToEnd( true);
-    th[26].WaitToEnd( true);
-    th[27].WaitToEnd( true);
-    th[28].WaitToEnd( true);
-    th[29].WaitToEnd( true);
+    th[0].WaitToEnd (true);
+    th[1].WaitToEnd (true);
+    th[2].WaitToEnd (true);
+    th[3].WaitToEnd (true);
+    th[4].WaitToEnd (true);
+    th[5].WaitToEnd (true);
+    th[6].WaitToEnd (true);
+    th[7].WaitToEnd (true);
+    th[8].WaitToEnd (true);
+    th[9].WaitToEnd (true);
+    th[10].WaitToEnd (true);
+    th[11].WaitToEnd (true);
+    th[12].WaitToEnd (true);
+    th[13].WaitToEnd (true);
+    th[14].WaitToEnd (true);
+    th[15].WaitToEnd (true);
+    th[16].WaitToEnd (true);
+    th[17].WaitToEnd (true);
+    th[18].WaitToEnd (true);
+    th[19].WaitToEnd (true);
+    th[20].WaitToEnd (true);
+    th[21].WaitToEnd (true);
+    th[22].WaitToEnd (true);
+    th[23].WaitToEnd (true);
+    th[24].WaitToEnd (true);
+    th[25].WaitToEnd (true);
+    th[26].WaitToEnd (true);
+    th[27].WaitToEnd (true);
+    th[28].WaitToEnd (true);
+    th[29].WaitToEnd (true);
 
-    handler.ReleaseTable( originalTable);
+    handler.ReleaseTable (originalTable);
   }
 
-  DBSReleaseDatabase( handler);
-  DBSRemoveDatabase( db_name);
+  DBSReleaseDatabase (handler);
+  DBSRemoveDatabase (db_name);
   DBSShoutdown();
 
   if (!success)

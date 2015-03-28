@@ -10,36 +10,36 @@
 
 #include "custom/include/test/test_fmw.h"
 
-extern int yyparse( struct ParserState *);
+extern int yyparse (struct ParserState *);
 
 static void
-init_state_for_test( struct ParserState *state, const char * buffer)
+init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
   state->strings = create_string_store();
-  state->bufferSize = strlen( buffer);
-  wh_array_init( &state->values, sizeof( struct SemValue));
+  state->bufferSize = strlen (buffer);
+  wh_array_init (&state->values, sizeof (struct SemValue));
 
-  init_glbl_stmt( &state->globalStmt);
+  init_glbl_stmt (&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
-free_state( struct ParserState *state)
+free_state (struct ParserState *state)
 {
-  release_string_store( state->strings);
-  clear_glbl_stmt( &(state->globalStmt));
-  wh_array_clean( &state->values);
+  release_string_store (state->strings);
+  clear_glbl_stmt (&(state->globalStmt));
+  wh_array_clean (&state->values);
 
 }
 
 static bool_t
-check_used_vals( struct ParserState *state)
+check_used_vals (struct ParserState *state)
 {
-  int vals_count = wh_array_count( &state->values);
-  while( --vals_count >= 0)
+  int vals_count = wh_array_count (&state->values);
+  while (--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get( &state->values, vals_count);
+      struct SemValue *val = wh_array_get (&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -56,7 +56,7 @@ char proc_decl_buffer[] =
     "       LET a,b,c AS BOOL;"
     " "
     "       a  = TRUE; "
-    "       WHILE( a) DO "
+    "       WHILE (a) DO "
     "               IF (b) DO "
     "                       BREAK;"
     "               ELSE IF (c) DO "
@@ -71,7 +71,7 @@ char proc_decl_buffer[] =
     "       LET a,b,c AS BOOL;"
     " "
     "       a  = TRUE; "
-    "       WHILE( a) DO "
+    "       WHILE (a) DO "
     "               IF (b)"
     "                       BREAK;"
     "               ELSE IF (c) "
@@ -86,7 +86,7 @@ char proc_decl_buffer[] =
     "       LET a,b,c AS BOOL;"
     " "
     "       a  = TRUE; "
-    "       WHILE( a)"
+    "       WHILE (a)"
     "               IF (b)"
     "                       BREAK;"
     "               ELSE IF (c) "
@@ -105,7 +105,7 @@ char proc_decl_buffer[] =
     "          ELSE IF (c) DO "
     "              BREAK; "
     "          END "
-    "   UNTIL( a);"
+    "   UNTIL (a);"
     "   RETURN c;"
     "  ENDPROC "
     " "
@@ -119,7 +119,7 @@ char proc_decl_buffer[] =
     "              CONTINUE;"
     "          ELSE IF (c)"
     "              BREAK; "
-    "   UNTIL( a);"
+    "   UNTIL (a);"
     "   RETURN c;"
     "  ENDPROC "
     " "
@@ -176,8 +176,8 @@ static bool_t
 check_procedure_1 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl( state, proc_name, strlen( proc_name), FALSE);
-  uint8_t *code = wh_ostream_data( stmt_query_instrs( stmt));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
   int shift = 0;
   int cond_exp_pos = 5;
   int while_end_pos = 0;
@@ -247,8 +247,8 @@ static bool_t
 check_procedure_2 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl( state, proc_name, strlen( proc_name), FALSE);
-  uint8_t *code = wh_ostream_data( stmt_query_instrs( stmt));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
   int shift = 0;
   int cond_exp_pos = 0;
 
@@ -295,8 +295,8 @@ static bool_t
 check_procedure_3 (struct ParserState *state, char * proc_name)
 {
   struct Statement *stmt =
-    find_proc_decl( state, proc_name, strlen( proc_name), FALSE);
-  uint8_t *code = wh_ostream_data( stmt_query_instrs( stmt));
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
   int shift = 0;
   int cond_exp_pos = 6;
   int step_exp_pos = 18;
@@ -350,7 +350,7 @@ check_procedure_3 (struct ParserState *state, char * proc_name)
 }
 
 static bool_t
-check_all_procs( struct ParserState *state)
+check_all_procs (struct ParserState *state)
 {
   return check_procedure_1 (state, "proc1")
          && check_procedure_1 (state, "proc1_b")
@@ -367,64 +367,64 @@ main()
   bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
-  init_state_for_test( &state, proc_decl_buffer);
+  init_state_for_test (&state, proc_decl_buffer);
 
-  printf( "Testing parse..");
+  printf ("Testing parse..");
   if (yyparse( &state) != 0)
     {
-      printf( "FAILED\n");
+      printf ("FAILED\n");
       test_result = FALSE;
     }
   else
     {
-      printf( "PASSED\n");
+      printf ("PASSED\n");
     }
 
   if (test_result)
     {
-      printf( "Testing garbage vals...");
+      printf ("Testing garbage vals...");
       if (check_used_vals( &state))
         {
           /* those should no be here */
-          printf( "FAILED\n");
+          printf ("FAILED\n");
           test_result = FALSE;
         }
       else
         {
-          printf( "PASSED\n");
+          printf ("PASSED\n");
         }
     }
 
-  printf( "Testing loop statements ...");
+  printf ("Testing loop statements ...");
   if (check_all_procs( &state))
     {
-      printf( "PASSED\n");
+      printf ("PASSED\n");
     }
   else
     {
-      printf( "FAILED\n");
+      printf ("FAILED\n");
       test_result = FALSE;
     }
 
-  free_state( &state);
-  printf( "Memory peak: %u bytes \n", test_get_mem_peak());
-  printf( "Current memory usage: %u bytes...", test_get_mem_used());
+  free_state (&state);
+  printf ("Memory peak: %u bytes \n", test_get_mem_peak());
+  printf ("Current memory usage: %u bytes...", test_get_mem_used());
   if (test_get_mem_used() != 0)
     {
       test_result = FALSE;
-      printf( "FAILED\n");
+      printf ("FAILED\n");
     }
   else
     {
-      printf( "PASSED\n");
+      printf ("PASSED\n");
     }
 
   if (test_result == FALSE)
     {
-      printf( "TEST RESULT: FAIL\n");
+      printf ("TEST RESULT: FAIL\n");
       return -1;
     }
 
-  printf( "TEST RESULT: PASS\n");
+  printf ("TEST RESULT: PASS\n");
   return 0;
 }

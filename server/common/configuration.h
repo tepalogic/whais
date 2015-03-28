@@ -50,23 +50,23 @@ struct ListenEntry
 struct ServerSettings
 {
   ServerSettings()
-    : mMaxConnections( UNSET_VALUE),
-      mMaxFrameSize( UNSET_VALUE),
-      mTableCacheBlockSize( UNSET_VALUE),
-      mTableCacheBlockCount( UNSET_VALUE),
-      mVLBlockSize( UNSET_VALUE),
-      mVLBlockCount( UNSET_VALUE),
-      mTempValuesCache( UNSET_VALUE),
-      mAuthTMO( UNSET_VALUE),
-      mSyncWakeup( UNSET_VALUE),
-      mSyncInterval( UNSET_VALUE),
-      mWaitReqTmo( UNSET_VALUE),
+    : mMaxConnections (UNSET_VALUE),
+      mMaxFrameSize (UNSET_VALUE),
+      mTableCacheBlockSize (UNSET_VALUE),
+      mTableCacheBlockCount (UNSET_VALUE),
+      mVLBlockSize (UNSET_VALUE),
+      mVLBlockCount (UNSET_VALUE),
+      mTempValuesCache (UNSET_VALUE),
+      mAuthTMO (UNSET_VALUE),
+      mSyncWakeup (UNSET_VALUE),
+      mSyncInterval (UNSET_VALUE),
+      mWaitReqTmo (UNSET_VALUE),
       mWorkDirectory(),
       mTempDirectory(),
       mLogFile(),
       mListens(),
-      mCipher( UNSET_VALUE),
-      mShowDebugLog( false)
+      mCipher (UNSET_VALUE),
+      mShowDebugLog (false)
   {
   }
 
@@ -95,19 +95,19 @@ struct ServerSettings
 
 struct DBSDescriptors
 {
-  DBSDescriptors( const uint_t configLine)
-    : mConfigLine( configLine),
-      mSyncInterval( UNSET_VALUE),
-      mWaitReqTmo( UNSET_VALUE),
+  DBSDescriptors (const uint_t configLine)
+    : mConfigLine (configLine),
+      mSyncInterval (UNSET_VALUE),
+      mWaitReqTmo (UNSET_VALUE),
       mStackCount (DEFAULT_MAX_STACK_CNT),
       mDbsName(),
       mDbsDirectory(),
       mObjectLibs(),
       mNativeLibs(),
-      mDbs( NULL),
-      mSession( NULL),
-      mLogger( NULL),
-      mLastFlushTick( 0)
+      mDbs (NULL),
+      mSession (NULL),
+      mLogger (NULL),
+      mLastFlushTick (0)
   {
   }
 
@@ -135,25 +135,25 @@ const ServerSettings&
 GetAdminSettings();
 
 bool
-SeekAtConfigurationSection( std::ifstream& config, uint_t& outConfigLine);
+SeekAtConfigurationSection (std::ifstream& config, uint_t& outConfigLine);
 
 bool
-FindNextContextSection( std::ifstream& config, uint_t& inoutConfigLine);
+FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseConfigurationSection( std::ifstream& config, uint_t& inoutConfigLine);
+ParseConfigurationSection (std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseContextSection( whais::Logger&        log,
+ParseContextSection (whais::Logger&        log,
                      std::ifstream&          config,
                      uint_t&                 inoutConfigLine,
                      DBSDescriptors&         output);
 
 bool
-PrepareConfigurationSection( whais::Logger& log);
+PrepareConfigurationSection (whais::Logger& log);
 
 bool
-PrepareContextSection( whais::Logger& log, DBSDescriptors& inoutDesc);
+PrepareContextSection (whais::Logger& log, DBSDescriptors& inoutDesc);
 
 #endif /* CONFIGURATION_H_ */
 

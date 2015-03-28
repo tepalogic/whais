@@ -45,45 +45,45 @@ class DbsManager;
 class DbsHandler : public IDBSHandler
 {
 public:
-  DbsHandler( const DBSSettings&    settings,
+  DbsHandler (const DBSSettings&    settings,
               const std::string&    directory,
               const std::string&    name);
 
-  DbsHandler( const DbsHandler&     source);
+  DbsHandler (const DbsHandler&     source);
 
-  virtual ~DbsHandler();
+  virtual ~DbsHandler ();
 
   virtual TABLE_INDEX PersistentTablesCount();
 
-  virtual ITable& RetrievePersistentTable( const TABLE_INDEX index);
+  virtual ITable& RetrievePersistentTable (const TABLE_INDEX index);
 
-  virtual ITable& RetrievePersistentTable( const char* const name);
+  virtual ITable& RetrievePersistentTable (const char* const name);
 
-  virtual void ReleaseTable( ITable&);
+  virtual void ReleaseTable (ITable&);
 
-  virtual void AddTable( const char* const      name,
+  virtual void AddTable (const char* const      name,
                          const FIELD_INDEX      fieldsCount,
                          DBSFieldDescriptor*    inoutFields);
 
-  virtual void DeleteTable( const char* const name);
+  virtual void DeleteTable (const char* const name);
 
-  virtual void SyncTableContent( const TABLE_INDEX index);
+  virtual void SyncTableContent (const TABLE_INDEX index);
 
-  virtual ITable& CreateTempTable( const FIELD_INDEX   fieldsCount,
+  virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields);
 
-  virtual const char* TableName( const TABLE_INDEX index);
+  virtual const char* TableName (const TABLE_INDEX index);
 
-  void Discard();
+  void Discard ();
 
   void RemoveFromStorage();
 
-  const std::string& WorkingDir() const
+  const std::string& WorkingDir () const
   {
     return mDbsLocationDir;
   }
 
-  const std::string& TemporalDir() const
+  const std::string& TemporalDir () const
   {
     return mGlbSettings.mTempDir;
   }
@@ -122,9 +122,9 @@ private:
 
 struct DbsElement
 {
-  DbsElement( const DbsHandler& dbs)
-    : mRefCount( 0),
-      mDbs( dbs)
+  DbsElement (const DbsHandler& dbs)
+    : mRefCount (0),
+      mDbs (dbs)
   {
   }
 
@@ -138,9 +138,9 @@ struct DbsManager
 {
   typedef std::map<std::string, DbsElement> DATABASES_MAP;
 
-  DbsManager( const DBSSettings& settings)
+  DbsManager (const DBSSettings& settings)
     : mSync(),
-      mDBSSettings( settings),
+      mDBSSettings (settings),
       mDatabases()
   {
     if ((mDBSSettings.mWorkDir.length() == 0)
@@ -151,8 +151,8 @@ struct DbsManager
         || (mDBSSettings.mVLStoreCacheBlkCount == 0)
         || (mDBSSettings.mVLValueCacheSize == 0))
       {
-        throw DBSException( 
-            _EXTRA( DBSException::BAD_PARAMETERS),
+        throw DBSException (
+            _EXTRA (DBSException::BAD_PARAMETERS),
             "Cannot create a database manager with the specified parameters."
                            );
       }

@@ -34,32 +34,32 @@ bool_t
 whs_init();
 
 uint32_t
-whs_create_client( const char* const       server,
+whs_create_client (const char* const       server,
                    const char* const       port,
                    WH_SOCKET* const        outSocket);
 
 uint32_t
-whs_create_server( const char* const       localAddress,
+whs_create_server (const char* const       localAddress,
                    const char* const       localPort,
                    const uint_t            listenBackLog,
                    WH_SOCKET* const        outSocket);
 
 uint32_t
-whs_accept( const WH_SOCKET           sd,
+whs_accept (const WH_SOCKET           sd,
             WH_SOCKET* const          outSocket);
 
 uint32_t
-whs_write( const WH_SOCKET           sd,
+whs_write (const WH_SOCKET           sd,
            const uint8_t*            srcBuffer,
            const uint_t              count);
 
 uint32_t
-whs_read( const WH_SOCKET           sd,
+whs_read (const WH_SOCKET           sd,
           uint8_t*                  dstBuffer,
           uint_t* const             inoutCount);
 
 void
-whs_close( const WH_SOCKET socket);
+whs_close (const WH_SOCKET socket);
 
 void
 whs_clean();

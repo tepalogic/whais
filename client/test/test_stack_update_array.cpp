@@ -289,32 +289,32 @@ struct ArrayValuesEntry _values[] =
         {WHC_TYPE_RICHREAL, 5, {"-9223372036854775807.00000000000001", "-0.00000000000001", "0.00000000000001", "1.1", "0" }}
     };
 
-static const uint_t _valuesCount  = sizeof( _values) / sizeof( _values[0]);
+static const uint_t _valuesCount  = sizeof (_values) / sizeof (_values[0]);
 
 static bool
-fill_array_entries_step( WH_CONNECTION hnd)
+fill_array_entries_step (WH_CONNECTION hnd)
 {
   for (uint_t i = 0; i < _valuesCount; i++)
     {
-      if ((WPushValue( hnd,
+      if ((WPushValue (hnd,
                        _values[i].type | WHC_TYPE_ARRAY_MASK,
                        0,
                        NULL) != WCS_OK)
-          || (WFlush( hnd) != WCS_OK))
+          || (WFlush (hnd) != WCS_OK))
         {
           return false;
         }
 
       for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
-          if ((WUpdateValue( hnd,
+          if ((WUpdateValue (hnd,
                              _values[i].type,
                              WIGNORE_FIELD,
                              WIGNORE_ROW,
                              j,
                              WIGNORE_OFF,
                              _values[i].values[j]) != WCS_OK)
-              || (WFlush( hnd) != WCS_OK))
+              || (WFlush (hnd) != WCS_OK))
             {
               return false;
             }
@@ -325,11 +325,11 @@ fill_array_entries_step( WH_CONNECTION hnd)
 }
 
 static bool
-fill_array_entries_bulk( WH_CONNECTION hnd)
+fill_array_entries_bulk (WH_CONNECTION hnd)
 {
   for (uint_t i = 0; i < _valuesCount; i++)
     {
-      if (WPushValue( hnd,
+      if (WPushValue (hnd,
                            _values[i].type | WHC_TYPE_ARRAY_MASK,
                            0,
                            NULL) != WCS_OK)
@@ -339,7 +339,7 @@ fill_array_entries_bulk( WH_CONNECTION hnd)
 
       for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
-          if (WUpdateValue( hnd,
+          if (WUpdateValue (hnd,
                             _values[i].type,
                             WIGNORE_FIELD,
                             WIGNORE_ROW,
@@ -352,20 +352,20 @@ fill_array_entries_bulk( WH_CONNECTION hnd)
         }
     }
 
-  if (WFlush( hnd) != WCS_OK)
+  if (WFlush (hnd) != WCS_OK)
     return false;
 
   return true;
 }
 
 static bool
-check_array_entry( WH_CONNECTION hnd, const int index)
+check_array_entry (WH_CONNECTION hnd, const int index)
 {
   const ArrayValuesEntry* pEntry = &_values[index];
   const char*           value;
   unsigned long long int  count;
 
-  if ((WValueArraySize( hnd,
+  if ((WValueArraySize (hnd,
                         WIGNORE_FIELD,
                         WIGNORE_ROW,
                         &count) != WCS_OK)
@@ -376,25 +376,25 @@ check_array_entry( WH_CONNECTION hnd, const int index)
 
   for (uint_t i = 0; i < pEntry->elementsCount; ++i)
     {
-      if ((WValueEntry( hnd,
+      if ((WValueEntry (hnd,
                         WIGNORE_FIELD,
                         WIGNORE_ROW,
                         i,
                         WIGNORE_OFF,
                         &value) != WCS_OK)
-          || (strcmp( value, pEntry->values[i]) != 0))
+          || (strcmp (value, pEntry->values[i]) != 0))
         {
           return false;
         }
     }
 
-  if ((WValueEntry( hnd,
+  if ((WValueEntry (hnd,
                     WIGNORE_FIELD,
                     WIGNORE_ROW,
                     pEntry->elementsCount,
                     WIGNORE_OFF,
                     &value) != WCS_INVALID_ARRAY_OFF)
-      || (WValueEntry( hnd,
+      || (WValueEntry (hnd,
                        WIGNORE_FIELD,
                        WIGNORE_ROW,
                        pEntry->elementsCount,
@@ -408,20 +408,20 @@ check_array_entry( WH_CONNECTION hnd, const int index)
 }
 
 static bool
-test_array_step_update( WH_CONNECTION hnd)
+test_array_step_update (WH_CONNECTION hnd)
 {
   cout << "Testing array step update ... ";
 
-  if (! fill_array_entries_step( hnd))
+  if (! fill_array_entries_step (hnd))
     goto test_array_step_update_fail;
 
   for (int i = _valuesCount - 1; i >= 0; i--)
     {
-      if (! check_array_entry( hnd, i))
+      if (! check_array_entry (hnd, i))
         goto test_array_step_update_fail;
 
-      if ((WPopValues( hnd, 1) != WCS_OK)
-          || (WFlush( hnd) != WCS_OK))
+      if ((WPopValues (hnd, 1) != WCS_OK)
+          || (WFlush (hnd) != WCS_OK))
         {
           goto test_array_step_update_fail;
         }
@@ -437,20 +437,20 @@ test_array_step_update_fail:
 }
 
 static bool
-test_array_bulk_update( WH_CONNECTION hnd)
+test_array_bulk_update (WH_CONNECTION hnd)
 {
   cout << "Testing array bulk update ... ";
 
-  if (! fill_array_entries_bulk( hnd))
+  if (! fill_array_entries_bulk (hnd))
     goto test_array_bulk_update_fail;
 
   for (int i = _valuesCount - 1; i >= 0; i--)
     {
-      if (! check_array_entry( hnd, i))
+      if (! check_array_entry (hnd, i))
         goto test_array_bulk_update_fail;
 
-      if ((WPopValues( hnd, 1) != WCS_OK)
-          || (WFlush( hnd) != WCS_OK))
+      if ((WPopValues (hnd, 1) != WCS_OK)
+          || (WFlush (hnd) != WCS_OK))
         {
           goto test_array_bulk_update_fail;
         }
@@ -466,29 +466,29 @@ test_array_bulk_update_fail:
 }
 
 static bool
-test_for_errors( WH_CONNECTION hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   unsigned long long count;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue( hnd, WHC_TYPE_BOOL | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
-      || (WFlush( hnd) != WCS_OK)
-      || (WFlush( hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount( NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount( NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount( hnd, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount( hnd, &count) != WCS_TYPE_MISMATCH)
-      || (WValueArraySize( hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_OK)
+  if ((WPushValue (hnd, WHC_TYPE_BOOL | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK) //Just for fun!
+      || (WValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount (hnd, &count) != WCS_TYPE_MISMATCH)
+      || (WValueArraySize (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_OK)
       || (count != 0)
-      || (WValueArraySize( hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WValueArraySize( hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
-      || (WValueTextLength( hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_ARRAY_OFF)
-      || (WValueTextLength( hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength( hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
-      || (WValueTextLength( hnd, WIGNORE_FIELD, WIGNORE_OFF, 0, &count) != WCS_INVALID_ARRAY_OFF)
-      || (WPopValues( hnd, WPOP_ALL) != WCS_OK)
-      || (WFlush( hnd) != WCS_OK))
+      || (WValueArraySize (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize (hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_ARRAY_OFF)
+      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
+      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_OFF, 0, &count) != WCS_INVALID_ARRAY_OFF)
+      || (WPopValues (hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush (hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -511,29 +511,29 @@ DefaultDatabaseName()
 }
 
 const uint_t
-DefaultUserId()
+DefaultUserId ()
 {
   return 1;
 }
 
 const char*
-DefaultUserPassword()
+DefaultUserPassword ()
 {
   return "test_password";
 }
 
 int
-main( int argc, const char** argv)
+main (int argc, const char** argv)
 {
   WH_CONNECTION hnd        = NULL;
 
-  bool success = tc_settup_connection( argc, argv, &hnd);
+  bool success = tc_settup_connection (argc, argv, &hnd);
 
-  success = success && test_for_errors( hnd);
-  success = success && test_array_step_update( hnd);
-  success = success && test_array_bulk_update( hnd);
+  success = success && test_for_errors (hnd);
+  success = success && test_array_step_update (hnd);
+  success = success && test_array_bulk_update (hnd);
 
-  WClose( hnd);
+  WClose (hnd);
 
   if (!success)
     {

@@ -92,7 +92,7 @@ static const uint8_t notDefGlbCode[] =
     "ENDPROC\n";
 
 static const uint8_t notDefProcCode[] =
-    "EXTERN PROCEDURE some_proc_name( p1v1 AS TEXT,\n"
+    "EXTERN PROCEDURE some_proc_name (p1v1 AS TEXT,\n"
     "                   p1v2 AS ARRAY OF INT8, \n"
     "                   p1v3 AS ARRAY,\n"
     "                   p1v4 AS DATETIME)\n"
@@ -101,7 +101,7 @@ static const uint8_t notDefProcCode[] =
     "PROCEDURE ref_proc()\n"
     "RETURN HIRESTIME\n"
     "DO\n"
-    "RETURN some_proc_name( NULL, NULL, NULL, NULL);\n"
+    "RETURN some_proc_name (NULL, NULL, NULL, NULL);\n"
     "\n"
     "ENDPROC\n";
 
@@ -161,7 +161,7 @@ static const char *MSG_PREFIX[] = {
                                     };
 
 static uint_t
-get_line_from_buffer( const char * buffer, uint_t buff_pos)
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
   uint_t count = 0;
   int result = 1;
@@ -169,13 +169,13 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
 
-  while( count < buff_pos)
+  while (count < buff_pos)
     {
       if (buffer[count] == '\n')
         ++result;
       else if (buffer[count] == 0)
         {
-          assert( 0);
+          assert (0);
         }
       ++count;
     }
@@ -183,7 +183,7 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
 }
 
 void
-my_postman( WH_MESSENGER_CTXT data,
+my_postman (WH_MESSENGER_CTXT data,
             uint_t            buff_pos,
             uint_t            msg_id,
             uint_t            msgType,
@@ -191,27 +191,27 @@ my_postman( WH_MESSENGER_CTXT data,
             va_list           args)
 {
   const char *buffer = (const char *) data;
-  int buff_line = get_line_from_buffer( buffer, buff_pos);
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
-  fprintf( stderr, MSG_PREFIX[msgType]);
-  fprintf( stderr, "%d : line %d: ", msg_id, buff_line);
-  vfprintf( stderr, pMsgFormat, args);
-  fprintf( stderr, "\n");
+  fprintf (stderr, MSG_PREFIX[msgType]);
+  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
+  vfprintf (stderr, pMsgFormat, args);
+  fprintf (stderr, "\n");
 }
 
 bool
-load_units( ISession& testSession)
+load_units (ISession& testSession)
 {
   bool result = true;
 
   try
   {
-      CompiledBufferUnit firstUnit( firstCode, sizeof firstCode, my_postman, firstCode);
-      testSession.LoadCompiledUnit( firstUnit);
+      CompiledBufferUnit firstUnit (firstCode, sizeof firstCode, my_postman, firstCode);
+      testSession.LoadCompiledUnit (firstUnit);
       std::cout << "Loading first unit  OK" << std::endl;
 
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Could not load unit 1";
       result = false;
@@ -222,11 +222,11 @@ load_units( ISession& testSession)
 
   try
   {
-      CompiledBufferUnit secondUnit( secondCode, sizeof secondCode, my_postman, secondCode);
-      testSession.LoadCompiledUnit( secondUnit);
+      CompiledBufferUnit secondUnit (secondCode, sizeof secondCode, my_postman, secondCode);
+      testSession.LoadCompiledUnit (secondUnit);
       std::cout << "Loading second unit  OK" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Could not load unit 2";
       result = false;
@@ -236,20 +236,20 @@ load_units( ISession& testSession)
 }
 
 bool
-check_global_def_err( ISession& testSession)
+check_global_def_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( notDefGlbCode,
+    CompiledBufferUnit unit (notDefGlbCode,
                               sizeof notDefGlbCode,
                               my_postman,
                               notDefGlbCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with external global not defined!" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::EXTERNAL_FIRST)
         {
@@ -259,7 +259,7 @@ check_global_def_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -268,20 +268,20 @@ check_global_def_err( ISession& testSession)
 }
 
 bool
-check_global_doubledef_err( ISession& testSession)
+check_global_doubledef_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( doubleDefGlbCode,
+    CompiledBufferUnit unit (doubleDefGlbCode,
                               sizeof doubleDefGlbCode,
                               my_postman,
                               doubleDefGlbCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with global defined twice !" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::DUPLICATE_DEFINITION)
         {
@@ -291,7 +291,7 @@ check_global_doubledef_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -300,20 +300,20 @@ check_global_doubledef_err( ISession& testSession)
 }
 
 bool
-check_global_diffdef_err( ISession& testSession)
+check_global_diffdef_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( diffDefGlbCode,
+    CompiledBufferUnit unit (diffDefGlbCode,
                               sizeof diffDefGlbCode,
                               my_postman,
                               diffDefGlbCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with two different type globals defined!" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::EXTERNAL_MISMATCH)
         {
@@ -323,7 +323,7 @@ check_global_diffdef_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -333,20 +333,20 @@ check_global_diffdef_err( ISession& testSession)
 
 
 bool
-check_proc_def_err( ISession& testSession)
+check_proc_def_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( notDefProcCode,
+    CompiledBufferUnit unit (notDefProcCode,
                               sizeof notDefProcCode,
                               my_postman,
                               notDefProcCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with external procedure not defined!" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::EXTERNAL_FIRST)
         {
@@ -356,7 +356,7 @@ check_proc_def_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -365,20 +365,20 @@ check_proc_def_err( ISession& testSession)
 }
 
 bool
-check_proc_doubledef_err( ISession& testSession)
+check_proc_doubledef_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( doubleDefProcCode,
+    CompiledBufferUnit unit (doubleDefProcCode,
                               sizeof doubleDefProcCode,
                               my_postman,
                               doubleDefProcCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with procedure defined twice !" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::DUPLICATE_DEFINITION)
         {
@@ -388,7 +388,7 @@ check_proc_doubledef_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -397,20 +397,20 @@ check_proc_doubledef_err( ISession& testSession)
 }
 
 bool
-check_proc_diffdef_err( ISession& testSession)
+check_proc_diffdef_err (ISession& testSession)
 {
   bool result = false;
 
   try
   {
-    CompiledBufferUnit unit( diffDefProcCode,
+    CompiledBufferUnit unit (diffDefProcCode,
                               sizeof diffDefProcCode,
                               my_postman,
                               diffDefProcCode);
-    testSession.LoadCompiledUnit( unit);
+    testSession.LoadCompiledUnit (unit);
     std::cout << "ERROR: Unit loaded with two procedures with different signatures !" << std::endl;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::EXTERNAL_MISMATCH)
         {
@@ -420,7 +420,7 @@ check_proc_diffdef_err( ISession& testSession)
       else
         std::cout << "Error! Wrong exception throwed!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unknown exception throwed!" << std::endl;
   }
@@ -434,29 +434,29 @@ main()
 {
   bool success = true;
   {
-    DBSInit( DBSSettings());
+    DBSInit (DBSSettings());
   }
 
-  DBSCreateDatabase( admin);
-  InitInterpreter();
+  DBSCreateDatabase (admin);
+  InitInterpreter ();
 
   {
-    ISession& commonSession = GetInstance( NULL);
+    ISession& commonSession = GetInstance (NULL);
     success = true;
 
-    success = success && load_units( commonSession);
-    success = success && check_global_def_err( commonSession);
-    success = success && check_global_doubledef_err( commonSession);
-    success = success && check_global_diffdef_err( commonSession);
-    success = success && check_proc_def_err( commonSession);
-    success = success && check_proc_doubledef_err( commonSession);
-    success = success && check_proc_diffdef_err( commonSession);
+    success = success && load_units (commonSession);
+    success = success && check_global_def_err (commonSession);
+    success = success && check_global_doubledef_err (commonSession);
+    success = success && check_global_diffdef_err (commonSession);
+    success = success && check_proc_def_err (commonSession);
+    success = success && check_proc_doubledef_err (commonSession);
+    success = success && check_proc_diffdef_err (commonSession);
 
-    ReleaseInstance( commonSession);
+    ReleaseInstance (commonSession);
   }
 
-  CleanInterpreter();
-  DBSRemoveDatabase( admin);
+  CleanInterpreter ();
+  DBSRemoveDatabase (admin);
   DBSShoutdown();
 
   if (!success)

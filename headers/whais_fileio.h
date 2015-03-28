@@ -45,55 +45,55 @@ extern "C"
 #endif
 
 WH_FILE
-whf_open( const char* const file, uint_t mode);
+whf_open (const char* const file, uint_t mode);
 
 WH_FILE
-whf_dup( WH_FILE hnd);
+whf_dup (WH_FILE hnd);
 
 bool_t
-whf_read( WH_FILE hnd, uint8_t* dstBuffer, uint_t size);
+whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size);
 
 bool_t
-whf_write( WH_FILE hnd, const uint8_t* srcBuffer, uint_t size);
+whf_write (WH_FILE hnd, const uint8_t* srcBuffer, uint_t size);
 
 bool_t
-whf_seek( WH_FILE hnd, int64_t where, int whence);
+whf_seek (WH_FILE hnd, int64_t where, int whence);
 
 bool_t
-whf_tell( WH_FILE hnd, uint64_t* const outPosition);
+whf_tell (WH_FILE hnd, uint64_t* const outPosition);
 
 bool_t
-whf_sync( WH_FILE hnd);
+whf_sync (WH_FILE hnd);
 
 bool_t
-whf_tell_size( WH_FILE hnd, uint64_t* const outSize);
+whf_tell_size (WH_FILE hnd, uint64_t* const outSize);
 
 bool_t
-whf_set_size( WH_FILE, const uint64_t newSize);
+whf_set_size (WH_FILE, const uint64_t newSize);
 
 bool_t
-whf_close( WH_FILE hnd);
+whf_close (WH_FILE hnd);
 
 uint32_t
-whf_last_error();
+whf_last_error ();
 
 bool_t
-whf_err_to_str( uint64_t errorCode, char* str, uint_t strSize);
+whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize);
 
 bool_t
-whf_remove( const char* const file);
+whf_remove (const char* const file);
 
 const char*
 whf_dir_delim();
 
 const char*
-whf_current_dir();
+whf_current_dir ();
 
 bool_t
-whf_is_absolute( const char* const path);
+whf_is_absolute (const char* const path);
 
 bool_t
-whf_file_exists( const char* const file);
+whf_file_exists (const char* const file);
 
 #ifdef __cplusplus
 } /* extern 'C' */

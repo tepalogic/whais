@@ -707,7 +707,7 @@ ITextStrategy::FindMatch (ITextStrategy&   text,
 
   const int64_t res = mMatcher->FindMatch (text, fromCh, toCh, ignoreCase);
 
-  assert( (res < 0)
+  assert ((res < 0)
           || ((fromCh <= (uint64_t)res)
               && ((uint64_t)res <= toCh - mCachedCharsCount)));
 
@@ -903,16 +903,16 @@ static const UTF8_CU_COUNTER _cuCache;
 /* Return the numbers of characters encoded by this string. The string is
    either null terminated or 'maxBytesCount' bounded. */
 static uint64_t
-get_utf8_string_length( const uint8_t* utf8Str,
+get_utf8_string_length (const uint8_t* utf8Str,
                         uint64_t       maxBytesCount,
                         uint64_t*      outCharsCount)
 {
   uint64_t result = 0;
 
   *outCharsCount = 0;
-  while( (maxBytesCount > 0) && (utf8Str[0] != 0))
+  while ((maxBytesCount > 0) && (utf8Str[0] != 0))
     {
-      const uint_t charSize = _cuCache.Count( utf8Str[0]);
+      const uint_t charSize = _cuCache.Count (utf8Str[0]);
 
       bool validChar = true;
 
@@ -929,7 +929,7 @@ get_utf8_string_length( const uint8_t* utf8Str,
         }
 
       if ( ! validChar)
-        throw DBSException( _EXTRA( DBSException::INVALID_UTF8_STRING));
+        throw DBSException (_EXTRA (DBSException::INVALID_UTF8_STRING));
 
       result += charSize, maxBytesCount -= charSize, utf8Str += charSize;
       *outCharsCount += 1;
@@ -955,7 +955,7 @@ NullText::ReadUtf8U (const uint64_t offset,
                      uint8_t* const buffer)
 {
   if (offset > 0)
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -964,7 +964,7 @@ NullText::WriteUtf8U (const uint64_t       offset,
                       const uint64_t       count,
                       const uint8_t* const buffer)
 {
-  throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+  throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -972,7 +972,7 @@ void
 NullText::TruncateUtf8U (const uint64_t offset)
 {
   if (offset > 0)
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 uint32_t
@@ -1005,16 +1005,16 @@ NullText::GetSingletoneInstace()
 
 
 
-TemporalText::TemporalText( const uint8_t* const utf8Str,
+TemporalText::TemporalText (const uint8_t* const utf8Str,
                             const uint64_t       unitsCount)
 {
   if (utf8Str == NULL)
     return;
 
-  const uint64_t bytesCount = get_utf8_string_length( utf8Str,
+  const uint64_t bytesCount = get_utf8_string_length (utf8Str,
                                                       unitsCount,
                                                       &mCachedCharsCount);
-  mStorage.Write( 0, bytesCount, utf8Str);
+  mStorage.Write (0, bytesCount, utf8Str);
 }
 
 
@@ -1030,7 +1030,7 @@ TemporalText::ReadUtf8U (const uint64_t offset,
                          uint8_t* const buffer)
 {
   const uint64_t toRead = MIN (count, mStorage.Size() - offset);
-  mStorage.Read( offset, toRead, buffer);
+  mStorage.Read (offset, toRead, buffer);
 }
 
 
@@ -1039,7 +1039,7 @@ TemporalText::WriteUtf8U (const uint64_t       offset,
                           const uint64_t       count,
                           const uint8_t* const buffer)
 {
-  mStorage.Write( offset, count, buffer);
+  mStorage.Write (offset, count, buffer);
 }
 
 
@@ -1058,12 +1058,12 @@ TemporalText::GetTemporalContainer ()
 
 
 
-RowFieldText::RowFieldText( VariableSizeStore& storage,
+RowFieldText::RowFieldText (VariableSizeStore& storage,
                             const uint64_t     firstEntry,
                             const uint64_t     bytesSize)
-  : mFirstEntry( firstEntry),
+  : mFirstEntry (firstEntry),
     mUtf8Count ((bytesSize == 0) ? 0 : bytesSize - CACHE_META_DATA_SIZE),
-    mStorage( storage),
+    mStorage (storage),
     mTempContainer ()
 {
   if (mUtf8Count == 0)
@@ -1072,20 +1072,20 @@ RowFieldText::RowFieldText( VariableSizeStore& storage,
   assert (bytesSize > CACHE_META_DATA_SIZE);
 
   mStorage.RegisterReference();
-  mStorage.IncrementRecordRef( mFirstEntry);
+  mStorage.IncrementRecordRef (mFirstEntry);
 
-  assert( bytesSize > CACHE_META_DATA_SIZE);
+  assert (bytesSize > CACHE_META_DATA_SIZE);
 
   uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
-  mStorage.GetRecord( mFirstEntry,
+  mStorage.GetRecord (mFirstEntry,
                       0,
                       CACHE_META_DATA_SIZE,
                       cachedMetaData);
 
   mCachedCharsCount = load_le_int32 (cachedMetaData);
-  mCachedCharIndex  = load_le_int32 (cachedMetaData + sizeof( uint32_t));
+  mCachedCharIndex  = load_le_int32 (cachedMetaData + sizeof (uint32_t));
   mCachedCharIndexOffset = load_le_int32 (
-                                cachedMetaData + 2 * sizeof( uint32_t)
+                                cachedMetaData + 2 * sizeof (uint32_t)
                                          );
 }
 
@@ -1093,27 +1093,27 @@ RowFieldText::RowFieldText( VariableSizeStore& storage,
 
 RowFieldText::~RowFieldText()
 {
-  assert( mCachedCharsCount <= MAX_CHARS_COUNT);
-  assert( mCachedCharIndex <= MAX_CHARS_COUNT);
-  assert( mCachedCharIndexOffset <= MAX_BYTES_COUNT);
+  assert (mCachedCharsCount <= MAX_CHARS_COUNT);
+  assert (mCachedCharIndex <= MAX_CHARS_COUNT);
+  assert (mCachedCharIndexOffset <= MAX_BYTES_COUNT);
 
   if (mUtf8Count != 0)
     {
       uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
 
-      mStorage.GetRecord( mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
+      mStorage.GetRecord (mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
 
       //Do not update the elements count
-      store_le_int32 (mCachedCharIndex, cachedMetaData + sizeof( uint32_t));
+      store_le_int32 (mCachedCharIndex, cachedMetaData + sizeof (uint32_t));
       store_le_int32 (mCachedCharIndexOffset,
-                      cachedMetaData + 2 * sizeof( uint32_t));
+                      cachedMetaData + 2 * sizeof (uint32_t));
 
-      mStorage.UpdateRecord( mFirstEntry,
+      mStorage.UpdateRecord (mFirstEntry,
                              0,
                              CACHE_META_DATA_SIZE,
                              cachedMetaData);
 
-      mStorage.DecrementRecordRef( mFirstEntry);
+      mStorage.DecrementRecordRef (mFirstEntry);
       mStorage.ReleaseReference();
     }
 }
@@ -1140,7 +1140,7 @@ RowFieldText::ReadUtf8U (const uint64_t offset,
       return ;
     }
 
-  assert( mFirstEntry > 0);
+  assert (mFirstEntry > 0);
 
   const uint64_t toRead = MIN (count, mUtf8Count - offset);
   if (toRead == 0)
@@ -1160,7 +1160,7 @@ RowFieldText::WriteUtf8U (const uint64_t       offset,
 {
   if ((offset + count) > MAX_BYTES_COUNT)
     {
-      throw DBSException( _EXTRA( DBSException::OPER_NOT_SUPPORTED),
+      throw DBSException (_EXTRA (DBSException::OPER_NOT_SUPPORTED),
                           "This implementation does not support text fields"
                             " with more than %lu characters.",
                           _SC (long, MAX_BYTES_COUNT));
@@ -1187,7 +1187,7 @@ RowFieldText::WriteUtf8U (const uint64_t       offset,
       assert (offset == mUtf8Count);
       assert (mTempContainer.Size () == mUtf8Count);
 
-      mStorage.DecrementRecordRef( mFirstEntry);
+      mStorage.DecrementRecordRef (mFirstEntry);
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;
@@ -1223,7 +1223,7 @@ RowFieldText::TruncateUtf8U (const uint64_t atOffset)
       assert (offset == MIN (mUtf8Count, atOffset));
       assert (mTempContainer.Size () == mUtf8Count);
 
-      mStorage.DecrementRecordRef( mFirstEntry);
+      mStorage.DecrementRecordRef (mFirstEntry);
       mStorage.ReleaseReference();
 
       _CC(uint64_t&, mUtf8Count) = 0;
@@ -1249,29 +1249,29 @@ RowFieldText::GetRowStorage ()
 
 
 StringMatcher::StringMatcher (ITextStrategy& pattern)
-  : mText( NULL),
-    mPattern( pattern),
-    mPatternSize( min<uint64_t> (pattern.Utf8CountU (), MAX_PATTERN_SIZE)),
-    mIgnoreCase( false),
-    mLastChar( 0xFFFFFFFFFFFFFFFFull),
-    mCurrentChar( 0),
-    mCurrentRawOffset( 0),
-    mCacheStartPos( 0),
-    mPatternRaw( mCache),
-    mTextRawCache( mPatternRaw + mPatternSize),
-    mAvailableCache( sizeof mCache - mPatternSize),
-    mCacheValid( 0)
+  : mText (NULL),
+    mPattern (pattern),
+    mPatternSize (min<uint64_t> (pattern.Utf8CountU (), MAX_PATTERN_SIZE)),
+    mIgnoreCase (false),
+    mLastChar (0xFFFFFFFFFFFFFFFFull),
+    mCurrentChar (0),
+    mCurrentRawOffset (0),
+    mCacheStartPos (0),
+    mPatternRaw (mCache),
+    mTextRawCache (mPatternRaw + mPatternSize),
+    mAvailableCache (sizeof mCache - mPatternSize),
+    mCacheValid (0)
 {
-  assert( mPatternSize > 0);
+  assert (mPatternSize > 0);
 
   mPattern.ReadUtf8U ( 0, mPatternSize, mPatternRaw);
 
   if (mPatternSize < pattern.Utf8CountU ())
     {
       uint_t chOffset = 0;
-      while( chOffset < mPatternSize)
+      while (chOffset < mPatternSize)
         {
-          const uint32_t codeUnits = _cuCache.Count( mPatternRaw[chOffset]);
+          const uint32_t codeUnits = _cuCache.Count (mPatternRaw[chOffset]);
 
           if (chOffset + codeUnits > mPatternSize)
             mPatternSize = chOffset;
@@ -1279,12 +1279,12 @@ StringMatcher::StringMatcher (ITextStrategy& pattern)
           else
             chOffset += codeUnits;
         }
-      assert( chOffset == mPatternSize);
+      assert (chOffset == mPatternSize);
     }
 
-  assert( mPatternSize != 0);
+  assert (mPatternSize != 0);
 
-  memset( mShiftTable, 0, sizeof( mShiftTable));
+  memset (mShiftTable, 0, sizeof (mShiftTable));
   for (uint_t i = 0; i < mPatternSize; ++i)
     mShiftTable[mPatternRaw[i]] = i;
 }
@@ -1320,7 +1320,7 @@ StringMatcher::FindMatch (ITextStrategy&  text,
 
   if (ignoreCase != mIgnoreCase)
     {
-      memset( mShiftTable, 0, sizeof mShiftTable);
+      memset (mShiftTable, 0, sizeof mShiftTable);
       mPattern.ReadUtf8U ( 0, mPatternSize, mPatternRaw);
       patternRefreshed = true;
     }
@@ -1329,33 +1329,33 @@ StringMatcher::FindMatch (ITextStrategy&  text,
     {
       uint_t chOffset = 0;
 
-      while( chOffset < mPatternSize)
+      while (chOffset < mPatternSize)
         {
           uint32_t codePoint;
 
           wh_load_utf8_cp (mPatternRaw + chOffset, &codePoint);
-          chOffset += wh_store_utf8_cp (wh_to_lowercase( codePoint),
+          chOffset += wh_store_utf8_cp (wh_to_lowercase (codePoint),
                                         mPatternRaw + chOffset);
         }
-      assert( chOffset == mPatternSize);
+      assert (chOffset == mPatternSize);
     }
 
   mIgnoreCase = ignoreCase;
 
   if (patternRefreshed)
     {
-      memset( mShiftTable, 0, sizeof( mShiftTable));
+      memset (mShiftTable, 0, sizeof (mShiftTable));
       for (uint_t i = 0; i < mPatternSize; ++i)
         mShiftTable[mPatternRaw[i]] = i;
     }
 
-  if (FindSubstr() < 0)
+  if (FindSubstr () < 0)
     return PATTERN_NOT_FOUND;
 
-  assert( mPattern.mCachedCharsCount <= toChar - mCurrentChar);
+  assert (mPattern.mCachedCharsCount <= toChar - mCurrentChar);
 
-  assert( mText->CharsUntilOffsetU (mCurrentRawOffset) == mCurrentChar);
-  assert( mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
+  assert (mText->CharsUntilOffsetU (mCurrentRawOffset) == mCurrentChar);
+  assert (mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
 
   return mCurrentChar;
 }
@@ -1367,7 +1367,7 @@ StringMatcher::FindMatchRaw (ITextStrategy&   text,
                              const uint64_t   toChar,
                              const bool       ignoreCase)
 {
-  if (FindMatch( text, fromChar, toChar, ignoreCase) < 0)
+  if (FindMatch (text, fromChar, toChar, ignoreCase) < 0)
     return PATTERN_NOT_FOUND;
 
   return mCurrentRawOffset;
@@ -1375,10 +1375,10 @@ StringMatcher::FindMatchRaw (ITextStrategy&   text,
 
 
 uint_t
-StringMatcher::ComparingWindowShift( uint_t position) const
+StringMatcher::ComparingWindowShift (uint_t position) const
 {
-  assert( _SC (uint_t, (mPatternSize - 1)) <= position);
-  assert( position < mCacheValid);
+  assert (_SC (uint_t, (mPatternSize - 1)) <= position);
+  assert (position < mCacheValid);
 
   for (int i = mPatternSize - 1; i >= 0; --i, --position)
     {
@@ -1397,7 +1397,7 @@ StringMatcher::ComparingWindowShift( uint_t position) const
 
 
 static bool
-compare_text_buffers( const uint8_t* buffer1,
+compare_text_buffers (const uint8_t* buffer1,
                       const uint8_t* buffer2,
                       const bool     ignoreCase,
                       uint_t*        ioSize)
@@ -1405,11 +1405,11 @@ compare_text_buffers( const uint8_t* buffer1,
   const uint_t maxSize = *ioSize;
 
   uint_t offset = 0;
-  while( offset < maxSize)
+  while (offset < maxSize)
     {
-      const uint_t chSize = _cuCache.Count( buffer1[offset]);
+      const uint_t chSize = _cuCache.Count (buffer1[offset]);
 
-      assert( chSize != 0);
+      assert (chSize != 0);
 
       if (offset + chSize <= maxSize)
         {
@@ -1421,7 +1421,7 @@ compare_text_buffers( const uint8_t* buffer1,
 
           if (ignoreCase)
             {
-              if (wh_to_lowercase( ch1) != wh_to_lowercase( ch2))
+              if (wh_to_lowercase (ch1) != wh_to_lowercase (ch2))
                 return false;
             }
           else if (ch1 != ch2)
@@ -1451,7 +1451,7 @@ StringMatcher::SuffixesMatch() const
   if (mText->Utf8CountU () < (mCurrentRawOffset + buffSize))
     return false;
 
-  while( buffOffset < buffSize)
+  while (buffOffset < buffSize)
     {
       uint8_t   buffer1[64];
       uint8_t   buffer2[sizeof buffer1];
@@ -1460,13 +1460,13 @@ StringMatcher::SuffixesMatch() const
 
       mPattern.ReadUtf8U (buffOffset, chunkSize, buffer1);
       mText->ReadUtf8U (mCurrentRawOffset + buffOffset, chunkSize, buffer2);
-      if (! compare_text_buffers( buffer1, buffer2, mIgnoreCase, &chunkSize))
+      if (! compare_text_buffers (buffer1, buffer2, mIgnoreCase, &chunkSize))
         return false;
 
       buffOffset += chunkSize;
     }
 
-  assert( buffOffset == buffSize);
+  assert (buffOffset == buffSize);
 
   return true;
 }
@@ -1475,15 +1475,15 @@ StringMatcher::SuffixesMatch() const
 uint_t
 StringMatcher::FindInCache() const
 {
-  assert( (mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
-  assert( (mCacheStartPos <= mCurrentRawOffset)
+  assert ((mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
+  assert ((mCacheStartPos <= mCurrentRawOffset)
           && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
 
   uint_t windowsPos = mCurrentRawOffset - mCacheStartPos + mPatternSize - 1;
 
-  while( windowsPos < mCacheValid)
+  while (windowsPos < mCacheValid)
     {
-      const uint_t shift = ComparingWindowShift( windowsPos);
+      const uint_t shift = ComparingWindowShift (windowsPos);
 
       if (shift == 0)
         break;
@@ -1496,19 +1496,19 @@ StringMatcher::FindInCache() const
 
 
 void
-StringMatcher::CountCachedChars( const uint_t offset)
+StringMatcher::CountCachedChars (const uint_t offset)
 {
   uint_t chOffset = mCurrentRawOffset - mCacheStartPos;
 
-  assert( offset <= mCacheValid);
-  assert( (mCacheStartPos <= mCurrentRawOffset)
+  assert (offset <= mCacheValid);
+  assert ((mCacheStartPos <= mCurrentRawOffset)
           && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
 
-  while( chOffset < offset)
+  while (chOffset < offset)
     {
-      const uint_t codeUnits = _cuCache.Count( mTextRawCache[chOffset]);
+      const uint_t codeUnits = _cuCache.Count (mTextRawCache[chOffset]);
 
-      assert( codeUnits > 0);
+      assert (codeUnits > 0);
 
       ++mCurrentChar;
 
@@ -1521,7 +1521,7 @@ StringMatcher::CountCachedChars( const uint_t offset)
 bool
 StringMatcher::FillTextCache()
 {
-  assert( mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
+  assert (mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
 
   if (mLastChar < mCurrentChar + mPattern.mCachedCharsCount)
     return false;
@@ -1547,7 +1547,7 @@ StringMatcher::FillTextCache()
     {
       uint_t chOffset = 0;
 
-      while( chOffset < mCacheValid)
+      while (chOffset < mCacheValid)
         {
           uint32_t codePoint;
 
@@ -1555,14 +1555,14 @@ StringMatcher::FillTextCache()
                                                     &codePoint);
           if (chOffset + codeUnits <= mCacheValid)
             {
-              wh_store_utf8_cp (wh_to_lowercase( codePoint),
+              wh_store_utf8_cp (wh_to_lowercase (codePoint),
                                 mTextRawCache + chOffset);
               chOffset += codeUnits;
             }
           else
             mCacheValid = chOffset;
         }
-      assert( chOffset == mCacheValid);
+      assert (chOffset == mCacheValid);
     }
 
   if (mCacheValid < mPatternSize)
@@ -1573,16 +1573,16 @@ StringMatcher::FillTextCache()
 
 
 int64_t
-StringMatcher::FindSubstr()
+StringMatcher::FindSubstr ()
 {
-  assert( mCurrentChar <= mLastChar);
+  assert (mCurrentChar <= mLastChar);
   assert (mCurrentRawOffset < mText->OffsetOfCharU (mLastChar));
   assert (mText->OffsetOfCharU (mLastChar) >= mPattern.Utf8CountU ());
 
   const uint64_t textSize = mText->OffsetOfCharU (mLastChar);
 
   int cacheOffset = 0;
-  while( mCurrentRawOffset < textSize)
+  while (mCurrentRawOffset < textSize)
     {
       if ( ! FillTextCache())
         return PATTERN_NOT_FOUND;
@@ -1590,11 +1590,11 @@ StringMatcher::FindSubstr()
       cacheOffset = FindInCache();
       if (cacheOffset < mCacheValid)
         {
-          assert( (mPatternSize - 1) <= cacheOffset);
+          assert ((mPatternSize - 1) <= cacheOffset);
 
           cacheOffset -= mPatternSize - 1;
 
-          CountCachedChars( cacheOffset);
+          CountCachedChars (cacheOffset);
 
           if (mPatternSize == mPattern.Utf8CountU ())
             break; // Match  found.
@@ -1608,13 +1608,13 @@ StringMatcher::FindSubstr()
                                                   );
             }
           else
-            break; //Match found( including the suffix).
+            break; //Match found (including the suffix).
         }
       else
         {
-          assert( mPatternSize <= mCacheValid);
+          assert (mPatternSize <= mCacheValid);
 
-          CountCachedChars( mCacheValid - (mPatternSize - 1));
+          CountCachedChars (mCacheValid - (mPatternSize - 1));
           mCacheValid = 0;
         }
     }
@@ -1623,7 +1623,7 @@ StringMatcher::FindSubstr()
     return PATTERN_NOT_FOUND;
 
   assert (mLastChar - mCurrentChar >= mPattern.mCachedCharsCount);
-  assert( mCurrentRawOffset <=
+  assert (mCurrentRawOffset <=
             mText->OffsetOfCharU (mLastChar) - mPattern.Utf8CountU ());
 
   return mCurrentChar;

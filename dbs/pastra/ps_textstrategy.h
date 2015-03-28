@@ -53,15 +53,15 @@ public:
   bool operator== (ITextStrategy& o);
 
   uint64_t CharsCount();
-  uint64_t CharsUntilOffset( const uint64_t offset);
-  uint64_t OffsetOfChar( const uint64_t index);
-  DChar CharAt( const uint64_t index);
+  uint64_t CharsUntilOffset (const uint64_t offset);
+  uint64_t OffsetOfChar (const uint64_t index);
+  DChar CharAt (const uint64_t index);
 
   ITextStrategy* ToCase (const bool toLower);
 
-  ITextStrategy* Append( const uint32_t ch);
-  ITextStrategy* Append( ITextStrategy& text);
-  ITextStrategy* Append( ITextStrategy& text,
+  ITextStrategy* Append (const uint32_t ch);
+  ITextStrategy* Append (ITextStrategy& text);
+  ITextStrategy* Append (ITextStrategy& text,
                          const uint64_t fromOff,
                          const uint64_t toOff);
 
@@ -176,7 +176,7 @@ class TemporalText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  TemporalText( const uint8_t* const utf8Str    = NULL,
+  TemporalText (const uint8_t* const utf8Str    = NULL,
                 const uint64_t       unitsCount = ~0);
 
   virtual TemporalContainer& GetTemporalContainer ();
@@ -205,7 +205,7 @@ class RowFieldText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  RowFieldText( VariableSizeStore& storage,
+  RowFieldText (VariableSizeStore& storage,
                 const uint64_t     firstEntry,
                 const uint64_t     bytesSize);
 
@@ -226,7 +226,7 @@ protected:
   virtual void TruncateUtf8U (const uint64_t offset);
 
 
-  static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof( uint32_t);
+  static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof (uint32_t);
   static const uint32_t MAX_CHARS_COUNT      = 0xFFFFFFFF;
   static const uint32_t MAX_BYTES_COUNT      = 0xFFFFFFFF;
 
@@ -236,7 +236,7 @@ protected:
   TemporalContainer     mTempContainer;
 
 private:
-  RowFieldText( const RowFieldText&);
+  RowFieldText (const RowFieldText&);
   RowFieldText operator= (const RowFieldText&);
 };
 
@@ -252,7 +252,7 @@ private:
 
 
 public:
-  explicit StringMatcher( ITextStrategy& pattern);
+  explicit StringMatcher (ITextStrategy& pattern);
 
   int64_t FindMatch (ITextStrategy&         text,
                      const uint64_t         fromChar,
@@ -265,17 +265,17 @@ public:
                         const bool          ignoreCase);
 
 private:
-  uint_t ComparingWindowShift( uint_t position) const;
+  uint_t ComparingWindowShift (uint_t position) const;
 
   bool SuffixesMatch() const;
 
   uint_t FindInCache() const;
 
-  void CountCachedChars( const uint_t offset);
+  void CountCachedChars (const uint_t offset);
 
   bool FillTextCache();
 
-  int64_t FindSubstr();
+  int64_t FindSubstr ();
 
 
   ITextStrategy*        mText;

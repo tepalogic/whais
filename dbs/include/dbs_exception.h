@@ -33,7 +33,7 @@ namespace whais
 class DBS_SHL DBSException : public Exception
 {
 public:
-  DBSException( const uint32_t  code,
+  DBSException (const uint32_t  code,
                 const char*     file,
                 uint32_t        line,
                 const char*     fmtMsg = NULL,

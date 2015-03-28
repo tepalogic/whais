@@ -35,30 +35,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 struct Statement*
-find_proc_decl( struct ParserState*     parser,
+find_proc_decl (struct ParserState*     parser,
                 const char*             name,
                 const uint_t            nameLength,
                 const bool_t            refer);
 
 YYSTYPE
-add_proc_param_decl( YYSTYPE    paramsList,
+add_proc_param_decl (YYSTYPE    paramsList,
                      YYSTYPE    id,
                      YYSTYPE    type);
 
 void
-install_proc_args( struct ParserState* const parser,
+install_proc_args (struct ParserState* const parser,
                    struct SemValue*          paramsList);
 
 void
-install_proc_decl( struct ParserState* const parser,
+install_proc_decl (struct ParserState* const parser,
                    struct SemValue* const    identifier);
 
 void
-set_proc_rettype( struct ParserState* const parser,
+set_proc_rettype (struct ParserState* const parser,
                   struct SemValue* const    typpe);
 
 void
-finish_proc_decl( struct ParserState* const parser);
+finish_proc_decl (struct ParserState* const parser);
 
 #endif /* PROCDECL_H */
 

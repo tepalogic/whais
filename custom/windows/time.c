@@ -34,8 +34,8 @@ wh_get_currtime()
   SYSTEMTIME utcTime;
   uint64_t   usec;
 
-  GetSystemTimeAsFileTime( &fileTime);
-  FileTimeToSystemTime( &fileTime, &utcTime);
+  GetSystemTimeAsFileTime (&fileTime);
+  FileTimeToSystemTime (&fileTime, &utcTime);
 
   /* Convert the FILETIME to a real 64 bit integer. */
   usec = fileTime.dwHighDateTime;
@@ -48,7 +48,7 @@ wh_get_currtime()
   /* Keep only the microseconds. */
   usec %= 1000000;
 
-  assert( usec / 1000 == utcTime.wMilliseconds);
+  assert (usec / 1000 == utcTime.wMilliseconds);
 
   result.year  = utcTime.wYear;
   result.month = utcTime.wMonth;

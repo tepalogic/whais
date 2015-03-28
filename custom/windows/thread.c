@@ -29,47 +29,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 uint_t
-wh_lock_init( WH_LOCK* const lock)
+wh_lock_init (WH_LOCK* const lock)
 {
-  InitializeCriticalSection( lock);
+  InitializeCriticalSection (lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_destroy( WH_LOCK* const lock)
+wh_lock_destroy (WH_LOCK* const lock)
 {
-  DeleteCriticalSection( lock);
+  DeleteCriticalSection (lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_acquire( WH_LOCK* const lock)
+wh_lock_acquire (WH_LOCK* const lock)
 {
-  EnterCriticalSection( lock);
+  EnterCriticalSection (lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_release( WH_LOCK* const lock)
+wh_lock_release (WH_LOCK* const lock)
 {
-  LeaveCriticalSection( lock);
+  LeaveCriticalSection (lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_thread_create( WH_THREAD* const              outThread,
+wh_thread_create (WH_THREAD* const              outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void* const                   args)
 {
-  *outThread = CreateThread( NULL,
+  *outThread = CreateThread (NULL,
                            0,
                            (LPTHREAD_START_ROUTINE)routine,
                            args,
@@ -79,7 +79,7 @@ wh_thread_create( WH_THREAD* const              outThread,
     {
       const uint_t result = GetLastError();
 
-      return( result == WOP_OK) ? WOP_UNKNOW : result;
+      return (result == WOP_OK) ? WOP_UNKNOW : result;
     }
 
   return WOP_OK;
@@ -87,11 +87,11 @@ wh_thread_create( WH_THREAD* const              outThread,
 
 
 uint_t
-wh_thread_free( WH_THREAD thread)
+wh_thread_free (WH_THREAD thread)
 {
   //Give a chance of the thread to finish!
-  WaitForSingleObject( thread, INFINITE);
-  CloseHandle( thread);
+  WaitForSingleObject (thread, INFINITE);
+  CloseHandle (thread);
 
   return WOP_OK;
 }
@@ -100,15 +100,15 @@ wh_thread_free( WH_THREAD thread)
 void
 wh_yield()
 {
-  Sleep( 0);
+  Sleep (0);
 }
 
 
 void
-wh_sleep( const uint_t millisecs)
+wh_sleep (const uint_t millisecs)
 {
   if (millisecs == 0)
     return;
 
-  Sleep( millisecs);
+  Sleep (millisecs);
 }

@@ -49,7 +49,7 @@ GetRemoteHostName();
 
 
 void
-SetRemoteHostName( const char* const host);
+SetRemoteHostName (const char* const host);
 
 
 const std::string&
@@ -57,22 +57,22 @@ GetConnectionPort();
 
 
 void
-SetConnectionPort( const char* const port);
+SetConnectionPort (const char* const port);
 
 
 uint_t
-GetUserId();
+GetUserId ();
 
 
 void
-SetUserId( const uint_t userId);
+SetUserId (const uint_t userId);
 
 const std::string&
-GetUserPassword();
+GetUserPassword ();
 
 
 void
-SetUserPassword( const char* const password);
+SetUserPassword (const char* const password);
 
 
 const std::string&
@@ -80,14 +80,14 @@ GetWorkingDirectory();
 
 
 void
-SetWorkingDirectory( const char* const directory);
+SetWorkingDirectory (const char* const directory);
 
 
 const std::string&
 GetWorkingDB();
 
 void
-SetWorkingDB( const char* const dbName);
+SetWorkingDB (const char* const dbName);
 
 
 VERBOSE_LEVEL
@@ -95,11 +95,11 @@ GetVerbosityLevel();
 
 
 void
-SetVerbosityLevel( const uint_t level);
+SetVerbosityLevel (const uint_t level);
 
 
 bool
-SetMaximumFileSize( std::string size);
+SetMaximumFileSize (std::string size);
 
 
 uint64_t
@@ -107,11 +107,11 @@ GetMaximumFileSize();
 
 
 void
-SetDbsHandler( whais::IDBSHandler& dbs);
+SetDbsHandler (whais::IDBSHandler& dbs);
 
 
 whais::IDBSHandler&
-GetDBSHandler();
+GetDBSHandler ();
 
 
 bool

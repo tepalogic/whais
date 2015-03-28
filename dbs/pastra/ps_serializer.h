@@ -38,93 +38,93 @@ typedef uint32_t NODE_INDEX;
 class Serializer
 {
 private:
-  Serializer();
-  ~Serializer();
+  Serializer ();
+  ~Serializer ();
 
 public:
-  static void Store( uint8_t* const dest, const DBool& value);
-  static void Store( uint8_t* const dest, const DChar& value);
-  static void Store( uint8_t* const dest, const DDate& value);
-  static void Store( uint8_t* const dest, const DDateTime& value);
-  static void Store( uint8_t* const dest, const DHiresTime& value);
-  static void Store( uint8_t* const dest, const DInt8& value);
-  static void Store( uint8_t* const dest, const DInt16& value);
-  static void Store( uint8_t* const dest, const DInt32& value);
-  static void Store( uint8_t* const dest, const DInt64& value);
-  static void Store( uint8_t* const dest, const DReal& value);
-  static void Store( uint8_t* const dest, const DRichReal& value);
-  static void Store( uint8_t* const dest, const DUInt8& value);
-  static void Store( uint8_t* const dest, const DUInt16& value);
-  static void Store( uint8_t* const dest, const DUInt32& value);
-  static void Store( uint8_t* const dest, const DUInt64& value);
+  static void Store (uint8_t* const dest, const DBool& value);
+  static void Store (uint8_t* const dest, const DChar& value);
+  static void Store (uint8_t* const dest, const DDate& value);
+  static void Store (uint8_t* const dest, const DDateTime& value);
+  static void Store (uint8_t* const dest, const DHiresTime& value);
+  static void Store (uint8_t* const dest, const DInt8& value);
+  static void Store (uint8_t* const dest, const DInt16& value);
+  static void Store (uint8_t* const dest, const DInt32& value);
+  static void Store (uint8_t* const dest, const DInt64& value);
+  static void Store (uint8_t* const dest, const DReal& value);
+  static void Store (uint8_t* const dest, const DRichReal& value);
+  static void Store (uint8_t* const dest, const DUInt8& value);
+  static void Store (uint8_t* const dest, const DUInt16& value);
+  static void Store (uint8_t* const dest, const DUInt32& value);
+  static void Store (uint8_t* const dest, const DUInt64& value);
 
-  static void Load( const uint8_t* const src, DBool* const outValue);
-  static void Load( const uint8_t* const src, DChar* const outValue);
-  static void Load( const uint8_t* const src, DDate* const outValue);
-  static void Load( const uint8_t* const src, DDateTime* const outValue);
-  static void Load( const uint8_t* const src, DHiresTime* const outValue);
-  static void Load( const uint8_t* const src, DInt8* const outValue);
-  static void Load( const uint8_t* const src, DInt16* const outValue);
-  static void Load( const uint8_t* const src, DInt32* const outValue);
-  static void Load( const uint8_t* const src, DInt64* const outValue);
-  static void Load( const uint8_t* const src, DReal* const outValue);
-  static void Load( const uint8_t* const src, DRichReal* const outValue);
-  static void Load( const uint8_t* const src, DUInt8* const outValue);
-  static void Load( const uint8_t* const src, DUInt16* const outValue);
-  static void Load( const uint8_t* const src, DUInt32* const outValue);
-  static void Load( const uint8_t* const src, DUInt64* const outValue);
+  static void Load (const uint8_t* const src, DBool* const outValue);
+  static void Load (const uint8_t* const src, DChar* const outValue);
+  static void Load (const uint8_t* const src, DDate* const outValue);
+  static void Load (const uint8_t* const src, DDateTime* const outValue);
+  static void Load (const uint8_t* const src, DHiresTime* const outValue);
+  static void Load (const uint8_t* const src, DInt8* const outValue);
+  static void Load (const uint8_t* const src, DInt16* const outValue);
+  static void Load (const uint8_t* const src, DInt32* const outValue);
+  static void Load (const uint8_t* const src, DInt64* const outValue);
+  static void Load (const uint8_t* const src, DReal* const outValue);
+  static void Load (const uint8_t* const src, DRichReal* const outValue);
+  static void Load (const uint8_t* const src, DUInt8* const outValue);
+  static void Load (const uint8_t* const src, DUInt16* const outValue);
+  static void Load (const uint8_t* const src, DUInt32* const outValue);
+  static void Load (const uint8_t* const src, DUInt64* const outValue);
 
-  static uint_t Size( const DBS_FIELD_TYPE type, const bool isArray);
+  static uint_t Size (const DBS_FIELD_TYPE type, const bool isArray);
 
-  static ROW_INDEX LoadRow( const ROW_INDEX* const from)
+  static ROW_INDEX LoadRow (const ROW_INDEX* const from)
   {
-    if (sizeof( ROW_INDEX) == sizeof( uint64_t))
+    if (sizeof (ROW_INDEX) == sizeof (uint64_t))
       return load_le_int64 (_RC (const uint8_t*, from));
 
-    else if (sizeof( ROW_INDEX) == sizeof( uint32_t))
+    else if (sizeof (ROW_INDEX) == sizeof (uint32_t))
       return load_le_int32 (_RC (const uint8_t*, from));
 
-    assert( false);
+    assert (false);
     return 0;
   }
 
-  static void StoreRow( const ROW_INDEX row, ROW_INDEX* const to)
+  static void StoreRow (const ROW_INDEX row, ROW_INDEX* const to)
   {
-    if (sizeof( ROW_INDEX) == sizeof( uint64_t))
+    if (sizeof (ROW_INDEX) == sizeof (uint64_t))
       store_le_int64 (row, _RC (uint8_t*, to));
 
-    else if (sizeof( ROW_INDEX) == sizeof( uint32_t))
+    else if (sizeof (ROW_INDEX) == sizeof (uint32_t))
       store_le_int32 (row, _RC (uint8_t*, to));
 
     else
       {
-        assert( false);
+        assert (false);
       }
   }
 
-  static NODE_INDEX LoadNode( const NODE_INDEX* const from)
+  static NODE_INDEX LoadNode (const NODE_INDEX* const from)
   {
-    assert( sizeof( NODE_INDEX) == sizeof( uint32_t));
+    assert (sizeof (NODE_INDEX) == sizeof (uint32_t));
 
     return load_le_int32 (_RC (const uint8_t*, from));
   }
 
-  static void StoreNode( const NODE_INDEX node, NODE_INDEX* const to)
+  static void StoreNode (const NODE_INDEX node, NODE_INDEX* const to)
   {
-    assert( sizeof( NODE_INDEX) == sizeof( uint32_t));
+    assert (sizeof (NODE_INDEX) == sizeof (uint32_t));
 
     store_le_int32 (node, _RC (uint8_t*, to));
   }
 
   template<typename T> static bool
-  ValidateBuffer( const uint8_t* const buffer)
+  ValidateBuffer (const uint8_t* const buffer)
   {
     return true;
   }
 
-  typedef bool( *VALUE_VALIDATOR) (const uint8_t* const);
+  typedef bool (*VALUE_VALIDATOR) (const uint8_t* const);
 
-  static VALUE_VALIDATOR SelectValidator( const DBS_FIELD_TYPE type);
+  static VALUE_VALIDATOR SelectValidator (const DBS_FIELD_TYPE type);
 
 
   static const int MAX_VALUE_RAW_SIZE = 0x20;

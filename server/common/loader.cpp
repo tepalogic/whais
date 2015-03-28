@@ -42,7 +42,7 @@ static const char CLEAR_LOG_STREAM[] = "";
 
 
 bool
-LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
+LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
 {
   ostringstream logEntry;
   uint64_t      temp;
@@ -52,10 +52,10 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
-  inoutDesc.mDbs = &DBSRetrieveDatabase( inoutDesc.mDbsName.c_str(),
-                                         inoutDesc.mDbsDirectory.c_str());
+  inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
+                                         inoutDesc.mDbsDirectory.c_str ());
   std::auto_ptr<Logger> dbsLogger(
-                         new FileLogger( inoutDesc.mDbsLogFile.c_str(), true)
+                         new FileLogger (inoutDesc.mDbsLogFile.c_str (), true)
                                   );
   logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
            << " milliseconds";
@@ -71,11 +71,11 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
 
   if (inoutDesc.mDbsName != GlobalContextDatabase())
     {
-      inoutDesc.mSession = &GetInstance( inoutDesc.mDbsName.c_str(),
+      inoutDesc.mSession = &GetInstance (inoutDesc.mDbsName.c_str (),
                                          dbsLogger.get ());
     }
   else
-    inoutDesc.mSession = &GetInstance( NULL, dbsLogger.get ());
+    inoutDesc.mSession = &GetInstance (NULL, dbsLogger.get ());
 
   temp = inoutDesc.mStackCount;
   if ( ! inoutDesc.mSession->NotifyEvent (ISession::MAX_STACK_COUNT, &temp))
@@ -98,9 +98,9 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
       log.Log (LOG_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
-      WH_SHLIB shl = wh_shl_load( it->c_str());
+      WH_SHLIB shl = wh_shl_load (it->c_str ());
       if ((shl == INVALID_SHL)
-          || ! inoutDesc.mSession->LoadSharedLib( shl))
+          || ! inoutDesc.mSession->LoadSharedLib (shl))
         {
           log.Log (LOG_ERROR, "Failed to load the dynamic library.");
         }
@@ -115,8 +115,8 @@ LoadDatabase( FileLogger& log, DBSDescriptors& inoutDesc)
       log.Log (LOG_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
-      CompiledFileUnit unit( it->c_str());
-      inoutDesc.mSession->LoadCompiledUnit( unit);
+      CompiledFileUnit unit (it->c_str ());
+      inoutDesc.mSession->LoadCompiledUnit (unit);
     }
 
   inoutDesc.mLogger = dbsLogger.release();

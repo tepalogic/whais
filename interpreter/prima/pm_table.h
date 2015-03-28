@@ -41,10 +41,10 @@ namespace prima {
 class TableReference
 {
 public:
-  TableReference( IDBSHandler& dbs, ITable& table)
-    : mDbsHnd( dbs),
-      mTable( table),
-      mRefCount( 0)
+  TableReference (IDBSHandler& dbs, ITable& table)
+    : mDbsHnd (dbs),
+      mTable (table),
+      mRefCount (0)
   {
   }
 
@@ -63,7 +63,7 @@ public:
   {
     LockRAII<Lock> _lock (mLock);
 
-    assert( mRefCount > 0);
+    assert (mRefCount > 0);
 
     if (--mRefCount == 0)
       {
@@ -74,14 +74,14 @@ public:
 
   ITable& GetTable()
   {
-    assert( mRefCount > 0);
+    assert (mRefCount > 0);
 
     return mTable;
   }
 
-  IDBSHandler& GetDBSHandler()
+  IDBSHandler& GetDBSHandler ()
   {
-    assert( mRefCount > 0);
+    assert (mRefCount > 0);
 
     return mDbsHnd;
   }
@@ -90,7 +90,7 @@ private:
   ~TableReference()
   {
     if (&mTable != &GeneralTable::Instance())
-      mDbsHnd.ReleaseTable( mTable);
+      mDbsHnd.ReleaseTable (mTable);
   }
 
   IDBSHandler&     mDbsHnd;

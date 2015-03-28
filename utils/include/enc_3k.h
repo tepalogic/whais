@@ -32,7 +32,7 @@ extern "C" {
 #endif
 
 void
-wh_buff_3k_encode( const uint32_t           firstKing,
+wh_buff_3k_encode (const uint32_t           firstKing,
                    const uint32_t           secondKing,
                    const uint8_t* const     key,
                    const uint_t             keyLen,
@@ -40,7 +40,7 @@ wh_buff_3k_encode( const uint32_t           firstKing,
                    const uint_t             bufferSize);
 
 void
-wh_buff_3k_decode( const uint32_t           firstKing,
+wh_buff_3k_decode (const uint32_t           firstKing,
                    const uint32_t           secondKing,
                    const uint8_t* const     key,
                    const uint_t             keyLen,

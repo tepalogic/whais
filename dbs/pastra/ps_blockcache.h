@@ -40,14 +40,14 @@ class IBlocksManager
 {
 public:
 
-  virtual ~IBlocksManager();
+  virtual ~IBlocksManager ();
 
 
-  virtual void StoreItems( uint64_t           firstItem,
+  virtual void StoreItems (uint64_t           firstItem,
                            uint_t             itemsCount,
                            const uint8_t*     from) = 0;
 
-  virtual void RetrieveItems( uint64_t    firstItem,
+  virtual void RetrieveItems (uint64_t    firstItem,
                               uint_t      itemsCount,
                               uint8_t*    to) = 0;
 };
@@ -56,17 +56,17 @@ public:
 class BlockEntry
 {
 public:
-  explicit BlockEntry( uint8_t* const data)
-    : mData( data),
-      mReferenceCount( 0),
-      mFlags( 0)
+  explicit BlockEntry (uint8_t* const data)
+    : mData (data),
+      mReferenceCount (0),
+      mFlags (0)
   {
-    assert( data != NULL);
+    assert (data != NULL);
   }
 
   bool IsDirty() const
   {
-    return( mFlags & BLOCK_ENTRY_DIRTY) != 0;
+    return (mFlags & BLOCK_ENTRY_DIRTY) != 0;
   }
 
   bool IsInUse() const
@@ -84,16 +84,16 @@ public:
     mFlags &= ~BLOCK_ENTRY_DIRTY;
   }
 
-  void RegisterUser()
+  void RegisterUser ()
   {
-    wh_atomic_inc32 (_RC (int32_t*, &mReferenceCount));
+    wh_atomic_fetch_inc32 (_RC (int32_t*, &mReferenceCount));
   }
 
-  void ReleaseUser()
+  void ReleaseUser ()
   {
-    assert(  mReferenceCount > 0);
+    assert ( mReferenceCount > 0);
 
-    wh_atomic_dec32 (_RC (int32_t*, &mReferenceCount));
+    wh_atomic_fetch_dec32 (_RC (int32_t*, &mReferenceCount));
   }
 
   uint8_t* Data()
@@ -114,23 +114,23 @@ private:
 class StoredItem
 {
 public:
-  StoredItem( BlockEntry& blockEntry, const uint_t itemOffset)
-    : mBlockEntry( &blockEntry),
-      mItemOffset( itemOffset)
+  StoredItem (BlockEntry& blockEntry, const uint_t itemOffset)
+    : mBlockEntry (&blockEntry),
+      mItemOffset (itemOffset)
   {
-    mBlockEntry->RegisterUser();
+    mBlockEntry->RegisterUser ();
   }
 
-  StoredItem( const StoredItem& src) :
-    mBlockEntry( src.mBlockEntry),
-    mItemOffset( src.mItemOffset)
+  StoredItem (const StoredItem& src) :
+    mBlockEntry (src.mBlockEntry),
+    mItemOffset (src.mItemOffset)
   {
-    mBlockEntry->RegisterUser();
+    mBlockEntry->RegisterUser ();
   }
 
   ~StoredItem()
   {
-    mBlockEntry->ReleaseUser();
+    mBlockEntry->ReleaseUser ();
   }
 
   StoredItem& operator= (const StoredItem& src)
@@ -138,8 +138,8 @@ public:
     if (this == &src)
       return *this;
 
-    src.mBlockEntry->RegisterUser();
-    mBlockEntry->ReleaseUser();
+    src.mBlockEntry->RegisterUser ();
+    mBlockEntry->ReleaseUser ();
 
     _CC (BlockEntry*&, mBlockEntry) = src.mBlockEntry;
     _CC (uint_t&,      mItemOffset) = src.mItemOffset;
@@ -153,7 +153,7 @@ public:
     return mBlockEntry->Data() + mItemOffset;
   }
 
-  const uint8_t* GetDataForRead() const
+  const uint8_t* GetDataForRead () const
   {
     return mBlockEntry->Data() + mItemOffset;
   }
@@ -171,7 +171,7 @@ public:
   BlockCache();
   ~BlockCache();
 
-  void Init( IBlocksManager&      blocksMgr,
+  void Init (IBlocksManager&      blocksMgr,
              const uint_t         itemSize,
              const uint_t         blockSize,
              const uint_t         maxCachedBlocks,
@@ -179,11 +179,11 @@ public:
 
   void Flush();
 
-  void FlushItem( const uint64_t item);
+  void FlushItem (const uint64_t item);
 
-  void RefreshItem( const uint64_t item);
+  void RefreshItem (const uint64_t item);
 
-  StoredItem RetriveItem( const uint64_t item);
+  StoredItem RetriveItem (const uint64_t item);
 
 private:
   IBlocksManager*  mManager;

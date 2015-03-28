@@ -42,16 +42,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* A mark to identify the unused declarations */
 #define NOTREF_DECL    0x20000000
 
-#define RETRIVE_ID( x) ((x) & ~(GLOBAL_DECL | EXTERN_DECL | NOTREF_DECL))
+#define RETRIVE_ID(x) ((x) & ~(GLOBAL_DECL | EXTERN_DECL | NOTREF_DECL))
 
-#define IS_GLOBAL( x)     (((x) & GLOBAL_DECL) != 0)
-#define IS_EXTERNAL( x)   (((x) & EXTERN_DECL) != 0)
-#define IS_REFERRED( x)   (((x) & NOTREF_DECL) == 0)
+#define IS_GLOBAL(x)     (((x) & GLOBAL_DECL) != 0)
+#define IS_EXTERNAL(x)   (((x) & EXTERN_DECL) != 0)
+#define IS_REFERRED(x)   (((x) & NOTREF_DECL) == 0)
 
-#define MARK_AS_GLOBAL( x)           ((x) |= GLOBAL_DECL)
-#define MARK_AS_EXTERNAL( x)         ((x) |= EXTERN_DECL)
-#define MARK_AS_NOT_REFERENCED( x)   ((x) |= NOTREF_DECL)
-#define MARK_AS_REFERENCED( x)       ((x) &= ~NOTREF_DECL)
+#define MARK_AS_GLOBAL(x)           ((x) |= GLOBAL_DECL)
+#define MARK_AS_EXTERNAL(x)         ((x) |= EXTERN_DECL)
+#define MARK_AS_NOT_REFERENCED(x)   ((x) |= NOTREF_DECL)
+#define MARK_AS_REFERENCED(x)       ((x) &= ~NOTREF_DECL)
 
 
 struct DeclaredVar
@@ -68,25 +68,25 @@ struct DeclaredVar
 };
 
 YYSTYPE
-add_id_to_list( YYSTYPE list, YYSTYPE id);
+add_id_to_list (YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec( struct ParserState* parser, const uint16_t type);
+create_type_spec (struct ParserState* parser, const uint16_t type);
 
 struct DeclaredVar*
-add_declaration( struct ParserState* const parser,
+add_declaration (struct ParserState* const parser,
                  YYSTYPE                   var,
                  YYSTYPE                   type,
                  const bool_t              paramter,
                  const bool_t              unique);
 
 YYSTYPE
-add_list_declaration( struct ParserState* parser,
+add_list_declaration (struct ParserState* parser,
                       YYSTYPE             vars,
                       YYSTYPE             type);
 
 YYSTYPE
-add_field_declaration( struct ParserState*       parser,
+add_field_declaration (struct ParserState*       parser,
                        YYSTYPE                   var,
                        YYSTYPE                   type,
                        struct DeclaredVar* const extra);

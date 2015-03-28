@@ -88,8 +88,8 @@ test_table_index (void *)
         else if ((wh_rnd () & 1) == 0)
           refTable->CreateIndex (f, NULL, NULL);
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   }
   catch (...)
@@ -300,8 +300,8 @@ test_table_rows (void *)
             refTable2->GetReusableRow (true);
           }
 
-        if (wh_rnd() & 1)
-          wh_yield();
+        if (wh_rnd () & 1)
+          wh_yield ();
       }
   }
   catch (...)
@@ -317,17 +317,17 @@ test_table_rows (void *)
 
 
 int
-main( int argc, char** argv)
+main (int argc, char** argv)
 {
   if (argc > 1)
-    _iterationsCount = atol( argv[1]);
+    _iterationsCount = atol (argv[1]);
 
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit( DBSSettings());
-    DBSCreateDatabase( db_name);
-    IDBSHandler& handler = DBSRetrieveDatabase( db_name);
+    DBSInit (DBSSettings());
+    DBSCreateDatabase (db_name);
+    IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
     handler.AddTable("t_test_table", 5, fieldsDescs);
     refTable  = &handler.RetrievePersistentTable ("t_test_table");
@@ -390,10 +390,10 @@ main( int argc, char** argv)
 
     handler.ReleaseTable (*refTable2);
     handler.DeleteTable ("t_test_table");
-    DBSReleaseDatabase( handler);
+    DBSReleaseDatabase (handler);
   }
 
-  DBSRemoveDatabase( db_name);
+  DBSRemoveDatabase (db_name);
   DBSShoutdown();
 
   if (!testResult)

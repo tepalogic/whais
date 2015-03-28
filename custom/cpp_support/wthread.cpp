@@ -36,28 +36,28 @@ namespace whais
 
 Lock::Lock()
 {
-  const uint_t result = wh_lock_init( &mLock);
+  const uint_t result = wh_lock_init (&mLock);
 
   if (result != WOP_OK)
-    throw LockException( _EXTRA( result), "Failed to initialize a lock.");
+    throw LockException (_EXTRA (result), "Failed to initialize a lock.");
 }
 
 
 Lock::~Lock()
 {
-  const uint_t result = wh_lock_destroy( &mLock);
+  const uint_t result = wh_lock_destroy (&mLock);
 
   (void)result;
-  assert( result == WOP_OK);
+  assert (result == WOP_OK);
 }
 
 
 void
 Lock::Acquire()
 {
-  const uint_t result = wh_lock_acquire( &mLock);
+  const uint_t result = wh_lock_acquire (&mLock);
   if (result != WOP_OK)
-    throw LockException( _EXTRA( result), "Failed to acquire a lock.");
+    throw LockException (_EXTRA (result), "Failed to acquire a lock.");
 }
 
 
@@ -66,10 +66,10 @@ Lock::TryAcquire()
 {
   bool_t acquired;
 
-  const int result = wh_lock_try_acquire( &mLock, &acquired);
+  const int result = wh_lock_try_acquire (&mLock, &acquired);
 
   if (result != WOP_OK)
-    throw LockException( _EXTRA( result), "Failed to try to acquire a lock.");
+    throw LockException (_EXTRA (result), "Failed to try to acquire a lock.");
 
   return acquired != FALSE;
 }
@@ -79,10 +79,10 @@ Lock::TryAcquire()
 void
 Lock::Release()
 {
-  const uint_t result = wh_lock_release( &mLock);
+  const uint_t result = wh_lock_release (&mLock);
 
   (void)result;
-  assert( result == WOP_OK);
+  assert (result == WOP_OK);
 }
 
 
@@ -101,10 +101,10 @@ SpinLock::Acquire ()
     {
       assert (mLock >= 0);
 
-      if (wh_atomic_inc16 (&mLock) == 0)
+      if (wh_atomic_fetch_inc16 (&mLock) == 0)
         break;
 
-      wh_atomic_dec16 (&mLock);
+      wh_atomic_fetch_dec16 (&mLock);
       wh_yield ();
     }
 }
@@ -115,10 +115,10 @@ SpinLock::TryAcquire ()
 {
   assert (mLock >= 0);
 
-  if (wh_atomic_inc16 (&mLock) == 0)
+  if (wh_atomic_fetch_inc16 (&mLock) == 0)
     return true;
 
-  wh_atomic_dec16(&mLock);
+  wh_atomic_fetch_dec16(&mLock);
   return false;
 }
 
@@ -126,20 +126,20 @@ void
 SpinLock::Release ()
 {
   assert (mLock > 0);
-  wh_atomic_dec16 (&mLock);
+  wh_atomic_fetch_dec16 (&mLock);
 }
 
 
 
-Thread::Thread()
-  : mRoutine( NULL),
-    mRoutineArgs( NULL),
-    mException( NULL),
-    mThread( 0),
+Thread::Thread ()
+  : mRoutine (NULL),
+    mRoutineArgs (NULL),
+    mException (NULL),
+    mThread (0),
     mEnded(0),
-    mUnkExceptSignaled( false),
-    mIgnoreExceptions( false),
-    mNeedsClean( false)
+    mUnkExceptSignaled (false),
+    mIgnoreExceptions (false),
+    mNeedsClean (false)
 {
 }
 
@@ -151,10 +151,10 @@ Thread::Run (WH_THREAD_ROUTINE routine,
 {
   while (true)
     {
-      if (wh_atomic_inc32 (&mEnded) == 0)
+      if (wh_atomic_fetch_inc32 (&mEnded) == 0)
         break;
 
-      wh_atomic_dec32 (&mEnded);
+      wh_atomic_fetch_dec32 (&mEnded);
 
       if ( ! waitPrevEnd)
         return false;
@@ -164,37 +164,37 @@ Thread::Run (WH_THREAD_ROUTINE routine,
 
   if (mNeedsClean)
     {
-      wh_thread_free( mThread);
+      wh_thread_free (mThread);
       mNeedsClean = false;
 
       ThrowPendingException();
     }
 
-  assert( mEnded > 0);
-  assert( mNeedsClean == false);
+  assert (mEnded > 0);
+  assert (mNeedsClean == false);
 
   mRoutine     = routine;
   mRoutineArgs = args;
 
-  const uint_t res = wh_thread_create( &mThread,
+  const uint_t res = wh_thread_create (&mThread,
                                        Thread::ThreadWrapperRoutine,
                                        this);
   if (res != WOP_OK)
     {
-      assert( mEnded > 0);
+      assert (mEnded > 0);
 
-      throw ThreadException( _EXTRA( errno), "Failed to create a thread.");
+      throw ThreadException (_EXTRA (errno), "Failed to create a thread.");
     }
 
   return true;
 }
 
 
-Thread::~Thread()
+Thread::~Thread ()
 {
-  WaitToEnd( false);
+  WaitToEnd (false);
 
-  assert( mNeedsClean == false);
+  assert (mNeedsClean == false);
 
   //If you did not have thrown the exception until now,
   //do not do it now from destructor.
@@ -203,32 +203,32 @@ Thread::~Thread()
 
 
 void
-Thread::WaitToEnd( const bool throwPending)
+Thread::WaitToEnd (const bool throwPending)
 {
-  while (wh_atomic_inc32 (&mEnded) != 0)
+  while (wh_atomic_fetch_inc32 (&mEnded) != 0)
     {
       wh_yield ();
       LockRAII<Lock> _l (mRoutineExecutionLock); //Avoid spin locks!
-      wh_atomic_dec32 (&mEnded);
+      wh_atomic_fetch_dec32 (&mEnded);
     }
 
   if (mNeedsClean)
     {
-      wh_thread_free( mThread);
+      wh_thread_free (mThread);
       mNeedsClean = false;
 
       if (throwPending)
         ThrowPendingException();
     }
 
-  wh_atomic_dec32 (&mEnded);
+  wh_atomic_fetch_dec32 (&mEnded);
 }
 
 
 void
 Thread::ThrowPendingException()
 {
-  assert( mEnded > 0);
+  assert (mEnded > 0);
 
   if (HasExceptionPending() == false)
     return;
@@ -237,9 +237,9 @@ Thread::ThrowPendingException()
     {
       DiscardException();
 
-      wh_atomic_dec32 (&mEnded);
+      wh_atomic_fetch_dec32 (&mEnded);
 
-      throw ThreadException( _EXTRA( WOP_UNKNOW));
+      throw ThreadException (_EXTRA (WOP_UNKNOW));
     }
 
   if (mException != NULL)
@@ -247,7 +247,7 @@ Thread::ThrowPendingException()
       Exception* clone = mException->Clone();
       DiscardException();
 
-      wh_atomic_dec32 (&mEnded);
+      wh_atomic_fetch_dec32 (&mEnded);
 
       throw clone;
     }
@@ -255,7 +255,7 @@ Thread::ThrowPendingException()
 
 
 void
-Thread::ThreadWrapperRoutine( void* const args)
+Thread::ThreadWrapperRoutine (void* const args)
 {
   Thread* const th = _RC (Thread*, args);
 
@@ -266,25 +266,25 @@ Thread::ThreadWrapperRoutine( void* const args)
   LockRAII<Lock> _l (th->mRoutineExecutionLock);
   try
   {
-      th->mRoutine( th->mRoutineArgs);
+      th->mRoutine (th->mRoutineArgs);
   }
-  catch( Exception &e)
+  catch (Exception &e)
   {
     if (th->mIgnoreExceptions == false)
       th->mException = e.Clone();
   }
-  catch( Exception* pE)
+  catch (Exception* pE)
   {
     if (th->mIgnoreExceptions == false)
       th->mException = pE;
   }
-  catch( ...)
+  catch (...)
   {
     if (th->mIgnoreExceptions == false)
       th->mUnkExceptSignaled = true;
   }
 
-  wh_atomic_dec32 (&th->mEnded);
+  wh_atomic_fetch_dec32 (&th->mEnded);
 }
 
 

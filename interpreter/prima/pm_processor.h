@@ -34,13 +34,13 @@ namespace prima {
 class ProcedureCall
 {
 public:
-  ProcedureCall( Session&              session,
+  ProcedureCall (Session&              session,
                  SessionStack&         stack,
                  const Procedure&      procedure);
 
-  void AquireSync( const uint8_t sync);
+  void AquireSync (const uint8_t sync);
 
-  void ReleaseSync( const uint8_t sync);
+  void ReleaseSync (const uint8_t sync);
 
   Session& GetSession() const
   {
@@ -54,7 +54,7 @@ public:
 
   const Unit& GetUnit() const
   {
-    assert( mProcedure.mUnit != NULL);
+    assert (mProcedure.mUnit != NULL);
 
     return *mProcedure.mUnit;
   }

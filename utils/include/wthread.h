@@ -42,7 +42,7 @@ public:
   void Release();
 
 private:
-  Lock( const Lock&);
+  Lock (const Lock&);
   Lock& operator= (const Lock&);
 
   WH_LOCK mLock;
@@ -70,8 +70,8 @@ class LockRAII
 {
 public:
   explicit LockRAII ( T &lock, const bool skipAcquire = false)
-    : mLock( lock),
-      mIsAcquireed( false)
+    : mLock (lock),
+      mIsAcquireed (false)
   {
     if ( ! skipAcquire)
       Acquire ();
@@ -253,7 +253,7 @@ private:
 class EXCEP_SHL LockException : public Exception
 {
 public:
-  LockException( const uint32_t    code,
+  LockException (const uint32_t    code,
                  const char*       file,
                  uint32_t          line,
                  const char*       fmtMsg = NULL,
@@ -271,18 +271,18 @@ public:
 class EXCEP_SHL Thread
 {
 public:
-  Thread();
-  ~Thread();
+  Thread ();
+  ~Thread ();
 
   bool Run (WH_THREAD_ROUTINE routine,
             void* const       args,
             const bool        waitPrevEnd = false);
 
-  void WaitToEnd( const bool throwPending = true);
+  void WaitToEnd (const bool throwPending = true);
 
   void ThrowPendingException();
 
-  void IgnoreExceptions( bool ignore)
+  void IgnoreExceptions (bool ignore)
   {
     mIgnoreExceptions = ignore;
   }
@@ -297,13 +297,13 @@ public:
 
   bool HasExceptionPending()
   {
-    return( mUnkExceptSignaled || (mException != NULL));
+    return (mUnkExceptSignaled || (mException != NULL));
   }
 
 private:
-  static void ThreadWrapperRoutine( void* const);
+  static void ThreadWrapperRoutine (void* const);
 
-  Thread( const Thread&);
+  Thread (const Thread&);
   Thread& operator= (const Thread&);
 
   WH_THREAD_ROUTINE       mRoutine;
@@ -322,7 +322,7 @@ private:
 class EXCEP_SHL ThreadException : public Exception
 {
 public:
-  ThreadException( const uint32_t    code,
+  ThreadException (const uint32_t    code,
                    const char*       file,
                    uint32_t          line,
                    const char*       fmtMsg = NULL,

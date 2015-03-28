@@ -34,20 +34,20 @@ NullLogger NULL_LOGGER;
 
 
 
-Logger::~Logger()
+Logger::~Logger ()
 {
 }
 
 
-FileLogger::FileLogger( const char* const file, const bool printStart)
-  : Logger(),
-    mStartTick( wh_msec_ticks()),
+FileLogger::FileLogger (const char* const file, const bool printStart)
+  : Logger (),
+    mStartTick (wh_msec_ticks()),
     mSync(),
     mOutStream(),
-    mLogFile( file),
-    mTodayTime( wh_get_currtime())
+    mLogFile (file),
+    mTodayTime (wh_get_currtime())
 {
-  mLogFile.append( ".wlog.yyyymmdd");
+  mLogFile.append (".wlog.yyyymmdd");
   SwitchFile();
 
   if (printStart)
@@ -62,9 +62,9 @@ FileLogger::FileLogger( const char* const file, const bool printStart)
       mOutStream << ':' << (int)dayStart.sec << "\n\n";
     }
 
-  if (! mOutStream.good())
+  if (! mOutStream.good ())
     {
-      throw ios_base::failure( "The file associated with the output stream "
+      throw ios_base::failure ("The file associated with the output stream "
                                "could not be opened.");
     }
 }
@@ -72,14 +72,14 @@ FileLogger::FileLogger( const char* const file, const bool printStart)
 void
 FileLogger::Log (const LOG_TYPE type, const char* str)
 {
-  LockRAII<Lock> holder( mSync);
+  LockRAII<Lock> holder (mSync);
 
-  const int markSize = PrintTimeMark( type);
+  const int markSize = PrintTimeMark (type);
 
   /* Print white spaces where the time mark should have been for
      for string messages that have more than one line, to keep
      a mice indentation. */
-  while( *str != 0)
+  while (*str != 0)
     {
       if ((*str == '\n') && (*(str + 1) != '\n'))
         {
@@ -100,12 +100,12 @@ FileLogger::Log (const LOG_TYPE type, const char* str)
 void
 FileLogger::Log (const LOG_TYPE type, const string& str)
 {
-  Log (type, str.c_str());
+  Log (type, str.c_str ());
 }
 
 
 uint_t
-FileLogger::PrintTimeMark( LOG_TYPE type)
+FileLogger::PrintTimeMark (LOG_TYPE type)
 {
   static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
@@ -126,18 +126,18 @@ FileLogger::PrintTimeMark( LOG_TYPE type)
   const streamsize width = mOutStream.width();
 
   mOutStream << '(' << logIds [type] << ')';
-  mOutStream.fill( '0');
-  mOutStream.width( 2);
+  mOutStream.fill ('0');
+  mOutStream.width (2);
   mOutStream << (uint_t) ctime.hour << ':';
-  mOutStream.width( 2);
+  mOutStream.width (2);
   mOutStream << (uint_t) ctime.min << ':';
-  mOutStream.width( 2);
+  mOutStream.width (2);
   mOutStream << (uint_t) ctime.sec << '.';
-  mOutStream.width( 6);
+  mOutStream.width (6);
   mOutStream << (uint_t) ctime.usec << ": ";
 
-  mOutStream.fill( fill);
-  mOutStream.width( width);
+  mOutStream.fill (fill);
+  mOutStream.width (width);
 
   return 1 + 2 + 1 + 2 + 1 + 2 + 1 + 6 + 2;
 }
@@ -149,14 +149,14 @@ FileLogger::SwitchFile()
   if (mOutStream.is_open())
     mOutStream.close();
 
-  snprintf( _CC (char*, mLogFile.c_str() + mLogFile.size() - 14),
+  snprintf (_CC (char*, mLogFile.c_str () + mLogFile.size() - 14),
             15,
             ".wlog.%04u%02u%02u",
             mTodayTime.year,
             mTodayTime.month,
             mTodayTime.day);
 
-  mOutStream.open( mLogFile.c_str(), ios::app | ios::out);
+  mOutStream.open (mLogFile.c_str (), ios::app | ios::out);
 }
 
 

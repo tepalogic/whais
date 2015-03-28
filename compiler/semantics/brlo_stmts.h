@@ -49,18 +49,18 @@ struct Branch
 };
 
 void
-begin_if_stmt( struct ParserState* const parser,
+begin_if_stmt (struct ParserState* const parser,
                YYSTYPE                   expression,
                enum BRANCH_TYPE          branchType);
 
 void
-begin_else_stmt( struct ParserState* const parser);
+begin_else_stmt (struct ParserState* const parser);
 
 void
-begin_elseif_stmt( struct ParserState* const parser, YYSTYPE exp);
+begin_elseif_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-finalize_if_stmt( struct ParserState* const parser);
+finalize_if_stmt (struct ParserState* const parser);
 
 
 
@@ -84,37 +84,37 @@ struct Loop
 
 
 void
-begin_for_stmt( struct ParserState* const parser,
+begin_for_stmt (struct ParserState* const parser,
                 YYSTYPE                   exp1,
                 YYSTYPE                   exp2,
                 YYSTYPE                   exp3);
 
 void
-finalize_for_stmt( struct ParserState* const parser);
+finalize_for_stmt (struct ParserState* const parser);
 
 void
-begin_while_stmt( struct ParserState* const parser, YYSTYPE exp);
+begin_while_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-finalize_while_stmt( struct ParserState* const parser);
+finalize_while_stmt (struct ParserState* const parser);
 
 void
-begin_until_stmt( struct ParserState* const parser);
+begin_until_stmt (struct ParserState* const parser);
 
 void
-finalize_until_stmt( struct ParserState* const parser, YYSTYPE exp);
+finalize_until_stmt (struct ParserState* const parser, YYSTYPE exp);
 
 void
-handle_break_stmt( struct ParserState* const parser);
+handle_break_stmt (struct ParserState* const parser);
 
 void
-handle_continue_stmt( struct ParserState* const parser);
+handle_continue_stmt (struct ParserState* const parser);
 
 void
-begin_sync_stmt( struct ParserState* const parser);
+begin_sync_stmt (struct ParserState* const parser);
 
 void
-finalize_sync_stmt( struct ParserState* const parser);
+finalize_sync_stmt (struct ParserState* const parser);
 
 #endif /* BRLO_STMTS_H */
 

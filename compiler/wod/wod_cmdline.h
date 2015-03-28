@@ -35,8 +35,8 @@ namespace wod {
 class CmdLineParser
 {
 public:
-  CmdLineParser( int argc, char** argv);
-  ~CmdLineParser();
+  CmdLineParser (int argc, char** argv);
+  ~CmdLineParser ();
 
   const char* SourceFile() const
   {
@@ -69,7 +69,7 @@ private:
 class CmdLineException : public Exception
 {
 public:
-  CmdLineException( const uint32_t  code,
+  CmdLineException (const uint32_t  code,
                     const char*     file,
                     uint32_t        line,
                     const char*     fmtMsg = NULL,

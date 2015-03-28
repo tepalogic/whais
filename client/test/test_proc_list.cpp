@@ -98,17 +98,17 @@ ProcedureEntry _procedures[] =
     };
 
 static bool
-test_proc_name_match( const char* proc_name)
+test_proc_name_match (const char* proc_name)
 {
   const char suffix[] = "_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
   char buffer[1024];
-  const uint_t glbsCount = sizeof( _procedures)/sizeof( _procedures[0]);
+  const uint_t glbsCount = sizeof (_procedures)/sizeof (_procedures[0]);
 
   for (uint_t i = 0; i < glbsCount; ++i)
     {
-      strcpy( buffer, _procedures[i].name);
-      strcat( buffer, suffix);
-      if (strcmp( buffer, proc_name) == 0)
+      strcpy (buffer, _procedures[i].name);
+      strcat (buffer, suffix);
+      if (strcmp (buffer, proc_name) == 0)
         {
           if (_procedures[i].visited)
             return false;
@@ -124,17 +124,17 @@ test_proc_name_match( const char* proc_name)
 }
 
 static bool
-test_procedures_list( WH_CONNECTION hnd)
+test_procedures_list (WH_CONNECTION hnd)
 {
   const char* recvGlbName = NULL;
-  const uint_t  procsCount = sizeof( _procedures)/sizeof( _procedures[0]);
+  const uint_t  procsCount = sizeof (_procedures)/sizeof (_procedures[0]);
 
   uint_t globalsCount;
   uint_t index = 0;
 
   cout << "Testing the procedures listing ... ";
 
-  if ((WStartProceduresList( hnd, &globalsCount) != WCS_OK)
+  if ((WStartProceduresList (hnd, &globalsCount) != WCS_OK)
       || (globalsCount != procsCount))
     {
       goto test_procedures_list_error;
@@ -142,17 +142,17 @@ test_procedures_list( WH_CONNECTION hnd)
 
   do
     {
-      if (WFetchProcedure( hnd, &recvGlbName) != WCS_OK)
+      if (WFetchProcedure (hnd, &recvGlbName) != WCS_OK)
         goto test_procedures_list_error;
       else if ((recvGlbName != NULL)
-               && ! test_proc_name_match( recvGlbName))
+               && ! test_proc_name_match (recvGlbName))
         {
           goto test_procedures_list_error;
         }
 
       ++index; //Only good for conditional breakpoints.
     }
-  while( recvGlbName != NULL);
+  while (recvGlbName != NULL);
 
   for (index = 0; index < procsCount; ++index)
     {
@@ -170,30 +170,30 @@ test_procedures_list_error:
 }
 
 static bool
-test_for_errors( WH_CONNECTION hnd)
+test_for_errors (WH_CONNECTION hnd)
 {
   uint_t          procsCount;
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WStartProceduresList( NULL, &procsCount) != WCS_INVALID_ARGS)
-      || (WStartProceduresList( NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartProceduresList (NULL, &procsCount) != WCS_INVALID_ARGS)
+      || (WStartProceduresList (NULL, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WFetchProcedure( hnd, &nameFetched) != WCS_INVALID_ARGS)
+  else if (WFetchProcedure (hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
 
-  else if (WStartProceduresList( hnd, NULL) != WCS_OK)
+  else if (WStartProceduresList (hnd, NULL) != WCS_OK)
     goto test_for_errors_fail;
 
-  else if ((WFetchProcedure( NULL, NULL) != WCS_INVALID_ARGS)
-           || (WFetchProcedure( NULL, &nameFetched) != WCS_INVALID_ARGS)
-           || (WFetchProcedure( hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchProcedure (NULL, NULL) != WCS_INVALID_ARGS)
+           || (WFetchProcedure (NULL, &nameFetched) != WCS_INVALID_ARGS)
+           || (WFetchProcedure (hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if (WFetchProcedure( hnd, &nameFetched) != WCS_OK)
+  else if (WFetchProcedure (hnd, &nameFetched) != WCS_OK)
     goto test_for_errors_fail;
 
   cout << "OK\n";
@@ -213,28 +213,28 @@ DefaultDatabaseName()
 }
 
 const uint_t
-DefaultUserId()
+DefaultUserId ()
 {
   return 0;
 }
 
 const char*
-DefaultUserPassword()
+DefaultUserPassword ()
 {
   return "root_test_password";
 }
 
 int
-main( int argc, const char** argv)
+main (int argc, const char** argv)
 {
   WH_CONNECTION       hnd = NULL;
 
-  bool success = tc_settup_connection( argc, argv, &hnd);
+  bool success = tc_settup_connection (argc, argv, &hnd);
 
-  success = success && test_for_errors( hnd);
-  success = success && test_procedures_list( hnd);
+  success = success && test_for_errors (hnd);
+  success = success && test_procedures_list (hnd);
 
-  WClose( hnd);
+  WClose (hnd);
 
   if (!success)
     {

@@ -54,13 +54,13 @@ static const uint_t UTF16_EXTRA_CODE_UNIT_MARK  = 0x10000;
 /* Get the code units count of an UTF-8 encoded char using the
  * first code unit. */
 uint_t
-wh_utf8_cu_count( const uint8_t codeUnit);
+wh_utf8_cu_count (const uint8_t codeUnit);
 
 
 /* Get the code units count of an UTF-16 encoded char using the first code
    unit. */
 uint_t
-wh_utf16_cu_count( const uint16_t codeUnit);
+wh_utf16_cu_count (const uint16_t codeUnit);
 
 
 /* Get the Unicode code point of the first UTF-8 encoded char. */
@@ -86,25 +86,25 @@ wh_store_utf16_cp (const uint32_t codePoint, uint16_t* const dest);
 /* Get the required code units count to store this Unicode code point using
  * the UTF-8 encoding. */
 uint_t
-wh_utf8_store_size( const uint32_t codePoint);
+wh_utf8_store_size (const uint32_t codePoint);
 
 
 /* Get the required code units count to store this Unicode code point using
  * the UTF-16 encoding. */
 uint_t
-wh_utf16_store_size( const uint32_t codePoint);
+wh_utf16_store_size (const uint32_t codePoint);
 
 
 /*  Get the Unicode code points count from an UTF-8 encoded
- *  string( null terminated). */
+ *  string (null terminated). */
 int
-wh_utf8_strlen( const uint8_t* utf8Str);
+wh_utf8_strlen (const uint8_t* utf8Str);
 
 
 /*  Get the Unicode code points count from an UTF-16 encoded
- *  string( null terminated). */
+ *  string (null terminated). */
 int
-wh_utf16_strlen( const uint16_t* utf16Str);
+wh_utf16_strlen (const uint16_t* utf16Str);
 
 
 
@@ -116,15 +116,15 @@ class UTF8_CU_COUNTER
 public:
   static uint8_t COUNTS[256];
 
-  static uint8_t Count( const uint8_t cu)
+  static uint8_t Count (const uint8_t cu)
   {
     return UTF8_CU_COUNTER::COUNTS [cu];
   }
 
   UTF8_CU_COUNTER()
     {
-      for (uint_t i = 0; i < sizeof( COUNTS); ++i)
-        COUNTS[i] = wh_utf8_cu_count( i);
+      for (uint_t i = 0; i < sizeof (COUNTS); ++i)
+        COUNTS[i] = wh_utf8_cu_count (i);
     }
 };
 

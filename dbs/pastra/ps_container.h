@@ -38,13 +38,13 @@ namespace pastra {
 static const uint_t DEFAULT_TEMP_MEM_RESERVED = 4096; //4KB
 
 void
-append_int_to_str( std::string& dest, uint64_t number);
+append_int_to_str (std::string& dest, uint64_t number);
 
 
 class DataContainerException : public Exception
 {
 public:
-  DataContainerException( const uint32_t      code,
+  DataContainerException (const uint32_t      code,
                           const char*         file,
                           const uint32_t      line,
                           const char* const   fmtMsg,
@@ -58,7 +58,7 @@ class WFileContainerException : public DataContainerException
 {
 public:
   explicit
-  WFileContainerException( const uint32_t       code,
+  WFileContainerException (const uint32_t       code,
                            const char*          file,
                            uint32_t             line,
                            const char*          fmtMsg = NULL,
@@ -85,13 +85,13 @@ class IDataContainer
 {
 public:
 
-  virtual ~IDataContainer();
+  virtual ~IDataContainer ();
 
-  virtual void Write( uint64_t to, uint64_t size, const uint8_t* buffer) = 0;
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer) = 0;
 
-  virtual void Read( uint64_t from, uint64_t size, uint8_t* buffer) = 0;
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer) = 0;
 
-  virtual void Colapse( uint64_t from, uint64_t to) = 0;
+  virtual void Colapse (uint64_t from, uint64_t to) = 0;
 
   virtual uint64_t Size() const = 0;
 
@@ -105,17 +105,17 @@ public:
 class FileContainer : public IDataContainer
 {
 public:
-  FileContainer( const char*       baseFile,
+  FileContainer (const char*       baseFile,
                  const uint64_t    maxFileSize,
                  const uint64_t    unitsCount);
 
-  virtual ~FileContainer();
+  virtual ~FileContainer ();
 
-  virtual void Write( uint64_t to, uint64_t size, const uint8_t* buffer);
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer);
 
-  virtual void Read( uint64_t from, uint64_t size, uint8_t* buffer);
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer);
 
-  virtual void Colapse( uint64_t from, uint64_t to);
+  virtual void Colapse (uint64_t from, uint64_t to);
 
   virtual uint64_t Size() const;
 
@@ -127,7 +127,7 @@ public:
                    const uint64_t          maxFileSize,
                    const uint64_t          newContainerSize);
 private:
-  void ExtendContainer();
+  void ExtendContainer ();
 
   const uint64_t       mMaxFileUnitSize;
   std::vector<File>    mFilesHandles;
@@ -140,7 +140,7 @@ private:
 class TemporalFileContainer : public FileContainer
 {
 public:
-  TemporalFileContainer( const char*    baseName,
+  TemporalFileContainer (const char*    baseName,
                          const uint32_t maxFileSize);
 };
 
@@ -153,11 +153,11 @@ public:
                         const uint_t reservedMemory = DEFAULT_TEMP_MEM_RESERVED
                              );
 
-  virtual void Write( uint64_t to, uint64_t size, const uint8_t* buffer);
+  virtual void Write (uint64_t to, uint64_t size, const uint8_t* buffer);
 
-  virtual void Read( uint64_t from, uint64_t size, uint8_t* buffer);
+  virtual void Read (uint64_t from, uint64_t size, uint8_t* buffer);
 
-  virtual void Colapse( uint64_t from, uint64_t to);
+  virtual void Colapse (uint64_t from, uint64_t to);
 
   virtual uint64_t Size() const;
 
@@ -166,7 +166,7 @@ public:
   virtual void Flush();
 
 private:
-  void  FillCache( uint64_t position);
+  void  FillCache (uint64_t position);
 
   std::auto_ptr<TemporalFileContainer> mFileContainer;
   std::auto_ptr<uint8_t>               mCache_1;

@@ -35,15 +35,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef ENABLE_MEMORY_TRACE
 
-#define mem_alloc( x)      custom_mem_alloc( (x))
-#define mem_realloc( x, y) custom_mem_realloc( (x), (y))
-#define mem_free( x)       custom_mem_free( (x))
+#define mem_alloc(x)      custom_mem_alloc ((x))
+#define mem_realloc(x, y) custom_mem_realloc ((x), (y))
+#define mem_free(x)       custom_mem_free ((x))
 
 #else
 
-#define mem_alloc( x) custom_trace_mem_alloc( (x), __FILE__, __LINE__)
-#define mem_realloc( x, y) custom_trace_mem_realloc( (x), (y), __FILE__, __LINE__)
-#define mem_free( x) custom_trace_mem_free( (x), __FILE__, __LINE__)
+#define mem_alloc(x) custom_trace_mem_alloc ((x), __FILE__, __LINE__)
+#define mem_realloc(x, y) custom_trace_mem_realloc ((x), (y), __FILE__, __LINE__)
+#define mem_free(x) custom_trace_mem_free ((x), __FILE__, __LINE__)
 
 #endif                                /* ENABLE_MEMORY_TRACE */
 
@@ -66,28 +66,28 @@ extern "C"
 #ifdef ENABLE_MEMORY_TRACE
 
 void*
-custom_trace_mem_alloc( size_t          size,
+custom_trace_mem_alloc (size_t          size,
                         const char*     file,
                         uint_t          line);
 
 void*
-custom_trace_mem_realloc( void*           oldPtr,
+custom_trace_mem_realloc (void*           oldPtr,
                           size_t          newSize,
                           const char*     file,
                           uint_t          line);
 
 void
-custom_trace_mem_free( void*              ptr,
+custom_trace_mem_free (void*              ptr,
                        const char*        file,
                        uint_t             line);
 
 #endif /* ENABLE_MEMORY_TRACE */
 
-void* custom_mem_alloc( size_t size);
+void* custom_mem_alloc (size_t size);
 
-void* custom_mem_realloc( void* oldPtr, size_t newSize);
+void* custom_mem_realloc (void* oldPtr, size_t newSize);
 
-void custom_mem_free( void* ptr);
+void custom_mem_free (void* ptr);
 
 
 #ifdef __cplusplus
@@ -95,7 +95,7 @@ void custom_mem_free( void* ptr);
 
 
 void*
-operator new (std::size_t size) throw( std::bad_alloc);
+operator new (std::size_t size) throw (std::bad_alloc);
 
 void*
 operator new (std::size_t size, const std::nothrow_t&) throw ();
@@ -104,7 +104,7 @@ void*
 operator new (std::size_t size, const char* file, uint_t line);
 
 void*
-operator new[] (std::size_t size) throw( std::bad_alloc);
+operator new[] (std::size_t size) throw (std::bad_alloc);
 
 void*
 operator new[] (std::size_t size, const std::nothrow_t&) throw ();
@@ -113,10 +113,10 @@ void*
 operator new[] (std::size_t size, const char* file, uint_t line);
 
 void
-operator delete( void* ptr) throw ();
+operator delete (void* ptr) throw ();
 
 void
-operator delete( void* ptr, const char*, uint_t);
+operator delete (void* ptr, const char*, uint_t);
 
 void
 operator delete[] (void* ptr) throw ();
@@ -126,19 +126,19 @@ operator delete[] (void* ptr, const char*, uint_t );
 
 
 template <class T> static inline void
-_placement_new( void* place, const T& value)
+_placement_new (void* place, const T& value)
 {
   new (place) T (value);
 }
 
 template <class T> static inline void
-_placement_new( void* place, T& value)
+_placement_new (void* place, T& value)
 {
   new (place) T (value);
 }
 
 template <class T> static inline void
-_placement_new( void* place)
+_placement_new (void* place)
 {
   new (place) T;
 }
@@ -155,12 +155,12 @@ class WMemoryTracker
 {
 public:
 
-  WMemoryTracker()
+  WMemoryTracker ()
   {
     smInitCount++;
   }
 
-  ~WMemoryTracker()
+  ~WMemoryTracker ()
   {
     if (smInitCount == 0)
       {
@@ -178,9 +178,9 @@ public:
   {
     return test_get_mem_max();
   }
-  static void MaxMemoryUsage( const size_t size)
+  static void MaxMemoryUsage (const size_t size)
   {
-    test_set_mem_max( size);
+    test_set_mem_max (size);
   }
   static size_t GetMemoryUsagePeak()
   {
@@ -189,10 +189,10 @@ public:
 
   static size_t GetCurrentMemoryUsage()
   {
-    return test_get_mem_used();
+    return test_get_mem_used ();
   }
 
-  static void PrintMemResume( const bool print)
+  static void PrintMemResume (const bool print)
   {
     if (print)
       smInitCount |= 0x80000000;

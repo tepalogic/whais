@@ -34,7 +34,7 @@ namespace whais
 
 
 const std::string
-NextToken( const std::string&       text,
+NextToken (const std::string&       text,
            size_t&                  inoutOff,
            const std::string&       delims);
 

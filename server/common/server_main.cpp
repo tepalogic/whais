@@ -28,21 +28,21 @@ static vector<DBSDescriptors> databases;
 
 
 static void
-clean_frameworks( FileLogger& log)
+clean_frameworks (FileLogger& log)
 {
   if (sInterpreterInited)
     {
-      assert( sDbsInited);
+      assert (sDbsInited);
 
       vector<DBSDescriptors>::reverse_iterator dbsIterator;
 
       for (dbsIterator = databases.rbegin();
-           dbsIterator != databases.rend();
+           dbsIterator != databases.rend ();
            ++dbsIterator)
         {
           if (dbsIterator->mSession != NULL)
             {
-              ReleaseInstance( *(dbsIterator->mSession));
+              ReleaseInstance (*(dbsIterator->mSession));
               dbsIterator->mSession = NULL;
             }
 
@@ -54,20 +54,20 @@ clean_frameworks( FileLogger& log)
     }
 
   if (sInterpreterInited)
-    CleanInterpreter();
+    CleanInterpreter ();
 
   if (sInterpreterInited)
     {
-      assert( sDbsInited);
+      assert (sDbsInited);
 
       vector<DBSDescriptors>::reverse_iterator dbsIterator;
 
       for (dbsIterator = databases.rbegin();
-           dbsIterator != databases.rend();
+           dbsIterator != databases.rend ();
            ++dbsIterator)
         {
           if (dbsIterator->mDbs != NULL)
-            DBSReleaseDatabase( *(dbsIterator->mDbs));
+            DBSReleaseDatabase (*(dbsIterator->mDbs));
 
           if (dbsIterator->mLogger != NULL)
             {
@@ -90,12 +90,12 @@ clean_frameworks( FileLogger& log)
 #ifndef ARCH_WINDOWS_VC
 
 static void
-sigterm_hdl( int sig, siginfo_t *siginfo, void *context)
+sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 {
   if ((sig != SIGINT) && (sig != SIGTERM))
     return ; //Ignore this!
 
-  StopServer();
+  StopServer ();
 }
 
 
@@ -104,14 +104,14 @@ set_signals()
 {
   struct sigaction action;
 
-  memset( &action, 0, sizeof action);
+  memset (&action, 0, sizeof action);
   action.sa_flags     = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
- if (sigaction( SIGINT, &action, NULL) < 0)
+ if (sigaction (SIGINT, &action, NULL) < 0)
    return false;
 
- if (sigaction( SIGTERM, &action, NULL) < 0)
+ if (sigaction (SIGTERM, &action, NULL) < 0)
    return false;
 
  return true;
@@ -120,9 +120,9 @@ set_signals()
 #else
 
 static BOOL WINAPI
-ServerStopHandler( DWORD)
+ServerStopHandler (DWORD)
 {
-  StopServer();
+  StopServer ();
 
   return TRUE;
 }
@@ -130,17 +130,17 @@ ServerStopHandler( DWORD)
 static BOOL
 set_signals()
 {
-  return SetConsoleCtrlHandler( ServerStopHandler, TRUE);
+  return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
 }
 
 #endif
 
 
 int
-main( int argc, char** argv)
+main (int argc, char** argv)
 {
-  auto_ptr<ifstream>   config( NULL);
-  auto_ptr<FileLogger> glbLog( NULL);
+  auto_ptr<ifstream>   config (NULL);
+  auto_ptr<FileLogger> glbLog (NULL);
 
   if (argc < 2)
     {
@@ -150,8 +150,8 @@ main( int argc, char** argv)
     }
   else
     {
-      config.reset( new ifstream( argv[1]));
-      if (! config->good())
+      config.reset (new ifstream (argv[1]));
+      if (! config->good ())
         {
           cerr << "Could not open the configuration file ";
           cerr << '\'' << argv[1] << "'.\n";
@@ -169,18 +169,18 @@ main( int argc, char** argv)
   try
   {
       uint_t sectionLine = 0;
-      if (SeekAtConfigurationSection( *config, sectionLine) == false)
+      if (SeekAtConfigurationSection (*config, sectionLine) == false)
         {
           cerr << "Cannot find the CONFIG section in configuration file!\n";
           return -1;
         }
 
-      assert( sectionLine > 0);
+      assert (sectionLine > 0);
 
-      if (ParseConfigurationSection( *config, sectionLine) == false)
+      if (ParseConfigurationSection (*config, sectionLine) == false)
         return -1;
 
-      glbLog.reset( new FileLogger( GetAdminSettings().mLogFile.c_str()));
+      glbLog.reset (new FileLogger (GetAdminSettings().mLogFile.c_str ()));
 
   }
   catch (ios_base::failure& e)
@@ -190,7 +190,7 @@ main( int argc, char** argv)
 
       return -1;
   }
-  catch( ...)
+  catch (...)
   {
     cerr << "Unknown error encountered during main configuration reading!\n";
     return -1;
@@ -199,17 +199,17 @@ main( int argc, char** argv)
   try
   {
     if (! set_signals())
-      throw std::runtime_error( "Signals handlers could not be overwritten.");
+      throw std::runtime_error ("Signals handlers could not be overwritten.");
 
     vector<DBSDescriptors>::iterator dbsIterator;
 
-    if ( ! PrepareConfigurationSection( *glbLog))
+    if ( ! PrepareConfigurationSection (*glbLog))
       return -1;
 
     uint_t configLine = 0;
-    config->clear();
-    config->seekg( 0);
-    while( FindNextContextSection( *config, configLine))
+    config->clear ();
+    config->seekg (0);
+    while (FindNextContextSection (*config, configLine))
       {
         DBSDescriptors dbs (configLine);
 
@@ -218,10 +218,10 @@ main( int argc, char** argv)
         dbs.mWaitReqTmo   = GetAdminSettings().mWaitReqTmo;
         dbs.mSyncInterval = GetAdminSettings().mSyncInterval;
 
-        if ( ! ParseContextSection( *glbLog, *config, configLine, dbs))
+        if ( ! ParseContextSection (*glbLog, *config, configLine, dbs))
           return -1;
 
-        if ( ! PrepareContextSection( *glbLog, dbs))
+        if ( ! PrepareContextSection (*glbLog, dbs))
           return -1;
 
         ostringstream   logEntry;
@@ -240,10 +240,10 @@ main( int argc, char** argv)
           }
 
         if (dbs.mDbsName == GlobalContextDatabase())
-          databases.insert( databases.begin(), dbs);
+          databases.insert (databases.begin(), dbs);
 
         else
-          databases.push_back( dbs);
+          databases.push_back (dbs);
       }
 
     if (databases.size() == 0)
@@ -273,22 +273,22 @@ main( int argc, char** argv)
     dbsSettings.mVLStoreCacheBlkSize  = confSettings.mVLBlockSize;
     dbsSettings.mVLValueCacheSize     = confSettings.mTempValuesCache;
 
-    DBSInit( dbsSettings);
+    DBSInit (dbsSettings);
     sDbsInited = true;
 
-    InitInterpreter( databases[0].mDbsDirectory.c_str());
+    InitInterpreter (databases[0].mDbsDirectory.c_str ());
     sInterpreterInited = true;
 
     for (dbsIterator = databases.begin();
-         dbsIterator != databases.end();
+         dbsIterator != databases.end ();
          ++dbsIterator)
       {
-        LoadDatabase( *glbLog, *dbsIterator);
+        LoadDatabase (*glbLog, *dbsIterator);
       }
 
-    StartServer( *glbLog, databases);
+    StartServer (*glbLog, databases);
   }
-  catch( Exception& e)
+  catch (Exception& e)
   {
     ostringstream logEntry;
     //TODO: Handle this exception with more specific err messages
@@ -305,39 +305,39 @@ main( int argc, char** argv)
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
 
-    clean_frameworks( *glbLog);
+    clean_frameworks (*glbLog);
 
     return -1;
   }
-  catch( std::bad_alloc&)
+  catch (std::bad_alloc&)
   {
     glbLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
-    clean_frameworks( *glbLog);
+    clean_frameworks (*glbLog);
 
     return -1;
   }
-  catch( std::exception& e)
+  catch (std::exception& e)
   {
     ostringstream logEntry;
 
     logEntry << "General system failure: " << e.what() << endl;
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
-    clean_frameworks( *glbLog);
+    clean_frameworks (*glbLog);
 
     return -1;
   }
-  catch( ...)
+  catch (...)
   {
-    assert( false);
+    assert (false);
 
     glbLog->Log (LOG_CRITICAL, "Unknown exception!");
-    clean_frameworks( *glbLog);
+    clean_frameworks (*glbLog);
 
     return -1;
   }
 
-  clean_frameworks( *glbLog);
+  clean_frameworks (*glbLog);
   whs_clean();
 
   return 0;

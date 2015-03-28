@@ -31,10 +31,10 @@ extern "C"
 #endif
 
 bool_t
-wh_disable_echo();
+wh_disable_echo ();
 
 bool_t
-wh_enable_echo();
+wh_enable_echo ();
 
 #ifdef __cplusplus
 }

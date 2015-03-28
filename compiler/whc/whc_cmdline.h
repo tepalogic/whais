@@ -44,8 +44,8 @@ namespace whc {
 class CmdLineParser
 {
 public:
-  CmdLineParser( int argc, char **argv);
-  ~CmdLineParser();
+  CmdLineParser (int argc, char **argv);
+  ~CmdLineParser ();
 
   const char* SourceFile() const
   {
@@ -85,7 +85,7 @@ private:
 
   void CheckArguments();
 
-  void AddInclusionPaths( const char* const paths);
+  void AddInclusionPaths (const char* const paths);
 
 private:
   int         mArgCount;
@@ -105,7 +105,7 @@ private:
 class CmdLineException : public Exception
 {
 public:
-  CmdLineException( const uint32_t      code,
+  CmdLineException (const uint32_t      code,
                     const char*         file,
                     const uint32_t      line,
                     const char*         fmtMsg = NULL,

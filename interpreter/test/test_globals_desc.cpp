@@ -23,9 +23,9 @@ struct TableFieldDesc
 {
 #if 0
   TableFieldDesc()
-    : field_name( NULL),
-      field_type( 0),
-      desc_visited( false)
+    : field_name (NULL),
+      field_type (0),
+      desc_visited (false)
   {
 
   }
@@ -114,7 +114,7 @@ static const char *MSG_PREFIX[] = {
                                     };
 
 static uint_t
-get_line_from_buffer( const char * buffer, uint_t buff_pos)
+get_line_from_buffer (const char * buffer, uint_t buff_pos)
 {
   uint_t count = 0;
   int result = 1;
@@ -122,13 +122,13 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
 
-  while( count < buff_pos)
+  while (count < buff_pos)
     {
       if (buffer[count] == '\n')
         ++result;
       else if (buffer[count] == 0)
         {
-          assert( 0);
+          assert (0);
         }
       ++count;
     }
@@ -136,7 +136,7 @@ get_line_from_buffer( const char * buffer, uint_t buff_pos)
 }
 
 void
-my_postman( WH_MESSENGER_CTXT data,
+my_postman (WH_MESSENGER_CTXT data,
             uint_t            buff_pos,
             uint_t            msg_id,
             uint_t            msgType,
@@ -144,16 +144,16 @@ my_postman( WH_MESSENGER_CTXT data,
             va_list           args)
 {
   const char *buffer = (const char *) data;
-  int buff_line = get_line_from_buffer( buffer, buff_pos);
+  int buff_line = get_line_from_buffer (buffer, buff_pos);
 
-  fprintf( stderr, MSG_PREFIX[msgType]);
-  fprintf( stderr, "%d : line %d: ", msg_id, buff_line);
-  vfprintf( stderr, pMsgFormat, args);
-  fprintf( stderr, "\n");
+  fprintf (stderr, MSG_PREFIX[msgType]);
+  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
+  vfprintf (stderr, pMsgFormat, args);
+  fprintf (stderr, "\n");
 }
 
 bool
-load_unit( ISession&           session,
+load_unit (ISession&           session,
            const uint8_t* const unitCode,
            const uint_t         unitCodeSize)
 {
@@ -161,14 +161,14 @@ load_unit( ISession&           session,
 
   try
   {
-    CompiledBufferUnit unit( unitCode,
+    CompiledBufferUnit unit (unitCode,
                               unitCodeSize,
                               my_postman,
                               unitCode);
-    session.LoadCompiledUnit( unit);
+    session.LoadCompiledUnit (unit);
     std::cout << "Unit loaded successfully!" << std::endl;
   }
-  catch( ...)
+  catch (...)
   {
       std::cout << "Error! Unable to load unit!" << std::endl;
       result = false;
@@ -178,13 +178,13 @@ load_unit( ISession&           session,
 }
 
 static GlobalDescs*
-find_glb_desc( const char* const glb_name,
+find_glb_desc (const char* const glb_name,
                GlobalDescs         glb_desc[],
                const uint_t        glb_count)
 {
   for (uint_t i = 0; i < glb_count; ++i)
     {
-      if (strcmp( glb_desc[i].name, glb_name) == 0)
+      if (strcmp (glb_desc[i].name, glb_name) == 0)
         return &glb_desc[i];
     }
 
@@ -192,13 +192,13 @@ find_glb_desc( const char* const glb_name,
 }
 
 static TableFieldDesc*
-find_field_desc( const char* const   name,
+find_field_desc (const char* const   name,
                  TableFieldDesc*       fields,
                  const uint_t          fieldsCount)
 {
   for (uint_t index = 0; index < fieldsCount; ++index)
     {
-      if (strcmp( name, fields[index].field_name) == 0)
+      if (strcmp (name, fields[index].field_name) == 0)
         {
           if (fields[index].desc_visited)
             return NULL;
@@ -211,26 +211,26 @@ find_field_desc( const char* const   name,
 }
 
 static bool
-test_fields_are_ok( ISession&            session,
+test_fields_are_ok (ISession&            session,
                     const char*         glbName,
                     const uint_t          glbId,
                     TableFieldDesc*       fields,
                     const uint_t          fieldsCount)
 {
   for (uint_t index = 0;
-       index < session.GlobalValueFieldsCount( glbName);
+       index < session.GlobalValueFieldsCount (glbName);
        ++index)
     {
-      const char* fname = session.GlobalValueFieldName( glbName, index);
-      const uint_t  type  = session.GlobalValueFieldType( glbName, index);
+      const char* fname = session.GlobalValueFieldName (glbName, index);
+      const uint_t  type  = session.GlobalValueFieldType (glbName, index);
 
-      if ((fname != session.GlobalValueFieldName( glbId, index))
-          || (type != session.GlobalValueFieldType( glbId, index)))
+      if ((fname != session.GlobalValueFieldName (glbId, index))
+          || (type != session.GlobalValueFieldType (glbId, index)))
         {
           return false;
         }
 
-      TableFieldDesc* desc = find_field_desc( fname,
+      TableFieldDesc* desc = find_field_desc (fname,
                                               fields,
                                               fieldsCount);
       if (desc->field_type != type)
@@ -247,32 +247,32 @@ test_fields_are_ok( ISession&            session,
 
   try
   {
-      session.GlobalValueFieldName( glbName, fieldsCount);
+      session.GlobalValueFieldName (glbName, fieldsCount);
       return false;
   }
-  catch( DBSException&)
+  catch (DBSException&)
   {
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.GlobalValueFieldType( glbName, fieldsCount);
+      session.GlobalValueFieldType (glbName, fieldsCount);
       return false;
   }
-  catch( DBSException&)
+  catch (DBSException&)
   {
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   return true;
 }
 
-bool test_globals( ISession&     session,
+bool test_globals (ISession&     session,
                    GlobalDescs    glb_desc[],
                    const uint_t   glbs_count)
 {
@@ -281,27 +281,27 @@ bool test_globals( ISession&     session,
 
   for (uint_t glb_i = 0; glb_i < glbs_count; ++glb_i)
     {
-      const char* glb_name = (char*)session.GlobalValueName( glb_i);
-      GlobalDescs*  glb = find_glb_desc( glb_name, glb_desc, glbs_count);
+      const char* glb_name = (char*)session.GlobalValueName (glb_i);
+      GlobalDescs*  glb = find_glb_desc (glb_name, glb_desc, glbs_count);
 
       if ((glb == NULL) || (glb->desc_visited == true))
         return false;
       else
         glb->desc_visited = true;
 
-      if ((session.GlobalValueRawType( glb_name) != glb->raw_type) ||
-          (session.GlobalValueRawType( glb_i) != glb->raw_type))
+      if ((session.GlobalValueRawType (glb_name) != glb->raw_type) ||
+          (session.GlobalValueRawType (glb_i) != glb->raw_type))
         {
           return false;
         }
-      else if ((session.GlobalValueFieldsCount( glb_name) != glb->fields_count) ||
-               (session.GlobalValueFieldsCount( glb_i) != glb->fields_count))
+      else if ((session.GlobalValueFieldsCount (glb_name) != glb->fields_count) ||
+               (session.GlobalValueFieldsCount (glb_i) != glb->fields_count))
         {
           return false;
         }
       else if (glb->raw_type == T_TABLE_MASK)
         {
-          if ( ! test_fields_are_ok( session,
+          if ( ! test_fields_are_ok (session,
                                      glb_name,
                                      glb_i,
                                      glb->table_fields,
@@ -322,28 +322,28 @@ bool test_globals( ISession&     session,
 
   try
   {
-      session.GlobalValueName( glbs_count);
+      session.GlobalValueName (glbs_count);
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.GlobalValueRawType( glbs_count);
+      session.GlobalValueRawType (glbs_count);
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
   try
   {
-      session.GlobalValueRawType( "some_weird_name");
+      session.GlobalValueRawType ("some_weird_name");
       return false;
   }
-  catch( InterException&)
+  catch (InterException&)
   {
   }
 
@@ -355,44 +355,44 @@ main()
 {
   bool success = true;
   {
-    DBSInit( DBSSettings());
+    DBSInit (DBSSettings());
   }
 
-  DBSCreateDatabase( admin);
-  DBSCreateDatabase( test_db1);
-  InitInterpreter();
+  DBSCreateDatabase (admin);
+  DBSCreateDatabase (test_db1);
+  InitInterpreter ();
 
   {
-    ISession& adminSession = GetInstance( NULL);
-    ISession& userSession  = GetInstance( test_db1);
+    ISession& adminSession = GetInstance (NULL);
+    ISession& userSession  = GetInstance (test_db1);
 
     success = true;
-    success = success && load_unit( adminSession,
+    success = success && load_unit (adminSession,
                                     commonCode,
                                     sizeof commonCode);
-    success = success && load_unit( userSession,
+    success = success && load_unit (userSession,
                                     userCode,
                                     sizeof userCode);
 
     std::cout << "Testing admin globals ... ";
-    success = success && test_globals( adminSession,
+    success = success && test_globals (adminSession,
                                              admin_glbs,
                                              ADMIN_GLBS_COUNT);
     std::cout << (success ? "OK" : "FAIL") << std::endl;
 
     std::cout << "Testing user globals ... ";
-    success = success && test_globals( userSession,
+    success = success && test_globals (userSession,
                                              user_glbs,
                                              USERS_GLBS_COUNT);
     std::cout << (success ? "OK" : "FAIL") << std::endl;
 
-    ReleaseInstance( adminSession);
-    ReleaseInstance( userSession);
+    ReleaseInstance (adminSession);
+    ReleaseInstance (userSession);
   }
 
-  CleanInterpreter();
-  DBSRemoveDatabase( admin);
-  DBSRemoveDatabase( test_db1);
+  CleanInterpreter ();
+  DBSRemoveDatabase (admin);
+  DBSRemoveDatabase (test_db1);
   DBSShoutdown();
 
   if (!success)

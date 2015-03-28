@@ -43,18 +43,18 @@ namespace whais {
 
 
 
-IArrayStrategy::IArrayStrategy( const DBS_FIELD_TYPE elemsType)
-  : mElementsCount( 0),
-    mMirrorsCount( 0),
-    mCopyReferences( 1),
-    mElementsType( elemsType),
-    mElementRawSize( 0)
+IArrayStrategy::IArrayStrategy (const DBS_FIELD_TYPE elemsType)
+  : mElementsCount (0),
+    mMirrorsCount (0),
+    mCopyReferences (1),
+    mElementsType (elemsType),
+    mElementRawSize (0)
 {
   if (elemsType != T_UNDETERMINED)
   {
-    assert( (elemsType >= T_BOOL) && (elemsType < T_TEXT));
+    assert ((elemsType >= T_BOOL) && (elemsType < T_TEXT));
 
-    mElementRawSize = pastra::Serializer::Size( mElementsType, false);
+    mElementRawSize = pastra::Serializer::Size (mElementsType, false);
   }
 }
 
@@ -562,8 +562,8 @@ namespace pastra {
 
 
 
-NullArray::NullArray( const DBS_FIELD_TYPE elemsType)
-  : IArrayStrategy( elemsType)
+NullArray::NullArray (const DBS_FIELD_TYPE elemsType)
+  : IArrayStrategy (elemsType)
 {
 }
 
@@ -589,30 +589,30 @@ NullArray::MirrorsCount () const
 
 
 void
-NullArray::RawRead( const uint64_t      offset,
+NullArray::RawRead (const uint64_t      offset,
                     const uint64_t      size,
                     uint8_t* const      buffer)
 {
   if ((offset != 0) || (size != 0))
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
-NullArray::RawWrite( const uint64_t           offset,
+NullArray::RawWrite (const uint64_t           offset,
                      const uint64_t           size,
                      const uint8_t* const     buffer)
 {
   if ((offset != 0) || (size != 0))
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
 void
-NullArray::ColapseRaw( const uint64_t offset, const uint64_t count)
+NullArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
   if ((offset != 0) || (count != 0))
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
 }
 
 
@@ -624,26 +624,26 @@ NullArray::RawSize() const
 
 
 NullArray&
-NullArray::GetSingletoneInstace( const DBS_FIELD_TYPE type)
+NullArray::GetSingletoneInstace (const DBS_FIELD_TYPE type)
 {
-  static NullArray _boolInstance( T_BOOL);
-  static NullArray _charInstance( T_CHAR);
-  static NullArray _dateInstance( T_DATE);
-  static NullArray _datetimeInstance( T_DATETIME);
-  static NullArray _hirestimeInstance( T_HIRESTIME);
-  static NullArray _uint8Instance( T_UINT8);
-  static NullArray _uint16Instance( T_UINT16);
-  static NullArray _uint32Instance( T_UINT32);
-  static NullArray _uint64Instance( T_UINT64);
-  static NullArray _realInstance( T_REAL);
-  static NullArray _richrealInstance( T_RICHREAL);
-  static NullArray _int8Instance( T_INT8);
-  static NullArray _int16Instance( T_INT16);
-  static NullArray _int32Instance( T_INT32);
-  static NullArray _int64Instance( T_INT64);
-  static NullArray _genericInstance( T_UNDETERMINED);
+  static NullArray _boolInstance (T_BOOL);
+  static NullArray _charInstance (T_CHAR);
+  static NullArray _dateInstance (T_DATE);
+  static NullArray _datetimeInstance (T_DATETIME);
+  static NullArray _hirestimeInstance (T_HIRESTIME);
+  static NullArray _uint8Instance (T_UINT8);
+  static NullArray _uint16Instance (T_UINT16);
+  static NullArray _uint32Instance (T_UINT32);
+  static NullArray _uint64Instance (T_UINT64);
+  static NullArray _realInstance (T_REAL);
+  static NullArray _richrealInstance (T_RICHREAL);
+  static NullArray _int8Instance (T_INT8);
+  static NullArray _int16Instance (T_INT16);
+  static NullArray _int32Instance (T_INT32);
+  static NullArray _int64Instance (T_INT64);
+  static NullArray _genericInstance (T_UNDETERMINED);
 
-  switch( type)
+  switch (type)
   {
   case T_UNDETERMINED:
     return _genericInstance;
@@ -694,20 +694,20 @@ NullArray::GetSingletoneInstace( const DBS_FIELD_TYPE type)
     return _int64Instance;
 
   case T_TEXT:
-    throw DBSException( _EXTRA( DBSException::INVALID_ARRAY_TYPE));
+    throw DBSException (_EXTRA (DBSException::INVALID_ARRAY_TYPE));
 
   default:
 
-    assert( false);
+    assert (false);
 
-    throw DBSException( _EXTRA( DBSException::GENERAL_CONTROL_ERROR));
+    throw DBSException (_EXTRA (DBSException::GENERAL_CONTROL_ERROR));
   }
 }
 
 
 
-TemporalArray::TemporalArray( const DBS_FIELD_TYPE type)
-  : IArrayStrategy( type),
+TemporalArray::TemporalArray (const DBS_FIELD_TYPE type)
+  : IArrayStrategy (type),
     mStorage()
 {
 }
@@ -715,40 +715,40 @@ TemporalArray::TemporalArray( const DBS_FIELD_TYPE type)
 
 TemporalArray::~TemporalArray()
 {
-  assert( mCopyReferences == 0);
+  assert (mCopyReferences == 0);
 }
 
 
 void
-TemporalArray::RawRead( const uint64_t    offset,
+TemporalArray::RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer)
 {
-  mStorage.Read( offset, size, buffer);
+  mStorage.Read (offset, size, buffer);
 }
 
 
 void
-TemporalArray::RawWrite( const uint64_t       offset,
+TemporalArray::RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer)
 {
-  assert( (mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
-  assert( mElementRawSize > 0);
-  assert( (size % mElementRawSize) == 0);
+  assert ((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
+  assert (mElementRawSize > 0);
+  assert ((size % mElementRawSize) == 0);
 
-  mStorage.Write( offset, size, buffer);
+  mStorage.Write (offset, size, buffer);
 }
 
 
 void
-TemporalArray::ColapseRaw( const uint64_t offset, const uint64_t count)
+TemporalArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
-  assert( (mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
-  assert( mElementRawSize > 0);
-  assert( (count % mElementRawSize) == 0);
+  assert ((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
+  assert (mElementRawSize > 0);
+  assert ((count % mElementRawSize) == 0);
 
-  mStorage.Colapse( offset, offset + count);
+  mStorage.Colapse (offset, offset + count);
 }
 
 
@@ -769,23 +769,23 @@ TemporalArray::GetTemporalContainer ()
 
 
 
-RowFieldArray::RowFieldArray( VariableSizeStore&    storage,
+RowFieldArray::RowFieldArray (VariableSizeStore&    storage,
                               const uint64_t        firstRecordEntry,
                               const DBS_FIELD_TYPE  type)
-  : IArrayStrategy( type),
-    mFirstRecordEntry( firstRecordEntry),
-    mStorage( storage)
+  : IArrayStrategy (type),
+    mFirstRecordEntry (firstRecordEntry),
+    mStorage (storage)
 {
-  assert( mFirstRecordEntry > 0);
-  assert( (mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
-  assert( mElementRawSize > 0);
+  assert (mFirstRecordEntry > 0);
+  assert ((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
+  assert (mElementRawSize > 0);
 
   mStorage.RegisterReference();
-  mStorage.IncrementRecordRef( mFirstRecordEntry);
+  mStorage.IncrementRecordRef (mFirstRecordEntry);
 
   uint8_t elemetsCount[METADATA_SIZE];
 
-  mStorage.GetRecord( firstRecordEntry, 0, sizeof elemetsCount, elemetsCount);
+  mStorage.GetRecord (firstRecordEntry, 0, sizeof elemetsCount, elemetsCount);
 
   mElementsCount = load_le_int64 (elemetsCount);
 
@@ -808,13 +808,13 @@ RowFieldArray::~RowFieldArray()
 
 
 void
-RowFieldArray::RawRead( const uint64_t    offset,
+RowFieldArray::RawRead (const uint64_t    offset,
                         const uint64_t    size,
                         uint8_t* const    buffer)
 {
   if (mFirstRecordEntry > 0)
     {
-      mStorage.GetRecord( mFirstRecordEntry,
+      mStorage.GetRecord (mFirstRecordEntry,
                           offset + METADATA_SIZE,
                           size,
                           buffer);
@@ -826,7 +826,7 @@ RowFieldArray::RawRead( const uint64_t    offset,
 
 
 void
-RowFieldArray::RawWrite( const uint64_t       offset,
+RowFieldArray::RawWrite (const uint64_t       offset,
                          const uint64_t       size,
                          const uint8_t* const buffer)
 {
@@ -863,7 +863,7 @@ RowFieldArray::RawWrite( const uint64_t       offset,
 
 
 void
-RowFieldArray::ColapseRaw( const uint64_t offset, const uint64_t count)
+RowFieldArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 {
 
   if (mFirstRecordEntry == 0)

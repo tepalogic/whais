@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "configuration.h"
 
 bool
-LoadDatabase( whais::FileLogger& log, DBSDescriptors& inoutDesc);
+LoadDatabase (whais::FileLogger& log, DBSDescriptors& inoutDesc);
 
 #endif /* LOADER_H_ */
 

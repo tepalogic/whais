@@ -34,7 +34,7 @@ extern "C" {
 
 
 uint64_t
-wh_hash( const uint8_t* key, const uint_t keySize);
+wh_hash (const uint8_t* key, const uint_t keySize);
 
 
 #ifdef __cplusplus

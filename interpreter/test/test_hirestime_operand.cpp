@@ -21,193 +21,193 @@ get_test_array()
 {
   DArray array;
 
-  array.Add (DHiresTime( 2002, 2, 14, 0, 0, 0, 1));
-  array.Add (DHiresTime( 2012, 12, 25, 23, 59, 59, 0));
-  array.Add (DHiresTime( -12, 10, 10, 18, 0, 1, 999999));
-  array.Add (DHiresTime( -1024, 2, 2, 8, 1, 0, 12));
+  array.Add (DHiresTime (2002, 2, 14, 0, 0, 0, 1));
+  array.Add (DHiresTime (2012, 12, 25, 23, 59, 59, 0));
+  array.Add (DHiresTime (-12, 10, 10, 18, 0, 1, 999999));
+  array.Add (DHiresTime (-1024, 2, 2, 8, 1, 0, 12));
 
   return array;
 }
 
 template <typename DBS_T> bool
-test_self_add( IOperand& op)
+test_self_add (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfAdd( nullValue);
+    op.SelfAdd (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_sub( IOperand& op)
+test_self_sub (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfSub( nullValue);
+    op.SelfSub (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_mul( IOperand& op)
+test_self_mul (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfMul( nullValue);
+    op.SelfMul (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_div( IOperand& op)
+test_self_div (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfDiv( nullValue);
+    op.SelfDiv (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_mod( IOperand& op)
+test_self_mod (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfMod( nullValue);
+    op.SelfMod (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_and( IOperand& op)
+test_self_and (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfAnd( nullValue);
+    op.SelfAnd (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_xor( IOperand& op)
+test_self_xor (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfXor( nullValue);
+    op.SelfXor (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
 }
 
 template <typename DBS_T> bool
-test_self_or( IOperand& op)
+test_self_or (IOperand& op)
 {
   bool result = true;
 
   try
   {
     DBS_T nullValue;
-    op.SelfOr( nullValue);
+    op.SelfOr (nullValue);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
-      assert( e.Code() == InterException::INVALID_OP_REQ);
+      assert (e.Code() == InterException::INVALID_OP_REQ);
       result = false;
   }
-  catch( ...)
+  catch (...)
   {
-      assert( false);
+      assert (false);
   }
 
   return result;
@@ -215,21 +215,21 @@ test_self_or( IOperand& op)
 
 
 template <typename DBS_T> bool
-test_operand_for_exceptions( IOperand& op)
+test_operand_for_exceptions (IOperand& op)
 {
   bool result = false;
 
   try
   {
       DBS_T value;
-      op.GetValue( value);
+      op.GetValue (value);
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() == InterException::INVALID_OP_REQ)
         result = true;
   }
-  catch( ...)
+  catch (...)
   {
   }
 
@@ -237,16 +237,16 @@ test_operand_for_exceptions( IOperand& op)
 }
 
 template <typename DBS_T> bool
-test_operand_for_conv( IOperand& op)
+test_operand_for_conv (IOperand& op)
 {
   bool result = true;
 
   try
   {
       DBS_T value;
-      op.GetValue( value);
+      op.GetValue (value);
   }
-  catch( ...)
+  catch (...)
   {
       result = false;
   }
@@ -255,7 +255,7 @@ test_operand_for_conv( IOperand& op)
 }
 
 bool
-test_op_invalid_conv( IOperand& op)
+test_op_invalid_conv (IOperand& op)
 {
   bool result = true;
 
@@ -304,15 +304,15 @@ test_op_invalid_conv( IOperand& op)
 
   try
   {
-      op.GetField();
+      op.GetField ();
       result = false;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
-  catch( ...)
+  catch (...)
   {
       result = false;
   }
@@ -322,27 +322,27 @@ test_op_invalid_conv( IOperand& op)
       op.GetTable();
       result = false;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
-  catch( ...)
+  catch (...)
   {
       result = false;
   }
 
   try
   {
-      op.GetValueAt( 0);
+      op.GetValueAt (0);
       result = false;
   }
-  catch( InterException& e)
+  catch (InterException& e)
   {
       if (e.Code() != InterException::INVALID_OP_REQ)
         result = false;
   }
-  catch( ...)
+  catch (...)
   {
       result = false;
   }
@@ -351,12 +351,12 @@ test_op_invalid_conv( IOperand& op)
 }
 
 template <typename DBS_T> bool
-test_null_write( IOperand& op, DBS_T value)
+test_null_write (IOperand& op, DBS_T value)
 {
   bool result = true;
 
-  op.SetValue( DBS_T());
-  op.GetValue( value);
+  op.SetValue (DBS_T());
+  op.GetValue (value);
 
   if (value.IsNull() == false)
     result = false;
@@ -365,10 +365,10 @@ test_null_write( IOperand& op, DBS_T value)
 }
 
 template <typename DBS_T> bool
-test_array_read_value( DArray array, const DBS_T testVal)
+test_array_read_value (DArray array, const DBS_T testVal)
 {
   bool  result = true;
-  ArrayOperand arrayOp( array);
+  ArrayOperand arrayOp (array);
   NullOperand nullOp;
   StackValue sv (nullOp);
   IOperand* pOp = NULL;
@@ -377,26 +377,26 @@ test_array_read_value( DArray array, const DBS_T testVal)
        (index < array.Count()) && result;
        ++index)
     {
-      sv = arrayOp.GetValueAt( index);
-      pOp = &sv.Operand();
+      sv = arrayOp.GetValueAt (index);
+      pOp = &sv.Operand ();
 
 
       DBS_T first, second;
-      pOp->GetValue( first);
+      pOp->GetValue (first);
       array.Get (index, second);
 
-      if ( (first != second) && ( ! test_op_invalid_conv( *pOp) ))
+      if ( (first != second) && ( ! test_op_invalid_conv (*pOp) ))
         result = false;
     }
 
-  sv = arrayOp.GetValueAt( array.Count() - 1);
-  pOp = &sv.Operand();
-  result &= test_op_invalid_conv( *pOp);
-  pOp->SetValue( testVal);
+  sv = arrayOp.GetValueAt (array.Count() - 1);
+  pOp = &sv.Operand ();
+  result &= test_op_invalid_conv (*pOp);
+  pOp->SetValue (testVal);
 
   DBS_T val;
 
-  arrayOp.GetValue( array);
+  arrayOp.GetValue (array);
   array.Get (array.Count() - 1, val);
 
   if ( val != testVal)
@@ -406,17 +406,17 @@ test_array_read_value( DArray array, const DBS_T testVal)
 }
 
 template <typename DBS_T> bool
-test_table_value( ITable& table, DArray& array, const DBS_T testVal)
+test_table_value (ITable& table, DArray& array, const DBS_T testVal)
 {
   bool result = true;
   DArray fieldArray;
   DBS_T    simpleVal;
 
   table.Get (0,
-                  table.RetrieveField( "simple_type"),
+                  table.RetrieveField ("simple_type"),
                   simpleVal);
   table.Get (0,
-                  table.RetrieveField( "array_type"),
+                  table.RetrieveField ("array_type"),
                   fieldArray);
 
   if (testVal != simpleVal)
@@ -440,15 +440,15 @@ test_table_value( ITable& table, DArray& array, const DBS_T testVal)
 }
 
 template <typename DBS_T> bool
-test_array_tableread_value( IDBSHandler& dbsHnd,
+test_array_tableread_value (IDBSHandler& dbsHnd,
                             DArray      array,
                             const DBS_T   testVal)
 {
   bool  result = true;
   const NullOperand nullOp;
-  StackValue svArray( nullOp);
-  StackValue svSimple( nullOp);
-  StackValue svArrayEl( nullOp);
+  StackValue svArray (nullOp);
+  StackValue svSimple (nullOp);
+  StackValue svArrayEl (nullOp);
 
   DBSFieldDescriptor fd[2];
 
@@ -460,43 +460,43 @@ test_array_tableread_value( IDBSHandler& dbsHnd,
   fd[1].type  = testVal.DBSType();
   fd[1].name = "simple_type";
 
-  ITable& testTable = dbsHnd.CreateTempTable( 2, fd);
-  const ROW_INDEX row = testTable.GetReusableRow( true);
+  ITable& testTable = dbsHnd.CreateTempTable (2, fd);
+  const ROW_INDEX row = testTable.GetReusableRow (true);
   {
-    TableOperand tableOp( dbsHnd, testTable, true);
-    FieldOperand fieldArrayOp( tableOp, testTable.RetrieveField( "array_type"));
-    FieldOperand fieldSimpleOp( tableOp,
-                                testTable.RetrieveField( "simple_type"));
+    TableOperand tableOp (dbsHnd, testTable, true);
+    FieldOperand fieldArrayOp (tableOp, testTable.RetrieveField ("array_type"));
+    FieldOperand fieldSimpleOp (tableOp,
+                                testTable.RetrieveField ("simple_type"));
 
-    svArray = fieldArrayOp.GetValueAt( row);
-    svSimple = fieldSimpleOp.GetValueAt( row);
+    svArray = fieldArrayOp.GetValueAt (row);
+    svSimple = fieldSimpleOp.GetValueAt (row);
   }
 
   DBS_T firstArrayVal;
   array.Get (row, firstArrayVal);
 
-  assert( testVal != firstArrayVal);
+  assert (testVal != firstArrayVal);
 
-  result &= test_op_invalid_conv( svSimple.Operand());
+  result &= test_op_invalid_conv (svSimple.Operand ());
 
-  svArray.Operand().SetValue( array);
-  svSimple.Operand().SetValue( firstArrayVal);
+  svArray.Operand ().SetValue (array);
+  svSimple.Operand ().SetValue (firstArrayVal);
 
-  result &= test_table_value( testTable, array, firstArrayVal);
+  result &= test_table_value (testTable, array, firstArrayVal);
 
   array.Set (0, testVal);
-  svArrayEl = svArray.Operand().GetValueAt( 0);
+  svArrayEl = svArray.Operand ().GetValueAt (0);
 
-  result &= test_op_invalid_conv( svArrayEl.Operand());
+  result &= test_op_invalid_conv (svArrayEl.Operand ());
 
-  svArrayEl.Operand().SetValue( testVal);
-  svSimple.Operand().SetValue( testVal);
+  svArrayEl.Operand ().SetValue (testVal);
+  svSimple.Operand ().SetValue (testVal);
 
-  result &= test_table_value( testTable, array, testVal);
+  result &= test_table_value (testTable, array, testVal);
 
-  result &= test_null_write( svSimple.Operand(), DBS_T());
+  result &= test_null_write (svSimple.Operand (), DBS_T());
 
-  result &= test_table_value( testTable, array, DBS_T());
+  result &= test_table_value (testTable, array, DBS_T());
 
   return result;
 }
@@ -508,31 +508,31 @@ main()
   bool success = true;
 
   {
-    DBSInit( DBSSettings());
+    DBSInit (DBSSettings());
   }
 
-  DBSCreateDatabase( admin);
+  DBSCreateDatabase (admin);
 
   {
-    IDBSHandler& dbsHnd = DBSRetrieveDatabase( admin);
-    HiresTimeOperand op (DHiresTime( 0, 1, 1, 0, 0, 0, 0));
-    success = success && test_op_invalid_conv( op);
-    success = success && test_null_write( op,
-                                          DHiresTime( 0,1,1, 0, 59, 0, 0));
+    IDBSHandler& dbsHnd = DBSRetrieveDatabase (admin);
+    HiresTimeOperand op (DHiresTime (0, 1, 1, 0, 0, 0, 0));
+    success = success && test_op_invalid_conv (op);
+    success = success && test_null_write (op,
+                                          DHiresTime (0,1,1, 0, 59, 0, 0));
     success = success && test_array_read_value(
                                             get_test_array(),
-                                            DHiresTime( 0,1,1, 0, 59, 0, 0)
+                                            DHiresTime (0,1,1, 0, 59, 0, 0)
                                                 );
     success = success && test_array_tableread_value(
                                               dbsHnd,
                                               get_test_array(),
-                                              DHiresTime( 0,1,1, 0, 59, 0, 0)
+                                              DHiresTime (0,1,1, 0, 59, 0, 0)
                                                      );
 
-    DBSReleaseDatabase( dbsHnd);
+    DBSReleaseDatabase (dbsHnd);
   }
 
-  DBSRemoveDatabase( admin);
+  DBSRemoveDatabase (admin);
   DBSShoutdown();
 
   if (!success)

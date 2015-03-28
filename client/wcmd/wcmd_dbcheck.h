@@ -31,7 +31,7 @@ repair_database_erros();
 
 
 int
-check_database_for_errors( const bool allAnswersYes, const bool userRequest);
+check_database_for_errors (const bool allAnswersYes, const bool userRequest);
 
 
 #endif /* WCMD_DBCHECK_H_ */

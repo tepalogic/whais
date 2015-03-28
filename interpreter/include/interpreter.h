@@ -45,7 +45,7 @@ namespace whais
 class INTERP_SHL InterException : public Exception
 {
 public:
-  explicit InterException( const uint32_t  code,
+  explicit InterException (const uint32_t  code,
                            const char*     file,
                            uint32_t        line,
                            const char*     fmtMsg = NULL,
@@ -110,69 +110,69 @@ public:
 class INTERP_SHL ISession
 {
 public:
-  ISession( Logger& log);
+  ISession (Logger& log);
   virtual ~ISession();
 
-  virtual void LoadCompiledUnit( WIFunctionalUnit& unit) = 0;
-  virtual bool LoadSharedLib( WH_SHLIB shl) = 0;
+  virtual void LoadCompiledUnit (WIFunctionalUnit& unit) = 0;
+  virtual bool LoadSharedLib (WH_SHLIB shl) = 0;
 
-  virtual void ExecuteProcedure( const char* const   name,
+  virtual void ExecuteProcedure (const char* const   name,
                                  SessionStack&       stack) = 0;
 
   virtual uint_t GlobalValuesCount() const = 0;
 
   virtual uint_t ProceduresCount() const = 0;
 
-  virtual const char* GlobalValueName( const uint_t index) const = 0;
+  virtual const char* GlobalValueName (const uint_t index) const = 0;
 
-  virtual const char* ProcedureName( const uint_t index) const = 0;
+  virtual const char* ProcedureName (const uint_t index) const = 0;
 
-  virtual uint_t GlobalValueRawType( const uint32_t index) = 0;
-  virtual uint_t GlobalValueRawType( const char* const name) = 0;
+  virtual uint_t GlobalValueRawType (const uint32_t index) = 0;
+  virtual uint_t GlobalValueRawType (const char* const name) = 0;
 
-  virtual uint_t GlobalValueFieldsCount( const uint32_t index) = 0;
-  virtual uint_t GlobalValueFieldsCount( const char* const name) = 0;
+  virtual uint_t GlobalValueFieldsCount (const uint32_t index) = 0;
+  virtual uint_t GlobalValueFieldsCount (const char* const name) = 0;
 
-  virtual const char* GlobalValueFieldName( const uint32_t index,
+  virtual const char* GlobalValueFieldName (const uint32_t index,
                                             const uint32_t field) = 0;
-  virtual const char* GlobalValueFieldName( const char* const   name,
+  virtual const char* GlobalValueFieldName (const char* const   name,
                                             const uint32_t      field) = 0;
 
-  virtual uint_t GlobalValueFieldType( const uint32_t index,
+  virtual uint_t GlobalValueFieldType (const uint32_t index,
                                        const uint32_t field) = 0;
-  virtual uint_t GlobalValueFieldType( const char* const   name,
+  virtual uint_t GlobalValueFieldType (const char* const   name,
                                        const uint32_t      field) = 0;
 
-  virtual uint_t ProcedureParametersCount( const uint_t id) const = 0;
-  virtual uint_t ProcedureParametersCount( const char* const name) const = 0;
+  virtual uint_t ProcedureParametersCount (const uint_t id) const = 0;
+  virtual uint_t ProcedureParametersCount (const char* const name) const = 0;
 
-  virtual uint_t ProcedurePameterRawType( const uint_t id,
+  virtual uint_t ProcedurePameterRawType (const uint_t id,
                                           const uint_t param) = 0;
-  virtual uint_t ProcedurePameterRawType( const char* const   name,
+  virtual uint_t ProcedurePameterRawType (const char* const   name,
                                           const uint_t        param) = 0;
 
-  virtual uint_t ProcedurePameterFieldsCount( const uint_t id,
+  virtual uint_t ProcedurePameterFieldsCount (const uint_t id,
                                               const uint_t param) = 0;
-  virtual uint_t ProcedurePameterFieldsCount( const char* const   name,
+  virtual uint_t ProcedurePameterFieldsCount (const char* const   name,
                                               const uint_t        param ) = 0;
 
-  virtual const char* ProcedurePameterFieldName( const uint_t id,
+  virtual const char* ProcedurePameterFieldName (const uint_t id,
                                                  const uint_t param,
                                                  const uint_t field ) = 0;
-  virtual const char* ProcedurePameterFieldName( const char* const   name,
+  virtual const char* ProcedurePameterFieldName (const char* const   name,
                                                  const uint_t        param,
                                                  const uint_t        field) = 0;
 
-  virtual uint_t ProcedurePameterFieldType( const uint_t id,
+  virtual uint_t ProcedurePameterFieldType (const uint_t id,
                                             const uint_t param,
                                             const uint_t field) = 0;
-  virtual uint_t ProcedurePameterFieldType( const char* const   name,
+  virtual uint_t ProcedurePameterFieldType (const char* const   name,
                                             const uint_t        param,
                                             const uint_t        field) = 0;
 
   virtual bool NotifyEvent (const uint_t     event,
                             uint64_t* const  extra) = 0;
-  Logger& GetLogger()
+  Logger& GetLogger ()
   {
     return mLog;
   }
@@ -190,19 +190,19 @@ protected:
 
 
 INTERP_SHL void
-InitInterpreter( const char* adminDbsDir = NULL);
+InitInterpreter (const char* adminDbsDir = NULL);
 
 
 INTERP_SHL ISession&
-GetInstance( const char* name, Logger* log = NULL);
+GetInstance (const char* name, Logger* log = NULL);
 
 
 INTERP_SHL void
-ReleaseInstance( ISession& instance);
+ReleaseInstance (ISession& instance);
 
 
 INTERP_SHL void
-CleanInterpreter( const bool force = false);
+CleanInterpreter (const bool force = false);
 
 
 } // namespace whais
