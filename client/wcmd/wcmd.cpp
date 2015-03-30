@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <fstream>
 #include <assert.h>
+#include <signal.h>
 
 
 #include "utils/enc_des.h"
@@ -120,6 +121,63 @@ static bool sFinishInteraction = false;
 
 
 
+
+#ifndef ARCH_WINDOWS_VC
+
+static void
+sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
+{
+  if (sig == SIGINT)
+    {
+      cout << endl;
+      sFinishInteraction = true;
+    }
+  else if (sig == SIGTERM)
+    {
+      cout << "\nTermination request received!\n";
+      sFinishInteraction = true;
+    }
+}
+
+
+static bool
+set_signals()
+{
+  struct sigaction action;
+
+  memset (&action, 0, sizeof action);
+  action.sa_flags     = SA_SIGINFO;
+  action.sa_sigaction = &sigterm_hdl;
+
+ if (sigaction (SIGINT, &action, NULL) < 0)
+   return false;
+
+ if (sigaction (SIGTERM, &action, NULL) < 0)
+   return false;
+
+ return true;
+}
+
+#else
+
+static BOOL WINAPI
+ServerStopHandler (DWORD)
+{
+  sFinishInteraction = true;
+  cout << endl;
+
+  return TRUE;
+}
+
+static BOOL
+set_signals()
+{
+  return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
+}
+
+#endif
+
+
 static void
 PrintHelpUsage()
 {
@@ -153,6 +211,9 @@ ExecuteCommandLine (const string& cmdLine)
   assert (cmdLine.length() > 0);
 
   static const string spaces = " \t";
+
+  if (sFinishInteraction)
+    return false;
 
   size_t firstPos = cmdLine.find_first_not_of (spaces);
   size_t lastPos  = cmdLine.find_last_not_of (spaces);
@@ -786,6 +847,7 @@ main (const int argc, char *argv[])
               AddOfflineTableCommands();
             }
 
+        set_signals ();
         if (scriptFile != NULL)
           {
             ifstream script (scriptFile);

@@ -224,6 +224,7 @@ add_declaration (struct ParserState* const parser,
           result = NULL;   /* Something went wrong along the way */
         }
       else if ((stmt->type != STMT_GLOBAL)
+               && ! IS_TABLE_FIELD (var.type)
                && (wh_ostream_size (&stmt->spec.proc.code) > 0))
         {
           char text[128];

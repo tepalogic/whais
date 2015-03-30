@@ -72,6 +72,9 @@ struct _ProcStatementSpec
   uint_t               declarationPos;
   uint_t               definitionPos;
   bool_t               checkParams;
+  bool_t               returnDetected;
+  bool_t               deadCodeWarned;
+
 };
 
 

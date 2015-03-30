@@ -491,7 +491,7 @@ VariableSizeStore::ConcludeStorageCheck()
                                   _RC (uint8_t*, &templateEntry));
 
   templateEntry.MarkAsDeleted (true);
-  templateEntry.MarkAsFirstEntry (true);
+  templateEntry.MarkAsFirstEntry (false);
   templateEntry.PrevEntry (0);
 
   templateEntry.NextEntry (StoreEntry::LAST_DELETED_ENTRY);

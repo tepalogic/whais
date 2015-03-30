@@ -46,7 +46,16 @@ struct Branch
   enum BRANCH_TYPE type;
   int32_t          startPos;
   int32_t          elsePos;
+
+  bool_t           prevReturnDetected;
+  bool_t           returnDetected;
+  bool_t           deadCodeWarned;
 };
+
+
+
+void
+check_for_dead_statement (struct ParserState* const parser);
 
 void
 begin_if_stmt (struct ParserState* const parser,

@@ -127,6 +127,482 @@ char test_prog_5[] = ""
   "LET some_var as FIELD OF ARRAY OF DATE;"
   "Proc_1 ( some_var, 10 ); \n" "RETURN some_var; \n" "ENDPROC \n";
 
+char test_prog_6[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_7[] = ""
+  "PROCEDURE Proc_1 ( v1 as ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_8[] = ""
+  "PROCEDURE Proc_1 ( v1 as TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_9[] = ""
+  "PROCEDURE Proc_1 ( v1 as INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_10[] = ""
+  "PROCEDURE Proc_1 ( v1 as INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_11[] = ""
+  "PROCEDURE Proc_1 ( v1 AS ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_12[] = ""
+  "PROCEDURE Proc_1 ( v1 AS ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_13[] = ""
+  "PROCEDURE Proc_1 ( v1 AS ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_14[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_15[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_16[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_17[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as TABLE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_18[] = ""
+  "PROCEDURE Proc_1 ( v1 AS INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_19[] = ""
+  "PROCEDURE Proc_1 ( v1 AS ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_20[] = ""
+  "PROCEDURE Proc_1 ( v1 AS INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_21[] = ""
+  "PROCEDURE Proc_1 ( v1 AS TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+
+char test_prog_22[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF INT8;"
+  "Proc_1 ( 10, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_23[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_24[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as TABLE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_25[] = ""
+  "PROCEDURE Proc_1 ( v1 AS FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv AS FIELD OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_26[] = ""
+  "PROCEDURE Proc_1 ( v1 AS ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_27[] = ""
+  "PROCEDURE Proc_1 ( v1 AS INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_28[] = ""
+  "PROCEDURE Proc_1 ( v1 AS TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF INT8;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_29[] = ""
+  "PROCEDURE Proc_1 ( v1 as ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF INT8;"
+  "Proc_1 ( 11, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_30[] = ""
+  "PROCEDURE Proc_1 ( v1 as ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as TABLE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+
+char test_prog_31[] = ""
+  "PROCEDURE Proc_1 ( v1 as INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as TABLE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_32[] = ""
+  "PROCEDURE Proc_1 ( v1 as ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_33[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF ARRAY OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_34[] = ""
+  "PROCEDURE Proc_1 ( v1 as FIELD OF INT8, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_35[] = ""
+  "PROCEDURE Proc_1 ( v1 as TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_36[] = ""
+  "PROCEDURE Proc_1 ( v1 as TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as FIELD OF ARRAY OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_37[] = ""
+  "PROCEDURE Proc_1 ( v1 as TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "LET tv as ARRAY OF DATE;"
+  "Proc_1 ( tv, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_38[] = ""
+  "PROCEDURE Proc_1 ( v1 as TABLE, v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "Proc_1 ( some_var, 10 ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+char test_prog_39[] = ""
+  "PROCEDURE Proc_1 (v2 as INT16) RETURN INT16 \n"
+  "DO \n"
+  "RETURN v2; \n"
+  "ENDPROC \n"
+  " \n"
+  "PROCEDURE Proc_1_2 () RETURN DATE \n"
+  "DO \n"
+  "LET some_var as DATE;"
+  "Proc_1 (some_var ); \n"
+  "RETURN some_var;\n"
+  "ENDPROC \n";
+
+
+
+
 bool_t
 test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
@@ -185,6 +661,168 @@ main()
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
                                                      MSG_PROC_ARG_NA,
                                                      MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_9,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_10,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_11,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_12,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_13,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_14,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_15,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_16,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_17,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_18,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_19,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_20,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_21,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_22,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_23,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_24,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_25,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_26,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_27,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_28,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_29,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_30,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_31,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_32,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_33,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_34,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_35,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_36,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_37,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_38,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_39,
+                                                     MSG_PROC_ARG_NA,
+                                                     MSG_ERROR_EVENT);
+
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

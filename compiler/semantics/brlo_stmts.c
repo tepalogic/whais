@@ -31,6 +31,42 @@
 #include "opcodes.h"
 #include "wlog.h"
 
+
+void
+check_for_dead_statement (struct ParserState* const parser)
+{
+  struct Statement* const stmt = parser->pCurrentStmt;
+
+  struct WArray* const branchStack = stmt_query_branch_stack (stmt);
+  const uint_t stackSize           = wh_array_count (branchStack);
+
+  assert (parser->pCurrentStmt->type = STMT_PROC);
+
+  if (stackSize > 0)
+    {
+      struct Branch* const branchIt = wh_array_get (branchStack, stackSize - 1);
+
+      if ( ! branchIt->returnDetected)
+        return ;
+
+      else if (branchIt->deadCodeWarned)
+        return ;
+
+      branchIt->deadCodeWarned = TRUE;
+    }
+  else if (parser->pCurrentStmt->spec.proc.returnDetected)
+    {
+      if (parser->pCurrentStmt->spec.proc.deadCodeWarned)
+        return ;
+
+      parser->pCurrentStmt->spec.proc.deadCodeWarned = TRUE;
+    }
+  else
+    return ;
+
+  log_message (parser, parser->bufferPos, MSG_DEAD_STMT);
+}
+
 void
 begin_if_stmt (struct ParserState* const parser,
                YYSTYPE                   expression,
@@ -40,7 +76,7 @@ begin_if_stmt (struct ParserState* const parser,
   struct WOutputStream* const code = stmt_query_instrs (stmt);
 
   struct WArray* const branchStack = stmt_query_branch_stack (stmt);
-  struct Branch        branch;
+  struct Branch        branch      = {0, };
 
   if ( ! translate_bool_exp (parser, expression))
     {
@@ -58,9 +94,8 @@ begin_if_stmt (struct ParserState* const parser,
       return;
     }
 
-  branch.type     = branchType;
-  branch.startPos = wh_ostream_size (code) - sizeof (uint32_t) - 1;
-  branch.elsePos  = 0;
+  branch.type      = branchType;
+  branch.startPos  = wh_ostream_size (code) - sizeof (uint32_t) - 1;
 
   if (wh_array_add( branchStack, &branch) == NULL)
     log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -74,8 +109,8 @@ begin_else_stmt (struct ParserState* const parser)
   struct WOutputStream* const code = stmt_query_instrs (stmt);
 
   struct WArray* const branchStack = stmt_query_branch_stack (stmt);
-  uint_t               branchId    = wh_array_count (branchStack) - 1;
-  struct Branch*       branchIt    = wh_array_get (branchStack, branchId);
+  const uint_t         branchId    = wh_array_count (branchStack) - 1;
+  struct Branch* const branchIt    = wh_array_get (branchStack, branchId);
   int32_t              jumpOffset  = 0;
 
   /* Last if or elseif statement needs to know where to exit */
@@ -90,29 +125,42 @@ begin_else_stmt (struct ParserState* const parser)
   branchIt->elsePos = wh_ostream_size (code) - sizeof (uint32_t) - 1;
   jumpOffset        = wh_ostream_size (code) - branchIt->startPos;
 
+  branchIt->prevReturnDetected = branchIt->returnDetected;
+  branchIt->returnDetected     = FALSE;
+
   store_le_int32 (jumpOffset, wh_ostream_data (code) + branchIt->startPos + 1);
 }
 
 
 void
-begin_elseif_stmt (struct ParserState *const state, YYSTYPE exp)
+begin_elseif_stmt (struct ParserState *const parser, YYSTYPE exp)
 {
-  begin_else_stmt (state);
+  struct Statement* const stmt = parser->pCurrentStmt;
 
-  if ( ! state->abortError)
-    begin_if_stmt (state, exp, BT_ELSEIF);
+  struct WArray* const branchStack = stmt_query_branch_stack (stmt);
+  const uint_t         branchId    = wh_array_count (branchStack) - 1;
+  struct Branch* const branchIt    = wh_array_get (branchStack, branchId);
+  const bool_t         retDetected = branchIt->returnDetected;
+
+  begin_else_stmt (parser);
+  branchIt->returnDetected = retDetected;
+
+  if ( ! parser->abortError)
+    begin_if_stmt (parser, exp, BT_ELSEIF);
 }
 
 
 void
 finalize_if_stmt (struct ParserState* const parser)
 {
-  struct Statement* const    stmt  = parser->pCurrentStmt;
+  struct Statement* const     stmt = parser->pCurrentStmt;
   struct WOutputStream* const code = stmt_query_instrs (stmt);
 
   struct WArray* const  branchStack = stmt_query_branch_stack (stmt);
   uint_t                branchId    = wh_array_count (branchStack);
-  const struct Branch*  branchIt    = NULL;
+   struct Branch*       branchIt    = NULL;
+
+  bool_t allBranchesReturn = TRUE;
 
   do
     {
@@ -131,6 +179,8 @@ finalize_if_stmt (struct ParserState* const parser)
 
           store_le_int32 (jumpOffset,
                           wh_ostream_data (code) + branchIt->startPos + 1);
+
+          allBranchesReturn = FALSE;
         }
       else
         {
@@ -143,10 +193,21 @@ finalize_if_stmt (struct ParserState* const parser)
                           wh_ostream_data (code) + branchIt->elsePos + 1);
         }
 
+      allBranchesReturn &= branchIt->returnDetected;
+      allBranchesReturn &= branchIt->prevReturnDetected;
     }
   while (branchIt->type == BT_ELSEIF);
 
   wh_array_resize (branchStack, branchId);
+
+  if (branchId == 0)
+    stmt->spec.proc.returnDetected |= allBranchesReturn;
+
+  else
+    {
+      branchIt = wh_array_get (branchStack, branchId - 1);
+      branchIt->returnDetected |= allBranchesReturn;
+    }
 }
 
 

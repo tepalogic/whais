@@ -1146,6 +1146,16 @@ char test_prog_8[] = ""
   "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
   "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
+char test_prog_9[] = ""
+  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "some_var=NULL; \n" "ENDPROC \n";
+
+char test_prog_10[] = ""
+  "PROCEDURE Proc() RETURN BOOL \n"
+  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n"
+  " IF (some_var != NULL) RETURN TRUE; ELSE RETURN FALSE;\n some_var=NULL; \n" "ENDPROC \n";
+
+
 bool_t
 test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
@@ -1157,12 +1167,32 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
                             strlen (test_buffer),
                             &my_postman, (WH_MESSENGER_CTXT) test_buffer);
 
-  if (handler != NULL)
+
+  if (err_type == MSG_WARNING_EVENT)
     {
+      if (handler == NULL)
+        {
+          test_result = FALSE;
+          printf ("The expected error code is actually a warning message. "
+                  "The buffer should have been compiled anyway, but it "
+                  "failed\n");
+          return test_result;
+        }
+      else
+        wh_compiler_discard (handler);
+
+      return test_result ;
+    }
+  else if (handler != NULL)
+    {
+      printf ("Looks like the buffer was compiled succefully, though an error "
+              "was expected.\n");
       test_result = FALSE;
       wh_compiler_discard (handler);
+
+      return test_result ;
     }
-  else
+
     {
       if ((last_msg_code != err_expected) || (last_msg_type != err_type))
         {
@@ -1172,10 +1202,12 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 
   if (test_get_mem_used() != 0)
     {
-      printf ("Current memory usage: %u bytes! It should be 0.",
+      printf ("Current memory usage: %u bytes! It should be 0.\n",
               test_get_mem_used());
+      test_print_unfree_mem ();
       test_result = FALSE;
     }
+
   return test_result;
 }
 
@@ -1185,6 +1217,7 @@ main()
   bool_t test_result = TRUE;
 
   printf ("Testing for received error messages...\n");
+
   test_result =
     test_for_error (test_prog_1, MSG_PROC_RET_NA_EXT, MSG_ERROR_EVENT);
   test_result =
@@ -1215,6 +1248,14 @@ main()
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
                                                      MSG_PROC_RET_NA,
                                                      MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_9,
+                                                     MSG_PROC_NO_RET,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_10,
+                                                     MSG_DEAD_STMT,
+                                                     MSG_WARNING_EVENT);
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");

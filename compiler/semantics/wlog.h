@@ -126,6 +126,8 @@ struct MsgCodeEntry
 #define MSG_CONTINUE_NOLOOP     (MSG_BREAK_NOLOOP + 1)
 #define MSG_SYNC_NA             (MSG_CONTINUE_NOLOOP + 1)
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
+#define MSG_PROC_NO_RET         (MSG_SYNC_MANY + 1)
+#define MSG_DEAD_STMT           (MSG_PROC_NO_RET + 1)
 
 void
 log_message (struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);

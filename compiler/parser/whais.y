@@ -22,6 +22,7 @@ int yylex(YYSTYPE *lvalp, struct ParserState *state);
 void yyerror(struct ParserState *state,  const char *msg);
 
 #define CHK_SEM_ERROR  { if (state->abortError != FALSE) YYABORT; }
+
 %}
 
 %token ARRAY
@@ -108,72 +109,72 @@ global_block_statement: /* empty */
 ;
 
 var_decl_stmt: LET id_list AS type_spec ';'
-		          { $$ = add_list_declaration (state, $2, $4); CHK_SEM_ERROR; }
+                  { $$ = add_list_declaration (state, $2, $4); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  
-			{ $$ = add_id_to_list(NULL, $1); }
+            { $$ = add_id_to_list(NULL, $1); }
        | id_list ',' IDENTIFIER
-       		{ $$ = add_id_to_list($1, $3); }
+               { $$ = add_id_to_list($1, $3); }
 ;
 
 type_spec: basic_type_spec
-			{ $$ = $1; }
+            { $$ = $1; }
          | array_type_spec
-         	{ $$ = $1; }
+             { $$ = $1; }
          | field_type_spec
             { $$ = $1; } 
          | table_type_spec
-         	{ $$ = $1; }
+             { $$ = $1; }
 ;
 
 basic_type_spec: BOOL
-					{ $$ = create_type_spec(state, T_BOOL); CHK_SEM_ERROR; }
+                    { $$ = create_type_spec(state, T_BOOL); CHK_SEM_ERROR; }
                | CHAR
-					{ $$ = create_type_spec(state, T_CHAR); CHK_SEM_ERROR; }
+                    { $$ = create_type_spec(state, T_CHAR); CHK_SEM_ERROR; }
                | DATE
-               		{ $$ = create_type_spec(state, T_DATE); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_DATE); CHK_SEM_ERROR; }
                | DATETIME
-               		{ $$ = create_type_spec(state, T_DATETIME); CHK_SEM_ERROR;}
+                       { $$ = create_type_spec(state, T_DATETIME); CHK_SEM_ERROR;}
                | HIRESTIME
-               		{ $$ = create_type_spec(state, T_HIRESTIME);
-               		 CHK_SEM_ERROR;
-               		}
+                       { $$ = create_type_spec(state, T_HIRESTIME);
+                        CHK_SEM_ERROR;
+                       }
                | INT8
-               		{ $$ = create_type_spec(state, T_INT8); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_INT8); CHK_SEM_ERROR; }
                | INT16
-               		{ $$ = create_type_spec(state, T_INT16); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_INT16); CHK_SEM_ERROR; }
                | INT32
-               		{ $$ = create_type_spec(state, T_INT32); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_INT32); CHK_SEM_ERROR; }
                | INT64
-               		{ $$ = create_type_spec(state, T_INT64);  CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_INT64);  CHK_SEM_ERROR; }
                | REAL
-               		{ $$ = create_type_spec(state, T_REAL); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_REAL); CHK_SEM_ERROR; }
                | RICHREAL
-               		{ $$ = create_type_spec(state, T_RICHREAL); CHK_SEM_ERROR;}
+                       { $$ = create_type_spec(state, T_RICHREAL); CHK_SEM_ERROR;}
                | TEXT 
-               		{ $$ = create_type_spec(state, T_TEXT); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_TEXT); CHK_SEM_ERROR; }
                | UINT8
-               		{ $$ = create_type_spec(state, T_UINT8);  CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_UINT8);  CHK_SEM_ERROR; }
                | UINT16
-               		{ $$ = create_type_spec(state, T_UINT16); CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_UINT16); CHK_SEM_ERROR; }
                | UINT32
-               		{ $$ = create_type_spec(state, T_UINT32);  CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_UINT32);  CHK_SEM_ERROR; }
                | UINT64
-               		{ $$ = create_type_spec(state, T_UINT64);  CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_UINT64);  CHK_SEM_ERROR; }
                | UNDEFINED
-               		{ $$ = create_type_spec(state, T_UNDETERMINED);  CHK_SEM_ERROR; }
+                       { $$ = create_type_spec(state, T_UNDETERMINED);  CHK_SEM_ERROR; }
 ;
 
 array_type_spec: ARRAY array_of_clause
-            		{	$$ = $2; MARK_ARRAY (($$)->val.u_tspec.type); }
+                    {    $$ = $2; MARK_ARRAY (($$)->val.u_tspec.type); }
 ;
 
 array_of_clause: /* empty */
-					{ $$ = create_type_spec(state, T_UNDETERMINED); 
-					  CHK_SEM_ERROR;
-					}
+                    { $$ = create_type_spec(state, T_UNDETERMINED); 
+                      CHK_SEM_ERROR;
+                    }
                | OF basic_type_spec
-               		{ $$ = $2; }
+                       { $$ = $2; }
 ;
 
 field_type_spec: FIELD field_of_clause
@@ -191,53 +192,53 @@ field_of_clause: /* empty */
 ;
 
 table_type_spec: TABLE cont_clause
-				 { MARK_TABLE ($2->val.u_tspec.type); $$ = $2; }
+                 { MARK_TABLE ($2->val.u_tspec.type); $$ = $2; }
 ;
 
 cont_clause: /* empty */
-			 {
-			    /* set the type spec later */
-				$$ = create_type_spec(state, 0);
-				CHK_SEM_ERROR;
-				$$->val.u_tspec.extra = NULL;
-			 }
+             {
+                /* set the type spec later */
+                $$ = create_type_spec(state, 0);
+                CHK_SEM_ERROR;
+                $$->val.u_tspec.extra = NULL;
+             }
              | OF '(' container_type_decl ')'
-       	 	 {
-		 		/* set the type spec later */
-				$$ = create_type_spec(state, 0);
-				CHK_SEM_ERROR;
-				$$->val.u_tspec.extra = $3;         			
-       		 }
+                 {
+                 /* set the type spec later */
+                $$ = create_type_spec(state, 0);
+                CHK_SEM_ERROR;
+                $$->val.u_tspec.extra = $3;                     
+                }
 ;
 
 container_type_decl: IDENTIFIER AS basic_type_spec ',' container_type_decl
-                    	{
-                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = add_field_declaration(state,
-                    			$1, $3, (struct DeclaredVar *)$5);
+                        {
+                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            $$ = add_field_declaration(state,
+                                $1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
-                    	} 
+                        } 
                    | IDENTIFIER AS array_type_spec ',' container_type_decl
-                    	{
-                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = add_field_declaration(state,
-                    			$1, $3, (struct DeclaredVar *)$5);
+                        {
+                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            $$ = add_field_declaration(state,
+                                $1, $3, (struct DeclaredVar *)$5);
                             CHK_SEM_ERROR;
-                    	}                
+                        }                
                    | IDENTIFIER AS basic_type_spec
-                    	{
-                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = add_field_declaration(state,
-                    			$1, $3, NULL);
+                        {
+                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            $$ = add_field_declaration(state,
+                                $1, $3, NULL);
                             CHK_SEM_ERROR;
-                    	}                
+                        }                
                    | IDENTIFIER AS array_type_spec
-                    	{
-                    		MARK_TABLE_FIELD ($3->val.u_tspec.type);
-                    		$$ = add_field_declaration(state,
-                    			$1, $3, NULL);
+                        {
+                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            $$ = add_field_declaration(state,
+                                $1, $3, NULL);
                             CHK_SEM_ERROR;
-                    	}
+                        }
 ;
 
 proc_decl_stmt: PROCEDURE IDENTIFIER 
@@ -256,9 +257,9 @@ proc_decl_stmt: PROCEDURE IDENTIFIER
                 DO local_block_statement
                 ENDPROC
                     {
-
                         finish_proc_decl(state);
                         $$ = NULL;
+                        CHK_SEM_ERROR;
                     }
 ;
 
@@ -276,7 +277,10 @@ extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER
                                 CHK_SEM_ERROR;
                                 set_proc_rettype(state, $9);
                                 CHK_SEM_ERROR;
+                                state->externDecl = TRUE;
                                 finish_proc_decl(state);
+                                CHK_SEM_ERROR;
+                                state->externDecl = FALSE;
                                 $$ = NULL;
                             }
 ;
@@ -299,6 +303,7 @@ one_statement: return_stmt
 
 return_stmt: RETURN exp ';'
                 {
+                   check_for_dead_statement (state);
                    $$ = translate_return_exp(state, $2); 
                    CHK_SEM_ERROR;
                 }
@@ -313,15 +318,18 @@ procedure_parameter_decl: /* empty */
 list_of_paramaters_decl: IDENTIFIER AS type_spec
                            {
                                 $$ =  add_proc_param_decl(NULL, $1, $3);
+                                CHK_SEM_ERROR;
                            }
                        | IDENTIFIER AS type_spec ',' list_of_paramaters_decl
                            {
                                 $$ = add_proc_param_decl($5, $1, $3);
+                                CHK_SEM_ERROR;
                            }
 ;
 
 exp_stmt : exp ';'
         {
+           check_for_dead_statement (state);
            $$ = translate_exp(state, $1); 
            CHK_SEM_ERROR;
         }
@@ -550,7 +558,7 @@ const_exp: WHAIS_INTEGER
                 $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
                 CHK_SEM_ERROR; 
             }
-;        
+;
 
 parameters_list: /* empty */
                     {
@@ -560,7 +568,8 @@ parameters_list: /* empty */
                     {
                         $$ = $1;
                     }
-     
+;
+
 not_empty_paramter_list: exp
                             {
                                 $$ = create_arg_link(state, $1, NULL);
@@ -575,6 +584,7 @@ not_empty_paramter_list: exp
 
 if_stmt : IF exp DO 
               {
+                check_for_dead_statement (state);
                 begin_if_stmt(state, $2, BT_IF);
                 CHK_SEM_ERROR;
               }
@@ -582,6 +592,7 @@ if_stmt : IF exp DO
 
         | IF exp 
               {
+                check_for_dead_statement (state);
                 begin_if_stmt(state, $2, BT_IF);
                 CHK_SEM_ERROR;
               }
@@ -589,17 +600,19 @@ if_stmt : IF exp DO
 ;
 
 possible_no_else_if_clause: /* empty */
-							   {
-								   finalize_if_stmt(state);
-							   }
-		   			      | else_if_clause
+                               {
+                                   finalize_if_stmt(state);
+                                   CHK_SEM_ERROR;
+                               }
+                             | else_if_clause
 ;
 
 end_of_if_statement: END
-					  {
-						   finalize_if_stmt (state);
-					  }
-				   | else_if_clause
+                      {
+                           finalize_if_stmt (state);
+                           CHK_SEM_ERROR;
+                      }
+                   | else_if_clause
 ;
 
 else_if_clause: ELSE
@@ -610,6 +623,7 @@ else_if_clause: ELSE
                 DO local_block_statement END
                   {
                        finalize_if_stmt(state);
+                       CHK_SEM_ERROR;
                   }
               | ELSE
                   {
@@ -619,11 +633,13 @@ else_if_clause: ELSE
                  one_statement
                   {
                        finalize_if_stmt(state);
+                       CHK_SEM_ERROR;
                   }   
 ; 
 
 while_stmt : WHILE exp
                {
+                    check_for_dead_statement (state);
                     begin_while_stmt(state, $2);
                     CHK_SEM_ERROR;
                }
@@ -634,6 +650,7 @@ while_stmt : WHILE exp
                }
            | WHILE exp
                {
+                    check_for_dead_statement (state);
                     begin_while_stmt(state, $2);
                     CHK_SEM_ERROR;
                }
@@ -646,6 +663,7 @@ while_stmt : WHILE exp
 
 until_stmt: DO 
               {
+                    check_for_dead_statement (state);
                     begin_until_stmt(state);
                     CHK_SEM_ERROR;
               }
@@ -660,19 +678,25 @@ for_stmt: FOR '(' IDENTIFIER ':' exp ')' one_statement
         | FOR '(' IDENTIFIER ':' exp ')' DO local_block_statement END
         | FOR '(' exp ';' exp ';' exp ')' 
           {
+            check_for_dead_statement (state);
             begin_for_stmt (state, $3, $5, $7);
+            CHK_SEM_ERROR;
           }
           one_statement
           {
             finalize_for_stmt (state);
+            CHK_SEM_ERROR;
           }
         | FOR '(' exp ';' exp ';' exp ')'
           {
+            check_for_dead_statement (state);
             begin_for_stmt (state, $3, $5, $7);
+            CHK_SEM_ERROR;
           } 
           DO local_block_statement END
           {
             finalize_for_stmt(state);
+            CHK_SEM_ERROR;
           }
 ; 
 

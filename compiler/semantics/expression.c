@@ -35,6 +35,7 @@
 #include "vardecl.h"
 #include "opcodes.h"
 #include "procdecl.h"
+#include "brlo_stmts.h"
 
 
 YYSTYPE
@@ -2507,23 +2508,20 @@ translate_call_exp (struct ParserState* const   parser,
 
       if (GET_TYPE( result.type) != T_UNDETERMINED)
         {
-          if (IS_FIELD( result.type))
+          if (IS_FIELD (result.type) || IS_FIELD (argType.type))
             {
-              const bool_t isArgArray = IS_ARRAY(
-                                            GET_FIELD_TYPE (argType.type)
-                                                 );
-
-              const bool_t isArgUndet = isArgArray ?
-                                          FALSE :
-                                          (GET_BASIC_TYPE( argType.type) ==
+              const uint_t arg_t      = GET_FIELD_TYPE (argType.type);
+              const uint_t res_t      = GET_FIELD_TYPE (result.type);
+              const bool_t isArgArray = IS_ARRAY (arg_t);
+              const bool_t isArgUndet = isArgArray
+                                          ? FALSE
+                                          : (GET_BASIC_TYPE (arg_t) ==
                                               T_UNDETERMINED);
 
               assert ((isArgArray == FALSE) || (isArgUndet == FALSE));
 
-              if ((IS_FIELD( argType.type) == FALSE)
-                  || ((GET_FIELD_TYPE( result.type) !=
-                        GET_FIELD_TYPE (argType.type))
-                     && (isArgUndet == FALSE)))
+              if ((IS_FIELD( argType.type) != IS_FIELD (result.type))
+                  || ( ! isArgUndet && (arg_t != res_t)))
                 {
                   log_message (parser,
                                parser->bufferPos,
@@ -2540,19 +2538,18 @@ translate_call_exp (struct ParserState* const   parser,
                   return sgResultUnk;
                 }
             }
-          else if ( ! IS_TABLE (result.type))
+          else if ( ! (IS_TABLE (result.type) || IS_TABLE (argType.type)))
             {
-              if (IS_ARRAY (argType.type))
+              if (IS_ARRAY (argType.type) || IS_ARRAY (result.type))
                 {
-                  const uint_t        arg_t  = GET_BASIC_TYPE (argType.type);
-                  const uint_t        res_t  = GET_BASIC_TYPE (result.type);
-                  const enum W_OPCODE tempOp = store_op[arg_t][res_t];
+                  const uint_t arg_t  = GET_BASIC_TYPE (argType.type);
+                  const uint_t res_t  = GET_BASIC_TYPE (result.type);
 
                   assert (arg_t <= T_UNDETERMINED);
                   assert (res_t <= T_UNDETERMINED);
 
-                  if ( ! IS_ARRAY (result.type)
-                      || ((arg_t != T_UNDETERMINED) && (tempOp == W_NA)))
+                  if ((IS_ARRAY (result.type) != IS_ARRAY (argType.type))
+                      || ((arg_t != T_UNDETERMINED) && (arg_t != res_t)))
                     {
                       log_message (parser,
                                    parser->bufferPos,
@@ -2568,7 +2565,7 @@ translate_call_exp (struct ParserState* const   parser,
                       return sgResultUnk;
                     }
                 }
-              else if ( ! IS_ARRAY (result.type))
+              else
                 {
                   const uint_t        arg_t  = GET_BASIC_TYPE (argType.type);
                   const uint_t        res_t  = GET_BASIC_TYPE (result.type);
@@ -2593,7 +2590,10 @@ translate_call_exp (struct ParserState* const   parser,
                       return sgResultUnk;
                     }
                 }
-              else if (GET_BASIC_TYPE( argType.type) != T_UNDETERMINED)
+            }
+          else
+            {
+              if (IS_TABLE (result.type) != IS_TABLE (argType.type))
                 {
                   log_message (parser,
                                parser->bufferPos,
@@ -2608,20 +2608,20 @@ translate_call_exp (struct ParserState* const   parser,
 
                   return sgResultUnk;
                 }
-            }
-          else if ( ! are_compatible_tables (parser, &argType, &result))
-            {
-              /* The two containers's types are not compatible.
-               * The error was already logged. */
-              log_message (parser,
-                           parser->bufferPos,
-                           MSG_PROC_ARG_COUNT,
-                           wh_copy_first (temp, proc->spec.proc.name,
-                                          sizeof temp,
-                                          proc->spec.proc.nameLength),
-                           argCount);
+              else if ( ! are_compatible_tables (parser, &argType, &result))
+                {
+                  /* The two containers's types are not compatible.
+                   * The error was already logged. */
+                  log_message (parser,
+                               parser->bufferPos,
+                               MSG_PROC_ARG_COUNT,
+                               wh_copy_first (temp, proc->spec.proc.name,
+                                              sizeof temp,
+                                              proc->spec.proc.nameLength),
+                               argCount);
 
-              return sgResultUnk;
+                  return sgResultUnk;
+                }
             }
         }
 
@@ -2981,11 +2981,23 @@ translate_return_exp (struct ParserState* const parser, YYSTYPE exp)
   struct WOutputStream* const     instrs  = stmt_query_instrs (stmt);
   const struct DeclaredVar* const pRetVar = stmt_get_param (stmt, 0);
 
+  const uint_t branchStackSize = wh_array_count (&stmt->spec.proc.branchStack);
+
   struct ExpResultType retType = sgResultUnk;
   struct ExpResultType expType = sgResultUnk;
 
   assert (exp->val_type = VAL_EXP_LINK);
   assert (stmt->type == STMT_PROC);
+
+  if (branchStackSize == 0)
+    stmt->spec.proc.returnDetected = TRUE;
+
+  else
+    {
+      struct Branch* const b = wh_array_get (&stmt->spec.proc.branchStack,
+                                             branchStackSize - 1);
+      b->returnDetected = TRUE;
+    }
 
   expType = translate_tree_exp (parser, stmt, &(exp->val.u_exp));
   if (expType.type == T_UNKNOWN)
@@ -3101,7 +3113,7 @@ translate_bool_exp (struct ParserState* const parser, YYSTYPE exp)
 
   expType = translate_tree_exp (parser,
                                 parser->pCurrentStmt,
-                                 &(exp->val.u_exp));
+                                &(exp->val.u_exp));
   if (expType.type == T_UNKNOWN)
     {
       /* Some error was encounter evaluating expression.

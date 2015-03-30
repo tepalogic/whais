@@ -400,6 +400,20 @@ finish_proc_decl (struct ParserState* const parser)
   assert (parser->pCurrentStmt->type = STMT_PROC);
   assert (&(parser->globalStmt) == parser->pCurrentStmt->parent);
 
+
+  if ( ! parser->externDecl
+      &&  ! parser->pCurrentStmt->spec.proc.returnDetected)
+    {
+      char tname[128];
+
+      wh_copy_first (tname,
+                     parser->pCurrentStmt->spec.proc.name,
+                     sizeof tname,
+                     parser->pCurrentStmt->spec.proc.nameLength);
+
+      log_message (parser, parser->bufferPos, MSG_PROC_NO_RET, tname);
+    }
+
   parser->pCurrentStmt = &parser->globalStmt;
 
   return;

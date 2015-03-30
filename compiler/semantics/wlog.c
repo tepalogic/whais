@@ -202,6 +202,10 @@ static const struct MsgCodeEntry messages[] = {
    "Synchronized statement inside another synchronized statement."},
   {MSG_SYNC_MANY, MSG_ERROR_EVENT,
    "No more than 256 synchronized statements can be used inside a procedure."},
+  {MSG_PROC_NO_RET, MSG_ERROR_EVENT,
+    "Procedure '%s' must return a value."},
+  {MSG_DEAD_STMT, MSG_WARNING_EVENT,
+    "This statement will never be executed. Same for the rest within this block."},
   {0, 0, 0}
 };
 
