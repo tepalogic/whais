@@ -290,10 +290,20 @@ printException (ostream& outputStream, const Exception& e)
 {
   const VERBOSE_LEVEL level = GetVerbosityLevel();
 
-  if (e.Type() == DBS_EXCEPTION)
+  if (e.Type () == DBS_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "DBS framework exception.\n";
+
+      if ( e.Message().empty())
+        outputStream << e.Description() <<endl;
+    }
+  else if (e.Type () == INTERPRETER_EXCEPTION)
+    {
+      if (level >= VL_DEBUG)
+        outputStream << "Interpreter exception.\n";
+
+      assert (! e.Message ().empty ());
 
       if ( e.Message().empty())
         outputStream << e.Description() <<endl;
@@ -315,13 +325,16 @@ printException (ostream& outputStream, const Exception& e)
       outputStream << "Unknown exception throwed.\n";
     }
 
+
   if ( ! e.Message().empty())
     outputStream << e.Message() << endl;
 
   if (level >= VL_DEBUG)
     {
-      outputStream << "file: " << e.File() << endl;
-      outputStream << "line: " << e.Line() << endl;
+      outputStream << "Type: " << e.Type () << endl;
+      outputStream << "Code: " << e.Code () << endl;
+      outputStream << "File: " << e.File () << endl;
+      outputStream << "Line: " << e.Line () << endl;
     }
 }
 

@@ -138,7 +138,7 @@ protected:
 };
 
 
-class StackValue
+class INTERP_SHL StackValue
 {
 public:
   template <class OP_T>
@@ -181,6 +181,26 @@ public:
   {
     return *_RC (IOperand*, mStorage);
   }
+
+
+  static StackValue Create (const DBool& value);
+  static StackValue Create (const DChar& value);
+  static StackValue Create (const DDate& value);
+  static StackValue Create (const DDateTime& value);
+  static StackValue Create (const DHiresTime& value);
+  static StackValue Create (const DInt8& value);
+  static StackValue Create (const DInt16& value);
+  static StackValue Create (const DInt32& value);
+  static StackValue Create (const DInt64& value);
+  static StackValue Create (const DReal& value);
+  static StackValue Create (const DRichReal& value);
+  static StackValue Create (const DUInt8& value);
+  static StackValue Create (const DUInt16& value);
+  static StackValue Create (const DUInt32& value);
+  static StackValue Create (const DUInt64& value);
+  static StackValue Create (const DText& value);
+  static StackValue Create (const DArray& value);
+
 
 private:
   void Clear ()

@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <algorithm>
 
 #include "whais.h"
 #include "whais_time.h"
@@ -39,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wcmd_cmdsmgr.h"
 #include "wcmd_optglbs.h"
 #include "wcmd_valparser.h"
+#include "wcmd_altertable.h"
 
 
 using namespace std;
@@ -58,7 +60,9 @@ static const char tableRmDesc[]      = "Remove some tables from the database.";
 static const char tableRmDescExt[ ]  =
   "Remove the specified tables from the database.\n"
   "Usage:\n"
-  "  table_remove table_name [second_table_name ...] ";
+  "  remove table_name [second_table_name ...]\n"
+  "Example:\n"
+  "  remove table other_table yet_another_table";
 
 static const char tableAddDesc[]     = "Add a table to the database.";
 static const char tableAddDescExt[]  =
@@ -88,23 +92,45 @@ static const char tableAddDescExt[]  =
   "\t\tfield_name [basic_type]\n"
   "\t\tfield_name [aggregate_types]\n"
   "Usage:\n"
-  "  table_add table_name field_specifier [second_field_specifier] ...\n"
+  "  add table_name field_specifier [second_field_specifier] ...\n"
   "Example:\n"
-  "  table_add SomeTableName fieldName DATE otherFieldname ARRAY INT8";
+  "  add SomeTableName fieldName DATE otherFieldname ARRAY INT8";
+
+static const char tableCopyDesc[]    = "Create a copy of a table.";
+static const char tableCopeDescExt[] =
+  "Creates a copy of persistent table. The user may supply a selection of\n"
+  "rows based on the row numeber and/or some fields values from the\n"
+  "that should be copied in the new table"
+  "of the table.)\n"
+  "Usage:\n"
+  " copy srctab newtab [field_name[@new_field_name],...] {rows} {field_vals}\n"
+  "Example:\n"
+  " copy t1 t2\n"
+  " copy t1 t2 name@username,pass\n"
+  " copy t1 t2 name@username,pass@password * id=5 \n"
+  " copy t1 t2 name,pass@password 1,3-100,1000- year=2001, \n"
+  "Note:\n"
+  "  The syntax used to provide the selected rows is the same as the one\n"
+  "  to list the rows of a value. Have a look at 'help rows' for more\n"
+  "  information and examples on how to select rows to be listed or updated.";
 
 static const char tableAddIndDesc[]    = "Index the specified field tables.";
 static const char tableAddIndDescExt[] =
   "Index the values of the specified table fields for faster searching.\n"
   "Currently it does not support to index array nor text field types.\n"
   "Usage:\n"
-  "  table_index table_name field_name [second_field_name ...]";
+  "  index table_name field_name [second_field_name ...]\n"
+  "Example:\n"
+  "  index mytab password_hash";
 
 static const char tableRmIndDesc[]    = "Remove the index associated with some"
                                         " table fields.";
 static const char tableRmIndDescExt[] =
   "Remove the associated index of the specified table fields.\n"
   "Usage:\n"
-  "  table_rmindex table_name field_name [second_field_name ...]";
+  "  rmindex table_name field_name [second_field_name ...]\n"
+  "Example:\n"
+  "  rmindex mytab password_hash";
 
 static const char rowsDesc[]    = "Manipulate table rows.";
 static const char rowsDescExt[] =
@@ -144,8 +170,8 @@ static const char rowsDescExt[] =
   "\n"
   "             rows Table remove * field1=n,field2=min,field3=max\n"
   "\n"
-  "           Will remove all rows that have field1 is null, field2 is set\n"
-  "           to minimum and field3 is set to maximum.\n"
+  "          Will remove all rows that have field1 is null, field2 is set to\n"
+  "          minimum and field3 is set to maximum.\n"
   "Usage:\n"
   "  rows Table info\n"
   "  rows Table list [[field,...]|* [[rows_selector]|* [field_selector]]]\n"
@@ -161,6 +187,67 @@ static const char rowsDescExt[] =
   "  rows Products update price=10.99 * price=0.99,productId=891\n"
   "  rows Products remove * qnty=null,0\n";
 
+static const char fieldsDesc[]    = "Manipulate table fields.";
+static const char fieldsDescExt[] = ""
+  "This commands is used to the manage the fields of a table. It can be\n"
+  "used to add fields to add fields into a table, remove fields from a\n"
+  "table, rename or change a table's fields. The following sub commands are\n"
+  "supported:\n"
+  "  add     Add a new field into a table.\n"
+  "\n"
+  "             fields Table add field1 TEXT field2 ARRAY DATE\n"
+  "\n"
+  "          This commands adds two fields to table Table, field1 as a\n"
+  "          text and field2 as an array of dates.\n"
+  "\n"
+  "  remove  Remove a field from a table.\n"
+  "\n"
+  "             fields Table remove field1 field2\n"
+  "\n"
+  "          Drops the fields name field1 and field2 from table Table.\n"
+  "\n"
+  "  rename  Rename fields of a table.\n"
+  "\n"
+  "             fields Table rename field1 new_field1 field2 new_field2\n"
+  "\n"
+  "          Renames the fields name field1 and field2 from table Table, to\n"
+  "\n"
+  "          new_field1 and respectively to new_filed2.\n"
+  "\n"
+  "  retype  Change the type of the fields of a table.\n"
+  "\n"
+  "             fields Table retype field1 TEXT field2 ARRAY DATETIME\n"
+  "\n"
+  "          Attempts to change the types of table Table field field1 to\n"
+  "          TEXT and of field2 to an array of date and times. Depending on\n"
+  "          the old fields types this operations might fail (e.g. the new\n"
+  "          and old field's types are incompatible and there is at least\n"
+  "          one non null value that has to be converted).\n"
+  "          Hint: If you want to change the type of a field but skip its\n"
+  "          value conversion, it is better to remove the field first and\n"
+  "          after add it again with the new type.\n"
+  "Usage:\n"
+  "  alter Table {subcommand}[,{subcommand}[,{subcommand}]]\n"
+  "Where {subcommands}:\n"
+  "  add {field specfier} [{field specifier} [{field specifier}]]\n"
+  "  retype {field specfier} [{field specifier} [{field specifier}]]\n"
+  "  rename {old name} {new name} [{old name} {new name}]\n"
+  "  remove {name} [{name} [{name}]]\n"
+  "Examples:\n"
+  "  alter Table add name TEXT surename TEXT, retype age INT8\n"
+  "  alter Table retype age UINT8 hash UINT64, remove email email_hash\n"
+  "  alter Table add username TEXT\n"
+  "  alter Table rename hash username_hash\n"
+  "Note:\n"
+  "1. Due to performance reasons it is better to group as much of this sub \n"
+  "   commands as much as possible. Also because if one of the sub commands\n"
+  "   fails then all group of them will be canceled.\n"
+  "2. The exact syntax for the fields specified in care of add or retype\n"
+  "   sub commands it is the same as the one specified in the case of\n"
+  "   'table_add' commands. See its help description for more details.\n"
+  "3. Any indexed fields associated with the table will be discarded. So\n"
+  "   they have to be rebuild after a successful completion of such a\n"
+  "   command.\n";
 
 
 
@@ -237,19 +324,126 @@ print_field_desc (const DBSFieldDescriptor& desc, const bool indexed)
 
 
 static bool
+parse_field_type (const string&   cmdLine,
+                  size_t*         ioLinePos,
+                  DBS_FIELD_TYPE* oType,
+                  bool_t*         oIsArray)
+{
+  string token = CmdLineNextToken (cmdLine, *ioLinePos);
+  transform (token.begin (), token.end (), token.begin (), ::toupper);
+  if (token == "ARRAY")
+    {
+      *oIsArray = TRUE;
+
+      token = CmdLineNextToken (cmdLine, *ioLinePos);
+      transform (token.begin (), token.end (), token.begin (), ::toupper);
+    }
+  else
+    *oIsArray = FALSE;
+
+  if (token == "BOOL")
+    *oType = T_BOOL;
+
+  else if (token == "CHAR")
+    *oType = T_CHAR;
+
+  else if (token == "DATE")
+    *oType = T_DATE;
+
+  else if (token == "DATETIME")
+    *oType = T_DATETIME;
+
+  else if (token == "HIRESTIME")
+    *oType = T_HIRESTIME;
+
+  else if (token == "INT8")
+    *oType = T_INT8;
+
+  else if (token == "INT16")
+    *oType = T_INT16;
+
+  else if (token == "INT32")
+    *oType = T_INT32;
+
+  else if (token == "INT64")
+    *oType = T_INT64;
+
+  else if (token == "UINT8")
+    *oType = T_UINT8;
+
+  else if (token == "UINT16")
+    *oType = T_UINT16;
+
+  else if (token == "UINT32")
+    *oType = T_UINT32;
+
+  else if (token == "UINT64")
+    *oType = T_UINT64;
+
+  else if (token == "REAL")
+    *oType = T_REAL;
+
+  else if (token == "RICHREAL")
+    *oType = T_RICHREAL;
+
+  else if (token == "RICHREAL")
+    *oType = T_RICHREAL;
+
+  else if (token == "TEXT")
+    *oType = T_TEXT;
+
+  else
+    {
+      cerr << "Token '" << token << "' is not a valid type.\n";
+      return false;
+    }
+
+  return true;
+}
+
+
+static void
+print_match_statistic (ostream&                os,
+                       ITable&                 table,
+                       const Range<ROW_INDEX>& rows,
+                       const WTICKS            startTicks,
+                       const WTICKS            endTicks)
+{
+  const WTICKS ticks = endTicks - startTicks;
+
+  const uint_t  secs  = ticks / 1000;
+  const uint_t  msecs = ticks % 1000;
+
+  ROW_INDEX matchedRows = 0;
+  for (size_t r = 0; r < rows.mIntervals.size(); ++r)
+    {
+      const Interval<ROW_INDEX> intv = rows.mIntervals[r];
+
+      matchedRows += intv.mTo - intv.mFrom + 1;
+    }
+
+  os << "Matched "<< matchedRows;
+  os << '(' << table.AllocatedRows() << ") rows in ";
+  os << secs << '.' << setw (3) << setfill ('0') << msecs;
+  os << setw (1) << setfill (' ') << "s.\n";
+}
+
+
+static bool
 cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   IDBSHandler&               dbs     = *_RC (IDBSHandler*, context);
   size_t                     linePos = 0;
   string                     token   = CmdLineNextToken (cmdLine, linePos);
   const  VERBOSE_LEVEL       level   = GetVerbosityLevel();
+  bool                       result  = true;
   vector<DBSFieldDescriptor> fields;
   vector<string>             fieldsNames;
   string                     tableName;
-  bool                       result   = true;
 
 
-  assert (token == "table_add");
+
+  assert (token == "add");
 
   if (linePos >= cmdLine.length())
     goto invalid_args;
@@ -267,83 +461,15 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       DBSFieldDescriptor desc = {NULL, };
 
       //The field name
+
       token = CmdLineNextToken (cmdLine, linePos);
       assert (token.length() > 0);
 
       fieldsNames.push_back (token);
       desc.name = fieldsNames.back().c_str ();
 
-      if (linePos >= cmdLine.length())
+      if ( ! parse_field_type (cmdLine, &linePos, &desc.type, &desc.isArray))
         goto invalid_args;
-
-      //The filed type
-      token = CmdLineNextToken (cmdLine, linePos);
-
-      if (token == "ARRAY")
-        {
-          if (linePos >= cmdLine.length())
-            goto invalid_args;
-
-          desc.isArray = true;
-          token        = CmdLineNextToken (cmdLine, linePos);
-        }
-
-      if (token == "BOOL")
-        desc.type = T_BOOL;
-
-      else if (token == "CHAR")
-        desc.type = T_CHAR;
-
-      else if (token == "DATE")
-        desc.type = T_DATE;
-
-      else if (token == "DATETIME")
-        desc.type = T_DATETIME;
-
-      else if (token == "HIRESTIME")
-        desc.type = T_HIRESTIME;
-
-      else if (token == "INT8")
-        desc.type = T_INT8;
-
-      else if (token == "INT16")
-        desc.type = T_INT16;
-
-      else if (token == "INT32")
-        desc.type = T_INT32;
-
-      else if (token == "INT64")
-        desc.type = T_INT64;
-
-      else if (token == "UINT8")
-        desc.type = T_UINT8;
-
-      else if (token == "UINT16")
-        desc.type = T_UINT16;
-
-      else if (token == "UINT32")
-        desc.type = T_UINT32;
-
-      else if (token == "UINT64")
-        desc.type = T_UINT64;
-
-      else if (token == "REAL")
-        desc.type = T_REAL;
-
-      else if (token == "RICHREAL")
-        desc.type = T_RICHREAL;
-
-      else if (token == "RICHREAL")
-        desc.type = T_RICHREAL;
-
-      else if (token == "TEXT")
-        desc.type = T_TEXT;
-
-      else
-        {
-          cerr << "Token '" << token << "' is not a valid type.\n";
-          return false;
-        }
 
       fields.push_back (desc);
 
@@ -378,6 +504,127 @@ invalid_args:
 
 
 static bool
+cmdTableCopy (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+{
+  IDBSHandler&               dbs      = *_RC (IDBSHandler*, context);
+  size_t                     linePos  = 0;
+  string                     token    = CmdLineNextToken (cmdLine, linePos);
+  const  VERBOSE_LEVEL       level    = GetVerbosityLevel();
+  ITable*                    srcTable = NULL;
+  bool                       result   = true;
+  RowsSelection              rows;
+  string                     tableName;
+  string                     newTableName;
+  string                     fieldSpecifier;
+  vector<string>             selectedFields;
+  vector<string>             newTableFields;
+
+  assert (token == "copy");
+
+  if (linePos < cmdLine.length ())
+    tableName = CmdLineNextToken (cmdLine, linePos);
+
+  if (linePos < cmdLine.length())
+    newTableName = CmdLineNextToken (cmdLine, linePos);
+
+  if ((newTableName.length () == 0) || (tableName.length () == 0))
+    goto invalid_args;
+
+  fieldSpecifier = CmdLineNextToken (cmdLine, linePos);
+  if (fieldSpecifier != "*")
+    {
+      size_t fieldsPos = 0;
+      while (fieldsPos < fieldSpecifier.length ())
+        {
+          string fieldEntry = NextToken (fieldSpecifier, fieldsPos, ",");
+          if (fieldEntry.length() == 0)
+            goto invalid_args;
+
+          const size_t sepOff = fieldEntry.find ('@');
+
+          if (sepOff == string::npos)
+            {
+              selectedFields.push_back (fieldEntry);
+              newTableFields.push_back (fieldEntry);
+            }
+          else
+            {
+              selectedFields.push_back (fieldEntry.substr (0, sepOff));
+              newTableFields.push_back (fieldEntry.substr (sepOff + 1));
+            }
+        }
+    }
+
+  assert (selectedFields.size () == newTableFields.size ());
+
+  try
+  {
+    assert (linePos <= cmdLine.length());
+
+    srcTable = &dbs.RetrievePersistentTable (tableName.c_str ());
+
+    if (! ParseRowsSelectionClause (&cerr,
+                                    *srcTable,
+                                    cmdLine.c_str () + linePos,
+                                    rows))
+      {
+        dbs.ReleaseTable (*srcTable);
+        return false;
+      }
+
+    if (level > VL_INFO)
+      {
+        cout << "Copy table " << tableName << " into " << newTableName << ".\n";
+
+        if (selectedFields.size () > 0)
+          cout << "Selected fields to copy:\n";
+
+        for (size_t f = 0; f < selectedFields.size (); ++f)
+          cout << selectedFields[f] << " --> " << newTableFields[f] << endl;
+      }
+
+
+    const WTICKS matchBegin = wh_msec_ticks();
+
+    MatchSelectedRows (*srcTable, rows);
+
+    const WTICKS matchEnd = wh_msec_ticks();
+
+    print_match_statistic (cout, *srcTable, rows.mRows, matchBegin, matchEnd);
+
+    dbs.ReleaseTable (*srcTable);
+    srcTable = NULL;
+
+    TableAlterRules copyRules (dbs, tableName, selectedFields);
+    for (size_t i = 0; i < selectedFields.size (); ++i)
+      copyRules.RenameField (selectedFields[i], newTableFields[i]);
+
+    copyRules.CommitToTable (newTableName, rows.mRows);
+  }
+  catch (const Exception& e)
+  {
+      printException (cerr, e);
+      result = false;
+  }
+
+  if (srcTable != NULL)
+    dbs.ReleaseTable (*srcTable);
+
+  return result;
+
+invalid_args:
+
+  cerr << "Invalid command arguments.\n";
+
+  if (srcTable != NULL)
+    dbs.ReleaseTable (*srcTable);
+
+  return false;
+}
+
+
+
+static bool
 cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
@@ -386,7 +633,7 @@ cmdTableRemove (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   const  VERBOSE_LEVEL level   = GetVerbosityLevel();
   bool                 result  = false;
 
-  assert (token == "table_remove");
+  assert (token == "remove");
 
   if (linePos >= cmdLine.length())
     goto invalid_args;
@@ -510,7 +757,7 @@ cmdTableAddIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   ITable*              table   = NULL;
   bool                 result  = true;
 
-  assert (token == "table_index");
+  assert (token == "index");
 
   if (linePos >= cmdLine.length())
     goto invalid_args;
@@ -595,7 +842,7 @@ cmdTableRmIndex (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   ITable*              table   = NULL;
   bool                 result  = true;
 
-  assert (token == "table_rmindex");
+  assert (token == "rmindex");
 
   if (linePos >= cmdLine.length())
     goto invalid_args;
@@ -724,34 +971,167 @@ parse_list_table_fields (ITable&                      table,
     return true;
 }
 
-static void
-print_match_statistic (ostream&                os,
-                       ITable&                 table,
-                       const Range<ROW_INDEX>& rows,
-                       const WTICKS            startTicks,
-                       const WTICKS            endTicks)
+
+static bool
+cmdFieldsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  const WTICKS ticks = endTicks - startTicks;
+  IDBSHandler&         dbs     = *_RC (IDBSHandler*, context);
+  size_t               linePos = 0;
+  string               token   = CmdLineNextToken (cmdLine, linePos);
+  const  VERBOSE_LEVEL level   = GetVerbosityLevel();
 
-  const uint_t  secs  = ticks / 1000;
-  const uint_t  msecs = ticks % 1000;
+  assert (token == "alter");
 
-  if (GetVerbosityLevel() >= VL_INFO)
-    return;
+  if (linePos >= cmdLine.length())
+    goto invalid_args;
 
-  ROW_INDEX matchedRows = 0;
-  for (size_t r = 0; r < rows.mIntervals.size(); ++r)
-    {
-      const Interval<ROW_INDEX> intv = rows.mIntervals[r];
+  try
+  {
+    const string tableName = CmdLineNextToken (cmdLine, linePos);
+    if ((tableName.length () == 0) || (linePos >= cmdLine.length ()))
+      goto invalid_args;
 
-      matchedRows += intv.mTo - intv.mFrom + 1;
-    }
+    TableAlterRules rules (dbs, tableName, vector<string> ());
 
-  os << "Matched "<< matchedRows;
-  os << '(' << table.AllocatedRows() << ") rows in ";
-  os << secs << '.' << setw (3) << setfill ('0') << msecs;
-  os << setw (1) << setfill (' ') << "s.\n";
+    string subCommand;
+
+    if (level >= VL_INFO)
+      cout << "Alter table '" << tableName << "' fields:";
+
+    while ((subCommand = NextToken (cmdLine, linePos, ",")).length () > 0)
+      {
+        size_t subCmdPos = 0;
+
+        while (subCmdPos < subCommand.length ())
+          {
+            token = CmdLineNextToken (subCommand, subCmdPos);
+            if (token == "add")
+              {
+                if (level >= VL_INFO)
+                  cout << "\n..add fields: ";
+
+                DBS_FIELD_TYPE type;
+                bool_t         isArray;
+
+                do
+                  {
+                    token = CmdLineNextToken (subCommand, subCmdPos);
+                    if (token.length () == 0)
+                      break;
+
+                    if ( ! parse_field_type (subCommand,
+                                             &subCmdPos,
+                                             &type,
+                                             &isArray))
+                      {
+                        goto invalid_args;
+                      }
+
+                    if (level >= VL_INFO)
+                      cout << token << ' ';
+
+                    rules.AddField (token, type, isArray);
+                  }
+                while (subCmdPos < subCommand.length ());
+              }
+            else if (token == "retype")
+              {
+                if (level >= VL_INFO)
+                  cout << "\n...retype fields: ";
+
+                DBS_FIELD_TYPE type;
+                bool_t         isArray;
+
+                do
+                  {
+                    token = CmdLineNextToken (subCommand, subCmdPos);
+                    if (token.length () == 0)
+                      break;
+
+                    if ( ! parse_field_type (subCommand,
+                                             &subCmdPos,
+                                             &type,
+                                             &isArray))
+                      {
+                        goto invalid_args;
+                      }
+
+                    if (level >= VL_INFO)
+                      cout << token << ' ';
+
+                    rules.RetypeField (token, type, isArray);
+                  }
+                while (subCmdPos < subCommand.length ());
+              }
+            else if (token == "rename")
+              {
+                if (level >= VL_INFO)
+                  cout << "\n...rename fields: ";
+
+                do
+                  {
+                    const string oldName = CmdLineNextToken (subCommand,
+                                                             subCmdPos);
+                    if (oldName.length() == 0)
+                      break;
+
+                    const string newName = CmdLineNextToken (subCommand,
+                                                             subCmdPos);
+
+                    if (level >= VL_INFO)
+                      cout << oldName << " --> " << newName << ' ';
+
+                    rules.RenameField (oldName, newName);
+                  }
+                while (subCmdPos < subCommand.length ());
+              }
+            else if (token == "remove")
+              {
+                if (level >= VL_INFO)
+                  cout << "\n...remove fields: ";
+
+                do
+                  {
+                    token = CmdLineNextToken (subCommand, subCmdPos);
+                    if (token.length() == 0)
+                      break ;
+
+                    if (level >= VL_INFO)
+                      cout << token << ' ';
+
+                    rules.DropField (token);
+                  }
+                while (subCmdPos < subCommand.length ());
+              }
+            else
+              {
+                cerr << "Unknown fields sub command '" << token << "'\n";
+                return false;
+              }
+          }
+      }
+
+    rules.Commit ();
+
+    if (level >= VL_INFO)
+      cout << "\nDone!\n";
+  }
+  catch (const Exception& e)
+  {
+      printException (cerr, e);
+      return false;
+  }
+
+  return true;
+
+invalid_args:
+
+  cerr << "Invalid commands arguments.\n";
+
+  return false;
 }
+
+
 
 static bool
 cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
@@ -815,7 +1195,8 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                         cmdLine.c_str () + linePos,
                                         rows))
           {
-            goto invalid_args;
+            dbs.ReleaseTable (*table);
+            return false;
           }
 
         const WTICKS matchBegin = wh_msec_ticks();
@@ -864,7 +1245,8 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                                         cmdLine.c_str () + linePos,
                                         rows))
           {
-            goto invalid_args;
+            dbs.ReleaseTable (*table);
+            return false;
           }
 
         const WTICKS matchBegin = wh_msec_ticks();
@@ -933,22 +1315,30 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       }
     else if (token == "remove")
       {
-        RowsSelection select;
+        RowsSelection rows;
 
         if ( ! ParseRowsSelectionClause (&cerr,
                                          *table,
                                          cmdLine.c_str () + linePos,
-                                         select))
+                                         rows))
           {
-            goto invalid_args;
+            dbs.ReleaseTable (*table);
+            return false;
           }
 
-        MatchSelectedRows (*table, select);
+        const WTICKS matchBegin = wh_msec_ticks();
 
-        const size_t rowIntervals = select.mRows.mIntervals.size();
+        MatchSelectedRows (*table, rows);
+
+        const WTICKS matchEnd = wh_msec_ticks();
+
+        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
+
+
+        const size_t rowIntervals = rows.mRows.mIntervals.size();
         for (size_t rowI = 0; rowI < rowIntervals; ++rowI)
           {
-            const Interval<ROW_INDEX>& r = select.mRows.mIntervals[rowI];
+            const Interval<ROW_INDEX>& r = rows.mRows.mIntervals[rowI];
 
             for (ROW_INDEX row = r.mFrom; row <= r.mTo; ++row)
               table->MarkRowForReuse (row);
@@ -1010,7 +1400,7 @@ AddOfflineTableCommands()
   RegisterCommand (entry);
 
   entry.mShowStatus   = true;
-  entry.mName         = "table_add";
+  entry.mName         = "add";
   entry.mDesc         = tableAddDesc;
   entry.mExtendedDesc = tableAddDescExt;
   entry.mCmd          = cmdTableAdd;
@@ -1018,7 +1408,15 @@ AddOfflineTableCommands()
   RegisterCommand (entry);
 
   entry.mShowStatus   = true;
-  entry.mName         = "table_remove";
+  entry.mName         = "copy";
+  entry.mDesc         = tableCopyDesc;
+  entry.mExtendedDesc = tableCopeDescExt;
+  entry.mCmd          = cmdTableCopy;
+
+  RegisterCommand (entry);
+
+  entry.mShowStatus   = true;
+  entry.mName         = "remove";
   entry.mDesc         = tableRmDesc;
   entry.mExtendedDesc = tableRmDescExt;
   entry.mCmd          = cmdTableRemove;
@@ -1026,7 +1424,7 @@ AddOfflineTableCommands()
   RegisterCommand (entry);
 
   entry.mShowStatus   = true;
-  entry.mName         = "table_index";
+  entry.mName         = "index";
   entry.mDesc         = tableAddIndDesc;
   entry.mExtendedDesc = tableAddIndDescExt;
   entry.mCmd          = cmdTableAddIndex;
@@ -1034,10 +1432,18 @@ AddOfflineTableCommands()
   RegisterCommand (entry);
 
   entry.mShowStatus   = true;
-  entry.mName         = "table_rmindex";
+  entry.mName         = "rmindex";
   entry.mDesc         = tableRmIndDesc;
   entry.mExtendedDesc = tableRmIndDescExt;
   entry.mCmd          = cmdTableRmIndex;
+
+  RegisterCommand (entry);
+
+  entry.mShowStatus   = true;
+  entry.mName         = "alter";
+  entry.mDesc         = fieldsDesc;
+  entry.mExtendedDesc = fieldsDescExt;
+  entry.mCmd          = cmdFieldsMgm;
 
   RegisterCommand (entry);
 

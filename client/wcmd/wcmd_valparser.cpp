@@ -43,34 +43,48 @@ using namespace whais;
 static const int  MAX_VALUE_OUTPUT_SIZE = 128;
 
 
-static const char NULL_VALUE[] = "null";
-static const char MIN_VALUE[]  = "min";
-static const char MAX_VALUE[]  = "max";
+static const char NULL_VALUE[]     = "null";
+static const char NON_NULL_VALUE[] = "set";
+static const char MIN_VALUE[]      = "min";
+static const char MAX_VALUE[]      = "max";
 
 
 
 template<class T>
 bool parse_defined_values (const char*       src,
                            size_t*           outSrcSize,
-                           T* const          outValue)
+                           T* const          outValue,
+                           T* const          outValue2)
 {
-  if (strncmp (src, NULL_VALUE, sizeof (NULL_VALUE) - 1) == 0)
+  if (strncmp (src, NULL_VALUE, sizeof NULL_VALUE - 1) == 0)
     {
-      *outSrcSize = sizeof (NULL_VALUE) - 1;
+      *outSrcSize = sizeof NULL_VALUE - 1;
       *outValue   = T ();
 
       return true;
     }
-  else if (strncmp (src, MIN_VALUE, sizeof (MIN_VALUE) - 1) == 0)
+  else if (strncmp (src, NON_NULL_VALUE, sizeof NON_NULL_VALUE - 1) == 0)
     {
-      *outSrcSize = sizeof (MIN_VALUE) - 1;
+      *outSrcSize = sizeof NON_NULL_VALUE - 1;
+      *outValue   = T::Min ();
+
+      if (outValue2 == NULL)
+        return false;
+
+      *outValue2  = T::Max ();
+
+      return true;
+    }
+  else if (strncmp (src, MIN_VALUE, sizeof MIN_VALUE - 1) == 0)
+    {
+      *outSrcSize = sizeof MIN_VALUE - 1;
       *outValue   = T::Min ();
 
       return true;
     }
-  else if (strncmp (src, MAX_VALUE, sizeof (MAX_VALUE) - 1) == 0)
+  else if (strncmp (src, MAX_VALUE, sizeof MAX_VALUE - 1) == 0)
     {
-      *outSrcSize = sizeof (MAX_VALUE) - 1;
+      *outSrcSize = sizeof MAX_VALUE - 1;
       *outValue   = T::Max ();
 
       return true;
@@ -85,12 +99,16 @@ ParseFieldValue (ostream* const  os,
                  const char*     src,
                  const bool      apostrophe,
                  size_t* const   outSrcSize,
-                 T* const        outValue)
+                 T* const        outValue,
+                 T* const        outValue2 = NULL)
 {
   uint_t offset = 0;
 
-  if (parse_defined_values (src, outSrcSize, outValue))
+  if (parse_defined_values (src, outSrcSize, outValue, outValue2))
     return true;
+
+  if (outValue2 != NULL)
+    *outValue2 = T ();
 
   if (apostrophe && (src[offset++] != '\''))
     return false;
@@ -122,13 +140,18 @@ ParseFieldValue<DChar> (ostream* const  os,
                         const char*     src,
                         const bool      apostrophe,
                         size_t* const   outSrcSize,
-                        DChar* const    outValue)
+                        DChar* const    outValue,
+                        DChar* const    outValue2)
+
 {
   (void)apostrophe;
   uint_t offset = 0;
 
-  if (parse_defined_values (src, outSrcSize, outValue))
+  if (parse_defined_values (src, outSrcSize, outValue, outValue2))
     return true;
+
+  if (outValue2 != NULL)
+    *outValue2 = DChar ();
 
   const bool specialChar = src[offset] == '\"';
   const char delimCh     = specialChar ? '\"' : '\'';
@@ -182,7 +205,8 @@ ParseFieldSpecifier (ostream* const              os,
                                 src + *outSrcSize,
                                 apostrophe,
                                 &offset,
-                                &first))
+                                &first,
+                                &second))
         {
           goto ParseFieldSpecifier_msg_err;
         }
@@ -193,17 +217,30 @@ ParseFieldSpecifier (ostream* const              os,
           || (src[offset] == 0)
           || (isspace (src[offset])))
         {
-          if (first.IsNull())
-            outFieldValues.mSearchNull = true;
+          if ((first == T::Min ()) && (second == T::Max ()))
+            range.Join (Interval<T> (first, second));
 
+          else if (first.IsNull())
+            {
+              assert (second == T ());
+
+              outFieldValues.mSearchNull = true;
+            }
           else
-            range.Join (Interval<T> (first, first));
+            {
+              assert (second == T ());
+
+              range.Join (Interval<T> (first, first));
+            }
 
           if (src[offset] == ',')
             ++offset;
         }
       else if (src[offset] == '@')
         {
+          if ((first == T::Min ()) && (second == T::Max ()))
+            goto ParseFieldSpecifier_msg_err;
+
           *outSrcSize = offset + 1;
 
           if (! ParseFieldValue<T> (os,

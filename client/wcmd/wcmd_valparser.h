@@ -113,7 +113,7 @@ struct FieldValuesSelection
 
 struct RowsSelection
 {
-  whais::Range<ROW_INDEX>          mRows;
+  whais::Range<ROW_INDEX>            mRows;
   std::vector<FieldValuesSelection>  mSearchedValue;
 };
 

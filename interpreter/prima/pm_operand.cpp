@@ -3454,6 +3454,124 @@ LocalOperand::CopyNativeObjectOperand (const NativeObjectOperand& source)
 
 using namespace prima;
 
+StackValue
+StackValue::Create (const DBool& value)
+{
+  return StackValue (BoolOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DChar& value)
+{
+  return StackValue (CharOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DDate& value)
+{
+  return StackValue (DateOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DDateTime& value)
+{
+  return StackValue (DateTimeOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DHiresTime& value)
+{
+  return StackValue (HiresTimeOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DInt8& value)
+{
+  return StackValue (Int8Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DInt16& value)
+{
+  return StackValue (Int16Operand (value));
+}
+
+StackValue
+StackValue::Create (const DInt32& value)
+{
+  return StackValue (Int32Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DInt64& value)
+{
+  return StackValue (Int64Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DUInt8& value)
+{
+  return StackValue (UInt8Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DUInt16& value)
+{
+  return StackValue (UInt16Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DUInt32& value)
+{
+  return StackValue (UInt32Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DUInt64& value)
+{
+  return StackValue (UInt64Operand (value));
+}
+
+
+StackValue
+StackValue::Create (const DReal& value)
+{
+  return StackValue (RealOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DRichReal& value)
+{
+  return StackValue (RichRealOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DText& value)
+{
+  return StackValue (TextOperand (value));
+}
+
+
+StackValue
+StackValue::Create (const DArray& value)
+{
+  return StackValue (ArrayOperand (value));
+}
+
+
 
 
 SessionStack::SessionStack()
@@ -3482,185 +3600,118 @@ SessionStack::Push()
 void
 SessionStack::Push (const DBool& value)
 {
-  BoolOperand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DChar& value)
 {
-  CharOperand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DDate& value)
 {
-  DateOperand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DDateTime& value)
 {
-  DateTimeOperand stackOp (value);
-
-  StackValue      stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DHiresTime& value)
 {
-  HiresTimeOperand stackOp (value);
-
-  StackValue       stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DInt8& value)
 {
-  Int8Operand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DInt16& value)
 {
-  Int16Operand stackOp (value);
-  StackValue   stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 void
 SessionStack::Push (const DInt32& value)
 {
-  Int32Operand stackOp (value);
-
-  StackValue   stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DInt64& value)
 {
-  Int64Operand stackOp (value);
-
-  StackValue   stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DUInt8& value)
 {
-  UInt8Operand stackOp (value);
-
-  StackValue   stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DUInt16& value)
 {
-  UInt16Operand stackOp (value);
-
-  StackValue    stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DUInt32& value)
 {
-  UInt32Operand stackOp (value);
-
-  StackValue    stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DUInt64& value)
 {
-  UInt64Operand stackOp (value);
-
-  StackValue    stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DReal& value)
 {
-  RealOperand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DRichReal& value)
 {
-  RichRealOperand stackOp (value);
-
-  StackValue      stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DText& value)
 {
-  TextOperand stackOp (value);
-
-  StackValue  stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 
 void
 SessionStack::Push (const DArray& value)
 {
-  ArrayOperand stackOp (value);
-
-  StackValue   stackValue (stackOp);
-
-  Push (stackValue);
+  Push (StackValue::Create (value));
 }
 
 

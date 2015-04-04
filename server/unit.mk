@@ -11,7 +11,7 @@ whais_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
 			
 whais_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL
 whais_LIB=utils/wslutils custom/wslcustom
-whais_SHL=dbs/wpastra interpreter/wprima compiler/wcompiler custom/wcommon
+whais_SHL=custom/wcommon dbs/wpastra compiler/wcompiler interpreter/wprima
 
 whais_LINUX_SRC=linux/main.cpp
 whais_WINDOWS_SRC=
