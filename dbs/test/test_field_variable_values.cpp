@@ -40,7 +40,7 @@ bool operator== (const DArray& a1, const DArray& a2)
   if (a1.Count () != a2.Count ())
     return false;
 
-  for (uint_t i = 0; i < a1.Count(); i++)
+  for (uint_t i = 0; i < a1.Count (); i++)
     {
       DInt64 v1, v2;
 
@@ -193,7 +193,7 @@ test_text_table (IDBSHandler& h)
   tables.Get (7, field, sf3_m);
   tables.Get (8, field, sf4_m);
 
-  if ((nt != snt) || ( ! nt.IsNull()))
+  if ((nt != snt) || ( ! nt.IsNull ()))
     return false;
 
   if ((f1 != sf1) || (f1 != DText (text1)))
@@ -391,7 +391,7 @@ test_array_table (IDBSHandler& h)
   tables.Get (7, field, sf3_m);
   tables.Get (8, field, sf4_m);
 
-  if ((nt != snt) || ( ! nt.IsNull()))
+  if ((nt != snt) || ( ! nt.IsNull ()))
     return false;
 
   if ((f1 != sf1) || (f1 != ra1))
@@ -427,11 +427,11 @@ test_array_table (IDBSHandler& h)
 
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
   }
 
@@ -442,7 +442,7 @@ main()
 
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);
-  DBSShoutdown();
+  DBSShoutdown ();
 
 
   if (!success)

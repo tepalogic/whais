@@ -60,14 +60,14 @@ public:
   IBTreeNode (IBTreeNodeManager&   nodesManager,
               const NODE_INDEX     nodeId);
 
-  virtual ~IBTreeNode();
+  virtual ~IBTreeNode ();
 
-  bool IsLeaf() const
+  bool IsLeaf () const
   {
     return mHeader->mLeaf != 0;
   }
 
-  bool IsDirty() const
+  bool IsDirty () const
   {
     return mHeader->mDirty != 0;
   }
@@ -82,7 +82,7 @@ public:
     return Serializer::LoadNode (&mHeader->mNodeId);
   }
 
-  NODE_INDEX Next() const
+  NODE_INDEX Next () const
   {
     return Serializer::LoadNode (&mHeader->mRight);
   }
@@ -90,10 +90,10 @@ public:
   void Next (const NODE_INDEX next)
   {
     Serializer::StoreNode (next, &mHeader->mRight);
-    MarkDirty();
+    MarkDirty ();
   }
 
-  NODE_INDEX Prev() const
+  NODE_INDEX Prev () const
   {
     return Serializer::LoadNode (&mHeader->mLeft);
   }
@@ -101,7 +101,7 @@ public:
   void Prev (const NODE_INDEX prev)
   {
     Serializer::StoreNode (prev, &mHeader->mLeft);
-    MarkDirty();
+    MarkDirty ();
   }
 
   const uint8_t* DataForRead () const
@@ -109,24 +109,24 @@ public:
     return _RC (const uint8_t*, (mHeader.get () + 1));
   }
 
-  uint8_t* DataForWrite()
+  uint8_t* DataForWrite ()
   {
-    MarkDirty();
+    MarkDirty ();
 
     return _RC (uint8_t*, (mHeader.get () + 1));
   }
 
-  uint8_t* RawData() const
+  uint8_t* RawData () const
   {
     return _RC (uint8_t*, mHeader.get ());
   }
 
-  void MarkDirty()
+  void MarkDirty ()
   {
     mHeader->mDirty = 1;
   }
 
-  void MarkClean()
+  void MarkClean ()
   {
     mHeader->mDirty = 0;
   }
@@ -139,16 +139,16 @@ public:
   void MarkAsRemoved ()
   {
     mHeader->mRemoved = 1;
-    MarkDirty();
+    MarkDirty ();
   }
 
   void MarkAsUsed ()
   {
     mHeader->mRemoved = 0;
-    MarkDirty();
+    MarkDirty ();
   }
 
-  uint16_t NullKeysCount() const
+  uint16_t NullKeysCount () const
   {
     return load_le_int16 (mHeader->mNullKeysCount);
   }
@@ -156,10 +156,10 @@ public:
   void NullKeysCount (const uint_t count)
   {
     store_le_int16 (count, mHeader->mNullKeysCount);
-    MarkDirty();
+    MarkDirty ();
   }
 
-  uint_t KeysCount() const
+  uint_t KeysCount () const
   {
     return load_le_int16 (mHeader->mKeysCount);
   }
@@ -167,14 +167,14 @@ public:
   void KeysCount (const uint_t count)
   {
     store_le_int16 (count, mHeader->mKeysCount);
-    MarkDirty();
+    MarkDirty ();
   }
 
-  virtual uint_t KeysPerNode() const = 0;
+  virtual uint_t KeysPerNode () const = 0;
 
-  virtual bool NeedsSpliting() const;
+  virtual bool NeedsSpliting () const;
 
-  virtual bool NeedsJoining() const;
+  virtual bool NeedsJoining () const;
 
 
   virtual KEY_INDEX GetParentKeyIndex (const IBTreeNode& parent) const = 0;
@@ -204,12 +204,12 @@ public:
   virtual int CompareKey (const IBTreeKey&   key,
                           const KEY_INDEX    nodeKeyIndex) const = 0;
 
-  virtual const IBTreeKey& SentinelKey() const = 0;
+  virtual const IBTreeKey& SentinelKey () const = 0;
 
   bool   FindBiggerOrEqual (const IBTreeKey&  key,
                             KEY_INDEX* const  outIndex) const;
 
-  void   Release();
+  void   Release ();
 
 protected:
   struct NodeHeader
@@ -248,20 +248,20 @@ public:
   {
   }
 
-  ~BTreeNodeRAII()
+  ~BTreeNodeRAII ()
   {
-    mTreeNode->Release();
+    mTreeNode->Release ();
   }
 
   void operator= (IBTreeNode& node)
   {
-    mTreeNode->Release();
+    mTreeNode->Release ();
     mTreeNode = &node;
   }
 
   void operator= (IBTreeNode* node)
   {
-    mTreeNode->Release();
+    mTreeNode->Release ();
     mTreeNode = node;
   }
 
@@ -304,9 +304,9 @@ public:
     ReleaseNode (node->NodeId ());
   }
 
-  void FlushNodes();
+  void FlushNodes ();
 
-  virtual uint64_t NodeRawSize() const = 0;
+  virtual uint64_t NodeRawSize () const = 0;
 
   virtual NODE_INDEX AllocateNode (const NODE_INDEX parent,
                                    const KEY_INDEX  parentKey) = 0;
@@ -331,7 +331,7 @@ protected:
   };
 
 
-  virtual uint_t MaxCachedNodes() = 0;
+  virtual uint_t MaxCachedNodes () = 0;
 
   virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId) = 0;
 

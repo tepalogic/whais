@@ -88,10 +88,11 @@ SHLS+=$(if $(3),./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
 	$(ECHO)$(LD) $($(1)_OBJ) $$(call arch_shl_linker_flags,$(1),$(3),$(4)) $$(call arch_add_lib_dirs,$(1))\
 		$$(call arch_handle_import_libs,$(1)) $$(call arch_set_output_sharedlib,$(1),$(2))
 
+#Odd but the links are kept the other way arround to facilitate multiple jobs
+#make runs. 
 ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) : ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
-	$(ECHO)mv ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
-	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
-	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)
+	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)$(4)
+	$(ECHO)ln -s -f $(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT) ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL_EXT)$(3)
 	
 endef
 

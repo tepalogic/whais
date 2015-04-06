@@ -26,7 +26,7 @@ uint64_t _iterationsCount = 5000000;
 
 
 static bool
-test_for_addition_64bit_values()
+test_for_addition_64bit_values ()
 {
 
   WE_I128 addRes, mulRes;
@@ -73,7 +73,7 @@ test_64_bit_ops_fail:
 
 
 static bool
-test_for_addition_32bit_values()
+test_for_addition_32bit_values ()
 {
   WE_I128 addRes, mulRes;
   int64_t i,j;
@@ -120,7 +120,7 @@ test_32_bit_ops_fail:
 
 
 static bool
-test_for_addition_mix_values()
+test_for_addition_mix_values ()
 {
 
   WE_I128 addRes, mulRes;
@@ -167,7 +167,7 @@ test_mix_bit_ops_fail:
 }
 
 static bool
-test_for_reminder_64bit_values()
+test_for_reminder_64bit_values ()
 {
   WE_I128 addRes, mulRes;
   int64_t i,j, k;
@@ -225,7 +225,7 @@ test_64_bit_reminder_fail:
 }
 
 static bool
-test_for_reminder_32bit_values()
+test_for_reminder_32bit_values ()
 {
   WE_I128 addRes, mulRes;
   int64_t i,j, k;
@@ -288,7 +288,7 @@ test_32_bit_reminder_fail:
 }
 
 static bool
-test_for_reminder_mix_bit_values()
+test_for_reminder_mix_bit_values ()
 {
   WE_I128 addRes, mulRes;
   int64_t i,j, k;
@@ -346,7 +346,7 @@ test_mix_bit_reminder_fail:
 }
 
 static bool
-test_for_special_add_cases()
+test_for_special_add_cases ()
 {
   WE_I128 sum;
   int64_t i,j;
@@ -416,7 +416,7 @@ test_special_add_fail:
 
 
 static bool
-test_for_special_mul_cases()
+test_for_special_mul_cases ()
 {
   int64_t i;
 
@@ -481,14 +481,14 @@ main (int argc, char** argv)
 
   bool success = true;
 
-  success = test_for_addition_64bit_values();
-  success = test_for_addition_32bit_values();
-  success = test_for_addition_mix_values();
-  success = test_for_reminder_64bit_values();
-  success = test_for_reminder_32bit_values();
-  success = test_for_reminder_mix_bit_values();
-  success = test_for_special_add_cases();
-  success = test_for_special_mul_cases();
+  success = test_for_addition_64bit_values ();
+  success = test_for_addition_32bit_values ();
+  success = test_for_addition_mix_values ();
+  success = test_for_reminder_64bit_values ();
+  success = test_for_reminder_32bit_values ();
+  success = test_for_reminder_mix_bit_values ();
+  success = test_for_special_add_cases ();
+  success = test_for_special_mul_cases ();
 
   if (!success)
     {

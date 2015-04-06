@@ -55,7 +55,7 @@ bool test_record (VariableSizeStore* storage,
 }
 
 
-bool test_record_create()
+bool test_record_create ()
 {
   bool result = true;
 
@@ -63,7 +63,7 @@ bool test_record_create()
   std::cout << "Testing record creation ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings().mWorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     VariableSizeStore storage;
@@ -99,12 +99,12 @@ bool test_record_create()
           result = false;
       }
 
-    storage.Flush();
+    storage.Flush ();
   }
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings().mWorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -121,7 +121,7 @@ bool test_record_create()
       else if (test_record (&storage, pattern2, 41, firstEntries[1], sizeof pattern2) == false)
         result = false;
 
-      storage.Flush();
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -130,14 +130,14 @@ bool test_record_create()
 
 
 bool
-test_record_removal()
+test_record_removal ()
 {
   bool result = true;
 
   std::cout << "Testing record removal ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings().mWorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -165,12 +165,12 @@ test_record_removal()
           result = false;
       }
 
-    storage.Flush();
+    storage.Flush ();
   }
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings().mWorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -183,21 +183,21 @@ test_record_removal()
       if (test_record (&storage, pattern3, 61, firstEntries[2], sizeof pattern3) == false)
         result = false;
 
-      storage.Flush();
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
 }
 
-bool test_record_update()
+bool test_record_update ()
 {
   bool result = true;
 
   std::cout << "Testing record update ... ";
 
   {
-    std::string temp_file_base = DBSGetSeettings().mWorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -231,12 +231,12 @@ bool test_record_update()
           result = false;
       }
 
-    storage.Flush();
+    storage.Flush ();
   }
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings().mWorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_ps_varstore";
 
       uint_t storageSize = sizeof pattern1 + sizeof pattern2 + sizeof pattern3;
@@ -245,7 +245,7 @@ bool test_record_update()
 
       VariableSizeStore storage;
       storage.Init (temp_file_base.c_str (), storageSize, TEST_UNIT_MAX_SIZE);
-      storage.MarkForRemoval();
+      storage.MarkForRemoval ();
 
       init_pattern (pattern3, sizeof pattern3, 21);
       storage.UpdateRecord (firstEntries[0], 0, sizeof pattern3, pattern3);
@@ -255,7 +255,7 @@ bool test_record_update()
       else if (test_record (&storage, pattern3, 21, firstEntries[0], sizeof pattern3) == false)
         result = false;
 
-      storage.Flush();
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -268,7 +268,7 @@ static uint8_t testBuffer[128] = "This is a test! Let us hope it will be big eno
                                  " text (e.g. at least the size of a 48 byte :)))";
 
 bool
-test_record_container_update()
+test_record_container_update ()
 {
 
   bool result = true;
@@ -276,7 +276,7 @@ test_record_container_update()
 
   do
    {
-    std::string temp_file_base = DBSGetSeettings().mWorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     TemporalContainer container (1024);
@@ -284,7 +284,7 @@ test_record_container_update()
 
     VariableSizeStore storage;
     storage.Init (temp_file_base.c_str (), 0, TEST_UNIT_MAX_SIZE);
-    storage.MarkForRemoval();
+    storage.MarkForRemoval ();
 
     const uint64_t entry = storage.AddRecord (container,  0, 0);
 
@@ -293,24 +293,24 @@ test_record_container_update()
         result = false;
         break;
       }
-    storage.UpdateRecord (entry, 0, container, 0, container.Size());
+    storage.UpdateRecord (entry, 0, container, 0, container.Size ());
     uint8_t temp[128];
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord (entry, 0, container.Size(), temp);
+    storage.GetRecord (entry, 0, container.Size (), temp);
     if ((memcmp (temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.Size()))
+        (sizeof temp  != container.Size ()))
       {
         result = false;
         break;
       }
 
-    storage.UpdateRecord (entry, sizeof testBuffer, container, 0, container.Size());
+    storage.UpdateRecord (entry, sizeof testBuffer, container, 0, container.Size ());
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord (entry, 0, container.Size(), temp);
+    storage.GetRecord (entry, 0, container.Size (), temp);
     if ((memcmp (temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.Size()))
+        (sizeof temp  != container.Size ()))
       {
         result = false;
         break;
@@ -324,7 +324,7 @@ test_record_container_update()
         break;
       }
 
-    storage.Flush();
+    storage.Flush ();
    }
   while (0);
 
@@ -333,14 +333,14 @@ test_record_container_update()
 }
 
 bool
-test_record_record_update()
+test_record_record_update ()
 {
   bool result = true;
   std::cout << "Testing record with other record update ... ";
 
   do
    {
-    std::string temp_file_base = DBSGetSeettings().mWorkDir;
+    std::string temp_file_base = DBSGetSeettings ().mWorkDir;
     temp_file_base += "t_ps_varstore";
 
     TemporalContainer container (1024);
@@ -348,9 +348,9 @@ test_record_record_update()
 
     VariableSizeStore storage;
     storage.Init (temp_file_base.c_str (), 0, TEST_UNIT_MAX_SIZE);
-    storage.MarkForRemoval();
+    storage.MarkForRemoval ();
 
-    const uint64_t entry = storage.AddRecord (container,  0, container.Size());
+    const uint64_t entry = storage.AddRecord (container,  0, container.Size ());
 
     if (entry == 0)
       {
@@ -361,19 +361,19 @@ test_record_record_update()
     assert (sizeof temp == sizeof testBuffer);
 
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord (entry, 0, container.Size(), temp);
+    storage.GetRecord (entry, 0, container.Size (), temp);
     if ((memcmp (temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.Size()))
+        (sizeof temp  != container.Size ()))
       {
         result = false;
         break;
       }
 
-    storage.UpdateRecord (entry, sizeof testBuffer, storage, entry, 0, container.Size());
+    storage.UpdateRecord (entry, sizeof testBuffer, storage, entry, 0, container.Size ());
     memset (temp, 0xFF, sizeof temp);
-    storage.GetRecord (entry, 0, container.Size(), temp);
+    storage.GetRecord (entry, 0, container.Size (), temp);
     if ((memcmp (temp, testBuffer, sizeof temp) != 0) ||
-        (sizeof temp  != container.Size()))
+        (sizeof temp  != container.Size ()))
       {
         result = false;
         break;
@@ -387,7 +387,7 @@ test_record_record_update()
         break;
       }
 
-    storage.Flush();
+    storage.Flush ();
    }
   while (0);
 
@@ -398,19 +398,19 @@ test_record_record_update()
 
 
 int
-main()
+main ()
 {
   bool success = true;
 
-  DBSInit (DBSSettings());
+  DBSInit (DBSSettings ());
 
-  success = success && test_record_create();
-  success = success && test_record_removal();
-  success = success && test_record_update();
-  success = success && test_record_container_update();
-  success = success && test_record_record_update();
+  success = success && test_record_create ();
+  success = success && test_record_removal ();
+  success = success && test_record_update ();
+  success = success && test_record_container_update ();
+  success = success && test_record_record_update ();
 
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

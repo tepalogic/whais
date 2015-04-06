@@ -45,7 +45,7 @@ typedef enum
 
 
 const std::string&
-GetRemoteHostName();
+GetRemoteHostName ();
 
 
 void
@@ -53,7 +53,7 @@ SetRemoteHostName (const char* const host);
 
 
 const std::string&
-GetConnectionPort();
+GetConnectionPort ();
 
 
 void
@@ -76,7 +76,7 @@ SetUserPassword (const char* const password);
 
 
 const std::string&
-GetWorkingDirectory();
+GetWorkingDirectory ();
 
 
 void
@@ -84,14 +84,14 @@ SetWorkingDirectory (const char* const directory);
 
 
 const std::string&
-GetWorkingDB();
+GetWorkingDB ();
 
 void
 SetWorkingDB (const char* const dbName);
 
 
 VERBOSE_LEVEL
-GetVerbosityLevel();
+GetVerbosityLevel ();
 
 
 void
@@ -103,7 +103,7 @@ SetMaximumFileSize (std::string size);
 
 
 uint64_t
-GetMaximumFileSize();
+GetMaximumFileSize ();
 
 
 void
@@ -115,7 +115,7 @@ GetDBSHandler ();
 
 
 bool
-IsOnlineDatabase();
+IsOnlineDatabase ();
 
 
 #endif //WCMD_OPTGLBS_H_

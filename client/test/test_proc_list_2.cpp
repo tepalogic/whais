@@ -27,7 +27,7 @@ check_procedure (WH_CONNECTION hnd, const ProcedureDescription& proc)
       cout << "Cannot get the parameters count for procedure '" << name << "'.\n";
       return false;
     }
-  else if (paramsCount != proc.mParameters.size())
+  else if (paramsCount != proc.mParameters.size ())
     {
       cout << "For procedure '" << name << "' parameters count does not match.\n";
       return false;
@@ -58,7 +58,7 @@ check_procedure (WH_CONNECTION hnd, const ProcedureDescription& proc)
       else
         {
           uint_t fieldsCount = 0;
-          for (size_t i = 0; i < proc.mParameters[parameter].length(); ++i)
+          for (size_t i = 0; i < proc.mParameters[parameter].length (); ++i)
             {
               if ((proc.mParameters[parameter][i] == '(')
                   || (proc.mParameters[parameter][i] == ','))
@@ -123,7 +123,7 @@ check_procedure (WH_CONNECTION hnd, const ProcedureDescription& proc)
                 }
               else
                 {
-                  for (temp = 0; temp < offsets.size(); temp++)
+                  for (temp = 0; temp < offsets.size (); temp++)
                     {
                       if (offset == offsets[temp])
                         {
@@ -150,10 +150,10 @@ test_procedures (WH_CONNECTION hnd, vector<ProcedureDescription> procs)
 {
   uint_t procsCount = 0;
   if ((WStartProceduresList (hnd, &procsCount) != WCS_OK)
-      || (procsCount != procs.size()))
+      || (procsCount != procs.size ()))
     {
       cout << "Procedures count mismatch: "
-           << procsCount << " vs. " << procs.size() << endl;
+           << procsCount << " vs. " << procs.size () << endl;
       return false;
     }
   vector<bool> foundProcs (procsCount, false);
@@ -172,13 +172,13 @@ test_procedures (WH_CONNECTION hnd, vector<ProcedureDescription> procs)
         break;
 
       size_t index;
-      for (index = 0; index < procs.size(); ++index)
+      for (index = 0; index < procs.size (); ++index)
         {
           if (procs[index].mName == string (name))
             break;
         }
 
-      if (index >= procs.size())
+      if (index >= procs.size ())
         {
           cout << "Found procedure '" << name << "' that we don't know it.\n";
           return false;
@@ -216,7 +216,7 @@ test_procedures (WH_CONNECTION hnd, vector<ProcedureDescription> procs)
       return false;
     }
 
-  for (i = 0; i < procs.size(); ++i)
+  for (i = 0; i < procs.size (); ++i)
     {
       if ( ! check_procedure (hnd, procs[i]))
         {
@@ -230,7 +230,7 @@ test_procedures (WH_CONNECTION hnd, vector<ProcedureDescription> procs)
 
 
 const char*
-DefaultDatabaseName()
+DefaultDatabaseName ()
 {
   return sDbName.c_str ();
 }

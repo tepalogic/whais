@@ -37,23 +37,23 @@ namespace prima {
 class GeneralTable : public ITable
 {
 public:
-  virtual bool IsTemporal() const;
+  virtual bool IsTemporal () const;
 
-  virtual ITable& Spawn() const;
+  virtual ITable& Spawn () const;
 
-  virtual FIELD_INDEX FieldsCount();
+  virtual FIELD_INDEX FieldsCount ();
 
   virtual FIELD_INDEX RetrieveField (const char* field);
 
   virtual DBSFieldDescriptor DescribeField (const FIELD_INDEX field);
 
-  virtual ROW_INDEX AllocatedRows();
+  virtual ROW_INDEX AllocatedRows ();
 
   virtual ROW_INDEX AddRow(const bool skipThreadSafety);
 
   virtual ROW_INDEX GetReusableRow (const bool forceAdd);
 
-  virtual ROW_INDEX ReusableRowsCount();
+  virtual ROW_INDEX ReusableRowsCount ();
 
   virtual void MarkRowForReuse (const ROW_INDEX row);
 
@@ -334,16 +334,16 @@ public:
                             const ROW_INDEX       fromRow,
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
-  virtual void Flush();
+  virtual void Flush ();
 
-  virtual void LockTable();
+  virtual void LockTable ();
 
-  virtual void UnlockTable();
+  virtual void UnlockTable ();
 
-  static GeneralTable& Instance();
+  static GeneralTable& Instance ();
 
 private:
-  GeneralTable();
+  GeneralTable ();
 };
 
 } //namespace prima

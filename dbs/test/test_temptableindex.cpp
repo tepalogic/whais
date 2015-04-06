@@ -65,8 +65,8 @@ fill_table_with_values (ITable& table,
                                    0,
                                    ~0,
                                    0);
-  if ((values.Count() != tableValues.Count()) ||
-      (values.Count() != rowCount))
+  if ((values.Count () != tableValues.Count ()) ||
+      (values.Count () != rowCount))
     {
       result = false;
     }
@@ -77,13 +77,13 @@ fill_table_with_values (ITable& table,
       DROW_INDEX rowIndex;
 
       values.Get (checkIndex, rowIndex);
-      assert (rowIndex.IsNull() == false);
+      assert (rowIndex.IsNull () == false);
 
       table.Get (rowIndex.mValue, 0, rowValue);
 
       DUInt64 generated;
       tableValues.Get (rowIndex.mValue, generated);
-      assert (generated.IsNull() == false);
+      assert (generated.IsNull () == false);
 
       if ((rowValue == generated) == false)
         {
@@ -125,17 +125,17 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
       DROW_INDEX element;
       values.Get (index, element);
 
-      if (element.IsNull() || (element.mValue != index))
+      if (element.IsNull () || (element.mValue != index))
         result = false;
 
       DUInt64 rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull() == false)
+      if (rowValue.IsNull () == false)
         result = false;
     }
 
-  if (values.Count() != rowCount)
+  if (values.Count () != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -175,7 +175,7 @@ test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
                                     ~0,
                                     0);
 
-  if (values.Count() != _rowsCount)
+  if (values.Count () != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -187,7 +187,7 @@ test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
       DUInt64 rowValue;
       table.Get (index, 0, rowValue);
 
-      if (rowValue.IsNull() == true)
+      if (rowValue.IsNull () == true)
         result = false;
 
       DUInt64 generatedValue;
@@ -213,7 +213,7 @@ main (int argc, char **argv)
 
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
   }
 
@@ -233,7 +233,7 @@ main (int argc, char **argv)
 
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

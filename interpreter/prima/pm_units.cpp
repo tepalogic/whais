@@ -97,7 +97,7 @@ Unit::GetConstData (const uint32_t offset) const
 
 UnitsManager::~UnitsManager ()
 {
-  for (uint32_t index = 0; index < mUnits.size(); ++index)
+  for (uint32_t index = 0; index < mUnits.size (); ++index)
     delete [] _RC (uint8_t*, mUnits[index]);
 }
 
@@ -123,29 +123,29 @@ UnitsManager::AddUnit (const uint32_t     glbsCount,
           constData,
           constDataSize);
 
-  const uint32_t result = mUnits.size();
+  const uint32_t result = mUnits.size ();
   mUnits.push_back (entry);
 
-  entryBuff.release();
+  entryBuff.release ();
 
   return result;
 }
 
 
 void
-UnitsManager::RemoveLastUnit()
+UnitsManager::RemoveLastUnit ()
 {
-  assert (mUnits.size() > 0);
+  assert (mUnits.size () > 0);
 
-  delete [] _RC (uint8_t*, mUnits[mUnits.size() - 1]);
-  mUnits.pop_back();
+  delete [] _RC (uint8_t*, mUnits[mUnits.size () - 1]);
+  mUnits.pop_back ();
 }
 
 
 Unit&
 UnitsManager::GetUnit (const uint32_t unitIndex)
 {
-  assert (unitIndex < mUnits.size());
+  assert (unitIndex < mUnits.size ());
 
   return *mUnits[unitIndex];
 }
@@ -156,7 +156,7 @@ UnitsManager::SetGlobalIndex (const uint32_t unitIndex,
                               const uint32_t unitGlbIndex,
                               const uint32_t glbMgrIndex)
 {
-  assert (unitIndex < mUnits.size());
+  assert (unitIndex < mUnits.size ());
 
   mUnits[unitIndex]->SetGlobalId (unitGlbIndex, glbMgrIndex);
 }
@@ -167,7 +167,7 @@ UnitsManager::SetProcedureIndex (const uint32_t unitIndex,
                                  const uint32_t unitProcIndex,
                                  const uint32_t procMgrIndex)
 {
-  assert (unitIndex < mUnits.size());
+  assert (unitIndex < mUnits.size ());
 
   mUnits[unitIndex]->SetProcedureId (unitProcIndex, procMgrIndex);
 }
@@ -177,7 +177,7 @@ uint32_t
 UnitsManager::GetGlobalIndex (const uint32_t unitIndex,
                               const uint32_t unitGlbIndex) const
 {
-  assert (unitIndex < mUnits.size());
+  assert (unitIndex < mUnits.size ());
 
  return mUnits[unitIndex]->GetGlobalId (unitGlbIndex);
 }
@@ -187,7 +187,7 @@ uint32_t
 UnitsManager::GetProcedureIndex (const uint32_t     unitIndex,
                                  const uint32_t     unitProcIndex) const
 {
-  assert (unitIndex < mUnits.size());
+  assert (unitIndex < mUnits.size ());
 
   return mUnits[unitIndex]->GetProcedureId (unitProcIndex);
 }

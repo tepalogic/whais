@@ -137,7 +137,7 @@ Socket::Socket (const Socket& src)
 }
 
 
-Socket::~Socket()
+Socket::~Socket ()
 {
   if (mOwned)
     {
@@ -165,7 +165,7 @@ Socket::operator= (const Socket& src)
 
 
 Socket
-Socket::Accept()
+Socket::Accept ()
 {
   WH_SOCKET      client = INVALID_SOCKET;
   const uint32_t e      = whs_accept (mSocket, &client);
@@ -220,7 +220,7 @@ Socket::Write (const uint8_t* const buffer, const uint_t count)
 
 
 void
-Socket::Close()
+Socket::Close ()
 {
   if (! mOwned)
     return;

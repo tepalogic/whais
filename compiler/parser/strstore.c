@@ -57,7 +57,7 @@ alloc_link (const uint_t size)
 }
 
 StringStoreHnd
-create_string_store()
+create_string_store ()
 {
   return (StringStoreHnd) alloc_link (DEFAULT_STR_SIZE);
 }

@@ -66,9 +66,9 @@ whf_dup (WH_FILE hnd)
 {
   WH_FILE result = INVALID_HANDLE_VALUE;
 
-  DuplicateHandle (GetCurrentProcess(),
+  DuplicateHandle (GetCurrentProcess (),
                   hnd,
-                  GetCurrentProcess(),
+                  GetCurrentProcess (),
                   &result,
                   0,
                   FALSE,
@@ -216,9 +216,9 @@ whf_close (WH_FILE hnd)
 }
 
 uint32_t
-whf_last_error()
+whf_last_error ()
 {
-  return GetLastError();
+  return GetLastError ();
 }
 
 bool_t
@@ -242,13 +242,13 @@ whf_remove (const char* const file)
 
 
 const char*
-whf_dir_delim()
+whf_dir_delim ()
 {
   return "\\";
 }
 
 const char*
-whf_current_dir()
+whf_current_dir ()
 {
   return ".\\";
 }

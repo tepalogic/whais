@@ -78,7 +78,7 @@ FIELD_INDEX f_t;
 
 
 DDateTime
-get_random_datetime()
+get_random_datetime ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
   uint8_t month = wh_rnd () % 12 + 1;
@@ -91,7 +91,7 @@ get_random_datetime()
 }
 
 DHiresTime
-get_random_hirestime()
+get_random_hirestime ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
   uint8_t month = wh_rnd () % 12 + 1;
@@ -105,7 +105,7 @@ get_random_hirestime()
 }
 
 DDate
-get_random_date()
+get_random_date ()
 {
   int16_t year  = wh_rnd () & 0xFFFF;
   uint8_t month = wh_rnd () % 12 + 1;
@@ -153,9 +153,9 @@ build_reference_table (IDBSHandler& dbs, const uint_t rowsCount)
   for (uint_t row = 0; row < rowsCount; ++row)
     {
       const DChar c (wh_rnd () % 0x300 + 1);
-      const DDate d (get_random_date());
-      const DDateTime dt (get_random_datetime());
-      const DHiresTime ht (get_random_hirestime());
+      const DDate d (get_random_date ());
+      const DDateTime dt (get_random_datetime ());
+      const DHiresTime ht (get_random_hirestime ());
 
       const DReal r (DBS_REAL_T (wh_rnd () % 100000,
                                  wh_rnd () % 100000,
@@ -178,17 +178,17 @@ build_reference_table (IDBSHandler& dbs, const uint_t rowsCount)
       result.Set (row, f_a, DUInt32 (row));
       result.Set (row, f_c, (row % (wh_rnd () % 4 + 1)) ? DChar () : c);
 
-      result.Set (row, f_d, (row % (wh_rnd () % 4 + 1)) ? DDate() : d);
-      result.Set (row, f_dt, (row % (wh_rnd () % 4 + 1)) ? DDateTime() : dt);
-      result.Set (row, f_ht, (row % (wh_rnd () % 4 + 1)) ? DHiresTime() : ht);
+      result.Set (row, f_d, (row % (wh_rnd () % 4 + 1)) ? DDate () : d);
+      result.Set (row, f_dt, (row % (wh_rnd () % 4 + 1)) ? DDateTime () : dt);
+      result.Set (row, f_ht, (row % (wh_rnd () % 4 + 1)) ? DHiresTime () : ht);
 
       result.Set (row, f_i8, (row % (wh_rnd () % 4 + 1)) ? DInt8 () : i8);
       result.Set (row, f_i16, (row % (wh_rnd () % 4 + 1)) ? DInt16 () : i16);
       result.Set (row, f_i32, (row % (wh_rnd () % 4 + 1)) ? DInt32 () : i32);
       result.Set (row, f_i64, (row % (wh_rnd () % 4 + 1)) ? DInt64 () : i64);
 
-      result.Set (row, f_r, (row % (wh_rnd () % 4 + 1)) ? DReal() : r);
-      result.Set (row, f_rr, (row % (wh_rnd () % 4 + 1)) ? DRichReal() : rr);
+      result.Set (row, f_r, (row % (wh_rnd () % 4 + 1)) ? DReal () : r);
+      result.Set (row, f_rr, (row % (wh_rnd () % 4 + 1)) ? DRichReal () : rr);
 
       result.Set (row, f_u8, (row % (wh_rnd () % 4 + 1)) ? DUInt8 () : u8);
       result.Set (row, f_u16, (row % (wh_rnd () % 4 + 1)) ? DUInt16 () : u16);
@@ -206,7 +206,7 @@ build_reference_table (IDBSHandler& dbs, const uint_t rowsCount)
 static ITable&
 copy_table (IDBSHandler& dbs, ITable& originalTable)
 {
-  const uint_t rowsCount = originalTable.AllocatedRows();
+  const uint_t rowsCount = originalTable.AllocatedRows ();
 
   ITable& result = dbs.CreateTempTable (FIELDS_COUNT, fieldsDescs);
 
@@ -289,9 +289,9 @@ test_table_sort (ITable&           tableSorted,
                  const FIELD_INDEX field,
                  const bool        reverseSort)
 {
-  const uint64_t rowsCount = tableSorted.AllocatedRows();
+  const uint64_t rowsCount = tableSorted.AllocatedRows ();
 
-  if (rowsCount != tableOriginal.AllocatedRows())
+  if (rowsCount != tableOriginal.AllocatedRows ())
     return false;
 
   T lastEtry;
@@ -311,7 +311,7 @@ test_table_sort (ITable&           tableSorted,
           else
             lastEtry = value;
 
-          if (rowValue.IsNull())
+          if (rowValue.IsNull ())
             return false;
 
           tableOriginal.Get (rowValue.mValue, field, orgValue);
@@ -335,7 +335,7 @@ test_table_sort (ITable&           tableSorted,
           else
             lastEtry = value;
 
-          if (rowValue.IsNull())
+          if (rowValue.IsNull ())
             return false;
 
           tableOriginal.Get (rowValue.mValue, field, orgValue);
@@ -368,7 +368,7 @@ check_field_sort (IDBSHandler&      dbs,
   else
     std::cout << "Starting the sort of field '" << fd.name << "'.\n";
 
-  table.Sort (field, 0, table.AllocatedRows() - 1, reverseSort);
+  table.Sort (field, 0, table.AllocatedRows () - 1, reverseSort);
 
   if (reverseSort)
     std::cout << "Ending the sort of field '" << fd.name << "' (reverse).\n";
@@ -520,7 +520,7 @@ main (int argc, char** argv)
     _elemsCount = atol (argv[1]);
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
   }
 
@@ -665,7 +665,7 @@ main (int argc, char** argv)
 
   DBSReleaseDatabase (handler);
   DBSRemoveDatabase (db_name);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

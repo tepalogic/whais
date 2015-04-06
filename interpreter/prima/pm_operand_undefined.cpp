@@ -30,7 +30,7 @@
 namespace whais {
 
 
-INativeObject::~INativeObject()
+INativeObject::~INativeObject ()
 {
 }
 
@@ -50,18 +50,18 @@ NativeObjectOperand::NativeObjectOperand (INativeObject& object)
 {
   mNativeValue = &object;
 
-  Initialise();
+  Initialise ();
 }
 
 
 NativeObjectOperand::NativeObjectOperand (const DArray& array)
-  : mType (array.Type())
+  : mType (array.Type ())
 {
   MARK_ARRAY (mType);
 
   _placement_new (mArrayValue, array);
 
-  Initialise();
+  Initialise ();
 }
 
 
@@ -70,7 +70,7 @@ NativeObjectOperand::NativeObjectOperand (const DText& text)
 {
   _placement_new (mTextValue, text);
 
-  Initialise();
+  Initialise ();
 }
 
 
@@ -149,7 +149,7 @@ NativeObjectOperand::NativeObjectOperand (TableReference& tableRef)
 
   mTableValue = &tableRef;
 
-  Initialise();
+  Initialise ();
 }
 
 
@@ -163,7 +163,7 @@ NativeObjectOperand::NativeObjectOperand (TableReference* const tableRef,
   mFieldValue.mTableRef   = tableRef;
   mFieldValue.mFieldIndex = fieldIndex;
 
-  Initialise();
+  Initialise ();
 }
 
 
@@ -189,13 +189,13 @@ NativeObjectOperand::NativeObjectOperand (const NativeObjectOperand& source)
   else
     memcpy (this, &source, sizeof (*this));
 
-  Initialise();
+  Initialise ();
 }
 
 
 NativeObjectOperand::~NativeObjectOperand ()
 {
-  Cleanup();
+  Cleanup ();
 }
 
 
@@ -205,7 +205,7 @@ NativeObjectOperand::operator= (const NativeObjectOperand& source)
   if (this == &source)
     return *this;
 
-  Cleanup();
+  Cleanup ();
 
   if (IS_TABLE (source.mType)
       || IS_FIELD (source.mType))
@@ -227,45 +227,45 @@ NativeObjectOperand::operator= (const NativeObjectOperand& source)
   else
     memcpy (this, &source, sizeof (*this));
 
-  Initialise();
+  Initialise ();
 
   return *this;
 }
 
 
 void
-NativeObjectOperand::Initialise()
+NativeObjectOperand::Initialise ()
 {
   if (mType == T_UNDETERMINED)
     {
       if (mNativeValue)
         {
-          assert (IsNull() == false);
+          assert (IsNull () == false);
 
           mNativeValue->RegisterUser ();
         }
       else
         {
-          assert (IsNull());
+          assert (IsNull ());
         }
     }
   else if (IS_TABLE (mType))
     {
       assert (mTableValue != NULL);
 
-      mTableValue->IncrementRefCount();
+      mTableValue->IncrementRefCount ();
     }
   else if (IS_FIELD (mType))
     {
       if (mFieldValue.mTableRef)
         {
-          assert (IsNull() == false);
+          assert (IsNull () == false);
 
-          mFieldValue.mTableRef->IncrementRefCount();
+          mFieldValue.mTableRef->IncrementRefCount ();
         }
       else
         {
-          assert (IsNull());
+          assert (IsNull ());
         }
     }
   else if (IS_ARRAY (mType))
@@ -284,45 +284,45 @@ NativeObjectOperand::Initialise()
 
 
 void
-NativeObjectOperand::Cleanup()
+NativeObjectOperand::Cleanup ()
 {
   if (mType == T_UNDETERMINED)
     {
       if (mNativeValue)
         {
-          assert (IsNull() == false);
+          assert (IsNull () == false);
 
           mNativeValue->ReleaseUser ();
         }
       else
         {
-          assert (IsNull());
+          assert (IsNull ());
         }
     }
   else if (IS_TABLE (mType))
     {
       assert (mTableValue != NULL);
 
-      mTableValue->DecrementRefCount();
+      mTableValue->DecrementRefCount ();
     }
   else if (IS_FIELD (mType))
     {
       if (mFieldValue.mTableRef)
         {
-          assert (IsNull() == false);
+          assert (IsNull () == false);
 
-          mFieldValue.mTableRef->DecrementRefCount();
+          mFieldValue.mTableRef->DecrementRefCount ();
         }
       else
         {
-          assert (IsNull());
+          assert (IsNull ());
         }
     }
   else if (IS_ARRAY (mType))
     {
       DArray* const array = _RC (DArray*, mArrayValue);
 
-      array->~DArray();
+      array->~DArray ();
 
       assert ((GET_BASIC_TYPE (mType) >= T_BOOL)
               && ((GET_BASIC_TYPE (mType) < T_TEXT)
@@ -332,7 +332,7 @@ NativeObjectOperand::Cleanup()
     {
       DText* const text = _RC (DText*, mTextValue);
 
-      text->~DText();
+      text->~DText ();
     }
   else
     {
@@ -344,13 +344,13 @@ NativeObjectOperand::Cleanup()
 
 
 bool
-NativeObjectOperand::IsNull() const
+NativeObjectOperand::IsNull () const
 {
   if (mType == T_UNDETERMINED)
     return mNativeValue == NULL;
 
   else if (IS_TABLE (mType))
-    return mTableValue->GetTable().AllocatedRows() == 0;
+    return mTableValue->GetTable ().AllocatedRows () == 0;
 
   else if (IS_FIELD (mType))
     return mFieldValue.mTableRef == NULL;
@@ -359,13 +359,13 @@ NativeObjectOperand::IsNull() const
     {
       const DArray* const array = _RC (const DArray*, mArrayValue);
 
-      return array->Count() == 0;
+      return array->Count () == 0;
     }
   else if (mType == T_TEXT)
     {
       const DText* const text = _RC (const DText*, mTextValue);
 
-      return text->RawSize() == 0;
+      return text->RawSize () == 0;
     }
   else
     {
@@ -400,8 +400,8 @@ NativeObjectOperand::GetValue (DBool& outValue) const
   if (mType != T_BOOL)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DBool();
+  if (IsNull ())
+    outValue = DBool ();
 
   else
     outValue = DBool (mUIntValue.mValue != 0);
@@ -414,7 +414,7 @@ NativeObjectOperand::GetValue (DChar& outValue) const
   if (mType != T_CHAR)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DChar ();
 
   else
@@ -428,8 +428,8 @@ NativeObjectOperand::GetValue (DDate& outValue) const
   if (mType != T_HIRESTIME)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DDate();
+  if (IsNull ())
+    outValue = DDate ();
 
   else
     outValue = DDate (mTimeValue.mYear, mTimeValue.mMonth, mTimeValue.mDay);
@@ -442,8 +442,8 @@ NativeObjectOperand::GetValue (DDateTime& outValue) const
   if (mType != T_HIRESTIME)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DDateTime();
+  if (IsNull ())
+    outValue = DDateTime ();
 
   else
     {
@@ -463,8 +463,8 @@ NativeObjectOperand::GetValue (DHiresTime& outValue) const
   if (mType != T_HIRESTIME)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DHiresTime();
+  if (IsNull ())
+    outValue = DHiresTime ();
 
   else
     {
@@ -485,7 +485,7 @@ NativeObjectOperand::GetValue (DInt8& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DInt8 ();
 
   else
@@ -499,7 +499,7 @@ NativeObjectOperand::GetValue (DInt16& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DInt16 ();
 
   else
@@ -513,7 +513,7 @@ NativeObjectOperand::GetValue (DInt32& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DInt32 ();
 
   else
@@ -527,7 +527,7 @@ NativeObjectOperand::GetValue (DInt64& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DInt64 ();
 
   else
@@ -541,7 +541,7 @@ NativeObjectOperand::GetValue (DUInt8& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DUInt8 ();
 
   else
@@ -555,7 +555,7 @@ NativeObjectOperand::GetValue (DUInt16& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DUInt16 ();
 
   else
@@ -569,7 +569,7 @@ NativeObjectOperand::GetValue (DUInt32& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DUInt32 ();
 
   else
@@ -583,7 +583,7 @@ NativeObjectOperand::GetValue (DUInt64& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
+  if (IsNull ())
     outValue = DUInt64 ();
 
   else
@@ -597,8 +597,8 @@ NativeObjectOperand::GetValue (DReal& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DReal();
+  if (IsNull ())
+    outValue = DReal ();
 
   else if (mType == T_RICHREAL)
     {
@@ -617,8 +617,8 @@ NativeObjectOperand::GetValue (DRichReal& outValue) const
   if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  if (IsNull())
-    outValue = DRichReal();
+  if (IsNull ())
+    outValue = DRichReal ();
 
   else if (mType == T_RICHREAL)
     {
@@ -654,7 +654,7 @@ NativeObjectOperand::GetValue (DArray& outValue) const
 void
 NativeObjectOperand::SetValue (const DBool& value)
 {
-  NativeObjectOperand temp (value.IsNull(), value.mValue);
+  NativeObjectOperand temp (value.IsNull (), value.mValue);
 
   *this = temp;
 }
@@ -663,7 +663,7 @@ NativeObjectOperand::SetValue (const DBool& value)
 void
 NativeObjectOperand::SetValue (const DChar& value)
 {
-  NativeObjectOperand temp (value.IsNull(), value.mValue);
+  NativeObjectOperand temp (value.IsNull (), value.mValue);
 
   *this = temp;
 }
@@ -672,7 +672,7 @@ NativeObjectOperand::SetValue (const DChar& value)
 void
 NativeObjectOperand::SetValue (const DDate& value)
 {
-  NativeObjectOperand temp (value.IsNull(),
+  NativeObjectOperand temp (value.IsNull (),
                             value.mYear,
                             value.mMonth,
                             value.mDay);
@@ -684,7 +684,7 @@ NativeObjectOperand::SetValue (const DDate& value)
 void
 NativeObjectOperand::SetValue (const DDateTime& value)
 {
-  NativeObjectOperand temp (value.IsNull(),
+  NativeObjectOperand temp (value.IsNull (),
                             value.mYear,
                             value.mMonth,
                             value.mDay,
@@ -698,7 +698,7 @@ NativeObjectOperand::SetValue (const DDateTime& value)
 void
 NativeObjectOperand::SetValue (const DHiresTime& value)
 {
-  NativeObjectOperand temp (value.IsNull(),
+  NativeObjectOperand temp (value.IsNull (),
                             value.mYear,
                             value.mMonth,
                             value.mDay,
@@ -713,7 +713,7 @@ NativeObjectOperand::SetValue (const DHiresTime& value)
 void
 NativeObjectOperand::SetValue (const DInt8& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (int64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (int64_t, value.mValue));
 
   *this = temp;
 }
@@ -722,7 +722,7 @@ NativeObjectOperand::SetValue (const DInt8& value)
 void
 NativeObjectOperand::SetValue (const DInt16& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (int64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (int64_t, value.mValue));
 
   *this = temp;
 }
@@ -731,7 +731,7 @@ NativeObjectOperand::SetValue (const DInt16& value)
 void
 NativeObjectOperand::SetValue (const DInt32& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (int64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (int64_t, value.mValue));
 
   *this = temp;
 }
@@ -740,7 +740,7 @@ NativeObjectOperand::SetValue (const DInt32& value)
 void
 NativeObjectOperand::SetValue (const DInt64& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (int64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (int64_t, value.mValue));
 
   *this = temp;
 }
@@ -749,7 +749,7 @@ NativeObjectOperand::SetValue (const DInt64& value)
 void
 NativeObjectOperand::SetValue (const DUInt8& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (uint64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (uint64_t, value.mValue));
 
   *this = temp;
 }
@@ -758,7 +758,7 @@ NativeObjectOperand::SetValue (const DUInt8& value)
 void
 NativeObjectOperand::SetValue (const DUInt16& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (uint64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (uint64_t, value.mValue));
 
   *this = temp;
 }
@@ -767,7 +767,7 @@ NativeObjectOperand::SetValue (const DUInt16& value)
 void
 NativeObjectOperand::SetValue (const DUInt32& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (uint64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (uint64_t, value.mValue));
 
   *this = temp;
 }
@@ -776,7 +776,7 @@ NativeObjectOperand::SetValue (const DUInt32& value)
 void
 NativeObjectOperand::SetValue (const DUInt64& value)
 {
-  NativeObjectOperand temp (value.IsNull(), _SC (uint64_t, value.mValue));
+  NativeObjectOperand temp (value.IsNull (), _SC (uint64_t, value.mValue));
 
   *this = temp;
 }
@@ -785,9 +785,9 @@ NativeObjectOperand::SetValue (const DUInt64& value)
 void
 NativeObjectOperand::SetValue (const DReal& value)
 {
-  NativeObjectOperand temp (value.IsNull(),
+  NativeObjectOperand temp (value.IsNull (),
                             value.mValue.Integer (),
-                            value.mValue.Fractional() *
+                            value.mValue.Fractional () *
                               (DBS_RICHREAL_PREC / DBS_REAL_PREC));
 
   *this = temp;
@@ -815,16 +815,16 @@ NativeObjectOperand::SetValue (const DArray& array)
 void
 NativeObjectOperand::SetValue (const DRichReal& value)
 {
-  NativeObjectOperand temp (value.IsNull(),
+  NativeObjectOperand temp (value.IsNull (),
                             value.mValue.Integer (),
-                            value.mValue.Fractional());
+                            value.mValue.Fractional ());
 
   *this = temp;
 }
 
 
 uint_t
-NativeObjectOperand::GetType()
+NativeObjectOperand::GetType ()
 {
   return mType;
 }
@@ -841,17 +841,17 @@ NativeObjectOperand::GetField ()
 
 
 ITable&
-NativeObjectOperand::GetTable()
+NativeObjectOperand::GetTable ()
 {
   if (IS_TABLE (mType))
-    return mTableValue->GetTable();
+    return mTableValue->GetTable ();
 
   else if (IS_FIELD (mType))
     {
-      if (IsNull())
+      if (IsNull ())
         throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
-      return mFieldValue.mTableRef->GetTable();
+      return mFieldValue.mTableRef->GetTable ();
     }
 
   throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
@@ -882,12 +882,12 @@ NativeObjectOperand::CopyNativeObjectOperand(
 }
 
 INativeObject&
-NativeObjectOperand::NativeObject()
+NativeObjectOperand::NativeObject ()
 {
   if (mType != T_UNDETERMINED)
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  else if (IsNull())
+  else if (IsNull ())
     throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
   assert (mNativeValue != NULL);
@@ -897,7 +897,7 @@ NativeObjectOperand::NativeObject()
 
 
 StackValue
-NativeObjectOperand::Duplicate() const
+NativeObjectOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -906,19 +906,19 @@ NativeObjectOperand::Duplicate() const
 bool
 NativeObjectOperand::PrepareToCopy (void* const)
 {
-  Initialise();
+  Initialise ();
 
   return true;
 }
 
 
 TableReference&
-NativeObjectOperand::GetTableReference()
+NativeObjectOperand::GetTableReference ()
 {
   if (! (IS_TABLE (mType) || IS_FIELD (mType)))
     throw InterException (_EXTRA (InterException::INVALID_NATIVE_OP_REQ));
 
-  else if (IS_FIELD (mType) && IsNull())
+  else if (IS_FIELD (mType) && IsNull ())
     throw InterException (_EXTRA (InterException::NATIVE_NULL_DEREFERENCE));
 
   if (IS_TABLE (mType))

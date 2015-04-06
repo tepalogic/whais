@@ -171,23 +171,23 @@ public:
       }
 
     if ((--smInitCount & 0x7FFFFFFF) == 0)
-      PrintMemoryStatistics();
+      PrintMemoryStatistics ();
   }
 
-  static size_t MaxMemoryUsage()
+  static size_t MaxMemoryUsage ()
   {
-    return test_get_mem_max();
+    return test_get_mem_max ();
   }
   static void MaxMemoryUsage (const size_t size)
   {
     test_set_mem_max (size);
   }
-  static size_t GetMemoryUsagePeak()
+  static size_t GetMemoryUsagePeak ()
   {
-    return test_get_mem_peak();
+    return test_get_mem_peak ();
   }
 
-  static size_t GetCurrentMemoryUsage()
+  static size_t GetCurrentMemoryUsage ()
   {
     return test_get_mem_used ();
   }
@@ -201,28 +201,28 @@ public:
       smInitCount &= 0x7FFFFFFF;
   }
 
-  static bool PrintMemResume()
+  static bool PrintMemResume ()
   {
     return ((smInitCount & 0x80000000) != 0)
             || (getenv ("WHAIS_TST_MEM") != NULL);
   }
 
 private:
-  static void PrintMemoryStatistics()
+  static void PrintMemoryStatistics ()
   {
-    if ((GetCurrentMemoryUsage() == 0) && (! PrintMemResume()))
+    if ((GetCurrentMemoryUsage () == 0) && (! PrintMemResume ()))
       return ;
 
     std::cout << '(' << smModule << ") ";
-    if (GetCurrentMemoryUsage() != 0)
+    if (GetCurrentMemoryUsage () != 0)
       {
         std::cout << "MEMORY: FAILED\n";
-        test_print_unfree_mem();
+        test_print_unfree_mem ();
       }
       std::cout << "MEMORY: OK\n";
 
-    std::cout << "Memory peak  : " << GetMemoryUsagePeak() << " bytes.\n";
-    std::cout << "Memory in use: " << GetCurrentMemoryUsage() << " bytes.\n";
+    std::cout << "Memory peak  : " << GetMemoryUsagePeak () << " bytes.\n";
+    std::cout << "Memory in use: " << GetCurrentMemoryUsage () << " bytes.\n";
   }
 
   static uint32_t       smInitCount;

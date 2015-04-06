@@ -59,23 +59,23 @@ public:
              uint32_t      line);
   Exception (const Exception& source);
 
-  virtual ~Exception();
+  virtual ~Exception ();
 
-  uint32_t            Code() const;
+  uint32_t            Code () const;
 
-  const std::string&  Message() const;
+  const std::string&  Message () const;
   void                Message (const char* msg, std::va_list vl);
   void                Message (const char* msg, ...);
 
-  const char*         File() const;
+  const char*         File () const;
 
-  uint32_t            Line() const;
+  uint32_t            Line () const;
 
-  virtual Exception* Clone() const = 0;
+  virtual Exception* Clone () const = 0;
 
-  virtual EXCEPTION_TYPE Type() const = 0;
+  virtual EXCEPTION_TYPE Type () const = 0;
 
-  virtual const char* Description() const = 0;
+  virtual const char* Description () const = 0;
 
 private:
 

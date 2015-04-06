@@ -34,7 +34,7 @@ template<typename T>bool test_stack_type (const char* optype)
 }
 
 int
-main()
+main ()
 {
   bool success = true;
 

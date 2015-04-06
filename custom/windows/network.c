@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 bool_t
-whs_init()
+whs_init ()
 {
   static bool_t _inited = FALSE;
 
@@ -54,7 +54,7 @@ whs_init()
 
   if ((LOBYTE( wsaData.wVersion) != 2) || (HIBYTE( wsaData.wVersion) != 2))
     {
-        WSACleanup();
+        WSACleanup ();
         return FALSE;
     }
 
@@ -95,7 +95,7 @@ whs_create_client (const char* const          server,
 
       if (setsockopt( sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
         {
-          status = WSAGetLastError();
+          status = WSAGetLastError ();
           closesocket (sd);
 
           return status;
@@ -104,14 +104,14 @@ whs_create_client (const char* const          server,
           break;
       else
         {
-          status = WSAGetLastError();
+          status = WSAGetLastError ();
           closesocket (sd);
 
           return status;
         }
     }
 
-  status = WSAGetLastError();
+  status = WSAGetLastError ();
   freeaddrinfo (pResults);
 
   if (pIt != NULL)
@@ -156,7 +156,7 @@ whs_create_server (const char* const         localAdress,
       if ((setsockopt( sd, IPPROTO_TCP, TCP_NODELAY, &on, sizeof on) != 0)
           || (setsockopt( sd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof on) != 0))
         {
-          status = WSAGetLastError();
+          status = WSAGetLastError ();
           closesocket (sd);
 
           return status;
@@ -166,14 +166,14 @@ whs_create_server (const char* const         localAdress,
 
       else
         {
-          status = WSAGetLastError();
+          status = WSAGetLastError ();
           closesocket (sd);
 
           return status;
         }
     }
 
-  status = WSAGetLastError();
+  status = WSAGetLastError ();
   freeaddrinfo (pResults);
 
   if (pIt != NULL)
@@ -181,7 +181,7 @@ whs_create_server (const char* const         localAdress,
       /* We have a valid socket */
       if (listen( sd, listenBackLog) != 0)
         {
-          status = WSAGetLastError();
+          status = WSAGetLastError ();
           closesocket (sd);
 
           return status;
@@ -201,7 +201,7 @@ whs_accept (const WH_SOCKET            sd,
   const WH_SOCKET csd = accept (sd, NULL, NULL);
 
   if (csd == INVALID_SOCKET)
-    return WSAGetLastError();
+    return WSAGetLastError ();
 
   *outSocket = csd;
 
@@ -222,7 +222,7 @@ whs_write (const WH_SOCKET            sd,
       const int chunk = send (sd, srcBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
         {
-          const uint32_t status = WSAGetLastError();
+          const uint32_t status = WSAGetLastError ();
           if (status != WSATRY_AGAIN)
             return status;
         }
@@ -251,7 +251,7 @@ whs_read (const WH_SOCKET           sd,
       const int chunk = recv (sd, dstBuffer, *inoutCount, 0);
       if (chunk < 0)
         {
-          const uint32_t status = WSAGetLastError();
+          const uint32_t status = WSAGetLastError ();
           if (status != WSATRY_AGAIN)
             return status;
         }
@@ -275,8 +275,8 @@ whs_close (const WH_SOCKET sd)
 }
 
 void
-whs_clean()
+whs_clean ()
 {
-  WSACleanup();
+  WSACleanup ();
 }
 

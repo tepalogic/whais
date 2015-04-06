@@ -76,11 +76,11 @@ public:
                        const char*     fmtMsg = NULL,
                        ...);
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 
@@ -91,12 +91,12 @@ public:
   ClientConnection (UserHandler&                 client,
                     std::vector<DBSDescriptors>& databases);
 
-  uint_t MaxSize() const;
+  uint_t MaxSize () const;
 
-  uint_t DataSize() const;
+  uint_t DataSize () const;
   void   DataSize (const uint16_t size);
 
-  uint8_t* Data();
+  uint8_t* Data ();
 
   uint32_t ReadCommand ();
 
@@ -109,20 +109,20 @@ public:
     return *mUserHandler.mDesc;
   }
 
-  SessionStack& Stack()
+  SessionStack& Stack ()
   {
     return mStack;
   }
 
-  bool IsAdmin() const
+  bool IsAdmin () const
   {
     return mUserHandler.mRoot;
   }
 
 private:
-  uint8_t* RawCmdData();
+  uint8_t* RawCmdData ();
 
-  void ReciveRawClientFrame();
+  void ReciveRawClientFrame ();
 
   void SendRawClientFrame (const uint8_t type);
 

@@ -29,7 +29,7 @@ struct DBSFieldDescriptor field_descs[] = {
 
 
 bool
-test_dbs_creation()
+test_dbs_creation ()
 {
   cout << "Testing database creation ... ";
 
@@ -77,7 +77,7 @@ test_table_addition (IDBSHandler& hnd)
   }
   catch (DBSException& e)
   {
-      if (e.Code() != DBSException::TABLE_EXISTS)
+      if (e.Code () != DBSException::TABLE_EXISTS)
         {
           cout << "Test received unexpected exception code.";
 
@@ -93,7 +93,7 @@ test_table_addition (IDBSHandler& hnd)
 }
 
  bool
- test_table_management()
+ test_table_management ()
  {
    bool result = true;
 
@@ -116,7 +116,7 @@ test_table_addition (IDBSHandler& hnd)
    }
    catch (DBSException& e)
    {
-       if (e.Code() != DBSException::TABLE_IN_USE)
+       if (e.Code () != DBSException::TABLE_IN_USE)
          result &= false;
    }
 
@@ -129,7 +129,7 @@ test_table_addition (IDBSHandler& hnd)
    }
    catch (DBSException& e)
    {
-       if (e.Code() != DBSException::DATABASE_IN_USE)
+       if (e.Code () != DBSException::DATABASE_IN_USE)
          result &= false;
    }
 
@@ -144,7 +144,7 @@ test_table_addition (IDBSHandler& hnd)
    }
    catch (DBSException& e)
    {
-       if (e.Code() != DBSException::DATABASE_IN_USE)
+       if (e.Code () != DBSException::DATABASE_IN_USE)
          result &= false;
    }
 
@@ -162,20 +162,20 @@ main (int argc, char** argv)
 {
   bool success = true;
 
-  DBSInit (DBSSettings());
+  DBSInit (DBSSettings ());
   DBSCreateDatabase (testDbName_1);
 
   IDBSHandler& hnd = DBSRetrieveDatabase (testDbName_1, NULL);
 
-  success &= test_dbs_creation();
+  success &= test_dbs_creation ();
   success &= test_table_addition (hnd);
 
   DBSReleaseDatabase (hnd);
 
-  success &= test_table_management();
+  success &= test_table_management ();
 
   DBSRemoveDatabase (testDbName_1);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if ( ! success)
     {

@@ -116,13 +116,13 @@ test_op_eqXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first == second));
@@ -157,13 +157,13 @@ test_op_neXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first != second));
@@ -198,13 +198,13 @@ test_op_ltXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first < second));
@@ -239,13 +239,13 @@ test_op_leXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first <= second));
@@ -280,13 +280,13 @@ test_op_gtXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first > second));
@@ -321,13 +321,13 @@ test_op_geXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.IsNull())
+  if (result.IsNull ())
     return false;
 
   return result == DBool ((first >= second));
@@ -336,12 +336,12 @@ test_op_geXX (Session& session,
 
 
 int
-main()
+main ()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -374,8 +374,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "bool (same values)",
                                         W_EQB,
-                                        DBool(),
-                                        DBool());
+                                        DBool (),
+                                        DBool ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "bool (different values)",
@@ -398,8 +398,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "date (same values)",
                                         W_EQD,
-                                        DDate(),
-                                        DDate());
+                                        DDate (),
+                                        DDate ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "date (different values)",
@@ -410,8 +410,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "datetime (same values)",
                                         W_EQDT,
-                                        DDateTime(),
-                                        DDateTime());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "datetime (different values)",
@@ -422,8 +422,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "hirestime (same values)",
                                         W_EQHT,
-                                        DDateTime(),
-                                        DDateTime());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "hirestime (different values)",
@@ -434,8 +434,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (same values)",
                                         W_EQRR,
-                                        DReal(),
-                                        DReal());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "real (different values)",
@@ -446,8 +446,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "richreal (same values)",
                                         W_EQRR,
-                                        DReal(),
-                                        DReal());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "richreal (different values)",
@@ -458,8 +458,8 @@ main()
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "text (same values)",
                                         W_EQT,
-                                        DText(),
-                                        DText());
+                                        DText (),
+                                        DText ());
 
     success = success && test_op_eqXX (_SC (Session&, commonSession),
                                         "text (different values)",
@@ -485,8 +485,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "bool (same values)",
                                         W_NEB,
-                                        DBool(),
-                                        DBool());
+                                        DBool (),
+                                        DBool ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "bool (different values)",
@@ -509,8 +509,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "date (same values)",
                                         W_NED,
-                                        DDate(),
-                                        DDate());
+                                        DDate (),
+                                        DDate ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "date (different values)",
@@ -521,8 +521,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "datetime (same values)",
                                         W_NEDT,
-                                        DDateTime(),
-                                        DDateTime());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "datetime (different values)",
@@ -533,8 +533,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "hirestime (same values)",
                                         W_NEHT,
-                                        DDateTime(),
-                                        DDateTime());
+                                        DDateTime (),
+                                        DDateTime ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "hirestime (different values)",
@@ -545,8 +545,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (same values)",
                                         W_NERR,
-                                        DReal(),
-                                        DReal());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "real (different values)",
@@ -557,8 +557,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "richreal (same values)",
                                         W_NERR,
-                                        DReal(),
-                                        DReal());
+                                        DReal (),
+                                        DReal ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "richreal (different values)",
@@ -569,8 +569,8 @@ main()
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "text (same values)",
                                         W_NET,
-                                        DText(),
-                                        DText());
+                                        DText (),
+                                        DText ());
 
     success = success && test_op_neXX (_SC (Session&, commonSession),
                                         "text (different values)",
@@ -763,7 +763,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 
 bool_t
-whs_init()
+whs_init ()
 {
   static bool_t _inited = FALSE;
 
@@ -256,7 +256,7 @@ whs_close (const WH_SOCKET sd)
 
 
 void
-whs_clean()
+whs_clean ()
 {
 }
 

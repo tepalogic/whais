@@ -39,11 +39,11 @@ public:
                  const char*       fmtMsg,
                  ...);
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 
@@ -56,7 +56,7 @@ public:
   File (const File& src);
   File& operator= (const File&);
 
-  ~File();
+  ~File ();
 
   void     Read (uint8_t* buffer, uint_t size);
 
@@ -64,15 +64,15 @@ public:
 
   void     Seek (const int64_t where, const int whence);
 
-  uint64_t Tell();
+  uint64_t Tell ();
 
-  void     Sync();
+  void     Sync ();
 
-  uint64_t Size() const;
+  uint64_t Size () const;
 
   void     Size (const uint64_t size);
 
-  void     Close();
+  void     Close ();
 
 
 private:

@@ -109,10 +109,10 @@ test_op_ldnull (Session& session)
   w_encode_opcode (W_RET, testCode + opSize);
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull() == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
   return true;
@@ -142,7 +142,7 @@ test_op_ldc (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DChar value;
@@ -173,7 +173,7 @@ test_op_ldi8 (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 value;
@@ -206,7 +206,7 @@ test_op_ldi16 (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt16 value;
@@ -240,7 +240,7 @@ test_op_ldi32 (Session& session)
   session.ExecuteProcedure (procName, stack);
   w_encode_opcode (W_RET, testCode + opSize + 4);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt32 value;
@@ -277,7 +277,7 @@ test_op_ldi64 (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt64 value;
@@ -310,7 +310,7 @@ test_op_ldd (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DDate value;
@@ -347,7 +347,7 @@ test_op_lddt (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DDateTime value;
@@ -388,7 +388,7 @@ test_op_ldht (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DHiresTime value;
@@ -435,7 +435,7 @@ test_op_ldrr (Session& session)
   w_encode_opcode (W_RET, testCode + opSize + 16);
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DRichReal value;
@@ -475,7 +475,7 @@ test_op_ldt (Session& session)
   w_encode_opcode (W_RET, testCode + opSize + 4);
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DText      value;
@@ -505,7 +505,7 @@ test_op_ldbt (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool value;
@@ -535,7 +535,7 @@ test_op_ldbf (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool value;
@@ -547,12 +547,12 @@ test_op_ldbf (Session& session)
 }
 
 int
-main()
+main ()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -587,7 +587,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

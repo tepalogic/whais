@@ -63,7 +63,7 @@ public:
     mAcquired = 0;
   }
 
-  uint_t NullBitIndex() const
+  uint_t NullBitIndex () const
   {
     return load_le_int16 (mNullBitIndex);
   }
@@ -73,7 +73,7 @@ public:
     store_le_int16 (index, mNullBitIndex);
   }
 
-  uint_t RowDataOff() const
+  uint_t RowDataOff () const
   {
     return load_le_int32 (mRowDataOff);
   }
@@ -83,7 +83,7 @@ public:
     store_le_int32 (off, mRowDataOff);
   }
 
-  uint_t NameOffset() const
+  uint_t NameOffset () const
   {
     return load_le_int32 (mNameOffset);
   }
@@ -93,7 +93,7 @@ public:
     store_le_int32 (off, mNameOffset);
   }
 
-  uint_t Type() const
+  uint_t Type () const
   {
     return load_le_int16 (mType);
   }
@@ -108,21 +108,21 @@ public:
     return mAcquired != 0;
   }
 
-  void Acquire()
+  void Acquire ()
   {
     assert (mAcquired == 0);
 
     mAcquired = 1;
   }
 
-  void Release()
+  void Release ()
   {
     assert (mAcquired > 0);
 
     mAcquired = 0;
   }
 
-  uint_t IndexNodeSizeKB() const
+  uint_t IndexNodeSizeKB () const
   {
     return mIndexNodeSizeKB;
   }
@@ -134,7 +134,7 @@ public:
     mIndexNodeSizeKB = kb;
   }
 
-  uint_t IndexUnitsCount() const
+  uint_t IndexUnitsCount () const
   {
     return load_le_int16 (mIndexUnitsCount);
   }
@@ -164,7 +164,7 @@ public:
   PrototypeTable (DbsHandler& dbs);
   PrototypeTable (const PrototypeTable& prototype);
 
-  virtual uint64_t NodeRawSize() const;
+  virtual uint64_t NodeRawSize () const;
   virtual NODE_INDEX  AllocateNode (const NODE_INDEX parent,
                                     const KEY_INDEX  parentKey);
   virtual void FreeNode (const NODE_INDEX node);
@@ -178,19 +178,19 @@ public:
                               uint_t        itemsCount,
                               uint8_t*      to);
 
-  virtual FIELD_INDEX FieldsCount();
+  virtual FIELD_INDEX FieldsCount ();
 
   virtual FIELD_INDEX RetrieveField (const char* name);
 
   virtual DBSFieldDescriptor DescribeField (const FIELD_INDEX field);
 
-  virtual ROW_INDEX AllocatedRows();
+  virtual ROW_INDEX AllocatedRows ();
 
   virtual ROW_INDEX AddRow (const bool skipThreadSafety = false);
 
   virtual ROW_INDEX GetReusableRow (const bool forceAdd);
 
-  virtual ROW_INDEX ReusableRowsCount();
+  virtual ROW_INDEX ReusableRowsCount ();
 
   virtual void MarkRowForReuse (const ROW_INDEX row);
 
@@ -471,19 +471,19 @@ public:
                             const ROW_INDEX       fromRow,
                             const ROW_INDEX       toRow,
                             const FIELD_INDEX     field);
-  virtual void LockTable();
+  virtual void LockTable ();
 
-  virtual void UnlockTable();
+  virtual void UnlockTable ();
 
   //Followings declarations shouldn't be public,
   //but kept here to ease the testing procedures.
-  uint_t RowSize() const;
+  uint_t RowSize () const;
 
   FieldDescriptor& GetFieldDescriptorInternal(
                            const FIELD_INDEX fieldIndex
                                               ) const;
 
-  virtual void Flush();
+  virtual void Flush ();
 
   DbsHandler& GetDBSHandler ()
   {
@@ -525,7 +525,7 @@ private:
 
   void ReleaseIndexField (FieldDescriptor* const field);
 
-  virtual uint_t MaxCachedNodes();
+  virtual uint_t MaxCachedNodes ();
 
   virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId);
 
@@ -533,7 +533,7 @@ private:
 
 protected:
 
-  virtual void MakeHeaderPersistent() = 0;
+  virtual void MakeHeaderPersistent () = 0;
 
   virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field) = 0;
 
@@ -541,13 +541,13 @@ protected:
 
   virtual IDataContainer& TableContainer () = 0;
 
-  virtual VariableSizeStore& VSStore() = 0;
+  virtual VariableSizeStore& VSStore () = 0;
 
-  virtual void FlushEpilog() = 0;
+  virtual void FlushEpilog () = 0;
 
-  void MarkRowModification();
+  void MarkRowModification ();
 
-  void FlushInternal();
+  void FlushInternal ();
 
   //Data members
   DbsHandler&                           mDbs;
@@ -576,7 +576,7 @@ public:
   {
   };
 
-  operator ROW_INDEX() const
+  operator ROW_INDEX () const
   {
     return mRow;
   }
@@ -593,7 +593,7 @@ public:
 
   TableRmNode (PrototypeTable& table, const NODE_INDEX nodeId);
 
-  virtual uint_t KeysPerNode() const;
+  virtual uint_t KeysPerNode () const;
 
   virtual KEY_INDEX GetParentKeyIndex (const IBTreeNode& parent) const;
 
@@ -616,7 +616,7 @@ public:
   virtual int CompareKey (const IBTreeKey&      key,
                           const KEY_INDEX       nodeKeyIndex) const;
 
-  virtual const IBTreeKey& SentinelKey() const;
+  virtual const IBTreeKey& SentinelKey () const;
 
   static const uint_t RAW_NODE_SIZE = 16384;
 };

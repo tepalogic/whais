@@ -50,7 +50,7 @@ class DBS_SHL IDBSHandler
 public:
   virtual ~IDBSHandler () {}
 
-  virtual TABLE_INDEX PersistentTablesCount() = 0;
+  virtual TABLE_INDEX PersistentTablesCount () = 0;
 
   virtual ITable& RetrievePersistentTable (const TABLE_INDEX index) = 0;
 
@@ -74,7 +74,7 @@ public:
 
 struct DBSSettings
 {
-  DBSSettings()
+  DBSSettings ()
     : mWorkDir (whf_current_dir ()),
       mTempDir (whf_current_dir ()),
       mMaxFileSize (DEFAULT_MAX_FILE_SIZE),
@@ -116,11 +116,11 @@ DBSInit (const DBSSettings& setup);
 
 
 DBS_SHL void
-DBSShoutdown();
+DBSShoutdown ();
 
 
 DBS_SHL const DBSSettings&
-DBSGetSeettings();
+DBSGetSeettings ();
 
 
 DBS_SHL void

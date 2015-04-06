@@ -47,23 +47,23 @@ InterException::InterException (const uint32_t  code,
 
 
 Exception*
-InterException::Clone() const
+InterException::Clone () const
 {
   return new InterException (*this);
 }
 
 
 EXCEPTION_TYPE
-InterException::Type() const
+InterException::Type () const
 {
   return INTERPRETER_EXCEPTION;
 }
 
 
 const char*
-InterException::Description() const
+InterException::Description () const
 {
-  switch (Code())
+  switch (Code ())
     {
   case INVALID_OP_REQ:
     return "An operation was requested that was not support by a stack operand.";

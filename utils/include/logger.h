@@ -71,7 +71,7 @@ private:
   FileLogger& operator= (const Logger&);
 
   uint_t PrintTimeMark (LOG_TYPE type);
-  void   SwitchFile();
+  void   SwitchFile ();
 
   WTICKS        mStartTick;
   Lock          mSync;

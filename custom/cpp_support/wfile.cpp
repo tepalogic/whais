@@ -45,7 +45,7 @@ File::File (const char* name, uint_t mode)
                            name);
     }
 
-  Size();
+  Size ();
 }
 
 
@@ -62,7 +62,7 @@ File::File (const File &src) :
 }
 
 
-File::~File()
+File::~File ()
 {
   /* Close it only if is not already closed */
   if (mHandle != INVALID_FILE)
@@ -87,7 +87,7 @@ File::Write (const uint8_t* pBuffer, uint_t size)
 {
   if (mFileSize != UNKNOWN_SIZE)
     {
-      uint64_t currPos = Tell();
+      uint64_t currPos = Tell ();
 
       if (mFileSize < currPos + size)
         mFileSize = currPos + size;
@@ -114,7 +114,7 @@ File::Seek (const int64_t where, const int whence)
 }
 
 
-uint64_t File::Tell()
+uint64_t File::Tell ()
 {
   uint64_t position;
 
@@ -130,7 +130,7 @@ uint64_t File::Tell()
 
 
 void
-File::Sync()
+File::Sync ()
 {
   if ( ! whf_sync (mHandle))
     {
@@ -141,7 +141,7 @@ File::Sync()
 }
 
 
-uint64_t File::Size() const
+uint64_t File::Size () const
 {
   if (mFileSize != UNKNOWN_SIZE)
     return mFileSize;
@@ -172,7 +172,7 @@ File::Size (const uint64_t size)
 
 
 void
-File::Close()
+File::Close ()
 {
   assert (mHandle != INVALID_FILE);
 
@@ -193,7 +193,7 @@ File::operator= (const File &src)
   if (&src == this)
     return *this;
 
-  Close(); // Close the old handler
+  Close (); // Close the old handler
 
   mHandle = whf_dup (src.mHandle);
   if (mHandle == INVALID_FILE)

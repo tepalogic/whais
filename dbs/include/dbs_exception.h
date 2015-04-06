@@ -38,7 +38,7 @@ public:
                 uint32_t        line,
                 const char*     fmtMsg = NULL,
                 ...);
-  virtual ~DBSException();
+  virtual ~DBSException ();
 
   enum ExceptionCodes
   {
@@ -80,11 +80,11 @@ public:
     GENERAL_CONTROL_ERROR
   };
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 } //namespace whais

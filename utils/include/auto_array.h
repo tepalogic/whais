@@ -34,7 +34,7 @@ template <class T>
 class auto_array
 {
 public:
-  auto_array()
+  auto_array ()
     : mpT (NULL),
       mSize (0)
   {
@@ -48,7 +48,7 @@ public:
   }
 
 
-  ~auto_array()
+  ~auto_array ()
   {
     delete [] mpT;
   }
@@ -74,7 +74,7 @@ public:
   }
 
 
-  unsigned int Size() const
+  unsigned int Size () const
   {
     return mSize;
   }

@@ -45,8 +45,8 @@ typedef DBS_RICHREAL_T RICHREAL_T;
 
 struct DBool
 {
-  DBool()
-    : mValue(),
+  DBool ()
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -73,10 +73,10 @@ struct DBool
 
   bool operator< (const DBool& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return (mValue == false) && (second.mValue == true);
@@ -84,10 +84,10 @@ struct DBool
 
   bool operator== (const DBool& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -113,28 +113,28 @@ struct DBool
     return (*this < second) == false;
   }
 
-  DBool Prev() const
+  DBool Prev () const
   {
     if (mIsNull || (mValue == false))
-      return DBool();
+      return DBool ();
 
     return DBool (false);
   }
 
-  DBool Next() const
+  DBool Next () const
   {
     if (mIsNull || mValue)
-      return DBool();
+      return DBool ();
 
     return DBool (true);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_BOOL;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -157,7 +157,7 @@ struct DBool
 struct DBS_SHL DChar
 {
   DChar ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -194,10 +194,10 @@ struct DBS_SHL DChar
 
   bool operator== (const DChar& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -223,16 +223,16 @@ struct DBS_SHL DChar
     return (*this < second) == false;
   }
 
-  DChar Prev() const;
+  DChar Prev () const;
 
-  DChar Next() const;
+  DChar Next () const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_CHAR;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -260,10 +260,10 @@ private:
 
 struct DBS_SHL DDate
 {
-  DDate()
+  DDate ()
     : mYear (),
-      mMonth(),
-      mDay(),
+      mMonth (),
+      mDay (),
       mIsNull (true)
   {
   }
@@ -292,10 +292,10 @@ struct DBS_SHL DDate
 
   bool operator< (const DDate& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     if (mYear < second.mYear)
@@ -315,10 +315,10 @@ struct DBS_SHL DDate
 
   bool operator== (const DDate& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
@@ -346,16 +346,16 @@ struct DBS_SHL DDate
     return (*this < second) == false;
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_DATE;
   }
 
-  DDate Prev() const;
+  DDate Prev () const;
 
-  DDate Next() const;
+  DDate Next () const;
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -373,13 +373,13 @@ struct DBS_SHL DDate
 
 struct DBS_SHL DDateTime
 {
-  DDateTime()
+  DDateTime ()
     : mYear (),
-      mMonth(),
-      mDay(),
+      mMonth (),
+      mDay (),
       mHour (),
-      mMinutes(),
-      mSeconds(),
+      mMinutes (),
+      mSeconds (),
       mIsNull (true)
   {
   }
@@ -428,10 +428,10 @@ struct DBS_SHL DDateTime
 
   bool operator< (const DDateTime& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     if (mYear < second.mYear)
@@ -469,10 +469,10 @@ struct DBS_SHL DDateTime
 
   bool operator== (const DDateTime& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
@@ -503,16 +503,16 @@ struct DBS_SHL DDateTime
     return (*this < second) == false;
   }
 
-  DDateTime Prev() const;
+  DDateTime Prev () const;
 
-  DDateTime Next() const;
+  DDateTime Next () const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_DATETIME;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -534,14 +534,14 @@ struct DBS_SHL DDateTime
 struct DBS_SHL DHiresTime
 {
 
-  DHiresTime()
-    : mMicrosec(),
+  DHiresTime ()
+    : mMicrosec (),
       mYear (),
-      mMonth(),
-      mDay(),
+      mMonth (),
+      mDay (),
       mHour (),
-      mMinutes(),
-      mSeconds(),
+      mMinutes (),
+      mSeconds (),
       mIsNull (true)
   {
   }
@@ -607,10 +607,10 @@ struct DBS_SHL DHiresTime
 
   bool operator< (const DHiresTime& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     if (mYear < second.mYear)
@@ -654,10 +654,10 @@ struct DBS_SHL DHiresTime
 
   bool operator== (const DHiresTime& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mYear == second.mYear)
@@ -689,16 +689,16 @@ struct DBS_SHL DHiresTime
     return (*this < second) == false;
   }
 
-  DHiresTime Prev() const;
+  DHiresTime Prev () const;
 
-  DHiresTime Next() const;
+  DHiresTime Next () const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_HIRESTIME;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -721,7 +721,7 @@ struct DBS_SHL DHiresTime
 struct DBS_SHL DUInt8
 {
   DUInt8 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -748,10 +748,10 @@ struct DBS_SHL DUInt8
 
   bool operator< (const DUInt8& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -759,10 +759,10 @@ struct DBS_SHL DUInt8
 
   bool operator== (const DUInt8& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -788,7 +788,7 @@ struct DBS_SHL DUInt8
     return (*this < second) == false;
   }
 
-  DUInt8 Prev() const
+  DUInt8 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DUInt8 ();
@@ -796,7 +796,7 @@ struct DBS_SHL DUInt8
     return DUInt8 (mValue - 1);
   }
 
-  DUInt8 Next() const
+  DUInt8 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DUInt8 ();
@@ -804,12 +804,12 @@ struct DBS_SHL DUInt8
     return DUInt8 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT8;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -832,7 +832,7 @@ struct DBS_SHL DUInt8
 struct DBS_SHL DUInt16
 {
   DUInt16 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -865,10 +865,10 @@ struct DBS_SHL DUInt16
 
   bool operator< (const DUInt16& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -876,10 +876,10 @@ struct DBS_SHL DUInt16
 
   bool operator== (const DUInt16& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -905,7 +905,7 @@ struct DBS_SHL DUInt16
     return (*this < second) == false;
   }
 
-  DUInt16 Prev() const
+  DUInt16 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DUInt16 ();
@@ -913,7 +913,7 @@ struct DBS_SHL DUInt16
     return DUInt16 (mValue - 1);
   }
 
-  DUInt16 Next() const
+  DUInt16 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DUInt16 ();
@@ -921,12 +921,12 @@ struct DBS_SHL DUInt16
     return DUInt16 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT16;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -949,7 +949,7 @@ struct DBS_SHL DUInt16
 struct DBS_SHL DUInt32
 {
   DUInt32 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -989,10 +989,10 @@ struct DBS_SHL DUInt32
 
   bool operator< (const DUInt32& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1000,10 +1000,10 @@ struct DBS_SHL DUInt32
 
   bool operator== (const DUInt32& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1029,7 +1029,7 @@ struct DBS_SHL DUInt32
     return (*this < second) == false;
   }
 
-  DUInt32 Prev() const
+  DUInt32 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DUInt32 ();
@@ -1037,7 +1037,7 @@ struct DBS_SHL DUInt32
     return DUInt32 (mValue - 1);
   }
 
-  DUInt32 Next() const
+  DUInt32 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DUInt32 ();
@@ -1045,12 +1045,12 @@ struct DBS_SHL DUInt32
     return DUInt32 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT32;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1073,7 +1073,7 @@ struct DBS_SHL DUInt32
 struct DBS_SHL DUInt64
 {
   DUInt64 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1118,10 +1118,10 @@ struct DBS_SHL DUInt64
 
   bool operator< (const DUInt64& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1129,10 +1129,10 @@ struct DBS_SHL DUInt64
 
   bool operator== (const DUInt64& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1158,7 +1158,7 @@ struct DBS_SHL DUInt64
     return (*this < second) == false;
   }
 
-  DUInt64 Prev() const
+  DUInt64 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DUInt64 ();
@@ -1166,7 +1166,7 @@ struct DBS_SHL DUInt64
     return DUInt64 (mValue - 1);
   }
 
-  DUInt64 Next() const
+  DUInt64 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DUInt64 ();
@@ -1174,12 +1174,12 @@ struct DBS_SHL DUInt64
     return DUInt64 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_UINT64;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1202,7 +1202,7 @@ struct DBS_SHL DUInt64
 struct DBS_SHL DInt8
 {
   DInt8 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1229,10 +1229,10 @@ struct DBS_SHL DInt8
 
   bool operator< (const DInt8& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1240,10 +1240,10 @@ struct DBS_SHL DInt8
 
   bool operator== (const DInt8& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1269,7 +1269,7 @@ struct DBS_SHL DInt8
     return (*this < second) == false;
   }
 
-  DInt8 Prev() const
+  DInt8 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DInt8 ();
@@ -1277,7 +1277,7 @@ struct DBS_SHL DInt8
     return DInt8 (mValue - 1);
   }
 
-  DInt8 Next() const
+  DInt8 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DInt8 ();
@@ -1285,12 +1285,12 @@ struct DBS_SHL DInt8
     return DInt8 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT8;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1313,7 +1313,7 @@ struct DBS_SHL DInt8
 struct DBS_SHL DInt16
 {
   DInt16 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1346,10 +1346,10 @@ struct DBS_SHL DInt16
 
   bool operator< (const DInt16& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1357,10 +1357,10 @@ struct DBS_SHL DInt16
 
   bool operator== (const DInt16& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1386,7 +1386,7 @@ struct DBS_SHL DInt16
     return (*this < second) == false;
   }
 
-  DInt16 Prev() const
+  DInt16 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DInt16 ();
@@ -1394,7 +1394,7 @@ struct DBS_SHL DInt16
     return DInt16 (mValue - 1);
   }
 
-  DInt16 Next() const
+  DInt16 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DInt16 ();
@@ -1402,12 +1402,12 @@ struct DBS_SHL DInt16
     return DInt16 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT16;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1430,7 +1430,7 @@ struct DBS_SHL DInt16
 struct DBS_SHL DInt32
 {
   DInt32 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1469,10 +1469,10 @@ struct DBS_SHL DInt32
 
   bool operator< (const DInt32& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1480,10 +1480,10 @@ struct DBS_SHL DInt32
 
   bool operator== (const DInt32& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1509,7 +1509,7 @@ struct DBS_SHL DInt32
     return (*this < second) == false;
   }
 
-  DInt32 Prev() const
+  DInt32 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DInt32 ();
@@ -1517,7 +1517,7 @@ struct DBS_SHL DInt32
     return DInt32 (mValue - 1);
   }
 
-  DInt32 Next() const
+  DInt32 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DInt32 ();
@@ -1525,12 +1525,12 @@ struct DBS_SHL DInt32
     return DInt32 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT32;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1553,7 +1553,7 @@ struct DBS_SHL DInt32
 struct DBS_SHL DInt64
 {
   DInt64 ()
-    : mValue(),
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1597,10 +1597,10 @@ struct DBS_SHL DInt64
 
   bool operator< (const DInt64& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1608,10 +1608,10 @@ struct DBS_SHL DInt64
 
   bool operator== (const DInt64& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1637,7 +1637,7 @@ struct DBS_SHL DInt64
     return (*this < second) == false;
   }
 
-  DInt64 Prev() const
+  DInt64 Prev () const
   {
     if (mIsNull || (*this == Min ()))
       return DInt64 ();
@@ -1645,7 +1645,7 @@ struct DBS_SHL DInt64
     return DInt64 (mValue - 1);
   }
 
-  DInt64 Next() const
+  DInt64 Next () const
   {
     if (mIsNull || (*this == Max ()))
       return DInt64 ();
@@ -1653,12 +1653,12 @@ struct DBS_SHL DInt64
     return DInt64 (mValue + 1);
   }
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_INT64;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1681,8 +1681,8 @@ struct DBS_SHL DInt64
 
 struct DBS_SHL DReal
 {
-  DReal() :
-    mValue(),
+  DReal () :
+    mValue (),
     mIsNull (true)
   {
   }
@@ -1709,10 +1709,10 @@ struct DBS_SHL DReal
 
   bool operator< (const DReal& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1720,10 +1720,10 @@ struct DBS_SHL DReal
 
   bool operator== (const DReal& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1749,16 +1749,16 @@ struct DBS_SHL DReal
     return (*this < second) == false;
   }
 
-  DReal Prev() const;
+  DReal Prev () const;
 
-  DReal Next() const;
+  DReal Next () const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_REAL;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1777,8 +1777,8 @@ struct DBS_SHL DReal
 
 struct DBS_SHL DRichReal
 {
-  DRichReal()
-    : mValue(),
+  DRichReal ()
+    : mValue (),
       mIsNull (true)
   {
   }
@@ -1810,10 +1810,10 @@ struct DBS_SHL DRichReal
 
   bool operator< (const DRichReal& second) const
   {
-    if (IsNull())
-      return second.IsNull() ?  false : true;
+    if (IsNull ())
+      return second.IsNull () ?  false : true;
 
-    else if (second.IsNull())
+    else if (second.IsNull ())
       return false;
 
     return mValue < second.mValue;
@@ -1821,10 +1821,10 @@ struct DBS_SHL DRichReal
 
   bool operator== (const DRichReal& second) const
   {
-    if (IsNull() != second.IsNull())
+    if (IsNull () != second.IsNull ())
       return false;
 
-    else if (IsNull())
+    else if (IsNull ())
       return true;
 
     return (mValue == second.mValue);
@@ -1850,16 +1850,16 @@ struct DBS_SHL DRichReal
     return (*this < second) == false;
   }
 
-  DRichReal Prev() const;
+  DRichReal Prev () const;
 
-  DRichReal Next() const;
+  DRichReal Next () const;
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_RICHREAL;
   }
 
-  bool IsNull() const
+  bool IsNull () const
   {
     return mIsNull;
   }
@@ -1887,13 +1887,13 @@ public:
   DText (const DText& source);
   DText& operator= (const DText& source);
 
-  ~DText();
+  ~DText ();
 
-  bool IsNull() const;
+  bool IsNull () const;
 
-  uint64_t Count() const;
+  uint64_t Count () const;
 
-  uint64_t RawSize() const;
+  uint64_t RawSize () const;
 
   void RawRead (uint64_t offset, uint64_t count, uint8_t* dest) const;
 
@@ -1922,12 +1922,12 @@ public:
                           const uint64_t  fromCh      = 0,
                           const uint64_t  toCh        = 0xFFFFFFFFFFFFFFFFull);
 
-  DText LowerCase() const;
-  DText UpperCase() const;
+  DText LowerCase () const;
+  DText UpperCase () const;
 
   void MakeMirror (DText& mirror);
 
-  DBS_FIELD_TYPE DBSType() const
+  DBS_FIELD_TYPE DBSType () const
   {
     return T_TEXT;
   }
@@ -1999,7 +1999,7 @@ public:
     return CompareTo (second) >= 0;
   }
 
-  ITextStrategy& GetStrategy();
+  ITextStrategy& GetStrategy ();
   StrategyRAII   GetStrategyRAII () const;
   void           ReleaseStrategy ();
   void           ReplaceStrategy (ITextStrategy* const strategy);
@@ -2019,7 +2019,7 @@ class DBS_SHL DArray
 {
 public:
 
-  DArray();
+  DArray ();
   explicit DArray (const DBool* const array, const uint64_t count = 0);
   explicit DArray (const DChar* const array, const uint64_t count = 0);
   explicit DArray (const DDate* const array, const uint64_t count = 0);
@@ -2038,19 +2038,19 @@ public:
 
   explicit DArray (IArrayStrategy& array);
 
-  ~DArray();
+  ~DArray ();
 
   DArray (const DArray& source);
   DArray& operator= (const DArray& source);
 
-  bool IsNull() const
+  bool IsNull () const
   {
-    return Count() == 0;
+    return Count () == 0;
   }
 
-  uint64_t Count() const;
+  uint64_t Count () const;
 
-  DBS_FIELD_TYPE Type() const;
+  DBS_FIELD_TYPE Type () const;
 
   uint64_t Add (const DBool& value);
   uint64_t Add (const DChar& value);
@@ -2142,7 +2142,7 @@ public:
     IArrayStrategy*  mStrategy;
   };
 
-  IArrayStrategy&     GetStrategy();
+  IArrayStrategy&     GetStrategy ();
   StrategyRAII        GetStrategyRAII () const;
   void                ReleaseStrategy ();
   void                ReplaceStrategy (IArrayStrategy* const strategy);

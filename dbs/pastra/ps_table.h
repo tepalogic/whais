@@ -51,18 +51,18 @@ public:
 
   PersistentTable (const PrototypeTable& prototype);
 
-  virtual ~PersistentTable();
+  virtual ~PersistentTable ();
 
-  void RemoveFromDatabase();
+  void RemoveFromDatabase ();
 
-  virtual bool IsTemporal() const;
+  virtual bool IsTemporal () const;
 
-  virtual ITable& Spawn() const;
+  virtual ITable& Spawn () const;
 
-  virtual void FlushEpilog();
+  virtual void FlushEpilog ();
 
 protected:
-  virtual void MakeHeaderPersistent();
+  virtual void MakeHeaderPersistent ();
 
   virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
 
@@ -70,7 +70,7 @@ protected:
 
   virtual IDataContainer& TableContainer ();
 
-  virtual VariableSizeStore& VSStore();
+  virtual VariableSizeStore& VSStore ();
 
   const DBSSettings&           mDbsSettings;
   uint64_t                     mMaxFileSize;
@@ -84,9 +84,9 @@ protected:
 private:
   void InitFromFile (const std::string& tableName);
 
-  void InitIndexedFields();
+  void InitIndexedFields ();
 
-  void InitVariableStorages();
+  void InitVariableStorages ();
 
   void CheckTableValues (FIX_ERROR_CALLBACK fixCallback);
 
@@ -111,17 +111,17 @@ public:
                  const FIELD_INDEX               fieldsCount);
   TemporalTable (const PrototypeTable& protoype);
 
-  virtual ~TemporalTable();
+  virtual ~TemporalTable ();
 
-  virtual bool IsTemporal() const;
+  virtual bool IsTemporal () const;
 
-  virtual ITable& Spawn() const;
+  virtual ITable& Spawn () const;
 
-  virtual void FlushEpilog();
+  virtual void FlushEpilog ();
 
 protected:
 
-  virtual void MakeHeaderPersistent();
+  virtual void MakeHeaderPersistent ();
 
   virtual IDataContainer* CreateIndexContainer (const FIELD_INDEX field);
 
@@ -129,7 +129,7 @@ protected:
 
   virtual IDataContainer& TableContainer ();
 
-  virtual VariableSizeStore& VSStore();
+  virtual VariableSizeStore& VSStore ();
 
   std::auto_ptr<TemporalContainer>  mTableData;
   std::auto_ptr<TemporalContainer>  mRowsData;

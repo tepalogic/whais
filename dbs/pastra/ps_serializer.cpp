@@ -129,7 +129,7 @@ new_integer (T_VAL value, T_OBJ* const outValue)
 void
 Serializer::Store (uint8_t* const dst, const DBool& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   dst[0] = value.mValue ? 1 : 0;
 }
@@ -138,7 +138,7 @@ Serializer::Store (uint8_t* const dst, const DBool& value)
 void
 Serializer::Store (uint8_t* const dst, const DChar& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int32 (value.mValue, dst);
 }
@@ -147,7 +147,7 @@ Serializer::Store (uint8_t* const dst, const DChar& value)
 void
 Serializer::Store (uint8_t* const dst, const DDate& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int16 (value.mYear, dst);
   dst[2] = value.mMonth;
@@ -158,7 +158,7 @@ Serializer::Store (uint8_t* const dst, const DDate& value)
 void
 Serializer::Store (uint8_t* const dst, const DDateTime& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int16 (value.mYear, dst);
   dst[2] = value.mMonth;
@@ -172,7 +172,7 @@ Serializer::Store (uint8_t* const dst, const DDateTime& value)
 void
 Serializer::Store (uint8_t* const dst, const DHiresTime& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int32 (value.mMicrosec, dst);
   store_le_int16 (value.mYear, dst + sizeof (uint32_t));
@@ -187,7 +187,7 @@ Serializer::Store (uint8_t* const dst, const DHiresTime& value)
 void
 Serializer::Store (uint8_t* const dst, const DInt8 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   dst[0] = value.mValue;
 }
@@ -196,7 +196,7 @@ Serializer::Store (uint8_t* const dst, const DInt8 &value)
 void
 Serializer::Store (uint8_t* const dst, const DInt16 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int16 (value.mValue, dst);
 }
@@ -205,7 +205,7 @@ Serializer::Store (uint8_t* const dst, const DInt16 &value)
 void
 Serializer::Store (uint8_t* const dst, const DInt32 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int32 (value.mValue, dst);
 }
@@ -214,7 +214,7 @@ Serializer::Store (uint8_t* const dst, const DInt32 &value)
 void
 Serializer::Store (uint8_t* const dst, const DInt64 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int64 (value.mValue, dst);
 }
@@ -223,7 +223,7 @@ Serializer::Store (uint8_t* const dst, const DInt64 &value)
 void
 Serializer::Store (uint8_t* const dst, const DReal& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   const uint_t integerSize    = 5;
   const uint_t fractionalSize = 3;
@@ -238,9 +238,9 @@ Serializer::Store (uint8_t* const dst, const DReal& value)
 
   memcpy (dst, &temp, integerSize);
 
-  store_le_int64 (value.mValue.Fractional(), temp);
+  store_le_int64 (value.mValue.Fractional (), temp);
 
-  const uint64_t f = value.mValue.Fractional() & 0xFFFFFFFFFF800000;
+  const uint64_t f = value.mValue.Fractional () & 0xFFFFFFFFFF800000;
   if ((f != 0) && (f != 0xFFFFFFFFFF800000))
     throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
 
@@ -251,7 +251,7 @@ Serializer::Store (uint8_t* const dst, const DReal& value)
 void
 Serializer::Store (uint8_t* const dst, const DRichReal& value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   const uint_t integerSize    = 8;
   const uint_t fractionalSize = 6;
@@ -260,9 +260,9 @@ Serializer::Store (uint8_t* const dst, const DRichReal& value)
 
   uint8_t temp[sizeof (uint64_t)];
 
-  store_le_int64 (value.mValue.Fractional(), temp);
+  store_le_int64 (value.mValue.Fractional (), temp);
 
-  const uint64_t f = value.mValue.Fractional() & 0xFFFF800000000000;
+  const uint64_t f = value.mValue.Fractional () & 0xFFFF800000000000;
   if ((f != 0) && (f != 0xFFFF800000000000))
     throw DBSException (_EXTRA (DBSException::NUMERIC_FAULT));
 
@@ -280,7 +280,7 @@ Serializer::Store (uint8_t* const dst, const DUInt8 &value)
 void
 Serializer::Store (uint8_t* const dst, const DUInt16 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int16 (value.mValue, dst);
 }
@@ -289,7 +289,7 @@ Serializer::Store (uint8_t* const dst, const DUInt16 &value)
 void
 Serializer::Store (uint8_t* const dst, const DUInt32 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int32 (value.mValue, dst);
 }
@@ -297,7 +297,7 @@ Serializer::Store (uint8_t* const dst, const DUInt32 &value)
 void
 Serializer::Store (uint8_t* const dst, const DUInt64 &value)
 {
-  assert (! value.IsNull());
+  assert (! value.IsNull ());
 
   store_le_int64 (value.mValue, dst);
 }

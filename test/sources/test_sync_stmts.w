@@ -70,8 +70,6 @@ DO
 	SYNC
 		return  AddTableRow (random (5));
 	ENDSYNC
-
-	return r;
 ENDPROC
 
 PROCEDURE HandleSyncTestRequest () RETURN UINT32

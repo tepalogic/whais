@@ -117,24 +117,24 @@ public:
     return *mSpace;
   }
 
-  uint64_t RefsCount()
+  uint64_t RefsCount ()
   {
     return mRefsCount;
   }
 
-  void IncRefsCount()
+  void IncRefsCount ()
   {
     ++mRefsCount;
   }
 
-  void DecRefsCount()
+  void DecRefsCount ()
   {
     assert (mRefsCount > 0);
 
     --mRefsCount;
   }
 
-  void ForceRelease()
+  void ForceRelease ()
   {
     mRefsCount = 0;
   }
@@ -155,7 +155,7 @@ public:
            NameSpaceHolder&   globalNames,
            NameSpaceHolder&   privateNames);
 
-  virtual ~Session();
+  virtual ~Session ();
 
   virtual void LoadCompiledUnit (WIFunctionalUnit& unit);
   virtual bool LoadSharedLib (WH_SHLIB shl);
@@ -163,9 +163,9 @@ public:
   virtual void ExecuteProcedure (const char* const   procedure,
                                  SessionStack&       stack);
 
-  virtual uint_t GlobalValuesCount() const;
+  virtual uint_t GlobalValuesCount () const;
 
-  virtual uint_t ProceduresCount() const;
+  virtual uint_t ProceduresCount () const;
 
   virtual const char* GlobalValueName (const uint_t index) const;
 
@@ -244,7 +244,7 @@ public:
   }
 
 private:
-  void DefineTablesGlobalValues();
+  void DefineTablesGlobalValues ();
 
   uint32_t DefineGlobalValue (const uint8_t* const   name,
                               const uint_t           nameLength,

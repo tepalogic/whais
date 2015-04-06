@@ -49,7 +49,7 @@ struct ListenEntry
 
 struct ServerSettings
 {
-  ServerSettings()
+  ServerSettings ()
     : mMaxConnections (UNSET_VALUE),
       mMaxFrameSize (UNSET_VALUE),
       mTableCacheBlockSize (UNSET_VALUE),
@@ -61,10 +61,10 @@ struct ServerSettings
       mSyncWakeup (UNSET_VALUE),
       mSyncInterval (UNSET_VALUE),
       mWaitReqTmo (UNSET_VALUE),
-      mWorkDirectory(),
-      mTempDirectory(),
-      mLogFile(),
-      mListens(),
+      mWorkDirectory (),
+      mTempDirectory (),
+      mLogFile (),
+      mListens (),
       mCipher (UNSET_VALUE),
       mShowDebugLog (false)
   {
@@ -100,10 +100,10 @@ struct DBSDescriptors
       mSyncInterval (UNSET_VALUE),
       mWaitReqTmo (UNSET_VALUE),
       mStackCount (DEFAULT_MAX_STACK_CNT),
-      mDbsName(),
-      mDbsDirectory(),
-      mObjectLibs(),
-      mNativeLibs(),
+      mDbsName (),
+      mDbsDirectory (),
+      mObjectLibs (),
+      mNativeLibs (),
       mDbs (NULL),
       mSession (NULL),
       mLogger (NULL),
@@ -129,10 +129,10 @@ struct DBSDescriptors
 };
 
 const std::string&
-GlobalContextDatabase();
+GlobalContextDatabase ();
 
 const ServerSettings&
-GetAdminSettings();
+GetAdminSettings ();
 
 bool
 SeekAtConfigurationSection (std::ifstream& config, uint_t& outConfigLine);

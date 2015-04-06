@@ -51,7 +51,7 @@ wh_compiler_load (const char*         sourceCode,
       state->messengerCtxt     = messengerContext;
       state->abortError        = FALSE;
       state->externDecl        = FALSE;
-      state->strings           = create_string_store();
+      state->strings           = create_string_store ();
 
       wh_array_init (&(state->values), sizeof (struct SemValue));
       init_glbl_stmt (&(state->globalStmt));

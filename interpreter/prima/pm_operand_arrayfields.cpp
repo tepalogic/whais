@@ -37,9 +37,9 @@ namespace prima {
 
 
 bool
-CharTextFieldElOperand::IsNull() const
+CharTextFieldElOperand::IsNull () const
 {
-  ITable& table = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable ();
 
   DText text;
   table.Get (mRow, mField, text);
@@ -51,9 +51,9 @@ CharTextFieldElOperand::IsNull() const
 void
 CharTextFieldElOperand::GetValue (DChar& outValue) const
 {
-  ITable& table = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable ();
 
-  if (table.AllocatedRows() <= mRow)
+  if (table.AllocatedRows () <= mRow)
     {
       outValue = DChar ();
       return;
@@ -79,7 +79,7 @@ CharTextFieldElOperand::GetValue (DText& outValue) const
 
   this->GetValue (ch);
 
-  outValue = DText();
+  outValue = DText ();
   outValue.Append (ch);
 }
 
@@ -87,7 +87,7 @@ CharTextFieldElOperand::GetValue (DText& outValue) const
 void
 CharTextFieldElOperand::SetValue (const DChar& value)
 {
-  ITable& table = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable ();
 
   DText text;
 
@@ -100,14 +100,14 @@ CharTextFieldElOperand::SetValue (const DChar& value)
 
 
 uint_t
-CharTextFieldElOperand::GetType()
+CharTextFieldElOperand::GetType ()
 {
   return T_CHAR;
 }
 
 
 StackValue
-CharTextFieldElOperand::Duplicate() const
+CharTextFieldElOperand::Duplicate () const
 {
   DChar ch;
 
@@ -120,16 +120,16 @@ CharTextFieldElOperand::Duplicate() const
 
 BaseArrayFieldElOperand::~BaseArrayFieldElOperand ()
 {
-  mTableRef->DecrementRefCount();
+  mTableRef->DecrementRefCount ();
 }
 
 
 bool
 BaseArrayFieldElOperand::IsNull () const
 {
-  ITable& table = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable ();
 
-  if (table.AllocatedRows() <= mRow)
+  if (table.AllocatedRows () <= mRow)
     return true;
 
   DArray array;
@@ -141,7 +141,7 @@ BaseArrayFieldElOperand::IsNull () const
 bool
 BaseArrayFieldElOperand::PrepareToCopy (void* const)
 {
-  mTableRef->IncrementRefCount();
+  mTableRef->IncrementRefCount ();
 
   return true;
 }
@@ -214,14 +214,14 @@ BoolArrayFieldElOperand::SelfOr (const DBool& value)
 
 
 uint_t
-BoolArrayFieldElOperand::GetType()
+BoolArrayFieldElOperand::GetType ()
 {
   return T_BOOL;
 }
 
 
 StackValue
-BoolArrayFieldElOperand::Duplicate() const
+BoolArrayFieldElOperand::Duplicate () const
 {
   DBool value;
   Get (value);
@@ -244,7 +244,7 @@ CharArrayFieldElOperand::GetValue (DText& outValue) const
   DChar ch;
   Get (ch);
 
-  outValue = DText();
+  outValue = DText ();
   outValue.Append (ch);
 }
 
@@ -257,14 +257,14 @@ CharArrayFieldElOperand::SetValue (const DChar& value)
 
 
 uint_t
-CharArrayFieldElOperand::GetType()
+CharArrayFieldElOperand::GetType ()
 {
   return T_CHAR;
 }
 
 
 StackValue
-CharArrayFieldElOperand::Duplicate() const
+CharArrayFieldElOperand::Duplicate () const
 {
   DChar ch;
   Get (ch);
@@ -330,14 +330,14 @@ DateArrayFieldElOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-DateArrayFieldElOperand::GetType()
+DateArrayFieldElOperand::GetType ()
 {
   return T_DATE;
 }
 
 
 StackValue
-DateArrayFieldElOperand::Duplicate() const
+DateArrayFieldElOperand::Duplicate () const
 {
   DDate value;
 
@@ -409,14 +409,14 @@ DateTimeArrayFieldElOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-DateTimeArrayFieldElOperand::GetType()
+DateTimeArrayFieldElOperand::GetType ()
 {
   return T_DATETIME;
 }
 
 
 StackValue
-DateTimeArrayFieldElOperand::Duplicate() const
+DateTimeArrayFieldElOperand::Duplicate () const
 {
   DDateTime value;
 
@@ -484,14 +484,14 @@ HiresTimeArrayFieldElOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-HiresTimeArrayFieldElOperand::GetType()
+HiresTimeArrayFieldElOperand::GetType ()
 {
   return T_HIRESTIME;
 }
 
 
 StackValue
-HiresTimeArrayFieldElOperand::Duplicate() const
+HiresTimeArrayFieldElOperand::Duplicate () const
 {
   DHiresTime value;
   Get (value);
@@ -727,14 +727,14 @@ UInt8ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt8ArrayFieldElOperand::GetType()
+UInt8ArrayFieldElOperand::GetType ()
 {
   return T_UINT8;
 }
 
 
 StackValue
-UInt8ArrayFieldElOperand::Duplicate() const
+UInt8ArrayFieldElOperand::Duplicate () const
 {
   DUInt8 value;
   Get (value);
@@ -970,14 +970,14 @@ UInt16ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt16ArrayFieldElOperand::GetType()
+UInt16ArrayFieldElOperand::GetType ()
 {
   return T_UINT16;
 }
 
 
 StackValue
-UInt16ArrayFieldElOperand::Duplicate() const
+UInt16ArrayFieldElOperand::Duplicate () const
 {
   DUInt16 value;
   Get (value);
@@ -1213,14 +1213,14 @@ UInt32ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt32ArrayFieldElOperand::GetType()
+UInt32ArrayFieldElOperand::GetType ()
 {
   return T_UINT32;
 }
 
 
 StackValue
-UInt32ArrayFieldElOperand::Duplicate() const
+UInt32ArrayFieldElOperand::Duplicate () const
 {
   DUInt32 value;
   Get (value);
@@ -1448,14 +1448,14 @@ UInt64ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt64ArrayFieldElOperand::GetType()
+UInt64ArrayFieldElOperand::GetType ()
 {
   return T_UINT64;
 }
 
 
 StackValue
-UInt64ArrayFieldElOperand::Duplicate() const
+UInt64ArrayFieldElOperand::Duplicate () const
 {
   DUInt64 value;
   Get (value);
@@ -1691,14 +1691,14 @@ Int8ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int8ArrayFieldElOperand::GetType()
+Int8ArrayFieldElOperand::GetType ()
 {
   return T_INT8;
 }
 
 
 StackValue
-Int8ArrayFieldElOperand::Duplicate() const
+Int8ArrayFieldElOperand::Duplicate () const
 {
   DInt8 value;
   Get (value);
@@ -1935,14 +1935,14 @@ Int16ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int16ArrayFieldElOperand::GetType()
+Int16ArrayFieldElOperand::GetType ()
 {
   return T_INT16;
 }
 
 
 StackValue
-Int16ArrayFieldElOperand::Duplicate() const
+Int16ArrayFieldElOperand::Duplicate () const
 {
   DInt16 value;
 
@@ -2180,14 +2180,14 @@ Int32ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int32ArrayFieldElOperand::GetType()
+Int32ArrayFieldElOperand::GetType ()
 {
   return T_INT32;
 }
 
 
 StackValue
-Int32ArrayFieldElOperand::Duplicate() const
+Int32ArrayFieldElOperand::Duplicate () const
 {
   DInt32 value;
   Get (value);
@@ -2422,14 +2422,14 @@ Int64ArrayFieldElOperand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int64ArrayFieldElOperand::GetType()
+Int64ArrayFieldElOperand::GetType ()
 {
   return T_INT64;
 }
 
 
 StackValue
-Int64ArrayFieldElOperand::Duplicate() const
+Int64ArrayFieldElOperand::Duplicate () const
 {
   DInt64 value;
   Get (value);
@@ -2574,14 +2574,14 @@ RealArrayFieldElOperand::SelfDiv (const DRichReal& value)
 
 
 uint_t
-RealArrayFieldElOperand::GetType()
+RealArrayFieldElOperand::GetType ()
 {
   return T_REAL;
 }
 
 
 StackValue
-RealArrayFieldElOperand::Duplicate() const
+RealArrayFieldElOperand::Duplicate () const
 {
   DReal value;
 
@@ -2725,14 +2725,14 @@ RichRealArrayFieldElOperand::SelfDiv (const DRichReal& value)
 
 
 uint_t
-RichRealArrayFieldElOperand::GetType()
+RichRealArrayFieldElOperand::GetType ()
 {
   return T_RICHREAL;
 }
 
 
 StackValue
-RichRealArrayFieldElOperand::Duplicate() const
+RichRealArrayFieldElOperand::Duplicate () const
 {
   DRichReal value;
   Get (value);

@@ -68,34 +68,34 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 }
 
 char test_prog_1[] = ""
-  "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
+  "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
   "RETURN some_var; \n"
   "ENDPROC \n";
 
 char test_prog_2[] = ""
-  "PROCEDURE Proc_1() RETURN DATE \n"
+  "PROCEDURE Proc_1 () RETURN DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
   "RETURN some_var; \n"
   "ENDPROC \n"
   " \n"
-  "PROCEDURE Proc() RETURN RICHREAL \n"
+  "PROCEDURE Proc () RETURN RICHREAL \n"
   "DO \n"
-  "IF Proc_1() THEN \n"
+  "IF Proc_1 () THEN \n"
   "RETURN 0.23; \n" "END \n" "RETURN 0.1; \n" "ENDPROC \n";
 
 char test_prog_3[] = ""
-  "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
+  "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n" "CONTINUE; \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_4[] = ""
-  "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
+  "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n" "BREAK; \n" "RETURN some_var; \n" "ENDPROC \n";;
 
 char test_prog_5[] = ""
-  "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
+  "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
   "LET some_int AS INT8; \n"
@@ -105,7 +105,7 @@ char test_prog_5[] = ""
   "ENDSYNC \n" "ENDSYNC \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_6[] = ""
-  "PROCEDURE Proc() RETURN ARRAY OF DATE \n"
+  "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
   "LET some_var AS DATE; \n"
   "LET some_int as INT32; \n"
@@ -1139,19 +1139,19 @@ char test_prog_6[] = ""
   "ENDSYNC \n" " \n" "RETURN some_var; \n" "ENDPROC \n" " \n";
 
 char test_prog_7[] = ""
-  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
   "DO \n" "LET some_var AS TABLE OF (v1 AS TEXT, v2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_8[] = ""
-  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
   "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_9[] = ""
-  "PROCEDURE Proc() RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
+  "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
   "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "some_var=NULL; \n" "ENDPROC \n";
 
 char test_prog_10[] = ""
-  "PROCEDURE Proc() RETURN BOOL \n"
+  "PROCEDURE Proc () RETURN BOOL \n"
   "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n"
   " IF (some_var != NULL) RETURN TRUE; ELSE RETURN FALSE;\n some_var=NULL; \n" "ENDPROC \n";
 
@@ -1200,10 +1200,10 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
         }
     }
 
-  if (test_get_mem_used() != 0)
+  if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.\n",
-              test_get_mem_used());
+              test_get_mem_used ());
       test_print_unfree_mem ();
       test_result = FALSE;
     }
@@ -1212,7 +1212,7 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 }
 
 int
-main()
+main ()
 {
   bool_t test_result = TRUE;
 

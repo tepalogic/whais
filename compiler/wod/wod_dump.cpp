@@ -134,7 +134,7 @@ wod_dump_const_area (WIFunctionalUnit& obj, ostream& output)
     << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*') << '*' << setw (0)
     << endl << endl;
 
-  const uint8_t* const constArea = obj.RetrieveConstArea();
+  const uint8_t* const constArea = obj.RetrieveConstArea ();
 
   uint_t constantOff = 0;
   do
@@ -151,7 +151,7 @@ wod_dump_const_area (WIFunctionalUnit& obj, ostream& output)
           if (rowPos && (rowPos % sizeof (uint32_t) == 0))
             output << ' ';
 
-          if (rowPos + constantOff >= obj.ConstsAreaSize())
+          if (rowPos + constantOff >= obj.ConstsAreaSize ())
             output << "  ";
 
           else
@@ -165,7 +165,7 @@ wod_dump_const_area (WIFunctionalUnit& obj, ostream& output)
       output << '\t';
       for (uint_t rowPos = 0; rowPos < rowSize; rowPos++)
         {
-          if (rowPos + constantOff >= obj.ConstsAreaSize())
+          if (rowPos + constantOff >= obj.ConstsAreaSize ())
             break;
 
           else
@@ -183,7 +183,7 @@ wod_dump_const_area (WIFunctionalUnit& obj, ostream& output)
         }
       constantOff += rowSize;
     }
-  while (constantOff < obj.ConstsAreaSize());
+  while (constantOff < obj.ConstsAreaSize ());
 
   output << setw (0);
   output.flags (ios::dec);
@@ -369,7 +369,7 @@ wod_dump_globals_tables (WIFunctionalUnit& obj, ostream& output)
     << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*') << '*' << setw (0)
     << endl << endl;
 
-  const int globalsCount = obj.GlobalsCount();
+  const int globalsCount = obj.GlobalsCount ();
   if (globalsCount == 0)
     {
       output << "No globals entries.\n\n";
@@ -398,7 +398,7 @@ wod_dump_globals_tables (WIFunctionalUnit& obj, ostream& output)
       output << left << (obj.IsGlobalExternal (i) ? "EXT " : "DEF ");
       output.width (0);
 
-      wod_dump_type_info (obj.RetriveTypeArea() + obj.GlobalTypeOff (i),
+      wod_dump_type_info (obj.RetriveTypeArea () + obj.GlobalTypeOff (i),
                           output);
       output << endl;
     }
@@ -457,7 +457,7 @@ wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
     << setw (HEADER_SEPARATOR_LENGTH) << setfill ('*') << '*' << setw (0)
     << endl << endl;
 
-  const uint_t procsCount = obj.ProceduresCount();
+  const uint_t procsCount = obj.ProceduresCount ();
   if (procsCount == 0)
     {
       output << "No procedures entries.\n\n";
@@ -490,7 +490,7 @@ wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
           else
             output << "local (id. " << local << " )\t\t";
 
-          wod_dump_type_info (obj.RetriveTypeArea() +
+          wod_dump_type_info (obj.RetriveTypeArea () +
                                 obj.GetProcLocalTypeOff (proc, local),
                               output);
           output << endl;

@@ -25,9 +25,9 @@ using namespace whais;
 using namespace pastra;
 
 static bool
-test_nulliness()
+test_nulliness ()
 {
-  std::cout << "Testing for nulliness ... "; std::cout.flush();
+  std::cout << "Testing for nulliness ... "; std::cout.flush ();
   bool result = true;
   uint8_t nullUtf8[] = {0x00};
 
@@ -35,17 +35,17 @@ test_nulliness()
     DText textSingleton;
     DText textTemporal (nullUtf8);
 
-    if (textSingleton.IsNull() == false)
+    if (textSingleton.IsNull () == false)
       result = false;
-    else if (textSingleton.Count() != 0)
+    else if (textSingleton.Count () != 0)
       result = false;
-    else if (textSingleton.RawSize() != 0)
+    else if (textSingleton.RawSize () != 0)
       result = false;
-    else if (textTemporal.IsNull() == false)
+    else if (textTemporal.IsNull () == false)
       result = false;
-    else if (textTemporal.Count() != 0)
+    else if (textTemporal.Count () != 0)
       result = false;
-    else if (textTemporal.RawSize() != 0)
+    else if (textTemporal.RawSize () != 0)
       result = false;
     else if (textSingleton.CharAt (0).mIsNull == false)
       return false;
@@ -58,11 +58,11 @@ test_nulliness()
       DText textSingleton;
       textSingleton.Append (DChar (0x42));
 
-      if (textSingleton.IsNull() != false)
+      if (textSingleton.IsNull () != false)
         result = false;
-      else if (textSingleton.Count() != 1)
+      else if (textSingleton.Count () != 1)
         result = false;
-      else if (textSingleton.RawSize() != 1)
+      else if (textSingleton.RawSize () != 1)
         result = false;
       else if (textSingleton.CharAt (0).mIsNull != false)
         result = false;
@@ -75,11 +75,11 @@ test_nulliness()
       DText textTemporal (nullUtf8);
       textTemporal.Append (DChar (0x281));
 
-      if (textTemporal.IsNull() != false)
+      if (textTemporal.IsNull () != false)
         result = false;
-      else if (textTemporal.Count() != 1)
+      else if (textTemporal.Count () != 1)
         result = false;
-      else if (textTemporal.RawSize() != 2)
+      else if (textTemporal.RawSize () != 2)
         result = false;
       else if (textTemporal.CharAt (0).mIsNull != false)
         result = false;
@@ -92,11 +92,11 @@ test_nulliness()
       DText textSingleton;
       textSingleton.Append (DChar (0x942));
 
-      if (textSingleton.IsNull() != false)
+      if (textSingleton.IsNull () != false)
         result = false;
-      else if (textSingleton.Count() != 1)
+      else if (textSingleton.Count () != 1)
         result = false;
-      else if (textSingleton.RawSize() != 3)
+      else if (textSingleton.RawSize () != 3)
         result = false;
       else if (textSingleton.CharAt (0).mIsNull != false)
         result = false;
@@ -109,11 +109,11 @@ test_nulliness()
       DText textSingleton;
       textSingleton.Append (DChar (0x10942));
 
-      if (textSingleton.IsNull() != false)
+      if (textSingleton.IsNull () != false)
         result = false;
-      else if (textSingleton.Count() != 1)
+      else if (textSingleton.Count () != 1)
         result = false;
-      else if (textSingleton.RawSize() != 4)
+      else if (textSingleton.RawSize () != 4)
         result = false;
       else if (textSingleton.CharAt (0).mIsNull != false)
         result = false;
@@ -126,11 +126,11 @@ test_nulliness()
       DText textSingleton;
       textSingleton.Append (DChar (0x3010942));
 
-      if (textSingleton.IsNull() != false)
+      if (textSingleton.IsNull () != false)
         result = false;
-      else if (textSingleton.Count() != 1)
+      else if (textSingleton.Count () != 1)
         result = false;
-      else if (textSingleton.RawSize() != 5)
+      else if (textSingleton.RawSize () != 5)
         result = false;
       else if (textSingleton.CharAt (0).mIsNull != false)
         result = false;
@@ -141,28 +141,28 @@ test_nulliness()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings().mWorkDir;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;
       temp_file_base += "t_cont_1";
 
       VariableSizeStore storage;
       storage.Init (temp_file_base.c_str (), 0, 713);
-      storage.RegisterReference();
-      storage.MarkForRemoval();
+      storage.RegisterReference ();
+      storage.MarkForRemoval ();
 
       uint64_t allocated_entry = storage.AddRecord (NULL, 0);
 
       DText textVarRaw (*(new RowFieldText (storage, allocated_entry, 0)));
 
-      if (textVarRaw.IsNull() == false)
+      if (textVarRaw.IsNull () == false)
         return false;
 
       textVarRaw.Append (DChar (0x10FFFE));
 
-      if (textVarRaw.IsNull() != false)
+      if (textVarRaw.IsNull () != false)
         result = false;
-      else if (textVarRaw.Count() != 1)
+      else if (textVarRaw.Count () != 1)
         result = false;
-      else if (textVarRaw.RawSize() != 4)
+      else if (textVarRaw.RawSize () != 4)
         result = false;
       else if (textVarRaw.CharAt (0).mIsNull != false)
         result = false;
@@ -171,7 +171,7 @@ test_nulliness()
       else if (textVarRaw.CharAt (1).mIsNull == false)
         result = false;
 
-      storage.Flush();
+      storage.Flush ();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -195,7 +195,7 @@ static const char* pOriginalText = "This is a text to test! Let's hope it will w
 static bool
 test_text_append ()
 {
-  std::cout << "Testing for text appending ... "; std::cout.flush();
+  std::cout << "Testing for text appending ... "; std::cout.flush ();
   bool result = true;
 
   if (result)
@@ -204,14 +204,14 @@ test_text_append ()
       const DText originalText (_RC(const uint8_t*, pOriginalText));
       const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
-      if (originalText.Count() != charsCount)
+      if (originalText.Count () != charsCount)
         result = false;
       else
         {
           destinationText.Append (originalText);
-          if (destinationText.Count() != originalText.Count())
+          if (destinationText.Count () != originalText.Count ())
             result = false;
-          else if (destinationText.RawSize() != originalText.RawSize())
+          else if (destinationText.RawSize () != originalText.RawSize ())
             result = false;
           else
             {
@@ -227,7 +227,7 @@ test_text_append ()
 
   if (result)
     {
-      std::string temp_file_base = DBSGetSeettings().mWorkDir;;
+      std::string temp_file_base = DBSGetSeettings ().mWorkDir;;
       temp_file_base += "ps_t_text";
 
       uint64_t allocated_entry = 0;
@@ -242,36 +242,36 @@ test_text_append ()
 
         VariableSizeStore storage;
         storage.Init (temp_file_base.c_str (), 0, 713);
-        storage.RegisterReference();
+        storage.RegisterReference ();
 
         allocated_entry = storage.AddRecord(
                                   tempBuff,
                                   (sizeof charValues / sizeof (uint32_t)) + 12
                                             );
 
-        storage.Flush();
+        storage.Flush ();
       }
 
-      if (originalText.Count() != charsCount)
+      if (originalText.Count () != charsCount)
         result = false;
       else
         {
           VariableSizeStore storage;
 
           storage.Init (temp_file_base.c_str (), 1, 713);
-          storage.RegisterReference();
-          storage.MarkForRemoval();
+          storage.RegisterReference ();
+          storage.MarkForRemoval ();
 
           {
             DText destinationText(
                       *(new RowFieldText (storage,
                                         allocated_entry,
-                                        originalText.RawSize() + 12))
+                                        originalText.RawSize () + 12))
                                     );
 
-            if (destinationText.Count() != originalText.Count())
+            if (destinationText.Count () != originalText.Count ())
               result = false;
-            else if (destinationText.RawSize() != originalText.RawSize())
+            else if (destinationText.RawSize () != originalText.RawSize ())
               result = false;
             else
               {
@@ -282,7 +282,7 @@ test_text_append ()
                       result = false;
               }
           }
-          storage.Flush();
+          storage.Flush ();
         }
     }
 
@@ -291,9 +291,9 @@ test_text_append ()
 }
 
 static bool
-test_character_insertion()
+test_character_insertion ()
 {
-  std::cout << "Testing for text insertion ... "; std::cout.flush();
+  std::cout << "Testing for text insertion ... "; std::cout.flush ();
   bool result = true;
 
   if (result)
@@ -301,14 +301,14 @@ test_character_insertion()
       DText originalText (_RC(const uint8_t*, pOriginalText));
       const uint_t charsCount = sizeof (charValues) / sizeof (uint32_t);
 
-      if (originalText.Count() != charsCount)
+      if (originalText.Count () != charsCount)
         result = false;
       else
         {
           DChar test_char = DChar ('A');
           originalText.CharAt (0, test_char);
 
-          if (originalText.Count() != charsCount)
+          if (originalText.Count () != charsCount)
             result = false;
           else if (originalText.CharAt (0).mValue != 'A')
             result = false;
@@ -318,7 +318,7 @@ test_character_insertion()
               DChar test_char = DChar (0x3412);
               originalText.CharAt (charsCount - 1, test_char);
 
-              if (originalText.Count() != charsCount)
+              if (originalText.Count () != charsCount)
                 result = false;
               else if (originalText.CharAt (charsCount - 1).mValue != 0x3412)
                 result = false;
@@ -326,14 +326,14 @@ test_character_insertion()
 
           if (result)
             {
-              std::string temp_file_base = DBSGetSeettings().mWorkDir;
+              std::string temp_file_base = DBSGetSeettings ().mWorkDir;
               temp_file_base += "ps_t_text";
               uint64_t allocated_entry = 0;
 
               VariableSizeStore storage;
               storage.Init (temp_file_base.c_str (), 0, 713);
-              storage.RegisterReference();
-              storage.MarkForRemoval();
+              storage.RegisterReference ();
+              storage.MarkForRemoval ();
 
                uint8_t tempBuff[1024] = {0, };
               strcpy (_RC (char*, tempBuff) + 12, pOriginalText);
@@ -355,12 +355,12 @@ test_character_insertion()
               DChar test_char = DChar (0x21135);
               originalText.CharAt (charsCount / 2, test_char);
 
-              if (originalText.Count() != charsCount)
+              if (originalText.Count () != charsCount)
                 result = false;
               else if (originalText.CharAt (charsCount / 2).mValue != 0x21135)
                 result = false;
 
-              storage.Flush();
+              storage.Flush ();
             }
         }
     }
@@ -370,9 +370,9 @@ test_character_insertion()
 }
 
 bool
-test_text_mirroring()
+test_text_mirroring ()
 {
-  std::cout << "Testing for text mirroring ... "; std::cout.flush();
+  std::cout << "Testing for text mirroring ... "; std::cout.flush ();
   bool result = true;
 
   const DText arbiter (_RC(const uint8_t*, "Love is all you need!"));
@@ -438,7 +438,7 @@ text_to_lower (const DText& src)
 {
   DText result;
 
-  for (uint64_t i = 0; i < src.Count(); ++i)
+  for (uint64_t i = 0; i < src.Count (); ++i)
     result.Append (DChar (wh_to_lowercase (src.CharAt (i).mValue)));
 
   return result;
@@ -451,10 +451,10 @@ check_text_match (const DText&      src,
                   const uint64_t    matchIndex,
                   const bool        ignoreCase)
 {
-  if (matchIndex + pattern.Count() > src.Count())
+  if (matchIndex + pattern.Count () > src.Count ())
     return false;
 
-  for (uint64_t i = 0; i < pattern.Count(); ++i)
+  for (uint64_t i = 0; i < pattern.Count (); ++i)
     {
       const uint32_t ch1 = src.CharAt (matchIndex + i).mValue;
       const uint32_t ch2 = pattern.CharAt (i).mValue;
@@ -489,7 +489,7 @@ test_text_limit_matches (const uint_t  patternSize,
 
   DText temp;
 
-  if ((temp.FindSubstring (pattern).IsNull() == false)
+  if ((temp.FindSubstring (pattern).IsNull () == false)
       || (temp.FindSubstring (pattern, true) != DUInt64 ()))
     {
       return false;
@@ -497,12 +497,12 @@ test_text_limit_matches (const uint_t  patternSize,
 
   temp.Append (pattern);
 
-  if ((temp.FindSubstring (nullText).IsNull() == false)
-      || (temp.FindSubstring (pattern, false, 1).IsNull() == false)
+  if ((temp.FindSubstring (nullText).IsNull () == false)
+      || (temp.FindSubstring (pattern, false, 1).IsNull () == false)
       || (temp.FindSubstring (pattern,
                               false,
                               0,
-                              temp.Count() - 1).IsNull() == false)
+                              temp.Count () - 1).IsNull () == false)
       || (temp.FindSubstring (pattern) != DUInt64 (0))
       || (temp.FindSubstring (pattern, true) != DUInt64 (0))
       || (temp.FindSubstring (lowerPattern, true) != DUInt64 (0))
@@ -512,7 +512,7 @@ test_text_limit_matches (const uint_t  patternSize,
       return false;
     }
 
-  temp = DText();
+  temp = DText ();
   temp.Append (DChar (wh_rnd () % 0xFF + 1));
   temp.Append (pattern);
 
@@ -520,7 +520,7 @@ test_text_limit_matches (const uint_t  patternSize,
       || (temp.FindSubstring (pattern,
                               false,
                               0,
-                              temp.Count() - 1).IsNull() == false)
+                              temp.Count () - 1).IsNull () == false)
       || (temp.FindSubstring (pattern) != DUInt64 (1))
       || (temp.FindSubstring (pattern, true) != DUInt64 (1))
       || (temp.FindSubstring (lowerPattern, true) != DUInt64 (1))
@@ -530,20 +530,20 @@ test_text_limit_matches (const uint_t  patternSize,
       return false;
     }
 
-  temp = DText();
+  temp = DText ();
   temp.Append (text);
   temp.Append (pattern);
 
-  if ((temp.FindSubstring (pattern) != DUInt64 (text.Count()))
+  if ((temp.FindSubstring (pattern) != DUInt64 (text.Count ()))
       || (temp.FindSubstring (pattern,
                               false,
                               0,
-                              text.Count() + pattern.Count() - 1).IsNull() == false)
-      || (temp.FindSubstring (pattern) != DUInt64 (text.Count()))
-      || (temp.FindSubstring (pattern, true) != DUInt64 (text.Count()))
-      || (temp.FindSubstring (lowerPattern, true) != DUInt64 (text.Count())
-      || (check_text_match (temp, pattern, text.Count(), false) == false)
-      || (check_text_match (temp, lowerPattern, text.Count(), true) == false)))
+                              text.Count () + pattern.Count () - 1).IsNull () == false)
+      || (temp.FindSubstring (pattern) != DUInt64 (text.Count ()))
+      || (temp.FindSubstring (pattern, true) != DUInt64 (text.Count ()))
+      || (temp.FindSubstring (lowerPattern, true) != DUInt64 (text.Count ())
+      || (check_text_match (temp, pattern, text.Count (), false) == false)
+      || (check_text_match (temp, lowerPattern, text.Count (), true) == false)))
     {
       return false;
     }
@@ -570,7 +570,7 @@ test_text_substrings_matches (const uint_t  patternSize,
 
   for (uint_t i = 0; i < ITERATIONS; ++i)
     {
-      pattOffsets[i] = DUInt64 (temp.Count());
+      pattOffsets[i] = DUInt64 (temp.Count ());
       temp.Append (pattern);
 
       if (textSize > 0)
@@ -584,7 +584,7 @@ test_text_substrings_matches (const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring (pattern, false, next) != pattOffsets[i])
@@ -602,7 +602,7 @@ test_text_substrings_matches (const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 2; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 2; i < pattOffsets.Size (); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring (lowerPattern, true, next) != pattOffsets[i])
@@ -613,17 +613,17 @@ test_text_substrings_matches (const uint_t  patternSize,
         }
     }
 
-  temp = DText();
+  temp = DText ();
 
   for (uint_t i = 0; i < ITERATIONS; ++i)
     {
-      pattOffsets[i] = DUInt64 (temp.Count());
+      pattOffsets[i] = DUInt64 (temp.Count ());
       temp.Append (pattern);
 
       if (textSize > 0)
         temp.Append (build_random_text (wh_rnd () % textSize));
 
-      pattOffsetsLowerCases [i] = DUInt64 (temp.Count());
+      pattOffsetsLowerCases [i] = DUInt64 (temp.Count ());
       temp.Append (lowerPattern);
 
       if (textSize > 0)
@@ -637,7 +637,7 @@ test_text_substrings_matches (const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring (pattern, false, next) != pattOffsets[i])
@@ -661,7 +661,7 @@ test_text_substrings_matches (const uint_t  patternSize,
   else
     {
       uint64_t next = pattOffsetsLowerCases[0].mValue + 1;
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.Size (); ++i)
         {
           if ((temp.FindSubstring (lowerPattern, true, next) != pattOffsets[i])
               || (check_text_match (temp, pattern, pattOffsets[0].mValue, false) == false))
@@ -725,10 +725,10 @@ test_text_substrings_replace (const uint_t  patternSize,
   if (temp.ReplaceSubstring ( pattern, newSubstr) != temp2)
     return false;
 
-  if (temp.ReplaceSubstring ( pattern, newSubstr, false, 1, temp.Count() - 1) != temp3)
+  if (temp.ReplaceSubstring ( pattern, newSubstr, false, 1, temp.Count () - 1) != temp3)
     return false;
 
-  temp = temp2 = temp3 = DText();
+  temp = temp2 = temp3 = DText ();
 
   for (uint_t i = 0; i < ITERATIONS; ++i)
     {
@@ -776,9 +776,9 @@ test_text_substrings_replace (const uint_t  patternSize,
 
 
 static bool
-test_text_substrings()
+test_text_substrings ()
 {
-  std::cout << "Testing for text pattern matching ... "; std::cout.flush();
+  std::cout << "Testing for text pattern matching ... "; std::cout.flush ();
   bool result = true;
 
   result = result && test_text_limit_matches (19, 256);
@@ -799,7 +799,7 @@ test_text_substrings()
 static bool
 test_text_substrings_2 ()
 {
-  std::cout << "Testing for text pattern replace ... "; std::cout.flush();
+  std::cout << "Testing for text pattern replace ... "; std::cout.flush ();
   bool result = true;
 
   result = result && test_text_substrings_replace (15, 0);
@@ -815,20 +815,20 @@ test_text_substrings_2 ()
 
 
 int
-main()
+main ()
 {
   bool success = true;
 
-  DBSInit (DBSSettings());
+  DBSInit (DBSSettings ());
 
-  success = success && test_nulliness();
+  success = success && test_nulliness ();
   success = success && test_text_append ();
-  success = success && test_character_insertion();
-  success = success && test_text_mirroring();
-  success = success && test_text_substrings();
+  success = success && test_character_insertion ();
+  success = success && test_text_mirroring ();
+  success = success && test_text_substrings ();
   success = success && test_text_substrings_2 ();
 
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

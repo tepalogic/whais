@@ -31,7 +31,7 @@ extern "C"
 #endif
 
 bool_t
-whs_init();
+whs_init ();
 
 uint32_t
 whs_create_client (const char* const       server,
@@ -62,7 +62,7 @@ void
 whs_close (const WH_SOCKET socket);
 
 void
-whs_clean();
+whs_clean ();
 
 #ifdef __cplusplus
 }

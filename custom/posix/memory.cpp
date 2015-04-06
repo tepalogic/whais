@@ -64,7 +64,7 @@ operator new (std::size_t size) throw (std::bad_alloc)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc();
+    throw std::bad_alloc ();
   return ptr;
 }
 
@@ -92,7 +92,7 @@ operator new (std::size_t size, const char* file, uint_t line)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc();
+    throw std::bad_alloc ();
   return ptr;
 }
 
@@ -107,7 +107,7 @@ operator new [] (std::size_t size) throw (std::bad_alloc)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc();
+    throw std::bad_alloc ();
   return ptr;
 }
 
@@ -135,7 +135,7 @@ operator new [] (std::size_t size, const char* file, uint_t line)
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc();
+    throw std::bad_alloc ();
   return ptr;
 }
 

@@ -213,7 +213,7 @@ whf_close (WH_FILE hnd)
 
 
 uint32_t
-whf_last_error()
+whf_last_error ()
 {
   /* POSIX.1c enforce this to be thread safe */
   return errno;
@@ -252,14 +252,14 @@ whf_remove (const char* const file)
 
 
 const char*
-whf_dir_delim()
+whf_dir_delim ()
 {
   return "/";
 }
 
 
 const char*
-whf_current_dir()
+whf_current_dir ()
 {
   return "./";
 }

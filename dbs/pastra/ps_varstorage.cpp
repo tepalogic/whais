@@ -48,8 +48,8 @@ StoreEntry::Read (uint_t offset, uint_t count, uint8_t* buffer) const
 {
   assert (IsDeleted () == false);
 
-  if (count + offset > Size() )
-    count = Size() - offset;
+  if (count + offset > Size () )
+    count = Size () - offset;
 
   memcpy (buffer, mRawData + offset, count);
 
@@ -62,8 +62,8 @@ StoreEntry::Write (uint_t offset, uint_t count, const uint8_t* buffer)
 {
   assert (IsDeleted () == false);
 
-  if (count + offset > Size() )
-    count = Size() - offset;
+  if (count + offset > Size () )
+    count = Size () - offset;
 
   memcpy (mRawData + offset, buffer, count);
 
@@ -71,10 +71,10 @@ StoreEntry::Write (uint_t offset, uint_t count, const uint8_t* buffer)
 }
 
 
-VariableSizeStore::VariableSizeStore()
+VariableSizeStore::VariableSizeStore ()
   : IBlocksManager (),
     mEntriesContainer (NULL),
-    mEntriesCache(),
+    mEntriesCache (),
     mFirstFreeEntry (0),
     mEntriesCount (0),
     mRefsCount (0)
@@ -83,14 +83,14 @@ VariableSizeStore::VariableSizeStore()
 
 
 void
-VariableSizeStore::RegisterReference()
+VariableSizeStore::RegisterReference ()
 {
   wh_atomic_fetch_inc64 (_RC (int64_t*, &mRefsCount));
 }
 
 
 void
-VariableSizeStore::ReleaseReference()
+VariableSizeStore::ReleaseReference ()
 {
   assert (mRefsCount > 0);
 
@@ -125,19 +125,19 @@ VariableSizeStore::Init (const char*        baseName,
                                               maxFileSize,
                                               unitsCount));
 
-  mEntriesCount = mEntriesContainer->Size() / sizeof (StoreEntry);
+  mEntriesCount = mEntriesContainer->Size () / sizeof (StoreEntry);
 
   FinishInit (false);
 }
 
 
 void
-VariableSizeStore::PrepareToCheckStorage()
+VariableSizeStore::PrepareToCheckStorage ()
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   //Disable the cache block.
-  mEntriesCache.~BlockCache();
+  mEntriesCache.~BlockCache ();
   memset (_RC (void*, &mEntriesCache), 0, sizeof (mEntriesCache));
 
   assert (mEntriesCount > 0);
@@ -148,8 +148,8 @@ VariableSizeStore::PrepareToCheckStorage()
 
   const uint64_t containerSize = mEntriesCount * sizeof (StoreEntry);
 
-  if (containerSize < mEntriesContainer->Size())
-    mEntriesContainer->Colapse (containerSize, mEntriesContainer->Size());
+  if (containerSize < mEntriesContainer->Size ())
+    mEntriesContainer->Colapse (containerSize, mEntriesContainer->Size ());
 }
 
 
@@ -159,18 +159,18 @@ is_entry_valid (const StoreEntry&    entry,
                 const bool           firstEntry,
                 const bool           lastEntry)
 {
-  if (firstEntry && ! entry.IsFirstEntry())
+  if (firstEntry && ! entry.IsFirstEntry ())
     return false;
 
-  else if ( ! firstEntry && entry.IsFirstEntry())
+  else if ( ! firstEntry && entry.IsFirstEntry ())
     return false;
 
-  else if (lastEntry && (entry.NextEntry() != StoreEntry::LAST_CHAINED_ENTRY))
+  else if (lastEntry && (entry.NextEntry () != StoreEntry::LAST_CHAINED_ENTRY))
     return false;
 
   return firstEntry ?
-          (entry.PrevEntry() >= StoreEntry::FIRST_PREV_ENTRY) :
-          (entry.PrevEntry() == prevEntry);
+          (entry.PrevEntry () >= StoreEntry::FIRST_PREV_ENTRY) :
+          (entry.PrevEntry () == prevEntry);
 }
 
 
@@ -192,7 +192,7 @@ VariableSizeStore::CheckArrayEntry (const uint64_t         recordFirstEntry,
   StoreEntry            vsEntry;
   vector<uint64_t>      entriesUsed;
 
-  if ((recordFirstEntry >= mUsedEntries.size()) || mUsedEntries[currentEntry])
+  if ((recordFirstEntry >= mUsedEntries.size ()) || mUsedEntries[currentEntry])
     return false;
 
   entriesUsed.push_back (currentEntry);
@@ -277,7 +277,7 @@ VariableSizeStore::CheckArrayEntry (const uint64_t         recordFirstEntry,
           && (actualSize % StoreEntry::ENTRY_SIZE == 0))
         {
           prevEntry     = currentEntry;
-          currentEntry  = vsEntry.NextEntry();
+          currentEntry  = vsEntry.NextEntry ();
 
           if ((currentEntry >= mEntriesCount)
               || mUsedEntries[currentEntry])
@@ -297,7 +297,7 @@ VariableSizeStore::CheckArrayEntry (const uint64_t         recordFirstEntry,
   if (actualSize != recordSize)
     return false;
 
-  for (size_t i = 0; i < entriesUsed.size(); ++i)
+  for (size_t i = 0; i < entriesUsed.size (); ++i)
     mUsedEntries[entriesUsed[i]] = true;
 
   return true;
@@ -316,7 +316,7 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
   StoreEntry            vsEntry;
   vector<uint64_t>      entriesUsed;
 
-  if ((recordFirstEntry >= mUsedEntries.size()) || mUsedEntries[currentEntry])
+  if ((recordFirstEntry >= mUsedEntries.size ()) || mUsedEntries[currentEntry])
     return false;
 
   entriesUsed.push_back (currentEntry);
@@ -429,7 +429,7 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
           && (actualSize % StoreEntry::ENTRY_SIZE == 0))
         {
           prevEntry     = currentEntry;
-          currentEntry  = vsEntry.NextEntry();
+          currentEntry  = vsEntry.NextEntry ();
 
           if ((currentEntry >= mEntriesCount)
               || mUsedEntries[currentEntry])
@@ -449,7 +449,7 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
   if (actualSize != recordSize)
     return false;
 
-  for (size_t i = 0; i < entriesUsed.size(); ++i)
+  for (size_t i = 0; i < entriesUsed.size (); ++i)
     mUsedEntries[entriesUsed[i]] = true;
 
   return true;
@@ -457,10 +457,10 @@ VariableSizeStore::CheckTextEntry (const uint64_t   recordFirstEntry,
 
 
 void
-VariableSizeStore::ConcludeStorageCheck()
+VariableSizeStore::ConcludeStorageCheck ()
 {
   assert (mUsedEntries[0]);
-  assert (mUsedEntries.size() == mEntriesCount);
+  assert (mUsedEntries.size () == mEntriesCount);
 
   while (mEntriesCount > 0)
     {
@@ -472,8 +472,8 @@ VariableSizeStore::ConcludeStorageCheck()
 
   const uint64_t containerSize = mEntriesCount * sizeof (StoreEntry);
 
-  if (containerSize <= mEntriesContainer->Size())
-    mEntriesContainer->Colapse (containerSize, mEntriesContainer->Size());
+  if (containerSize <= mEntriesContainer->Size ())
+    mEntriesContainer->Colapse (containerSize, mEntriesContainer->Size ());
 
   else
     {
@@ -498,7 +498,7 @@ VariableSizeStore::ConcludeStorageCheck()
   mFirstFreeEntry = StoreEntry::LAST_DELETED_ENTRY;
 
   uint64_t lastFreeEntry = 0, currentEntry = 1;
-  while (currentEntry < mUsedEntries.size())
+  while (currentEntry < mUsedEntries.size ())
     {
       if (mUsedEntries[currentEntry])
         {
@@ -525,10 +525,10 @@ VariableSizeStore::ConcludeStorageCheck()
                                    sizeof templateEntry,
                                    _RC (uint8_t*, &templateEntry));
 
-  _placement_new (_RC (void*, &mEntriesCache), BlockCache());
+  _placement_new (_RC (void*, &mEntriesCache), BlockCache ());
 
-  uint_t       blkSize  = DBSSettings().mVLStoreCacheBlkSize;
-  const uint_t blkCount = DBSSettings().mVLStoreCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().mVLStoreCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().mVLStoreCacheBlkCount;
 
   assert ((blkSize != 0) && (blkCount != 0));
 
@@ -556,8 +556,8 @@ VariableSizeStore::FinishInit (const bool nonPersitentData)
       mEntriesCount++;
     }
 
-  uint_t       blkSize  = DBSSettings().mVLStoreCacheBlkSize;
-  const uint_t blkCount = DBSSettings().mVLStoreCacheBlkCount;
+  uint_t       blkSize  = DBSSettings ().mVLStoreCacheBlkSize;
+  const uint_t blkCount = DBSSettings ().mVLStoreCacheBlkCount;
 
   assert ((blkSize != 0) && (blkCount != 0));
 
@@ -577,28 +577,28 @@ VariableSizeStore::FinishInit (const bool nonPersitentData)
   //TBD: What we should with these? Leave them like this for now, maybe we are
   //     in the middle of a repair.
   //assert (entry->IsDeleted ());
-  //assert (entry->IsFirstEntry() == false);
+  //assert (entry->IsFirstEntry () == false);
 
-  mFirstFreeEntry = entry->NextEntry();
+  mFirstFreeEntry = entry->NextEntry ();
 
-  assert ((mEntriesContainer->Size() % sizeof (StoreEntry)) == 0);
+  assert ((mEntriesContainer->Size () % sizeof (StoreEntry)) == 0);
   assert (mEntriesCount > 0);
 }
 
 
 void
-VariableSizeStore::Flush()
+VariableSizeStore::Flush ()
 {
   LockRAII<Lock> sync (mSync);
 
-  mEntriesCache.Flush();
+  mEntriesCache.Flush ();
 }
 
 
 void
-VariableSizeStore::MarkForRemoval()
+VariableSizeStore::MarkForRemoval ()
 {
-  mEntriesContainer.get ()->MarkForRemoval();
+  mEntriesContainer.get ()->MarkForRemoval ();
 }
 
 
@@ -606,13 +606,13 @@ uint64_t
 VariableSizeStore::AddRecord (const uint8_t*    buffer,
                               const uint64_t    size)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   LockRAII<Lock> sync (mSync);
 
   uint64_t resultEntry   = AllocateEntry (0);
   StoredItem  cachedItem = mEntriesCache.RetriveItem (resultEntry);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   entry->MarkAsDeleted (false);
   entry->MarkAsFirstEntry (true);
@@ -639,13 +639,13 @@ VariableSizeStore::AddRecord (VariableSizeStore& sourceStore,
                               uint64_t           sourceOffset,
                               uint64_t           sourceSize)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   LockRAII<Lock> sync (mSync);
 
   uint64_t resultEntry   = AllocateEntry (0);
   StoredItem  cachedItem = mEntriesCache.RetriveItem (resultEntry);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   entry->MarkAsDeleted (false);
   entry->MarkAsFirstEntry (true);
@@ -674,13 +674,13 @@ VariableSizeStore::AddRecord (IDataContainer& sourceContainer,
                               uint64_t        sourceOffset,
                               uint64_t        sourceSize)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   LockRAII<Lock> sync (mSync);
 
   uint64_t resultEntry   = AllocateEntry (0);
   StoredItem  cachedItem = mEntriesCache.RetriveItem (resultEntry);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   entry->MarkAsDeleted (false);
   entry->MarkAsFirstEntry (true);
@@ -703,7 +703,7 @@ VariableSizeStore::GetRecord (uint64_t  recordFirstEntry,
                               uint64_t  size,
                               uint8_t*  buffer)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   LockRAII<Lock> sync (mSync);
   do
@@ -720,11 +720,11 @@ VariableSizeStore::GetRecord (uint64_t  recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      if (offset < entry->Size())
+      if (offset < entry->Size ())
         break;
 
-      offset           -= entry->Size();
-      recordFirstEntry  = entry->NextEntry();
+      offset           -= entry->Size ();
+      recordFirstEntry  = entry->NextEntry ();
     }
   while (true);
 
@@ -740,12 +740,12 @@ VariableSizeStore::GetRecord (uint64_t  recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      const uint64_t chunkSize = min (size, entry->Size() - offset);
+      const uint64_t chunkSize = min (size, entry->Size () - offset);
       entry->Read (offset, chunkSize, buffer);
 
       size -= chunkSize, buffer += chunkSize;
-      offset = (offset + chunkSize) % entry->Size();
-      recordFirstEntry = entry->NextEntry();
+      offset = (offset + chunkSize) % entry->Size ();
+      recordFirstEntry = entry->NextEntry ();
     }
 }
 
@@ -755,7 +755,7 @@ VariableSizeStore::UpdateRecord (uint64_t       recordFirstEntry,
                                  uint64_t       size,
                                  const uint8_t* buffer)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   uint64_t prevEntry = recordFirstEntry;
 
@@ -780,12 +780,12 @@ VariableSizeStore::UpdateRecord (uint64_t       recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      if (offset < entry->Size())
+      if (offset < entry->Size ())
         break;
 
-      offset           -= entry->Size();
+      offset           -= entry->Size ();
       prevEntry         = recordFirstEntry;
-      recordFirstEntry  = entry->NextEntry();
+      recordFirstEntry  = entry->NextEntry ();
     }
   while (true);
 
@@ -797,7 +797,7 @@ VariableSizeStore::UpdateRecord (uint64_t       recordFirstEntry,
       StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
       StoreEntry* const entry = _RC (StoreEntry*,
-                                     cachedItem.GetDataForUpdate());
+                                     cachedItem.GetDataForUpdate ());
 
       assert (entry->IsDeleted () == false);
 
@@ -806,10 +806,10 @@ VariableSizeStore::UpdateRecord (uint64_t       recordFirstEntry,
 
       size -= chunkSize, buffer += chunkSize;
 
-      offset = (offset + chunkSize) % entry->Size();
+      offset = (offset + chunkSize) % entry->Size ();
 
       prevEntry        = recordFirstEntry;
-      recordFirstEntry = entry->NextEntry();
+      recordFirstEntry = entry->NextEntry ();
     }
 }
 
@@ -822,7 +822,7 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
                                  uint64_t           sourceOffset,
                                  uint64_t           sourceSize)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   uint64_t prevEntry       = recordFirstEntry;
   uint64_t sourcePrevEntry = sourceFirstEntry;
@@ -846,12 +846,12 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      if (offset < entry->Size())
+      if (offset < entry->Size ())
         break;
 
-      offset           -= entry->Size();
+      offset           -= entry->Size ();
       prevEntry         = recordFirstEntry;
-      recordFirstEntry  = entry->NextEntry();
+      recordFirstEntry  = entry->NextEntry ();
 
     }
   while (true);
@@ -875,11 +875,11 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      if (sourceOffset < entry->Size())
+      if (sourceOffset < entry->Size ())
         break;
 
-      sourceOffset     -= entry->Size();
-      sourceFirstEntry  = entry->NextEntry();
+      sourceOffset     -= entry->Size ();
+      sourceFirstEntry  = entry->NextEntry ();
     }
   while (true);
 
@@ -899,18 +899,18 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
         StoredItem cachedItem = sourceStore.mEntriesCache.RetriveItem(
                                                              sourceFirstEntry
                                                                       );
-        StoreEntry* entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+        StoreEntry* entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
-        assert (entry->Size() <= sizeof tembuffer);
+        assert (entry->Size () <= sizeof tembuffer);
 
         tempValid        = entry->Read (sourceOffset, sourceSize, tembuffer);
         sourcePrevEntry  = sourceFirstEntry;
-        sourceFirstEntry = entry->NextEntry();
+        sourceFirstEntry = entry->NextEntry ();
       }
 
       StoredItem  cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
       StoreEntry* entry      = _RC (StoreEntry*,
-                                    cachedItem.GetDataForUpdate());
+                                    cachedItem.GetDataForUpdate ());
 
       assert (entry->IsDeleted () == false);
 
@@ -920,20 +920,20 @@ VariableSizeStore::UpdateRecord (uint64_t           recordFirstEntry,
 
       sourceSize -= chunkSize, offset += chunkSize;
 
-      if (offset >= entry->Size())
+      if (offset >= entry->Size ())
         {
           prevEntry        = recordFirstEntry;
-          recordFirstEntry = entry->NextEntry();
+          recordFirstEntry = entry->NextEntry ();
 
-          offset -= entry->Size();
+          offset -= entry->Size ();
         }
 
       sourceOffset += chunkSize;
-      if (sourceOffset < entry->Size())
+      if (sourceOffset < entry->Size ())
         sourceFirstEntry = sourcePrevEntry;
 
       else
-        sourceOffset -= entry->Size();
+        sourceOffset -= entry->Size ();
     }
 }
 
@@ -945,7 +945,7 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
                                  uint64_t         sourceOffset,
                                  uint64_t         sourceSize)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   uint64_t prevEntry = recordFirstEntry;
 
@@ -969,12 +969,12 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
 
       assert (entry->IsDeleted () == false);
 
-      if (offset < entry->Size())
+      if (offset < entry->Size ())
         break;
 
-      offset           -= entry->Size();
+      offset           -= entry->Size ();
       prevEntry         = recordFirstEntry;
-      recordFirstEntry  = entry->NextEntry();
+      recordFirstEntry  = entry->NextEntry ();
 
     }
   while (true);
@@ -986,14 +986,14 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
 
       StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
-      StoreEntry* entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+      StoreEntry* entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
       assert (entry->IsDeleted () == false);
 
       uint8_t tembuffer[64];
-      uint_t  tempValid = MIN (entry->Size() - offset, sourceSize);
+      uint_t  tempValid = MIN (entry->Size () - offset, sourceSize);
 
-      assert (entry->Size() < sizeof tembuffer);
+      assert (entry->Size () < sizeof tembuffer);
 
       sourceContainer.Read (sourceOffset, tempValid, tembuffer);
 
@@ -1004,10 +1004,10 @@ VariableSizeStore::UpdateRecord (uint64_t         recordFirstEntry,
 
       sourceSize -= tempValid, sourceOffset += tempValid;
 
-      offset = (offset + tempValid) % entry->Size();
+      offset = (offset + tempValid) % entry->Size ();
 
       prevEntry        = recordFirstEntry;
-      recordFirstEntry = entry->NextEntry();
+      recordFirstEntry = entry->NextEntry ();
     }
 }
 
@@ -1019,13 +1019,13 @@ VariableSizeStore::IncrementRecordRef (const uint64_t recordFirstEntry)
 
   StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
-  StoreEntry* const entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* const entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
-  assert (entry->IsFirstEntry());
+  assert (entry->IsFirstEntry ());
   assert (entry->IsDeleted () == false);
-  assert (entry->PrevEntry() > 0);
+  assert (entry->PrevEntry () > 0);
 
-  entry->PrevEntry (entry->PrevEntry() + 1);
+  entry->PrevEntry (entry->PrevEntry () + 1);
 }
 
 
@@ -1036,12 +1036,12 @@ VariableSizeStore::DecrementRecordRef (const uint64_t recordFirstEntry)
 
   StoredItem cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
 
-  StoreEntry* const entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* const entry = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
-  assert (entry->IsFirstEntry());
+  assert (entry->IsFirstEntry ());
   assert (entry->IsDeleted () == false);
 
-  uint64_t refCount = entry->PrevEntry();
+  uint64_t refCount = entry->PrevEntry ();
 
   assert (refCount > 0);
 
@@ -1053,14 +1053,14 @@ VariableSizeStore::DecrementRecordRef (const uint64_t recordFirstEntry)
 
 
 uint64_t
-VariableSizeStore::Size() const
+VariableSizeStore::Size () const
 {
   LockRAII<Lock> sync (_CC(Lock&, mSync));
 
   if (mEntriesContainer.get () == NULL)
     return 0;
 
-  return mEntriesContainer->Size();
+  return mEntriesContainer->Size ();
 }
 
 
@@ -1118,23 +1118,23 @@ VariableSizeStore::AllocateEntry (const uint64_t prevEntryId)
     }
 
   if (foundFree == StoreEntry::LAST_DELETED_ENTRY)
-    foundFree = ExtentFreeList();
+    foundFree = ExtentFreeList ();
 
   ExtractFromFreeList (foundFree);
 
   StoredItem  cachedItem = mEntriesCache.RetriveItem (foundFree);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   if (prevEntryId > 0)
     {
       StoredItem  prevCachedItem = mEntriesCache.RetriveItem (prevEntryId);
       StoreEntry* prevEntry      = _RC (StoreEntry*,
-                                        prevCachedItem.GetDataForUpdate());
+                                        prevCachedItem.GetDataForUpdate ());
 
-      const uint64_t prevNext = prevEntry->NextEntry();
+      const uint64_t prevNext = prevEntry->NextEntry ();
 
       assert (prevEntry->IsDeleted () == false);
-      assert (prevEntry->NextEntry() == StoreEntry::LAST_CHAINED_ENTRY);
+      assert (prevEntry->NextEntry () == StoreEntry::LAST_CHAINED_ENTRY);
 
       prevEntry->NextEntry (foundFree);
 
@@ -1142,12 +1142,12 @@ VariableSizeStore::AllocateEntry (const uint64_t prevEntryId)
       entry->MarkAsFirstEntry (false);
       entry->NextEntry (prevNext);
 
-      if (entry->NextEntry() != StoreEntry::LAST_CHAINED_ENTRY)
+      if (entry->NextEntry () != StoreEntry::LAST_CHAINED_ENTRY)
         {
           StoredItem nextCachedItem = mEntriesCache.RetriveItem(
-                                                      entry->NextEntry()
+                                                      entry->NextEntry ()
                                                                 );
-          entry = _RC (StoreEntry*, nextCachedItem.GetDataForUpdate());
+          entry = _RC (StoreEntry*, nextCachedItem.GetDataForUpdate ());
 
           entry->PrevEntry (foundFree);
         }
@@ -1164,7 +1164,7 @@ VariableSizeStore::AllocateEntry (const uint64_t prevEntryId)
 
 
 uint64_t
-VariableSizeStore::ExtentFreeList()
+VariableSizeStore::ExtentFreeList ()
 {
   assert (mFirstFreeEntry == StoreEntry::LAST_DELETED_ENTRY);
   StoreEntry newEntry;
@@ -1175,7 +1175,7 @@ VariableSizeStore::ExtentFreeList()
 
   newEntry.MarkAsFirstEntry (false);
 
-  const uint64_t insertPos = mEntriesContainer.get ()->Size();
+  const uint64_t insertPos = mEntriesContainer.get ()->Size ();
 
   mFirstFreeEntry = insertPos / sizeof (newEntry);
 
@@ -1193,7 +1193,7 @@ VariableSizeStore::ExtentFreeList()
 
   StoredItem  cachedItem = mEntriesCache.RetriveItem (0);
   StoreEntry* entry      = _RC (StoreEntry*,
-                                cachedItem.GetDataForUpdate());
+                                cachedItem.GetDataForUpdate ());
 
   entry->NextEntry (mFirstFreeEntry);
 
@@ -1204,7 +1204,7 @@ VariableSizeStore::ExtentFreeList()
 void
 VariableSizeStore::RemoveRecord (uint64_t recordFirstEntry)
 {
-  assert (mUsedEntries.size() == 0);
+  assert (mUsedEntries.size () == 0);
 
   StoredItem        cachedItem = mEntriesCache.RetriveItem (recordFirstEntry);
   const StoreEntry* entry      = _RC (const StoreEntry*,
@@ -1212,7 +1212,7 @@ VariableSizeStore::RemoveRecord (uint64_t recordFirstEntry)
 
   (void)entry;
   assert (entry->IsDeleted () == false);
-  assert (entry->IsFirstEntry());
+  assert (entry->IsFirstEntry ());
 
   while (recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
     {
@@ -1223,7 +1223,7 @@ VariableSizeStore::RemoveRecord (uint64_t recordFirstEntry)
       assert (entry->IsDeleted () == false);
 
       const uint64_t currentEntry = recordFirstEntry;
-      recordFirstEntry            = entry->NextEntry();
+      recordFirstEntry            = entry->NextEntry ();
 
       AddToFreeList (currentEntry);
     }
@@ -1234,14 +1234,14 @@ void
 VariableSizeStore::ExtractFromFreeList (const uint64_t entryId)
 {
   StoredItem  cachedItem = mEntriesCache.RetriveItem (entryId);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   assert (entryId != 0);
   assert (entry->IsDeleted ());
-  assert (entry->IsFirstEntry() == false);
+  assert (entry->IsFirstEntry () == false);
 
-  const uint64_t prevEntry = entry->PrevEntry();
-  const uint64_t nextEntry = entry->NextEntry();
+  const uint64_t prevEntry = entry->PrevEntry ();
+  const uint64_t nextEntry = entry->NextEntry ();
 
   assert (prevEntry < mEntriesCount);
   assert ((nextEntry == StoreEntry::LAST_DELETED_ENTRY)
@@ -1252,10 +1252,10 @@ VariableSizeStore::ExtractFromFreeList (const uint64_t entryId)
   entry->NextEntry (0);
 
   cachedItem = mEntriesCache.RetriveItem (prevEntry);
-  entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   assert (entry->IsDeleted ());
-  assert (entry->IsFirstEntry() == false);
+  assert (entry->IsFirstEntry () == false);
 
   entry->NextEntry (nextEntry);
 
@@ -1265,10 +1265,10 @@ VariableSizeStore::ExtractFromFreeList (const uint64_t entryId)
   if (nextEntry != StoreEntry::LAST_DELETED_ENTRY)
     {
       cachedItem = mEntriesCache.RetriveItem (nextEntry);
-      entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+      entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
       assert (entry->IsDeleted ());
-      assert (entry->IsFirstEntry() == false);
+      assert (entry->IsFirstEntry () == false);
 
       entry->PrevEntry (prevEntry);
     }
@@ -1281,7 +1281,7 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
   assert (mEntriesCount > entryId);
 
   StoredItem  cachedItem = mEntriesCache.RetriveItem (entryId);
-  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  StoreEntry* entry      = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   //Just to have a valid initialization
   StoredItem  neighborCachedItem = cachedItem;
@@ -1298,13 +1298,13 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
     {
       neighborCachedItem = mEntriesCache.RetriveItem (entryId + 1);
       neighborEntry      = _RC (StoreEntry*,
-                                neighborCachedItem.GetDataForUpdate());
+                                neighborCachedItem.GetDataForUpdate ());
 
       if (neighborEntry->IsDeleted ())
         {
-          assert (neighborEntry->IsFirstEntry() == false);
+          assert (neighborEntry->IsFirstEntry () == false);
 
-          const uint64_t prevEntry = neighborEntry->PrevEntry();
+          const uint64_t prevEntry = neighborEntry->PrevEntry ();
 
           neighborEntry->PrevEntry (entryId);
           entry->PrevEntry (prevEntry);
@@ -1312,10 +1312,10 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
 
           neighborCachedItem = mEntriesCache.RetriveItem (prevEntry);
           neighborEntry      = _RC (StoreEntry*,
-                                    neighborCachedItem.GetDataForUpdate());
+                                    neighborCachedItem.GetDataForUpdate ());
 
           assert (neighborEntry->IsDeleted ());
-          assert (neighborEntry->IsFirstEntry() == false);
+          assert (neighborEntry->IsFirstEntry () == false);
 
           neighborEntry->NextEntry (entryId);
 
@@ -1333,13 +1333,13 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
     {
       neighborCachedItem = mEntriesCache.RetriveItem (entryId - 1);
       neighborEntry      = _RC (StoreEntry*,
-                                neighborCachedItem.GetDataForUpdate());
+                                neighborCachedItem.GetDataForUpdate ());
 
       if (neighborEntry->IsDeleted ())
         {
-          assert (neighborEntry->IsFirstEntry() == false);
+          assert (neighborEntry->IsFirstEntry () == false);
 
-          const uint64_t nextEntry = neighborEntry->NextEntry();
+          const uint64_t nextEntry = neighborEntry->NextEntry ();
 
           neighborEntry->NextEntry (entryId);
           entry->NextEntry (nextEntry);
@@ -1350,10 +1350,10 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
 
           neighborCachedItem = mEntriesCache.RetriveItem (nextEntry);
           neighborEntry      = _RC (StoreEntry*,
-                                    neighborCachedItem.GetDataForUpdate());
+                                    neighborCachedItem.GetDataForUpdate ());
 
           assert (neighborEntry->IsDeleted ());
-          assert (neighborEntry->IsFirstEntry() == false);
+          assert (neighborEntry->IsFirstEntry () == false);
 
           neighborEntry->PrevEntry (entryId);
 
@@ -1366,10 +1366,10 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
     {
       neighborCachedItem = mEntriesCache.RetriveItem (mFirstFreeEntry);
       neighborEntry      = _RC (StoreEntry*,
-                                neighborCachedItem.GetDataForUpdate());
+                                neighborCachedItem.GetDataForUpdate ());
 
       assert (neighborEntry->IsDeleted ());
-      assert (neighborEntry->IsFirstEntry() == false);
+      assert (neighborEntry->IsFirstEntry () == false);
 
      neighborEntry->PrevEntry (entryId);
     }
@@ -1379,10 +1379,10 @@ VariableSizeStore::AddToFreeList (const uint64_t entryId)
 
   mFirstFreeEntry = entryId;
   cachedItem      = mEntriesCache.RetriveItem (0);
-  entry           = _RC (StoreEntry*, cachedItem.GetDataForUpdate());
+  entry           = _RC (StoreEntry*, cachedItem.GetDataForUpdate ());
 
   assert (entry->IsDeleted ());
-  assert (entry->IsFirstEntry() == false);
+  assert (entry->IsFirstEntry () == false);
 
   entry->NextEntry (entryId);
 }

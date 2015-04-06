@@ -16,7 +16,7 @@ prepare_env:
 		done ;
 		
 generate_files: prepare_env ./compiler/parser/whais.tab.c
-	$(ECHO)$(MAKE) --no-print-directory -otarget executables 
+	$(ECHO)$(MAKE) --no-print-directory -oline executables 
 		
 executables:  $(EXES) $(SHLS) $(LIBS)
 

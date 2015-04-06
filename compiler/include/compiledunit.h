@@ -40,20 +40,20 @@ namespace whais
 class COMPILER_SHL WIFunctionalUnit
 {
 public:
-  virtual ~WIFunctionalUnit();
+  virtual ~WIFunctionalUnit ();
 
-  virtual uint_t         TypeAreaSize() = 0;
-  virtual const uint8_t* RetriveTypeArea() = 0;
-  virtual uint_t         ConstsAreaSize() = 0;
-  virtual const uint8_t* RetrieveConstArea() = 0;
+  virtual uint_t         TypeAreaSize () = 0;
+  virtual const uint8_t* RetriveTypeArea () = 0;
+  virtual uint_t         ConstsAreaSize () = 0;
+  virtual const uint8_t* RetrieveConstArea () = 0;
 
-  virtual uint_t         GlobalsCount() = 0;
+  virtual uint_t         GlobalsCount () = 0;
   virtual uint_t         GlobalNameLength (const uint_t id) = 0;
   virtual const char*    RetriveGlobalName (const uint_t id) = 0;
   virtual uint_t         GlobalTypeOff (const uint_t id) = 0;
   virtual bool_t         IsGlobalExternal (const uint_t id) = 0;
 
-  virtual uint_t         ProceduresCount() = 0;
+  virtual uint_t         ProceduresCount () = 0;
   virtual uint_t         ProcSyncStatementsCount (const uint_t id) = 0;
   virtual uint_t         ProcCodeAreaSize (const uint_t id) = 0;
   virtual const uint8_t* RetriveProcCodeArea (const uint_t id) = 0;
@@ -78,11 +78,11 @@ public:
                            const char*        fmtMsg = NULL,
                            ...);
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 
@@ -93,20 +93,20 @@ public:
                       uint_t            bufferSize,
                       WH_MESSENGER      messenger,
                       WH_MESSENGER_CTXT messengerContext);
-  virtual ~CompiledBufferUnit();
+  virtual ~CompiledBufferUnit ();
 
-  virtual uint_t         TypeAreaSize();
-  virtual const uint8_t* RetriveTypeArea();
-  virtual uint_t         ConstsAreaSize();
-  virtual const uint8_t* RetrieveConstArea();
+  virtual uint_t         TypeAreaSize ();
+  virtual const uint8_t* RetriveTypeArea ();
+  virtual uint_t         ConstsAreaSize ();
+  virtual const uint8_t* RetrieveConstArea ();
 
-  virtual uint_t        GlobalsCount();
+  virtual uint_t        GlobalsCount ();
   virtual uint_t        GlobalNameLength (const uint_t id);
   virtual const char*   RetriveGlobalName (const uint_t id);
   virtual uint_t        GlobalTypeOff (const uint_t id);
   virtual bool_t        IsGlobalExternal (const uint_t id);
 
-  virtual uint_t         ProceduresCount();
+  virtual uint_t         ProceduresCount ();
   virtual uint_t         ProcSyncStatementsCount (const uint_t id);
   virtual uint_t         ProcCodeAreaSize (const uint_t id);
   virtual const uint8_t* RetriveProcCodeArea (const uint_t id);
@@ -133,20 +133,20 @@ class COMPILER_SHL CompiledFileUnit : public WIFunctionalUnit
 
 public:
   explicit CompiledFileUnit (const char* file);
-  virtual ~CompiledFileUnit();
+  virtual ~CompiledFileUnit ();
 
-  virtual uint_t         TypeAreaSize();
-  virtual const uint8_t* RetriveTypeArea();
+  virtual uint_t         TypeAreaSize ();
+  virtual const uint8_t* RetriveTypeArea ();
 
-  virtual uint_t         GlobalsCount();
+  virtual uint_t         GlobalsCount ();
   virtual uint_t         GlobalNameLength (const uint_t id);
   virtual const char*    RetriveGlobalName (const uint_t id);
   virtual uint_t         GlobalTypeOff (const uint_t id);
   virtual bool_t         IsGlobalExternal (const uint_t id);
-  virtual uint_t         ConstsAreaSize();
-  virtual const uint8_t* RetrieveConstArea();
+  virtual uint_t         ConstsAreaSize ();
+  virtual const uint8_t* RetrieveConstArea ();
 
-  virtual uint_t         ProceduresCount();
+  virtual uint_t         ProceduresCount ();
   virtual uint_t         ProcSyncStatementsCount (const uint_t id);
   virtual uint_t         ProcCodeAreaSize (const uint_t id);
   virtual const uint8_t* RetriveProcCodeArea (const uint_t id);

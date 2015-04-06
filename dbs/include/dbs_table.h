@@ -32,7 +32,7 @@ namespace whais {
 
 struct CreateIndexCallbackContext
 {
-  virtual ~CreateIndexCallbackContext() {};
+  virtual ~CreateIndexCallbackContext () {};
 
   uint64_t      mRowIndex;
   uint64_t      mRowsCount;
@@ -43,25 +43,25 @@ typedef void CREATE_INDEX_CALLBACK_FUNC (CreateIndexCallbackContext* cbContext);
 class DBS_SHL ITable
 {
 public:
-  virtual ~ITable();
+  virtual ~ITable ();
 
-  virtual bool IsTemporal() const = 0;
+  virtual bool IsTemporal () const = 0;
 
-  virtual ITable& Spawn() const = 0;
+  virtual ITable& Spawn () const = 0;
 
-  virtual FIELD_INDEX FieldsCount() = 0;
+  virtual FIELD_INDEX FieldsCount () = 0;
 
   virtual FIELD_INDEX RetrieveField (const char* fieldName) = 0;
 
   virtual DBSFieldDescriptor DescribeField (const FIELD_INDEX field) = 0;
 
-  virtual ROW_INDEX AllocatedRows() = 0;
+  virtual ROW_INDEX AllocatedRows () = 0;
 
   virtual ROW_INDEX AddRow(const bool skipThreadSafety = false) = 0;
 
   virtual ROW_INDEX GetReusableRow (const bool forceAdd) = 0;
 
-  virtual ROW_INDEX ReusableRowsCount() = 0;
+  virtual ROW_INDEX ReusableRowsCount () = 0;
 
   virtual void MarkRowForReuse (const ROW_INDEX row) = 0;
 
@@ -343,11 +343,11 @@ public:
                             const ROW_INDEX    toRow,
                             const FIELD_INDEX  field) = 0;
 
-  virtual void Flush() = 0;
+  virtual void Flush () = 0;
 
-  virtual void LockTable() = 0;
+  virtual void LockTable () = 0;
 
-  virtual void UnlockTable() = 0;
+  virtual void UnlockTable () = 0;
 };
 
 } //namespace whais

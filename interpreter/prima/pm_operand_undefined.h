@@ -75,7 +75,7 @@ public:
 
   NativeObjectOperand& operator= (const NativeObjectOperand& source);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DChar& outValue) const;
   virtual void GetValue (DDate& outValue) const;
@@ -112,22 +112,22 @@ public:
   virtual void SetValue (const DText& value);
   virtual void SetValue (const DArray& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
 
   virtual void           NativeObject (INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual INativeObject& NativeObject ();
 
   virtual bool PrepareToCopy (void* const dest);
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 
 private:
   struct RealValue
@@ -168,8 +168,8 @@ private:
     bool       mNull;
   };
 
-  void Initialise();
-  void Cleanup();
+  void Initialise ();
+  void Cleanup ();
 
   uint16_t               mType;
   union

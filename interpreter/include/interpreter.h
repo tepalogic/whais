@@ -50,11 +50,11 @@ public:
                            uint32_t        line,
                            const char*     fmtMsg = NULL,
                            ...);
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 
   enum
   {
@@ -111,7 +111,7 @@ class INTERP_SHL ISession
 {
 public:
   ISession (Logger& log);
-  virtual ~ISession();
+  virtual ~ISession ();
 
   virtual void LoadCompiledUnit (WIFunctionalUnit& unit) = 0;
   virtual bool LoadSharedLib (WH_SHLIB shl) = 0;
@@ -119,9 +119,9 @@ public:
   virtual void ExecuteProcedure (const char* const   name,
                                  SessionStack&       stack) = 0;
 
-  virtual uint_t GlobalValuesCount() const = 0;
+  virtual uint_t GlobalValuesCount () const = 0;
 
-  virtual uint_t ProceduresCount() const = 0;
+  virtual uint_t ProceduresCount () const = 0;
 
   virtual const char* GlobalValueName (const uint_t index) const = 0;
 

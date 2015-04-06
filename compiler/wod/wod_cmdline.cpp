@@ -55,7 +55,7 @@ CmdLineParser::CmdLineParser (int argc, char ** argv)
     mOutStream (&cout),
     mShowHelp (false)
 {
-  Parse();
+  Parse ();
 }
 
 
@@ -67,7 +67,7 @@ CmdLineParser::~CmdLineParser ()
 
 
 void
-CmdLineParser::Parse()
+CmdLineParser::Parse ()
 {
   int index = 1;
   if (index >= mArgCount)
@@ -120,16 +120,16 @@ CmdLineParser::Parse()
                                   mArgs[index]);
         }
     }
-  CheckArguments();
+  CheckArguments ();
 }
 
 
 void
-CmdLineParser::CheckArguments()
+CmdLineParser::CheckArguments ()
 {
   if (mShowHelp)
     {
-      DisplayUsage();
+      DisplayUsage ();
       exit (0);
     }
   else if (mSourceFile == NULL)
@@ -138,7 +138,7 @@ CmdLineParser::CheckArguments()
 
 
 void
-CmdLineParser::DisplayUsage() const
+CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
@@ -177,7 +177,7 @@ CmdLineException::CmdLineException (const uint32_t  code,
 
 
 Exception*
-CmdLineException::Clone() const
+CmdLineException::Clone () const
 {
   return new CmdLineException (*this);
 }
@@ -185,14 +185,14 @@ CmdLineException::Clone() const
 
 
 EXCEPTION_TYPE
-CmdLineException::Type() const
+CmdLineException::Type () const
 {
   return DUMP_CMD_LINE_EXCEPTION;
 }
 
 
 const char*
-CmdLineException::Description() const
+CmdLineException::Description () const
 {
   return "Invalid command line.";
 }

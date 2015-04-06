@@ -43,7 +43,7 @@ namespace prima {
 
 
 bool
-BaseOperand::IsNull() const
+BaseOperand::IsNull () const
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -348,16 +348,16 @@ BaseOperand::GetField ()
 
 
 ITable&
-BaseOperand::GetTable()
+BaseOperand::GetTable ()
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
 
 StackValue
-BaseOperand::GetTableValue()
+BaseOperand::GetTableValue ()
 {
-  return StackValue (TableOperand (GetTableReference()));
+  return StackValue (TableOperand (GetTableReference ()));
 }
 
 
@@ -376,7 +376,7 @@ BaseOperand::GetValueAt (const uint64_t index)
 
 
 TableOperand
-BaseOperand::GetTableOp()
+BaseOperand::GetTableOp ()
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -390,7 +390,7 @@ BaseOperand::CopyTableOp (const TableOperand& tableOp)
 
 
 FieldOperand
-BaseOperand::GetFieldOp()
+BaseOperand::GetFieldOp ()
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -418,7 +418,7 @@ BaseOperand::NativeObject (INativeObject* const)
 
 
 INativeObject&
-BaseOperand::NativeObject()
+BaseOperand::NativeObject ()
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -432,7 +432,7 @@ BaseOperand::PrepareToCopy (void* const)
 
 
 TableReference&
-BaseOperand::GetTableReference()
+BaseOperand::GetTableReference ()
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -441,7 +441,7 @@ BaseOperand::GetTableReference()
 template <typename T>
 static void assign_null (T& output)
 {
-  output = T();
+  output = T ();
 }
 
 
@@ -452,7 +452,7 @@ NullOperand::~NullOperand ()
 
 
 bool
-NullOperand::IsNull() const
+NullOperand::IsNull () const
 {
   return true;
 }
@@ -578,14 +578,14 @@ NullOperand::GetValue (DArray& outValue) const
 
 
 uint_t
-NullOperand::GetType()
+NullOperand::GetType ()
 {
   return T_UNKNOWN;
 }
 
 
 StackValue
-NullOperand::Duplicate() const
+NullOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -594,9 +594,9 @@ NullOperand::Duplicate() const
 
 
 bool
-BoolOperand::IsNull() const
+BoolOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -650,14 +650,14 @@ BoolOperand::SelfOr (const DBool& value)
 
 
 uint_t
-BoolOperand::GetType()
+BoolOperand::GetType ()
 {
   return T_BOOL;
 }
 
 
 StackValue
-BoolOperand::Duplicate() const
+BoolOperand::Duplicate () const
 {
   return  StackValue (*this);
 }
@@ -665,9 +665,9 @@ BoolOperand::Duplicate() const
 
 
 bool
-CharOperand::IsNull() const
+CharOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -697,14 +697,14 @@ CharOperand::SetValue (const DChar& value)
 
 
 uint_t
-CharOperand::GetType()
+CharOperand::GetType ()
 {
   return T_CHAR;
 }
 
 
 StackValue
-CharOperand::Duplicate() const
+CharOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -712,9 +712,9 @@ CharOperand::Duplicate() const
 
 
 bool
-DateOperand::IsNull() const
+DateOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -760,14 +760,14 @@ DateOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-DateOperand::GetType()
+DateOperand::GetType ()
 {
   return T_DATE;
 }
 
 
 StackValue
-DateOperand::Duplicate() const
+DateOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -775,9 +775,9 @@ DateOperand::Duplicate() const
 
 
 bool
-DateTimeOperand::IsNull() const
+DateTimeOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -829,14 +829,14 @@ DateTimeOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-DateTimeOperand::GetType()
+DateTimeOperand::GetType ()
 {
   return T_DATETIME;
 }
 
 
 StackValue
-DateTimeOperand::Duplicate() const
+DateTimeOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -844,9 +844,9 @@ DateTimeOperand::Duplicate() const
 
 
 bool
-HiresTimeOperand::IsNull() const
+HiresTimeOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -897,14 +897,14 @@ HiresTimeOperand::SetValue (const DHiresTime& value)
 
 
 uint_t
-HiresTimeOperand::GetType()
+HiresTimeOperand::GetType ()
 {
   return T_HIRESTIME;
 }
 
 
 StackValue
-HiresTimeOperand::Duplicate() const
+HiresTimeOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -912,9 +912,9 @@ HiresTimeOperand::Duplicate() const
 
 
 bool
-UInt8Operand::IsNull() const
+UInt8Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1067,14 +1067,14 @@ UInt8Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt8Operand::GetType()
+UInt8Operand::GetType ()
 {
   return T_UINT8;
 }
 
 
 StackValue
-UInt8Operand::Duplicate() const
+UInt8Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1083,9 +1083,9 @@ UInt8Operand::Duplicate() const
 
 
 bool
-UInt16Operand::IsNull() const
+UInt16Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1120,14 +1120,14 @@ UInt16Operand::GetValue (DInt64& outValue) const
 void
 UInt16Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 UInt16Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -1239,14 +1239,14 @@ UInt16Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt16Operand::GetType()
+UInt16Operand::GetType ()
 {
   return T_UINT16;
 }
 
 
 StackValue
-UInt16Operand::Duplicate() const
+UInt16Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1254,9 +1254,9 @@ UInt16Operand::Duplicate() const
 
 
 bool
-UInt32Operand::IsNull() const
+UInt32Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1294,14 +1294,14 @@ UInt32Operand::GetValue (DInt64& outValue) const
 void
 UInt32Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 UInt32Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -1413,14 +1413,14 @@ UInt32Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt32Operand::GetType()
+UInt32Operand::GetType ()
 {
   return T_UINT32;
 }
 
 
 StackValue
-UInt32Operand::Duplicate() const
+UInt32Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1428,9 +1428,9 @@ UInt32Operand::Duplicate() const
 
 
 bool
-UInt64Operand::IsNull() const
+UInt64Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 void
@@ -1464,14 +1464,14 @@ UInt64Operand::GetValue (DInt64& outValue) const
 void
 UInt64Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 UInt64Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -1583,14 +1583,14 @@ UInt64Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-UInt64Operand::GetType()
+UInt64Operand::GetType ()
 {
   return T_UINT64;
 }
 
 
 StackValue
-UInt64Operand::Duplicate() const
+UInt64Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1598,9 +1598,9 @@ UInt64Operand::Duplicate() const
 
 
 bool
-Int8Operand::IsNull() const
+Int8Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1635,14 +1635,14 @@ Int8Operand::GetValue (DInt64& outValue) const
 void
 Int8Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 Int8Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -1752,14 +1752,14 @@ Int8Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int8Operand::GetType()
+Int8Operand::GetType ()
 {
   return T_INT8;
 }
 
 
 StackValue
-Int8Operand::Duplicate() const
+Int8Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1767,9 +1767,9 @@ Int8Operand::Duplicate() const
 
 
 bool
-Int16Operand::IsNull() const
+Int16Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1804,14 +1804,14 @@ Int16Operand::GetValue (DInt64& outValue) const
 void
 Int16Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 Int16Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -1923,14 +1923,14 @@ Int16Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int16Operand::GetType()
+Int16Operand::GetType ()
 {
   return T_INT16;
 }
 
 
 StackValue
-Int16Operand::Duplicate() const
+Int16Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -1938,9 +1938,9 @@ Int16Operand::Duplicate() const
 
 
 bool
-Int32Operand::IsNull() const
+Int32Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -1975,14 +1975,14 @@ Int32Operand::GetValue (DInt64& outValue) const
 void
 Int32Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 Int32Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -2094,14 +2094,14 @@ Int32Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int32Operand::GetType()
+Int32Operand::GetType ()
 {
   return T_INT32;
 }
 
 
 StackValue
-Int32Operand::Duplicate() const
+Int32Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2109,9 +2109,9 @@ Int32Operand::Duplicate() const
 
 
 bool
-Int64Operand::IsNull() const
+Int64Operand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -2146,14 +2146,14 @@ Int64Operand::GetValue (DInt64& outValue) const
 void
 Int64Operand::GetValue (DRichReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DRichReal() : DRichReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DRichReal () : DRichReal (mValue.mValue);
 }
 
 
 void
 Int64Operand::GetValue (DReal& outValue) const
 {
-  outValue = mValue.IsNull() ? DReal() : DReal (mValue.mValue);
+  outValue = mValue.IsNull () ? DReal () : DReal (mValue.mValue);
 }
 
 
@@ -2265,14 +2265,14 @@ Int64Operand::SelfOr (const DInt64& value)
 
 
 uint_t
-Int64Operand::GetType()
+Int64Operand::GetType ()
 {
   return T_INT64;
 }
 
 
 StackValue
-Int64Operand::Duplicate() const
+Int64Operand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2280,9 +2280,9 @@ Int64Operand::Duplicate() const
 
 
 bool
-RealOperand::IsNull() const
+RealOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -2373,14 +2373,14 @@ RealOperand::SelfDiv (const DRichReal& value)
 
 
 uint_t
-RealOperand::GetType()
+RealOperand::GetType ()
 {
   return T_REAL;
 }
 
 
 StackValue
-RealOperand::Duplicate() const
+RealOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2388,9 +2388,9 @@ RealOperand::Duplicate() const
 
 
 bool
-RichRealOperand::IsNull() const
+RichRealOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -2482,14 +2482,14 @@ RichRealOperand::SelfDiv (const DRichReal& value)
 
 
 uint_t
-RichRealOperand::GetType()
+RichRealOperand::GetType ()
 {
   return T_RICHREAL;
 }
 
 
 StackValue
-RichRealOperand::Duplicate() const
+RichRealOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2498,9 +2498,9 @@ RichRealOperand::Duplicate() const
 
 
 bool
-TextOperand::IsNull() const
+TextOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -2540,14 +2540,14 @@ TextOperand::GetValueAt (const uint64_t index)
 
 
 uint_t
-TextOperand::GetType()
+TextOperand::GetType ()
 {
   return T_TEXT;
 }
 
 
 StackValue
-TextOperand::Duplicate() const
+TextOperand::Duplicate () const
 {
   return StackValue (*this);
 }
@@ -2564,7 +2564,7 @@ TextOperand::PrepareToCopy (void* const dest)
 
 
 bool
-CharTextElOperand::IsNull() const
+CharTextElOperand::IsNull () const
 {
   return (mText.Count () <= mIndex) ? true : false;
 }
@@ -2573,7 +2573,7 @@ CharTextElOperand::IsNull() const
 void
 CharTextElOperand::GetValue (DChar& outValue) const
 {
-  outValue = (mText.Count() <= mIndex) ?
+  outValue = (mText.Count () <= mIndex) ?
                DChar () :
                mText.CharAt (mIndex);
 }
@@ -2598,14 +2598,14 @@ CharTextElOperand::SetValue (const DChar& value)
 
 
 uint_t
-CharTextElOperand::GetType()
+CharTextElOperand::GetType ()
 {
   return T_CHAR;
 }
 
 
 StackValue
-CharTextElOperand::Duplicate() const
+CharTextElOperand::Duplicate () const
 {
   DChar ch;
   GetValue (ch);
@@ -2631,9 +2631,9 @@ GlobalOperand::GlobalOperand (GlobalValue& value)
 }
 
 bool
-GlobalOperand::IsNull() const
+GlobalOperand::IsNull () const
 {
-  return mValue.IsNull();
+  return mValue.IsNull ();
 }
 
 
@@ -2931,9 +2931,9 @@ GlobalOperand::SelfOr (const DBool& value)
 
 
 uint_t
-GlobalOperand::GetType()
+GlobalOperand::GetType ()
 {
-  return mValue.GetType();
+  return mValue.GetType ();
 }
 
 
@@ -2945,9 +2945,9 @@ GlobalOperand::GetField ()
 
 
 ITable&
-GlobalOperand::GetTable()
+GlobalOperand::GetTable ()
 {
-  return mValue.GetTable();
+  return mValue.GetTable ();
 }
 
 
@@ -2966,9 +2966,9 @@ GlobalOperand::GetValueAt (const uint64_t index)
 
 
 StackValue
-GlobalOperand::Duplicate() const
+GlobalOperand::Duplicate () const
 {
-  return mValue.Duplicate();
+  return mValue.Duplicate ();
 }
 
 
@@ -2980,16 +2980,16 @@ GlobalOperand::NativeObject (INativeObject* const value)
 
 
 INativeObject&
-GlobalOperand::NativeObject()
+GlobalOperand::NativeObject ()
 {
-  return mValue.NativeObject();
+  return mValue.NativeObject ();
 }
 
 
 TableReference&
-GlobalOperand::GetTableReference()
+GlobalOperand::GetTableReference ()
 {
-  return mValue.GetTableReference();
+  return mValue.GetTableReference ();
 }
 
 
@@ -3001,9 +3001,9 @@ GlobalOperand::PrepareToCopy (void* const)
 
 
 TableOperand
-GlobalOperand::GetTableOp()
+GlobalOperand::GetTableOp ()
 {
-  return mValue.GetTableOp();
+  return mValue.GetTableOp ();
 }
 
 
@@ -3015,9 +3015,9 @@ GlobalOperand::CopyTableOp (const TableOperand& tableOp)
 
 
 FieldOperand
-GlobalOperand::GetFieldOp()
+GlobalOperand::GetFieldOp ()
 {
-  return mValue.GetFieldOp();
+  return mValue.GetFieldOp ();
 }
 
 
@@ -3045,9 +3045,9 @@ LocalOperand::LocalOperand (SessionStack& stack, const uint64_t index)
 
 
 bool
-LocalOperand::IsNull() const
+LocalOperand::IsNull () const
 {
-  return mStack[mIndex].Operand ().IsNull();
+  return mStack[mIndex].Operand ().IsNull ();
 }
 
 
@@ -3345,9 +3345,9 @@ LocalOperand::SelfOr (const DBool& value)
 
 
 uint_t
-LocalOperand::GetType()
+LocalOperand::GetType ()
 {
-  return mStack[mIndex].Operand ().GetType();
+  return mStack[mIndex].Operand ().GetType ();
 }
 
 
@@ -3359,9 +3359,9 @@ LocalOperand::GetField ()
 
 
 ITable&
-LocalOperand::GetTable()
+LocalOperand::GetTable ()
 {
-  return mStack[mIndex].Operand ().GetTable();
+  return mStack[mIndex].Operand ().GetTable ();
 }
 
 
@@ -3387,31 +3387,31 @@ LocalOperand::NativeObject (INativeObject* const value)
 
 
 INativeObject&
-LocalOperand::NativeObject()
+LocalOperand::NativeObject ()
 {
-  return mStack[mIndex].Operand ().NativeObject();
+  return mStack[mIndex].Operand ().NativeObject ();
 }
 
 
 TableReference&
-LocalOperand::GetTableReference()
+LocalOperand::GetTableReference ()
 {
-  return _SC (BaseOperand&, mStack[mIndex].Operand ()).GetTableReference();
+  return _SC (BaseOperand&, mStack[mIndex].Operand ()).GetTableReference ();
 }
 
 
 StackValue
-LocalOperand::Duplicate() const
+LocalOperand::Duplicate () const
 {
-  return mStack[mIndex].Operand ().Duplicate();
+  return mStack[mIndex].Operand ().Duplicate ();
 }
 
 
 TableOperand
-LocalOperand::GetTableOp()
+LocalOperand::GetTableOp ()
 {
   BaseOperand& op = _SC (BaseOperand&, mStack[mIndex].Operand ());
-  return op.GetTableOp();
+  return op.GetTableOp ();
 }
 
 
@@ -3424,10 +3424,10 @@ LocalOperand::CopyTableOp (const TableOperand& tableOp)
 
 
 FieldOperand
-LocalOperand::GetFieldOp()
+LocalOperand::GetFieldOp ()
 {
   BaseOperand& op = _SC (BaseOperand&, mStack[mIndex].Operand ());
-  return op.GetFieldOp();
+  return op.GetFieldOp ();
 }
 
 
@@ -3574,21 +3574,21 @@ StackValue::Create (const DArray& value)
 
 
 
-SessionStack::SessionStack()
-  : mStack()
+SessionStack::SessionStack ()
+  : mStack ()
 {
 }
 
 
-SessionStack::~SessionStack()
+SessionStack::~SessionStack ()
 {
-  if (mStack.size() > 0)
-    Pop (mStack.size());
+  if (mStack.size () > 0)
+    Pop (mStack.size ());
 }
 
 
 void
-SessionStack::Push()
+SessionStack::Push ()
 {
   NullOperand stackOp;
 
@@ -3747,27 +3747,27 @@ SessionStack::Push (const StackValue& value)
 void
 SessionStack::Pop (const uint_t count)
 {
-  if (count > mStack.size())
+  if (count > mStack.size ())
     throw InterException (_EXTRA (InterException::STACK_CORRUPTED));
 
-  uint_t topIndex = mStack.size() - 1;
+  uint_t topIndex = mStack.size () - 1;
 
   for (uint_t index = 0; index < count; ++index, --topIndex)
-    mStack.pop_back();
+    mStack.pop_back ();
 }
 
 
 size_t
-SessionStack::Size() const
+SessionStack::Size () const
 {
-  return mStack.size();
+  return mStack.size ();
 }
 
 
 StackValue&
 SessionStack::operator[] (const uint_t index)
 {
-  if (index > mStack.size())
+  if (index > mStack.size ())
     throw InterException (_EXTRA (InterException::STACK_CORRUPTED));
 
   return mStack[index];

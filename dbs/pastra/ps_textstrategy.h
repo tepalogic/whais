@@ -52,7 +52,7 @@ class ITextStrategy
 public:
   bool operator== (ITextStrategy& o);
 
-  uint64_t CharsCount();
+  uint64_t CharsCount ();
   uint64_t CharsUntilOffset (const uint64_t offset);
   uint64_t OffsetOfChar (const uint64_t index);
   DChar CharAt (const uint64_t index);
@@ -80,7 +80,7 @@ public:
                           const uint64_t   fromCh,
                           const uint64_t   toCh,
                           const bool       ignoreCase);
-  uint64_t Utf8Count();
+  uint64_t Utf8Count ();
   void ReadUtf8 (const uint64_t offset,
                  const uint64_t count,
                  uint8_t *const buffer);
@@ -127,8 +127,8 @@ protected:
   ITextStrategy (uint32_t charsCount = 0);
   virtual ~ITextStrategy ();
 
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
+  virtual uint32_t ReferenceCount () const;
+  virtual uint32_t MirrorsCount () const;
 
   pastra::StringMatcher*  mMatcher;
   uint64_t                mCachedCharsCount;
@@ -149,10 +149,10 @@ class NullText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  static NullText& GetSingletoneInstace();
+  static NullText& GetSingletoneInstace ();
 
 protected:
-  NullText();
+  NullText ();
 
   virtual uint64_t Utf8CountU ();
   virtual void ReadUtf8U (const uint64_t offset,
@@ -164,8 +164,8 @@ protected:
   virtual void TruncateUtf8U (const uint64_t offset);
 
 
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
+  virtual uint32_t ReferenceCount () const;
+  virtual uint32_t MirrorsCount () const;
 
   virtual void ReleaseReference ();
 };
@@ -214,7 +214,7 @@ public:
   virtual VariableSizeStore& GetRowStorage ();
 
 protected:
-  virtual ~RowFieldText();
+  virtual ~RowFieldText ();
 
   virtual uint64_t Utf8CountU ();
   virtual void ReadUtf8U (const uint64_t offset,
@@ -267,13 +267,13 @@ public:
 private:
   uint_t ComparingWindowShift (uint_t position) const;
 
-  bool SuffixesMatch() const;
+  bool SuffixesMatch () const;
 
-  uint_t FindInCache() const;
+  uint_t FindInCache () const;
 
   void CountCachedChars (const uint_t offset);
 
-  bool FillTextCache();
+  bool FillTextCache ();
 
   int64_t FindSubstr ();
 

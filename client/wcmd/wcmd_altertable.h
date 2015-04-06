@@ -41,7 +41,7 @@ public:
   TableAlterRules (whais::IDBSHandler&             dbs,
                    const std::string&              table,
                    const std::vector<std::string>& fields);
-  ~TableAlterRules();
+  ~TableAlterRules ();
 
   void DropField (const std::string& field);
   void RetypeField (const std::string&   name,

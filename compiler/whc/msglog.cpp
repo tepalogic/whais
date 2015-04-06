@@ -45,11 +45,11 @@ get_line_from_buffer (const vector<SourceCodeMark>& codeMarks,
                       uint_t                        bufferOff,
                       uint_t* const                 mark)
 {
-  if ((bufferOff == WHC_IGNORE_BUFFER_POS) || (codeMarks.size() == 0))
+  if ((bufferOff == WHC_IGNORE_BUFFER_POS) || (codeMarks.size () == 0))
     return -1;
 
   *mark = 0;
-  while (*mark + 1 < codeMarks.size())
+  while (*mark + 1 < codeMarks.size ())
     {
       if (codeMarks[*mark + 1].mBufferOffset <= bufferOff)
         *mark += 1;
@@ -103,7 +103,7 @@ whc_messenger (WH_MESSENGER_CTXT    data,
 
   if (buffLine >= 0)
     {
-      assert (codeMarks.size() > 0);
+      assert (codeMarks.size () > 0);
 
       fprintf (stderr,
                "%s: line %d: %s %d: ",

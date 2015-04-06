@@ -48,7 +48,7 @@ ITextStrategy::ITextStrategy (uint32_t charsCount)
 }
 
 
-ITextStrategy::~ITextStrategy()
+ITextStrategy::~ITextStrategy ()
 {
   delete mMatcher;
 };
@@ -91,7 +91,7 @@ ITextStrategy::CharsCount ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   return mCachedCharsCount;
@@ -107,7 +107,7 @@ ITextStrategy::CharsUntilOffset (const uint64_t offset)
 uint64_t
 ITextStrategy::CharsUntilOffsetU (const uint64_t offset)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   const uint64_t maxOffset = MIN (offset, Utf8CountU ());
@@ -151,7 +151,7 @@ ITextStrategy::OffsetOfChar (const uint64_t index)
 uint64_t
 ITextStrategy::OffsetOfCharU (const uint64_t index)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (index == mCachedCharsCount)
@@ -204,7 +204,7 @@ ITextStrategy::CharAt (const uint64_t index)
 DChar
 ITextStrategy::CharAtU (const uint64_t index)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   assert (index <= mCachedCharsCount);
@@ -263,7 +263,7 @@ ITextStrategy::CharAtU (const uint64_t index)
 ITextStrategy*
 ITextStrategy::DuplicateU ()
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
@@ -301,7 +301,7 @@ ITextStrategy::ToCase (const bool toLower)
 ITextStrategy*
 ITextStrategy::ToCaseU (const bool toLower)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
@@ -364,7 +364,7 @@ ITextStrategy::Append (const uint32_t ch)
 ITextStrategy*
 ITextStrategy::AppendU (const uint32_t ch)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
   assert (ch != 0);
 
@@ -378,7 +378,7 @@ ITextStrategy::AppendU (const uint32_t ch)
     }
 
   assert (result->mCachedCharsCount == mCachedCharsCount);
-  assert (result->Utf8CountU () == Utf8CountU());
+  assert (result->Utf8CountU () == Utf8CountU ());
 
   uint8_t buffer[16];
   const uint_t cuCount = wh_store_utf8_cp (ch, buffer);
@@ -394,7 +394,7 @@ ITextStrategy::AppendU (const uint32_t ch)
       mMatcher = NULL;
     }
 
-  keeper.release();
+  keeper.release ();
   return result;
 }
 
@@ -409,7 +409,7 @@ ITextStrategy::Append (ITextStrategy& text)
 ITextStrategy*
 ITextStrategy::AppendU (ITextStrategy& text)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (text.Utf8CountU () == 0)
@@ -472,7 +472,7 @@ ITextStrategy::AppendU (ITextStrategy&   text,
                         const uint64_t   utf8OffFrom,
                         const uint64_t   utf8OffTo)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if ((utf8OffFrom >= text.Utf8CountU ())
@@ -491,7 +491,7 @@ ITextStrategy::AppendU (ITextStrategy&   text,
     }
 
   assert (result->mCachedCharsCount == mCachedCharsCount);
-  assert (result->Utf8CountU() == Utf8CountU());
+  assert (result->Utf8CountU () == Utf8CountU ());
 
   result->mCachedCharIndex       = mCachedCharsCount;
   result->mCachedCharIndexOffset = result->Utf8CountU ();
@@ -577,7 +577,7 @@ ITextStrategy*
 ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
                               const uint64_t   index)
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (index == mCachedCharsCount)
@@ -816,7 +816,7 @@ ITextStrategy::ReleaseReference ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (MirrorsCount () > 0)
@@ -849,10 +849,10 @@ ITextStrategy::MakeMirrorCopy ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  if (ReferenceCount() > 1)
+  if (ReferenceCount () > 1)
     return DuplicateU ()->MakeMirrorCopy ();
 
   ++mMirrorsCount;
@@ -864,10 +864,10 @@ ITextStrategy::MakeClone ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  if (MirrorsCount() > 0)
+  if (MirrorsCount () > 0)
     {
       ++mMirrorsCount;
       return this;
@@ -939,7 +939,7 @@ get_utf8_string_length (const uint8_t* utf8Str,
 }
 
 
-NullText::NullText()
+NullText::NullText ()
 {
 }
 
@@ -976,7 +976,7 @@ NullText::TruncateUtf8U (const uint64_t offset)
 }
 
 uint32_t
-NullText::ReferenceCount() const
+NullText::ReferenceCount () const
 {
   return 8; //Enough not to allow to change use
 }
@@ -996,7 +996,7 @@ NullText::ReleaseReference ()
 
 
 NullText&
-NullText::GetSingletoneInstace()
+NullText::GetSingletoneInstace ()
 {
   static NullText nullTextInstance;
 
@@ -1029,7 +1029,7 @@ TemporalText::ReadUtf8U (const uint64_t offset,
                          const uint64_t count,
                          uint8_t* const buffer)
 {
-  const uint64_t toRead = MIN (count, mStorage.Size() - offset);
+  const uint64_t toRead = MIN (count, mStorage.Size () - offset);
   mStorage.Read (offset, toRead, buffer);
 }
 
@@ -1071,7 +1071,7 @@ RowFieldText::RowFieldText (VariableSizeStore& storage,
 
   assert (bytesSize > CACHE_META_DATA_SIZE);
 
-  mStorage.RegisterReference();
+  mStorage.RegisterReference ();
   mStorage.IncrementRecordRef (mFirstEntry);
 
   assert (bytesSize > CACHE_META_DATA_SIZE);
@@ -1091,7 +1091,7 @@ RowFieldText::RowFieldText (VariableSizeStore& storage,
 
 
 
-RowFieldText::~RowFieldText()
+RowFieldText::~RowFieldText ()
 {
   assert (mCachedCharsCount <= MAX_CHARS_COUNT);
   assert (mCachedCharIndex <= MAX_CHARS_COUNT);
@@ -1114,7 +1114,7 @@ RowFieldText::~RowFieldText()
                              cachedMetaData);
 
       mStorage.DecrementRecordRef (mFirstEntry);
-      mStorage.ReleaseReference();
+      mStorage.ReleaseReference ();
     }
 }
 
@@ -1188,7 +1188,7 @@ RowFieldText::WriteUtf8U (const uint64_t       offset,
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef (mFirstEntry);
-      mStorage.ReleaseReference();
+      mStorage.ReleaseReference ();
 
       _CC(uint64_t&, mUtf8Count) = 0;
 
@@ -1224,7 +1224,7 @@ RowFieldText::TruncateUtf8U (const uint64_t atOffset)
       assert (mTempContainer.Size () == mUtf8Count);
 
       mStorage.DecrementRecordRef (mFirstEntry);
-      mStorage.ReleaseReference();
+      mStorage.ReleaseReference ();
 
       _CC(uint64_t&, mUtf8Count) = 0;
    }
@@ -1440,7 +1440,7 @@ compare_text_buffers (const uint8_t* buffer1,
 
 
 bool
-StringMatcher::SuffixesMatch() const
+StringMatcher::SuffixesMatch () const
 {
   if (mLastChar < mCurrentChar + mPattern.mCachedCharsCount)
     return false;
@@ -1473,7 +1473,7 @@ StringMatcher::SuffixesMatch() const
 
 
 uint_t
-StringMatcher::FindInCache() const
+StringMatcher::FindInCache () const
 {
   assert ((mTextRawCache[0] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG);
   assert ((mCacheStartPos <= mCurrentRawOffset)
@@ -1519,7 +1519,7 @@ StringMatcher::CountCachedChars (const uint_t offset)
 
 
 bool
-StringMatcher::FillTextCache()
+StringMatcher::FillTextCache ()
 {
   assert (mText->OffsetOfCharU (mCurrentChar) == mCurrentRawOffset);
 
@@ -1584,10 +1584,10 @@ StringMatcher::FindSubstr ()
   int cacheOffset = 0;
   while (mCurrentRawOffset < textSize)
     {
-      if ( ! FillTextCache())
+      if ( ! FillTextCache ())
         return PATTERN_NOT_FOUND;
 
-      cacheOffset = FindInCache();
+      cacheOffset = FindInCache ();
       if (cacheOffset < mCacheValid)
         {
           assert ((mPatternSize - 1) <= cacheOffset);
@@ -1599,7 +1599,7 @@ StringMatcher::FindSubstr ()
           if (mPatternSize == mPattern.Utf8CountU ())
             break; // Match  found.
 
-          else if (! SuffixesMatch())
+          else if (! SuffixesMatch ())
             {
               //A prefix match was found but the rest of string don't match.
               ++mCurrentChar;

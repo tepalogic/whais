@@ -16,7 +16,7 @@ static void
 init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
-  state->strings = create_string_store();
+  state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
   wh_array_init (&state->values, sizeof (struct SemValue));
 
@@ -51,7 +51,7 @@ check_used_vals (struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-    "  PROCEDURE proc1() RETURN BOOL"
+    "  PROCEDURE proc1 () RETURN BOOL"
     "  DO"
     "       LET a,b,c AS BOOL;"
     " "
@@ -66,7 +66,7 @@ char proc_decl_buffer[] =
     "       RETURN b; "
     " ENDPROC "
     " "
-    " PROCEDURE proc1_b() RETURN BOOL"
+    " PROCEDURE proc1_b () RETURN BOOL"
     " DO"
     "       LET a,b,c AS BOOL;"
     " "
@@ -81,7 +81,7 @@ char proc_decl_buffer[] =
     " ENDPROC "
     " "
     " "
-    " PROCEDURE proc1_c() RETURN BOOL"
+    " PROCEDURE proc1_c () RETURN BOOL"
     " DO"
     "       LET a,b,c AS BOOL;"
     " "
@@ -95,7 +95,7 @@ char proc_decl_buffer[] =
     " ENDPROC "
     " "
     " "
-    "  PROCEDURE proc2() RETURN BOOL"
+    "  PROCEDURE proc2 () RETURN BOOL"
     "  DO"
     "   LET a,b,c AS BOOL;"
     "   a  = TRUE;"
@@ -110,7 +110,7 @@ char proc_decl_buffer[] =
     "  ENDPROC "
     " "
     " "
-    "  PROCEDURE proc2_b() RETURN BOOL"
+    "  PROCEDURE proc2_b () RETURN BOOL"
     "  DO"
     "   LET a,b,c AS BOOL;"
     "   a  = TRUE;"
@@ -362,7 +362,7 @@ check_all_procs (struct ParserState *state)
 }
 
 int
-main()
+main ()
 {
   bool_t test_result = TRUE;
   struct ParserState state = { 0, };
@@ -407,9 +407,9 @@ main()
     }
 
   free_state (&state);
-  printf ("Memory peak: %u bytes \n", test_get_mem_peak());
-  printf ("Current memory usage: %u bytes...", test_get_mem_used());
-  if (test_get_mem_used() != 0)
+  printf ("Memory peak: %u bytes \n", test_get_mem_peak ());
+  printf ("Current memory usage: %u bytes...", test_get_mem_used ());
+  if (test_get_mem_used () != 0)
     {
       test_result = FALSE;
       printf ("FAILED\n");

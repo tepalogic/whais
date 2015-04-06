@@ -15,7 +15,7 @@ static void
 init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
-  state->strings = create_string_store();
+  state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
   wh_array_init (&state->values, sizeof (struct SemValue));
 
@@ -235,7 +235,7 @@ char proc_decl_buffer[] =
   "ENDPROC\n\n";
 
 static bool_t
-check_op_symmetry()
+check_op_symmetry ()
 {
   int i, j;
   for (i = T_END_OF_TYPES - 1, j = 0;
@@ -318,7 +318,7 @@ check_all_procs (struct ParserState *state)
 }
 
 int
-main()
+main ()
 {
   bool_t test_result = TRUE;
   struct ParserState state = { 0, };
@@ -352,7 +352,7 @@ main()
     }
 
   printf ("Testing add op symmetry...");
-  if (check_op_symmetry())
+  if (check_op_symmetry ())
     {
       printf ("PASSED\n");
     }
@@ -374,9 +374,9 @@ main()
     }
 
   free_state (&state);
-  printf ("Memory peak: %u bytes \n", test_get_mem_peak());
-  printf ("Current memory usage: %u bytes...", test_get_mem_used());
-  if (test_get_mem_used() != 0)
+  printf ("Memory peak: %u bytes \n", test_get_mem_peak ());
+  printf ("Current memory usage: %u bytes...", test_get_mem_used ());
+  if (test_get_mem_used () != 0)
     {
       test_result = FALSE;
       printf ("FAILED\n");

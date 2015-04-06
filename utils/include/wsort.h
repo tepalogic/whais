@@ -39,7 +39,7 @@ partition (int64_t      from,
            bool* const  outAlreadySorted)
 {
   assert (from < to);
-  assert (to < _SC (int64_t, inoutContainer.Count()));
+  assert (to < _SC (int64_t, inoutContainer.Count ()));
 
   *outAlreadySorted = true;
 
@@ -105,7 +105,7 @@ partition_reverse (int64_t      from,
                    bool* const  outAlreadySorted)
 {
   assert (from < to);
-  assert (to < _SC (int64_t, inoutContainer.Count()));
+  assert (to < _SC (int64_t, inoutContainer.Count ()));
 
   *outAlreadySorted = true;
 
@@ -192,8 +192,8 @@ quick_sort (int64_t           from,
 
   do
     {
-      _partition_t current = partStack[partStack.size() - 1];
-      partStack.pop_back();
+      _partition_t current = partStack[partStack.size () - 1];
+      partStack.pop_back ();
 
       int64_t pivot;
       bool    alreadySorted;
@@ -222,7 +222,7 @@ quick_sort (int64_t           from,
             partStack.push_back (_partition_t (current.mFrom, pivot - 1));
         }
     }
-  while (partStack.size() > 0);
+  while (partStack.size () > 0);
 }
 
 

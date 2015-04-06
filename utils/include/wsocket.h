@@ -42,11 +42,11 @@ public:
                    const char*    fmMsg = NULL,
                    ...);
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 
@@ -73,17 +73,17 @@ public:
   Socket (const WH_SOCKET sd);
   Socket (const Socket& src);
 
-  ~Socket();
+  ~Socket ();
 
   Socket& operator= (const Socket& src);
 
-  Socket  Accept();
+  Socket  Accept ();
 
   uint_t  Read (uint8_t* const buffer, const uint_t maxCount);
 
   void    Write (const uint8_t* const buffer, const uint_t count);
 
-  void    Close();
+  void    Close ();
 
 private:
   WH_SOCKET   mSocket;
@@ -93,7 +93,7 @@ private:
   {
     SocketInitialiser ()
     {
-      if ( ! whs_init())
+      if ( ! whs_init ())
         {
           throw SocketException (
                           _EXTRA (0),
@@ -104,13 +104,13 @@ private:
 
     ~SocketInitialiser ()
     {
-      whs_clean();
+      whs_clean ();
     }
   };
 
   // Use the following static member to initialise the socket framework.
   // Note: in a program that uses the Socket wrapper class, one must not
-  // call 'whs_init()' or 'whs_clean()', as this is handled automatically.
+  // call 'whs_init ()' or 'whs_clean ()', as this is handled automatically.
   static SocketInitialiser __initer;
 };
 

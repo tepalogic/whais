@@ -42,7 +42,7 @@ namespace prima {
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return _SC (T_DEST, firstOp.mValue + secondOp.mValue);
@@ -52,7 +52,7 @@ internal_add (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_sub (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue - secondOp.mValue);
@@ -62,7 +62,7 @@ internal_sub (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mul (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue * secondOp.mValue);
@@ -72,7 +72,7 @@ internal_mul (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_div (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue / secondOp.mValue);
@@ -82,7 +82,7 @@ internal_div (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue % secondOp.mValue);
@@ -92,7 +92,7 @@ internal_mod (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_and (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue & secondOp.mValue);
@@ -102,7 +102,7 @@ internal_and (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_xor (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue ^ secondOp.mValue);
@@ -112,7 +112,7 @@ internal_xor (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
 {
-  if (firstOp.IsNull() || secondOp.IsNull())
+  if (firstOp.IsNull () || secondOp.IsNull ())
     return firstOp;
 
   return T_DEST (firstOp.mValue ^ secondOp.mValue);
@@ -122,7 +122,7 @@ internal_or (const T_DEST& firstOp, const T_SRC& secondOp)
 template <typename T_SRC, typename T_DEST> void
 number_convert (const T_SRC& from, T_DEST& to)
 {
-  to = from.IsNull() ? T_DEST() : _SC (T_DEST, from.mValue);
+  to = from.IsNull () ? T_DEST () : _SC (T_DEST, from.mValue);
 }
 
 
@@ -138,7 +138,7 @@ class GlobalOperand;
 class BaseOperand : public IOperand
 {
 public:
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DChar& outValue) const;
@@ -195,30 +195,30 @@ public:
 
   virtual FIELD_INDEX GetField ();
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
-  virtual StackValue GetTableValue();
+  virtual StackValue GetTableValue ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp ();
 
   virtual void CopyTableOp (const TableOperand& source);
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
   virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
 
   virtual void           NativeObject (INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual INativeObject& NativeObject ();
 
   virtual bool PrepareToCopy (void* const dest);
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 };
 
 
@@ -233,7 +233,7 @@ public:
 
   virtual ~NullOperand ();
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DChar& outValue) const;
@@ -253,9 +253,9 @@ public:
   virtual void GetValue (DText& outValue) const;
   virtual void GetValue (DArray& outValue) const;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -268,7 +268,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DText& outValue) const;
@@ -281,9 +281,9 @@ public:
 
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DBool mValue;
@@ -299,16 +299,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DChar& outValue) const;
   virtual void GetValue (DText& outValue) const;
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DChar mValue;
@@ -324,7 +324,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -333,9 +333,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DDate mValue;
@@ -351,7 +351,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -360,9 +360,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DDateTime mValue;
@@ -378,7 +378,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -387,9 +387,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DHiresTime mValue;
@@ -405,7 +405,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -438,9 +438,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DUInt8 mValue;
@@ -456,7 +456,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -487,9 +487,9 @@ public:
   virtual void SelfXor (const DInt64& value);
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DUInt16 mValue;
@@ -505,7 +505,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -538,9 +538,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DUInt32 mValue;
@@ -556,7 +556,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -589,9 +589,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DUInt64 mValue;
@@ -607,7 +607,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -640,9 +640,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DInt8 mValue;
@@ -658,7 +658,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -691,9 +691,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DInt16 mValue;
@@ -709,7 +709,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -742,9 +742,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DInt32 mValue;
@@ -760,7 +760,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -793,9 +793,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DInt64 mValue;
@@ -811,7 +811,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DReal& outValue) const;
   virtual void GetValue (DRichReal& outValue) const;
@@ -831,9 +831,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DReal mValue;
@@ -849,7 +849,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DReal& outValue) const;
   virtual void GetValue (DRichReal& outValue) const;
@@ -869,9 +869,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   DRichReal mValue;
@@ -887,7 +887,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DText& outValue) const;
 
@@ -896,11 +896,11 @@ public:
   virtual void SelfAdd (const DChar& value);
   virtual void SelfAdd (const DText& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 
@@ -915,7 +915,7 @@ public:
   CharTextElOperand (DText &text, const uint64_t index)
     : BaseOperand (),
       mIndex (index),
-      mText()
+      mText ()
   {
     text.MakeMirror (mText);
   }
@@ -923,21 +923,21 @@ public:
   CharTextElOperand (const CharTextElOperand& source)
     : BaseOperand (),
       mIndex (source.mIndex),
-      mText()
+      mText ()
   {
     _CC (DText&, source.mText).MakeMirror (mText);
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DChar& outValue) const;
   virtual void GetValue (DText& outValue) const;
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 
@@ -953,21 +953,21 @@ public:
   explicit ArrayOperand (const DArray& array)
     : BaseOperand (),
       mValue (array),
-      mFirstArrayType (array.Type())
+      mFirstArrayType (array.Type ())
     {
     }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DArray& outValue) const;
 
   virtual void SetValue (const DArray& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const);
 
@@ -983,7 +983,7 @@ protected:
   BaseArrayElOperand (DArray& array, const uint64_t index)
     : BaseOperand (),
       mIndex (index),
-      mArray()
+      mArray ()
   {
     array.MakeMirror (mArray);
   }
@@ -991,7 +991,7 @@ protected:
   BaseArrayElOperand (const BaseArrayElOperand& source)
     : BaseOperand (),
       mIndex (source.mIndex),
-      mArray()
+      mArray ()
   {
     source.mArray.MakeMirror (mArray);
   }
@@ -1044,9 +1044,9 @@ public:
 
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1065,9 +1065,9 @@ public:
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1088,9 +1088,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1111,9 +1111,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1134,9 +1134,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1182,9 +1182,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1229,9 +1229,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1276,9 +1276,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1323,9 +1323,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1370,9 +1370,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1416,9 +1416,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1463,9 +1463,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1510,9 +1510,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1544,9 +1544,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1578,9 +1578,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 };
@@ -1594,7 +1594,7 @@ public:
       mTableRef (new TableReference (dbsHnd, table)),
       mChangeable (changeable)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   TableOperand (const TableOperand& source)
@@ -1602,7 +1602,7 @@ public:
       mTableRef (source.mTableRef),
       mChangeable (source.mChangeable)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   TableOperand (TableReference& tableRef)
@@ -1610,7 +1610,7 @@ public:
       mTableRef (&tableRef),
       mChangeable (true)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~TableOperand ();
@@ -1619,32 +1619,32 @@ public:
   {
     if (this != &source)
       {
-        mTableRef->DecrementRefCount();
+        mTableRef->DecrementRefCount ();
         mTableRef = source.mTableRef;
-        mTableRef->IncrementRefCount();
+        mTableRef->IncrementRefCount ();
 
         mChangeable = source.mChangeable;
       }
     return *this;
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const dest);
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp ();
 
   virtual void CopyTableOp (const TableOperand& source);
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 
 private:
   TableReference* mTableRef;
@@ -1671,24 +1671,24 @@ public:
 
   const FieldOperand& operator= (const FieldOperand& source);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
   virtual bool PrepareToCopy (void* const dest);
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 
 private:
   TableReference*   mTableRef;
@@ -1711,7 +1711,7 @@ protected:
       mRow (row),
       mField (field)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   BaseFieldElOperand (const BaseFieldElOperand& source)
@@ -1720,14 +1720,14 @@ protected:
       mRow (source.mRow),
       mField (source.mField)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~BaseFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& out) const
   {
-    ITable& table = mTableRef->GetTable();
+    ITable& table = mTableRef->GetTable ();
 
     if (table.AllocatedRows () <= mRow)
       {
@@ -1740,7 +1740,7 @@ protected:
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    ITable& table = mTableRef->GetTable();
+    ITable& table = mTableRef->GetTable ();
 
     table.Set (mRow, mField, value);
   }
@@ -1766,7 +1766,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DText& outValue) const;
@@ -1779,9 +1779,9 @@ public:
 
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1795,16 +1795,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DChar& outValue) const;
   virtual void GetValue (DText& outValue) const;
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1818,7 +1818,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -1827,9 +1827,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1844,7 +1844,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -1853,9 +1853,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1869,7 +1869,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DDate& outValue) const;
   virtual void GetValue (DDateTime& outValue) const;
@@ -1878,9 +1878,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1894,7 +1894,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -1927,9 +1927,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1943,7 +1943,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -1976,9 +1976,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -1992,7 +1992,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2025,9 +2025,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2041,7 +2041,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2074,9 +2074,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2090,7 +2090,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2123,9 +2123,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2139,7 +2139,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2172,9 +2172,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2188,7 +2188,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2221,9 +2221,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2237,7 +2237,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DInt8& outValue) const;
   virtual void GetValue (DInt16& outValue) const;
@@ -2271,9 +2271,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2287,7 +2287,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DReal& outValue) const;
   virtual void GetValue (DRichReal& outValue) const;
@@ -2307,9 +2307,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2323,7 +2323,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DReal& outValue) const;
   virtual void GetValue (DRichReal& outValue) const;
@@ -2343,9 +2343,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2359,7 +2359,7 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DText& outValue) const;
   virtual void SetValue (const DText& value);
@@ -2367,11 +2367,11 @@ public:
   virtual void SelfAdd (const DChar& value);
   virtual void SelfAdd (const DText& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2385,16 +2385,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DArray& outValue) const;
   virtual void SetValue (const DArray& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2410,16 +2410,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DChar& outValue) const;
   virtual void GetValue (DText& outValue) const;
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
 private:
   const uint64_t    mIndex;
@@ -2438,7 +2438,7 @@ protected:
        mRow (row),
        mField (field)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   BaseArrayFieldElOperand (const BaseArrayFieldElOperand& source)
@@ -2447,14 +2447,14 @@ protected:
        mRow (source.mRow),
        mField (source.mField)
   {
-    mTableRef->IncrementRefCount();
+    mTableRef->IncrementRefCount ();
   }
 
   virtual ~BaseArrayFieldElOperand ();
 
   template <typename DBS_T> void Get (DBS_T& outValue) const
   {
-    ITable& table = mTableRef->GetTable();
+    ITable& table = mTableRef->GetTable ();
 
     if (table.AllocatedRows () <= mRow)
       {
@@ -2473,16 +2473,16 @@ protected:
 
     array.Get (mIndex, outValue);
 
-    assert (! outValue.IsNull());
+    assert (! outValue.IsNull ());
   }
 
   template <typename DBS_T> void Set (const DBS_T& value)
   {
-    ITable& table = mTableRef->GetTable();
+    ITable& table = mTableRef->GetTable ();
 
     DArray array;
 
-    if (mRow < table.AllocatedRows() )
+    if (mRow < table.AllocatedRows () )
       table.Get (mRow, mField, array);
 
     array.Set (mIndex, value);
@@ -2524,9 +2524,9 @@ public:
 
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2546,9 +2546,9 @@ public:
 
   virtual void SetValue (const DChar& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2570,9 +2570,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2593,9 +2593,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2616,9 +2616,9 @@ public:
 
   virtual void SetValue (const DHiresTime& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2663,9 +2663,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2709,9 +2709,9 @@ public:
   virtual void SelfXor (const DInt64& value);
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2757,9 +2757,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2805,9 +2805,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2852,9 +2852,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2900,9 +2900,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2948,9 +2948,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -2996,9 +2996,9 @@ public:
 
   virtual void SelfOr (const DInt64& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -3031,9 +3031,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -3066,9 +3066,9 @@ public:
   virtual void SelfDiv (const DInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 };
 
 
@@ -3077,7 +3077,7 @@ class GlobalValue
 public:
   template <class OP_T>
   explicit GlobalValue (const OP_T& op)
-    : mSync(),
+    : mSync (),
       mOperandOwner (true)
   {
     const BaseOperand& compileTest = op;
@@ -3088,7 +3088,7 @@ public:
   }
 
   GlobalValue (const GlobalValue& source)
-    : mSync(),
+    : mSync (),
       mOperandOwner (source.mOperandOwner)
   {
     for (uint_t i = 0; i < sizeof (mStorage) / sizeof (mStorage[0]); ++i)
@@ -3110,17 +3110,17 @@ public:
     return *this;
   }
 
-  ~GlobalValue()
+  ~GlobalValue ()
   {
     if (mOperandOwner)
       Operand ().~BaseOperand ();
   }
 
-  bool IsNull()
+  bool IsNull ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().IsNull();
+    return Operand ().IsNull ();
   }
 
   template <class DBS_T>
@@ -3203,9 +3203,9 @@ public:
     Operand ().SelfOr (value);
   }
 
-  uint_t GetType()
+  uint_t GetType ()
   {
-    return Operand ().GetType();
+    return Operand ().GetType ();
   }
 
 
@@ -3216,11 +3216,11 @@ public:
     return Operand ().GetField ();
   }
 
-  ITable& GetTable()
+  ITable& GetTable ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().GetTable();
+    return Operand ().GetTable ();
   }
 
   StackValue GetFieldAt (const FIELD_INDEX field)
@@ -3237,11 +3237,11 @@ public:
     return Operand ().GetValueAt (index);
   }
 
-  StackValue Duplicate()
+  StackValue Duplicate ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().Duplicate();
+    return Operand ().Duplicate ();
   }
 
   bool PrepareToCopy (void* const dest)
@@ -3251,11 +3251,11 @@ public:
     return Operand ().PrepareToCopy(dest);
   }
 
-  TableOperand GetTableOp()
+  TableOperand GetTableOp ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().GetTableOp();
+    return Operand ().GetTableOp ();
   }
 
   void CopyTableOp (const TableOperand& source)
@@ -3265,11 +3265,11 @@ public:
     return Operand ().CopyTableOp (source);
   }
 
-  FieldOperand  GetFieldOp()
+  FieldOperand  GetFieldOp ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().GetFieldOp();
+    return Operand ().GetFieldOp ();
   }
 
   void CopyFieldOp (const FieldOperand& source)
@@ -3293,18 +3293,18 @@ public:
     Operand ().NativeObject (value);
   }
 
-  INativeObject& NativeObject()
+  INativeObject& NativeObject ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().NativeObject();
+    return Operand ().NativeObject ();
   }
 
-  TableReference& GetTableReference()
+  TableReference& GetTableReference ()
   {
     LockRAII<Lock> dummy (mSync);
 
-    return Operand ().GetTableReference();
+    return Operand ().GetTableReference ();
   }
 
   BaseOperand& Operand ()
@@ -3325,7 +3325,7 @@ class GlobalOperand : public BaseOperand
 public:
   GlobalOperand (GlobalValue& global);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DChar& outValue) const;
@@ -3379,34 +3379,34 @@ public:
   virtual void SelfOr (const DInt64& value);
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
   virtual bool PrepareToCopy (void* const);
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp ();
 
   virtual void CopyTableOp (const TableOperand& source);
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
   virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
 
   virtual void           NativeObject (INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual INativeObject& NativeObject ();
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 
 private:
   GlobalValue&    mValue;
@@ -3418,7 +3418,7 @@ class LocalOperand : public BaseOperand
 public:
   LocalOperand (SessionStack& stack, const uint64_t index);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull () const;
 
   virtual void GetValue (DBool& outValue) const;
   virtual void GetValue (DChar& outValue) const;
@@ -3472,32 +3472,32 @@ public:
   virtual void SelfOr (const DInt64& value);
   virtual void SelfOr (const DBool& value);
 
-  virtual uint_t GetType();
+  virtual uint_t GetType ();
 
   virtual FIELD_INDEX GetField ();
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
 
   virtual StackValue GetValueAt (const uint64_t index);
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate () const;
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp ();
 
   virtual void CopyTableOp (const TableOperand& source);
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp ();
 
   virtual void CopyFieldOp (const FieldOperand& source);
 
   virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
 
   virtual void           NativeObject (INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual INativeObject& NativeObject ();
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference ();
 
 private:
   const uint64_t      mIndex;

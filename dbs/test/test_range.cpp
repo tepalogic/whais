@@ -305,11 +305,11 @@ test_complement (const RANGE& f, const RANGE& r)
 {
   RANGE op1 = f, op2 = r;
 
-  if (op1.Complement() != op2)
+  if (op1.Complement () != op2)
     return false;
 
   op1 = f; op2 = r;
-  if (op2.Complement() != op1)
+  if (op2.Complement () != op1)
     return false;
 
   RANGE all, empty;
@@ -337,15 +337,15 @@ test_complement_rel (const RANGE& r)
 
   all.Join (INTERVAL (0, 255));
 
-  if (op1.Complement().Complement() != r)
+  if (op1.Complement ().Complement () != r)
     return false;
 
   op1 = r;
-  if (op1.Complement().Join (r) != all)
+  if (op1.Complement ().Join (r) != all)
     return false;
 
   op1 = r;
-  if (op1.Complement().Match (r) != empty)
+  if (op1.Complement ().Match (r) != empty)
     return false;
 
   return true;
@@ -353,7 +353,7 @@ test_complement_rel (const RANGE& r)
 
 
 int
-main()
+main ()
 {
   bool success = true;
 

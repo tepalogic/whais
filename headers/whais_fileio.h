@@ -84,7 +84,7 @@ bool_t
 whf_remove (const char* const file);
 
 const char*
-whf_dir_delim();
+whf_dir_delim ();
 
 const char*
 whf_current_dir ();

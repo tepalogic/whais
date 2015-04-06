@@ -41,7 +41,7 @@ FieldIndexNodeManager::FieldIndexNodeManager (
     mMaxCachedMem (maxCacheMem),
     mRootNode (NIL_NODE),
     mFirstFreeNode (NIL_NODE),
-    mContainer (container.release()),
+    mContainer (container.release ()),
     mFieldType (fieldType)
 {
 
@@ -53,25 +53,25 @@ FieldIndexNodeManager::FieldIndexNodeManager (
 
 FieldIndexNodeManager::~FieldIndexNodeManager ()
 {
-  FlushNodes();
+  FlushNodes ();
 }
 
 uint64_t
-FieldIndexNodeManager::NodeRawSize() const
+FieldIndexNodeManager::NodeRawSize () const
 {
   return mNodeSize;
 }
 
 void
-FieldIndexNodeManager::MarkForRemoval()
+FieldIndexNodeManager::MarkForRemoval ()
 {
-  mContainer->MarkForRemoval();
+  mContainer->MarkForRemoval ();
 }
 
 uint64_t
-FieldIndexNodeManager::IndexRawSize() const
+FieldIndexNodeManager::IndexRawSize () const
 {
-  return mContainer->Size();
+  return mContainer->Size ();
 }
 
 NODE_INDEX
@@ -84,15 +84,15 @@ FieldIndexNodeManager::AllocateNode (const NODE_INDEX parent,
     {
       BTreeNodeRAII freeNode (RetrieveNode (nodeIndex));
 
-      mFirstFreeNode = freeNode->Next();
+      mFirstFreeNode = freeNode->Next ();
 
       UpdateContainer ();
     }
   else
     {
-      assert (mContainer->Size() % NodeRawSize() == 0);
+      assert (mContainer->Size () % NodeRawSize () == 0);
 
-      nodeIndex = mContainer->Size() / NodeRawSize();
+      nodeIndex = mContainer->Size () / NodeRawSize ();
     }
 
   if (parent != NIL_NODE)
@@ -101,7 +101,7 @@ FieldIndexNodeManager::AllocateNode (const NODE_INDEX parent,
 
       parentNode->SetNodeOfKey (parentKey, nodeIndex);
 
-      assert (parentNode->IsLeaf() == false);
+      assert (parentNode->IsLeaf () == false);
     }
 
   assert (nodeIndex > 0);
@@ -134,7 +134,7 @@ FieldIndexNodeManager::RootNodeId ()
       rootNode->Prev (NIL_NODE);
       rootNode->KeysCount (0);
       rootNode->Leaf (true);
-      rootNode->InsertKey (rootNode->SentinelKey());
+      rootNode->InsertKey (rootNode->SentinelKey ());
 
       RootNodeId (rootNode->NodeId ());
     }
@@ -154,7 +154,7 @@ FieldIndexNodeManager::RootNodeId (const NODE_INDEX nodeId)
 }
 
 uint_t
-FieldIndexNodeManager::MaxCachedNodes()
+FieldIndexNodeManager::MaxCachedNodes ()
 {
   return mMaxCachedMem / mNodeSize;
 }
@@ -166,42 +166,42 @@ FieldIndexNodeManager::LoadNode (const NODE_INDEX nodeId)
 
   auto_ptr<IBTreeNode> node (NodeFactory (nodeId));
 
-  assert (mContainer->Size() % NodeRawSize() == 0);
+  assert (mContainer->Size () % NodeRawSize () == 0);
 
-  if (mContainer->Size() > nodeId * NodeRawSize())
+  if (mContainer->Size () > nodeId * NodeRawSize ())
     {
-      mContainer->Read (nodeId * NodeRawSize(), NodeRawSize(),
-          node->RawData());
+      mContainer->Read (nodeId * NodeRawSize (), NodeRawSize (),
+          node->RawData ());
     }
   else
     {
-      assert (mContainer->Size() == nodeId * NodeRawSize());
+      assert (mContainer->Size () == nodeId * NodeRawSize ());
 
       //Reserve the required space
-      mContainer->Write (nodeId * NodeRawSize(), NodeRawSize(),
-          node->RawData());
+      mContainer->Write (nodeId * NodeRawSize (), NodeRawSize (),
+          node->RawData ());
     }
 
-  node->MarkClean();
+  node->MarkClean ();
   assert (node->NodeId () == nodeId);
 
-  return node.release();
+  return node.release ();
 }
 
 void
 FieldIndexNodeManager::SaveNode (IBTreeNode* const node)
 {
   assert (node->NodeId () > 0);
-  assert (mContainer->Size() > node->NodeId () * NodeRawSize());
-  assert (mContainer->Size() % NodeRawSize() == 0);
+  assert (mContainer->Size () > node->NodeId () * NodeRawSize ());
+  assert (mContainer->Size () % NodeRawSize () == 0);
 
-  if (node->IsDirty() == false)
+  if (node->IsDirty () == false)
     return;
 
-  mContainer->Write (node->NodeId () * NodeRawSize(), NodeRawSize(),
-      node->RawData());
+  mContainer->Write (node->NodeId () * NodeRawSize (), NodeRawSize (),
+      node->RawData ());
 
-  node->MarkClean();
+  node->MarkClean ();
 }
 
 void
@@ -212,7 +212,7 @@ FieldIndexNodeManager::InitContainer ()
   node->Next (NIL_NODE);
   node->Prev (NIL_NODE);
 
-  mContainer->Write (0, NodeRawSize(), node->RawData());
+  mContainer->Write (0, NodeRawSize (), node->RawData ());
 }
 
 void
@@ -223,7 +223,7 @@ FieldIndexNodeManager::UpdateContainer ()
   node->Next (mFirstFreeNode);
   node->Prev (mRootNode);
 
-  mContainer->Write (0, NodeRawSize(), node->RawData());
+  mContainer->Write (0, NodeRawSize (), node->RawData ());
 }
 
 void
@@ -231,10 +231,10 @@ FieldIndexNodeManager::InitFromContainer ()
 {
   auto_ptr<IBTreeNode> node (NodeFactory (0));
 
-  mContainer->Read (0, NodeRawSize(), node->RawData());
+  mContainer->Read (0, NodeRawSize (), node->RawData ());
 
-  mFirstFreeNode = node->Next();
-  mRootNode = node->Prev();
+  mFirstFreeNode = node->Next ();
+  mRootNode = node->Prev ();
 }
 
 IBTreeNode *

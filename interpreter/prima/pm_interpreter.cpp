@@ -57,7 +57,7 @@ InitInterpreter (const char* adminDbsDir)
 {
   LockRAII<Lock> syncHolder (gSync);
 
-  if (gmNameSpaces.size() != 0)
+  if (gmNameSpaces.size () != 0)
     throw InterException (_EXTRA (InterException::ALREADY_INITED));
 
   static IDBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName, adminDbsDir);
@@ -76,7 +76,7 @@ GetInstance (const char* name, Logger* log)
 
   LockRAII<Lock> syncHolder (gSync);
 
-  if (gmNameSpaces.size() == 0)
+  if (gmNameSpaces.size () == 0)
     throw InterException (_EXTRA (InterException::NOT_INITED));
 
   if (name == NULL)
@@ -116,7 +116,7 @@ ReleaseInstance (ISession& instance)
 {
   LockRAII<Lock> syncHolder (gSync);
 
-  if (gmNameSpaces.size() == 0)
+  if (gmNameSpaces.size () == 0)
     throw InterException (_EXTRA (InterException::NOT_INITED));
 
   prima::Session* const inst = _SC (prima::Session*, &instance);
@@ -130,20 +130,20 @@ CleanInterpreter (const bool forced)
 {
   LockRAII<Lock> syncHolder (gSync);
 
-  if (gmNameSpaces.size() == 0)
+  if (gmNameSpaces.size () == 0)
     throw InterException (_EXTRA (InterException::NOT_INITED));
 
   //TODO: Remember to clean the sessions to when the mechanism will
   //      be employed
-  map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.begin();
+  map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.begin ();
   while (it != gmNameSpaces.end ())
     {
       prima::NameSpaceHolder& space = it->second;
 
       if (forced)
-        space.ForceRelease();
+        space.ForceRelease ();
 
-      else if (space.RefsCount() != 0)
+      else if (space.RefsCount () != 0)
         throw InterException (_EXTRA (InterException::SESSION_IN_USE));
 
       ++it;
@@ -161,7 +161,7 @@ ISession::ISession (Logger& log)
 }
 
 
-ISession::~ISession()
+ISession::~ISession ()
 {
 }
 
@@ -193,19 +193,19 @@ Session::Session (Logger&           log,
     mMaxStackCount (~0),
     mServerStopped (false)
 {
-  mGlobalNames.IncRefsCount();
-  mPrivateNames.IncRefsCount();
+  mGlobalNames.IncRefsCount ();
+  mPrivateNames.IncRefsCount ();
 
-  DefineTablesGlobalValues();
+  DefineTablesGlobalValues ();
 }
 
 
-Session::~Session()
+Session::~Session ()
 {
-  mGlobalNames.DecRefsCount();
-  mPrivateNames.DecRefsCount();
+  mGlobalNames.DecRefsCount ();
+  mPrivateNames.DecRefsCount ();
 
-  for (vector<WH_SHLIB>::iterator it = mNativeLibs.begin();
+  for (vector<WH_SHLIB>::iterator it = mNativeLibs.begin ();
        it != mNativeLibs.end ();
        ++it)
     {
@@ -224,17 +224,17 @@ void
 Session::LoadCompiledUnit (WIFunctionalUnit& unit)
 {
   UnitsManager&  unitMgr   = mPrivateNames.Get ().GetUnitsManager ();
-  const uint32_t unitIndex = unitMgr.AddUnit (unit.GlobalsCount(),
-                                              unit.ProceduresCount(),
-                                              unit.RetrieveConstArea(),
-                                              unit.ConstsAreaSize());
+  const uint32_t unitIndex = unitMgr.AddUnit (unit.GlobalsCount (),
+                                              unit.ProceduresCount (),
+                                              unit.RetrieveConstArea (),
+                                              unit.ConstsAreaSize ());
   try
   {
     TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
-    for (uint_t glbIt = 0; glbIt < unit.GlobalsCount(); ++glbIt)
+    for (uint_t glbIt = 0; glbIt < unit.GlobalsCount (); ++glbIt)
       {
         const uint_t         typeOff  = unit.GlobalTypeOff (glbIt);
-        const uint8_t* const typeDesc = unit.RetriveTypeArea() + typeOff;
+        const uint8_t* const typeDesc = unit.RetriveTypeArea () + typeOff;
         const uint8_t* const name     = _RC (const uint8_t*,
                                             unit.RetriveGlobalName (glbIt));
         const uint_t nameLength = unit.GlobalNameLength (glbIt);
@@ -248,7 +248,7 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
         unitMgr.SetGlobalIndex (unitIndex, glbIt, glbIndex);
       }
 
-    for (uint_t procIt = 0; procIt < unit.ProceduresCount(); ++procIt)
+    for (uint_t procIt = 0; procIt < unit.ProceduresCount (); ++procIt)
       {
         const uint8_t* const name = _RC (const uint8_t*,
                                          unit.RetriveProcName (procIt));
@@ -264,7 +264,7 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
         for (uint_t localIt = 0; localIt < localsCount; ++localIt)
           {
             const uint8_t* const localTypeDesc =
-                                  unit.RetriveTypeArea() +
+                                  unit.RetriveTypeArea () +
                                     unit.GetProcLocalTypeOff (procIt, localIt);
 
             const uint_t tdSize = TypeManager::GetTypeLength (localTypeDesc);
@@ -302,7 +302,7 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
   }
   catch (...)
   {
-      unitMgr.RemoveLastUnit();
+      unitMgr.RemoveLastUnit ();
       throw;
   }
 }
@@ -336,7 +336,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
       logEntry << WSTDLIB_START_FUNC << "' function.";
       mLog.Log (LOG_WARNING, logEntry.str ());
     }
-  else if (start() != WOP_OK)
+  else if (start () != WOP_OK)
     {
       mLog.Log (LOG_ERROR, "Failed to initialize the library.");
 
@@ -357,7 +357,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
       return false;
     }
 
-  const WLIB_DESCRIPTION* const lib = describe();
+  const WLIB_DESCRIPTION* const lib = describe ();
   if (lib == NULL)
     {
       mLog.Log (LOG_ERROR, "The shared lib doesn't provide its content.");
@@ -447,16 +447,16 @@ Session::ExecuteProcedure (const char* const   procedure,
 
 
 uint_t
-Session::GlobalValuesCount() const
+Session::GlobalValuesCount () const
 {
-  return mPrivateNames.Get ().GetGlobalsManager ().Count();
+  return mPrivateNames.Get ().GetGlobalsManager ().Count ();
 }
 
 
 uint_t
-Session::ProceduresCount() const
+Session::ProceduresCount () const
 {
-  return mPrivateNames.Get ().GetProcedureManager ().Count();
+  return mPrivateNames.Get ().GetProcedureManager ().Count ();
 }
 
 
@@ -484,7 +484,7 @@ Session::GlobalValueRawType (const uint32_t glbId)
 
   IOperand& glbOp = value.Operand ();
 
-  return glbOp.GetType();
+  return glbOp.GetType ();
 }
 
 
@@ -506,8 +506,8 @@ Session::GlobalValueFieldsCount (const uint32_t glbId)
 
   IOperand& glbOp = value.Operand ();
 
-  if (IS_TABLE (glbOp.GetType()))
-    return glbOp.GetTable().FieldsCount();
+  if (IS_TABLE (glbOp.GetType ()))
+    return glbOp.GetTable ().FieldsCount ();
 
   return 0;
 }
@@ -531,7 +531,7 @@ Session::GlobalValueFieldName (const uint32_t glbId, const uint32_t field)
 
   IOperand& glbOp = value.Operand ();
 
-  const DBSFieldDescriptor fd = glbOp.GetTable().DescribeField (field);
+  const DBSFieldDescriptor fd = glbOp.GetTable ().DescribeField (field);
 
   return fd.name;
 }
@@ -556,7 +556,7 @@ Session::GlobalValueFieldType (const uint32_t glbId, const uint32_t field)
 
   IOperand& glbOp = value.Operand ();
 
-  const DBSFieldDescriptor fd = glbOp.GetTable().DescribeField (field);
+  const DBSFieldDescriptor fd = glbOp.GetTable ().DescribeField (field);
 
   uint16_t type = fd.type;
   if (fd.isArray)
@@ -603,7 +603,7 @@ Session::ProcedurePameterRawType (const uint_t id, const uint_t param)
   ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
 
-  return val.Operand ().GetType();
+  return val.Operand ().GetType ();
 }
 
 
@@ -626,8 +626,8 @@ Session::ProcedurePameterFieldsCount (const uint_t id, const uint_t param)
   ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
 
-  if (IS_TABLE (val.Operand ().GetType()))
-    return val.Operand ().GetTable().FieldsCount();
+  if (IS_TABLE (val.Operand ().GetType ()))
+    return val.Operand ().GetTable ().FieldsCount ();
 
   return 0;
 }
@@ -654,7 +654,7 @@ Session::ProcedurePameterFieldName (const uint_t id,
 
   ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
-  ITable&           table = val.Operand ().GetTable();
+  ITable&           table = val.Operand ().GetTable ();
 
   return table.DescribeField (field).name;
 }
@@ -682,7 +682,7 @@ Session::ProcedurePameterFieldType (const uint_t id,
 
   ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
-  ITable&           table = val.Operand ().GetTable();
+  ITable&           table = val.Operand ().GetTable ();
 
   DBSFieldDescriptor fd = table.DescribeField (field);
 
@@ -848,11 +848,11 @@ Session::GetProcedure (const uint32_t procId)
 
 
 void
-Session::DefineTablesGlobalValues()
+Session::DefineTablesGlobalValues ()
 {
   IDBSHandler& dbs = mPrivateNames.Get ().GetDBSHandler ();
 
-  const uint_t tablesCount = dbs.PersistentTablesCount();
+  const uint_t tablesCount = dbs.PersistentTablesCount ();
 
   for (uint_t tableId = 0; tableId < tablesCount; ++tableId)
     {
@@ -866,7 +866,7 @@ Session::DefineTablesGlobalValues()
 
           DefineGlobalValue (_RC (const uint8_t*, tableName),
                              strlen (tableName),
-                             &typeInfo.front(),
+                             &typeInfo.front (),
                              false,
                              &table);
       }
@@ -892,7 +892,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
       string message = "Could not add the global variable ";
 
       message += "'";
-      message.insert (message.size(), _RC (const char*, name), nameLength);
+      message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "' do to invalid type description.";
 
       mLog.Log (LOG_ERROR, message);
@@ -916,7 +916,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
         {
           string message = "Couldn't not find the definition for external "
                            "declaration of global value '";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "'.";
 
           mLog.Log (LOG_ERROR, message);
@@ -939,7 +939,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
                   TypeManager::GetTypeLength (tdBuff.get ()) ) != 0)
         {
           string message = "External declaration of global value '";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' has a different type than its definition.";
 
           mLog.Log (LOG_ERROR, message);
@@ -951,7 +951,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
   else
     {
       string message = "Duplicate definition of global value '";
-      message.insert (message.size(), _RC (const char*, name), nameLength);
+      message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "'.";
 
       mLog.Log (LOG_ERROR, message);
@@ -993,7 +993,7 @@ Session::DefineProcedure (const uint8_t* const   name,
           string message = "Could not define the procedure ";
 
           message += "'";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' do to invalid type description of local value.";
 
           mLog.Log (LOG_ERROR, message);
@@ -1012,7 +1012,7 @@ Session::DefineProcedure (const uint8_t* const   name,
         {
           string message = "Couldn't not find the definition "
                            "for external procedure '";
-          message.insert (message.size(),
+          message.insert (message.size (),
                           _RC (const char*, name),
                           nameLength);
           message += "'.";
@@ -1041,7 +1041,7 @@ Session::DefineProcedure (const uint8_t* const   name,
       if (argsMatch == false)
         {
           string message = "External declaration of procedure '";
-          message.insert (message.size(), _RC (const char*, name), nameLength);
+          message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' has a different signature than its definition.";
 
           mLog.Log (LOG_ERROR, message);
@@ -1056,7 +1056,7 @@ Session::DefineProcedure (const uint8_t* const   name,
   else if (ProcedureManager::IsValid (procIndex))
     {
       string message = "Duplicate definition of procedure '";
-      message.insert (message.size(), _RC (const char*, name), nameLength);
+      message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "'.";
 
       mLog.Log (LOG_ERROR, message);

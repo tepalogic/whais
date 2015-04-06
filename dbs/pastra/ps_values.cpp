@@ -114,10 +114,10 @@ is_valid_hiresdate (const int       year,
 bool
 DChar::operator< (const DChar& second) const
 {
-  if (IsNull())
-    return second.IsNull() ?  false : true;
+  if (IsNull ())
+    return second.IsNull () ?  false : true;
 
-  else if (second.IsNull())
+  else if (second.IsNull ())
     return false;
 
   return wh_cmp_alphabetically (mValue, second.mValue) < 0;
@@ -125,7 +125,7 @@ DChar::operator< (const DChar& second) const
 
 
 DChar
-DChar::Prev() const
+DChar::Prev () const
 {
   if (mIsNull || (mValue == 1))
     return DChar ();
@@ -135,7 +135,7 @@ DChar::Prev() const
 
 
 DChar
-DChar::Next() const
+DChar::Next () const
 {
   if (mIsNull || (mValue == UTF_LAST_CODEPOINT))
       return DChar ();
@@ -174,10 +174,10 @@ DDate::Max ()
 
 
 DDate
-DDate::Prev() const
+DDate::Prev () const
 {
   if (mIsNull || (*this == Min ()))
-    return DDate();
+    return DDate ();
 
   uint16_t year = mYear;
   uint8_t  mnth = mMonth;
@@ -200,10 +200,10 @@ DDate::Prev() const
 
 
 DDate
-DDate::Next() const
+DDate::Next () const
 {
   if (mIsNull || (*this == Max ()))
-    return DDate();
+    return DDate ();
 
   uint16_t year = mYear;
   uint8_t  mnth = mMonth;
@@ -264,10 +264,10 @@ DDateTime::Max ()
 
 
 DDateTime
-DDateTime::Prev() const
+DDateTime::Prev () const
 {
   if (mIsNull || (*this == Min ()))
-    return DDateTime();
+    return DDateTime ();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -305,10 +305,10 @@ DDateTime::Prev() const
 
 
 DDateTime
-DDateTime::Next() const
+DDateTime::Next () const
 {
   if (mIsNull || (*this == Max ()))
-    return DDateTime();
+    return DDateTime ();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -392,11 +392,11 @@ DHiresTime::Max ()
 
 
 DHiresTime
-DHiresTime::Prev() const
+DHiresTime::Prev () const
 {
   if (mIsNull || (*this == Min ()))
     {
-      return DHiresTime();
+      return DHiresTime ();
     }
 
   uint16_t year  = mYear;
@@ -440,10 +440,10 @@ DHiresTime::Prev() const
 
 
 DHiresTime
-DHiresTime::Next() const
+DHiresTime::Next () const
 {
   if (mIsNull || (*this == Max ()))
-    return DHiresTime();
+    return DHiresTime ();
 
   uint16_t year  = mYear;
   uint8_t  mnth  = mMonth;
@@ -508,20 +508,20 @@ DReal::Max ()
 
 
 DReal
-DReal::Prev() const
+DReal::Prev () const
 {
   if (mIsNull || (*this == Min ()))
-    return DReal();
+    return DReal ();
 
   return DReal (mValue - DBS_REAL_T (0, 1, DBS_REAL_PREC));
 }
 
 
 DReal
-DReal::Next() const
+DReal::Next () const
 {
   if (mIsNull || (*this == Max ()))
-    return DReal();
+    return DReal ();
 
   return DReal (mValue + DBS_REAL_T (0, 1, DBS_REAL_PREC));
 }
@@ -549,20 +549,20 @@ DRichReal::Max ()
 
 
 DRichReal
-DRichReal::Prev() const
+DRichReal::Prev () const
 {
   if (mIsNull || (*this == Min ()))
-    return DRichReal();
+    return DRichReal ();
 
   return DRichReal (mValue - DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
 }
 
 
 DRichReal
-DRichReal::Next() const
+DRichReal::Next () const
 {
   if (mIsNull || (*this == Max ()))
-    return DRichReal();
+    return DRichReal ();
 
   return DRichReal (mValue + DBS_RICHREAL_T (0, 1, DBS_RICHREAL_PREC));
 }
@@ -570,7 +570,7 @@ DRichReal::Next() const
 
 
 DText::DText (const char* text)
-  : mText (&pastra::NullText::GetSingletoneInstace()),
+  : mText (&pastra::NullText::GetSingletoneInstace ()),
     mTextRefs (0)
 
 {
@@ -580,7 +580,7 @@ DText::DText (const char* text)
 
 
 DText::DText (const uint8_t *utf8Src, uint_t unitsCount)
-  : mText (& NullText::GetSingletoneInstace()),
+  : mText (& NullText::GetSingletoneInstace ()),
     mTextRefs (0)
 
 {
@@ -608,7 +608,7 @@ DText::DText (const DText& source)
 }
 
 
-DText::~DText()
+DText::~DText ()
 {
   assert (mTextRefs == 0);
 
@@ -617,9 +617,9 @@ DText::~DText()
 
 
 bool
-DText::IsNull() const
+DText::IsNull () const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharsCount () == 0;
+  return _SC (ITextStrategy&, GetStrategyRAII ()).CharsCount () == 0;
 }
 
 
@@ -643,16 +643,16 @@ DText::operator= (const DText& source)
 
 
 uint64_t
-DText::Count() const
+DText::Count () const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharsCount ();
+  return _SC (ITextStrategy&, GetStrategyRAII ()).CharsCount ();
 }
 
 
 uint64_t
-DText::RawSize() const
+DText::RawSize () const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).Utf8Count();
+  return _SC (ITextStrategy&, GetStrategyRAII ()).Utf8Count ();
 }
 
 
@@ -661,28 +661,28 @@ DText::RawRead (uint64_t        offset,
                 uint64_t        count,
                 uint8_t* const  dest) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).ReadUtf8 (offset, count, dest);
+  return _SC (ITextStrategy&, GetStrategyRAII ()).ReadUtf8 (offset, count, dest);
 }
 
 
 uint64_t
 DText::OffsetOfChar (const uint64_t chIndex) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).OffsetOfChar (chIndex);
+  return _SC (ITextStrategy&, GetStrategyRAII ()).OffsetOfChar (chIndex);
 }
 
 
 uint64_t
 DText::CharsUntilOffset (const uint64_t offset) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharsUntilOffset (offset);
+  return _SC (ITextStrategy&, GetStrategyRAII ()).CharsUntilOffset (offset);
 }
 
 
 void
 DText::Append (const DChar& ch)
 {
-  if (ch.IsNull())
+  if (ch.IsNull ())
     return ;
 
   StrategyRAII    t = GetStrategyRAII ();
@@ -721,7 +721,7 @@ DText::Append (const DText& text)
 DChar
 DText::CharAt (const uint64_t index) const
 {
-  return _SC (ITextStrategy&, GetStrategyRAII()).CharAt (index);
+  return _SC (ITextStrategy&, GetStrategyRAII ()).CharAt (index);
 }
 
 
@@ -775,7 +775,7 @@ DText::ReplaceSubstring (const DText&    substr,
   ITextStrategy&  t = s;
 
   ITextStrategy* const result = t.Replace (GetStrategyRAII (),
-                                           newSubstr.GetStrategyRAII(),
+                                           newSubstr.GetStrategyRAII (),
                                            fromCh,
                                            toCh,
                                            ignoreCase);
@@ -784,16 +784,16 @@ DText::ReplaceSubstring (const DText&    substr,
 
 
 DText
-DText::LowerCase() const
+DText::LowerCase () const
 {
-  return DText (*_SC (ITextStrategy&, GetStrategyRAII()).ToCase (true));
+  return DText (*_SC (ITextStrategy&, GetStrategyRAII ()).ToCase (true));
 }
 
 
 DText
-DText::UpperCase() const
+DText::UpperCase () const
 {
-  return DText (*_SC (ITextStrategy&, GetStrategyRAII()).ToCase (false));
+  return DText (*_SC (ITextStrategy&, GetStrategyRAII ()).ToCase (false));
 }
 
 
@@ -920,13 +920,13 @@ wh_array_init (const T* const       array,
   else if (array == NULL)
     throw DBSException (_EXTRA (DBSException::BAD_PARAMETERS));
 
-  auto_ptr<IArrayStrategy> s (new TemporalArray (array[0].DBSType()));
+  auto_ptr<IArrayStrategy> s (new TemporalArray (array[0].DBSType ()));
 
   for (uint64_t index = 0; index < count; ++index)
     {
       uint64_t dummy;
 
-      if (array[index].IsNull())
+      if (array[index].IsNull ())
         continue;
 
       uint8_t rawValue [MAX_VALUE_RAW_STORAGE];
@@ -937,11 +937,11 @@ wh_array_init (const T* const       array,
       s->Add (array[index].DBSType (), rawValue, &dummy);
     }
 
-  *outStrategy = s.release();
+  *outStrategy = s.release ();
 }
 
 
-DArray::DArray()
+DArray::DArray ()
   : mArray (&NullArray::GetSingletoneInstace (T_UNDETERMINED)),
     mArrayRefs (0)
 {
@@ -1086,7 +1086,7 @@ DArray::DArray (const DArray& source)
 }
 
 
-DArray::~DArray()
+DArray::~DArray ()
 {
   assert (mArrayRefs == 0);
 
@@ -1114,16 +1114,16 @@ DArray::operator= (const DArray& source)
 
 
 uint64_t
-DArray::Count() const
+DArray::Count () const
 {
-  return _SC (IArrayStrategy&, GetStrategyRAII()).Count();
+  return _SC (IArrayStrategy&, GetStrategyRAII ()).Count ();
 }
 
 
 DBS_FIELD_TYPE
-DArray::Type() const
+DArray::Type () const
 {
-  return _SC (IArrayStrategy&, GetStrategyRAII()).Type();
+  return _SC (IArrayStrategy&, GetStrategyRAII ()).Type ();
 }
 
 template <class T> inline uint64_t
@@ -1132,7 +1132,7 @@ add_array_element (const T& value, DArray& array)
   uint64_t result;
   uint8_t  rawValue[MAX_VALUE_RAW_STORAGE];
 
-  assert (Serializer::Size (value.DBSType(), false) <= sizeof rawValue);
+  assert (Serializer::Size (value.DBSType (), false) <= sizeof rawValue);
 
   Serializer::Store (rawValue, value);
 
@@ -1144,7 +1144,7 @@ add_array_element (const T& value, DArray& array)
                                           &result);
   if (newArray != &s)
     {
-      a.Release();
+      a.Release ();
       array.ReplaceStrategy (newArray);
     }
 
@@ -1269,7 +1269,7 @@ get_array_element (const DArray&          array,
   const uint_t elSize = s.Get (index, rawValue);
   if (elSize == 0)
     {
-      outElement = T();
+      outElement = T ();
       return ;
     }
 
@@ -1395,7 +1395,7 @@ set_array_element (const T&          value,
 
   uint8_t  rawValue[MAX_VALUE_RAW_STORAGE];
 
-  assert (Serializer::Size (value.DBSType(), false) <= sizeof rawValue);
+  assert (Serializer::Size (value.DBSType (), false) <= sizeof rawValue);
 
   Serializer::Store (rawValue, value);
 
@@ -1407,7 +1407,7 @@ set_array_element (const T&          value,
                                           index);
   if (newArray != &s)
     {
-      a.Release();
+      a.Release ();
       array.ReplaceStrategy (newArray);
     }
 }
@@ -1527,7 +1527,7 @@ DArray::Remove(const uint64_t index)
   IArrayStrategy* const newArray = s.Remove(index);
   if (newArray != &s)
     {
-      a.Release();
+      a.Release ();
       ReplaceStrategy (newArray);
     }
 }
@@ -1543,7 +1543,7 @@ DArray::Sort (bool reverse)
   IArrayStrategy* const newArray = s.Sort (reverse);
   if (newArray != &s)
     {
-      a.Release();
+      a.Release ();
       ReplaceStrategy (newArray);
     }
 }

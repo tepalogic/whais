@@ -61,14 +61,14 @@ struct FieldValuesUpdate
   {
     if (this != &src)
     {
-      this->~FieldValuesUpdate();
+      this->~FieldValuesUpdate ();
       _placement_new (this, src);
     }
 
     return *this;
   }
 
-  ~FieldValuesUpdate();
+  ~FieldValuesUpdate ();
 
 
   uint_t    mFieldId;
@@ -80,8 +80,8 @@ struct FieldValuesUpdate
 
 struct FieldValuesSelection
 {
-  FieldValuesSelection();
-  ~FieldValuesSelection();
+  FieldValuesSelection ();
+  ~FieldValuesSelection ();
 
   FieldValuesSelection (const FieldValuesSelection& src)
     : mFieldId (src.mFieldId),
@@ -96,7 +96,7 @@ struct FieldValuesSelection
   {
     if (this != &src)
       {
-        this->~FieldValuesSelection();
+        this->~FieldValuesSelection ();
         _placement_new (this, src);
       }
 

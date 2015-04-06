@@ -141,7 +141,7 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
 
 bool
-repair_database_erros()
+repair_database_erros ()
 {
   return ask_question ("Should I try to check and fix the database? (y/n)");
 }
@@ -163,7 +163,7 @@ check_database_for_errors (const bool allAnswersYes, const bool userRequest)
         }
     }
 
-  const char* const dbName = GetWorkingDB().c_str ();
+  const char* const dbName = GetWorkingDB ().c_str ();
 
   if ( ! DBSRepairDatabase (dbName, NULL, repair_callback))
     return -1;

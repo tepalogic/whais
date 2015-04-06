@@ -74,7 +74,7 @@ char test_prog_1[] = ""
   "RETURN v1;\n "
   "ENDPROC\n "
   "\n "
-  "PROCEDURE Proc_2() RETURN INT32\n "
+  "PROCEDURE Proc_2 () RETURN INT32\n "
   "DO\n "
   "LET v1 as INT32;\n "
   "RETURN v1;\n "
@@ -90,7 +90,7 @@ char test_prog_2[] = ""
   "RETURN v1;\n "
   "ENDPROC\n "
   "\n "
-  "PROCEDURE Proc_2() RETURN INT32\n "
+  "PROCEDURE Proc_2 () RETURN INT32\n "
   "DO\n "
   "LET v1 as INT32;\n "
   "RETURN v1;\n "
@@ -106,7 +106,7 @@ char test_prog_3[] = ""
   "RETURN v1;\n "
   "ENDPROC\n "
   "\n "
-  "PROCEDURE Proc_2() RETURN INT32\n "
+  "PROCEDURE Proc_2 () RETURN INT32\n "
   "DO\n "
   "LET v1 as INT32;\n "
   "RETURN v1;\n "
@@ -122,7 +122,7 @@ char test_prog_4[] = ""
   "RETURN v_t;\n "
   "ENDPROC\n "
   "\n "
-  "PROCEDURE Proc_2() RETURN INT32\n "
+  "PROCEDURE Proc_2 () RETURN INT32\n "
   "DO\n "
   "LET v1 as INT32;\n "
   "RETURN v1;\n "
@@ -140,7 +140,7 @@ char test_prog_5[] = ""
   "RETURN v_t;\n "
   "ENDPROC\n "
   "\n "
-  "PROCEDURE Proc_2() RETURN INT32\n "
+  "PROCEDURE Proc_2 () RETURN INT32\n "
   "DO\n "
   "LET v1 as INT32;\n "
   "RETURN v1;\n "
@@ -156,7 +156,7 @@ char test_prog_5[] = ""
     "RETURN v_t;\n "
     "ENDPROC\n "
     "\n "
-    "PROCEDURE Proc_2() RETURN INT32\n "
+    "PROCEDURE Proc_2 () RETURN INT32\n "
     "DO\n "
     "LET v1 as INT32;\n "
     "RETURN v1;\n "
@@ -171,7 +171,7 @@ char test_prog_5[] = ""
     "RETURN v_t;\n "
     "ENDPROC\n "
     "\n "
-    "PROCEDURE Proc_2() RETURN INT32\n "
+    "PROCEDURE Proc_2 () RETURN INT32\n "
     "DO\n "
     "LET v1 as INT32;\n "
     "RETURN v1;\n "
@@ -238,17 +238,17 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
         }
     }
 
-  if (test_get_mem_used() != 0)
+  if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.",
-              test_get_mem_used());
+              test_get_mem_used ());
       test_result = FALSE;
     }
   return test_result;
 }
 
 int
-main()
+main ()
 {
   bool_t test_result = TRUE;
 

@@ -22,7 +22,7 @@ using namespace whais;
 struct TableFieldDesc
 {
 #if 0
-  TableFieldDesc()
+  TableFieldDesc ()
     : field_name (NULL),
       field_type (0),
       desc_visited (false)
@@ -276,7 +276,7 @@ bool test_globals (ISession&     session,
                    GlobalDescs    glb_desc[],
                    const uint_t   glbs_count)
 {
-  if (session.GlobalValuesCount() != glbs_count)
+  if (session.GlobalValuesCount () != glbs_count)
     return false;
 
   for (uint_t glb_i = 0; glb_i < glbs_count; ++glb_i)
@@ -351,11 +351,11 @@ bool test_globals (ISession&     session,
 }
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -393,7 +393,7 @@ main()
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
   DBSRemoveDatabase (test_db1);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

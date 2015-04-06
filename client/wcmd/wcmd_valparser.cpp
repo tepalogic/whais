@@ -220,7 +220,7 @@ ParseFieldSpecifier (ostream* const              os,
           if ((first == T::Min ()) && (second == T::Max ()))
             range.Join (Interval<T> (first, second));
 
-          else if (first.IsNull())
+          else if (first.IsNull ())
             {
               assert (second == T ());
 
@@ -261,7 +261,7 @@ ParseFieldSpecifier (ostream* const              os,
               goto ParseFieldSpecifier_msg_err;
             }
 
-          if (first.IsNull() || second.IsNull())
+          if (first.IsNull () || second.IsNull ())
             goto ParseFieldSpecifier_msg_err;
 
           range.Join (Interval<T> (first, second));
@@ -451,8 +451,8 @@ parse_rows_selection (ostream* const     os,
 
   Range<ROW_INDEX> allRows;
 
-  if (table.AllocatedRows() > 0)
-    allRows.Join (Interval<ROW_INDEX> (0, table.AllocatedRows() - 1));
+  if (table.AllocatedRows () > 0)
+    allRows.Join (Interval<ROW_INDEX> (0, table.AllocatedRows () - 1));
 
   if (offset >= strSize)
     {
@@ -484,7 +484,7 @@ parse_rows_selection (ostream* const     os,
     {
       bool fromEntered = false;
 
-      from = 0, to = table.AllocatedRows();
+      from = 0, to = table.AllocatedRows ();
       while (isdigit (str[offset]))
         {
           const ROW_INDEX temp = from;
@@ -570,7 +570,7 @@ parse_field_values_selection (ostream* const              os,
 {
   size_t& offset  = *outSelectSize;
 
-  outRowsRange->~FieldValuesSelection();
+  outRowsRange->~FieldValuesSelection ();
   _placement_new<FieldValuesSelection> (outRowsRange);
 
   /* Get the field information first. */
@@ -815,7 +815,7 @@ ParseRowsSelectionClause (ostream* const    os,
 {
   size_t offset = 0;
 
-  outRowsSelection.~RowsSelection();
+  outRowsSelection.~RowsSelection ();
   _placement_new<RowsSelection> (&outRowsSelection);
 
   if (! parse_rows_selection (os,
@@ -859,7 +859,7 @@ ParseRowsSelectionClause (ostream* const    os,
 
 
 
-FieldValuesSelection::FieldValuesSelection()
+FieldValuesSelection::FieldValuesSelection ()
   : mFieldId (0),
     mFieldType (T_UNKNOWN),
     mSearchNull (false),
@@ -868,7 +868,7 @@ FieldValuesSelection::FieldValuesSelection()
 }
 
 
-FieldValuesSelection::~FieldValuesSelection()
+FieldValuesSelection::~FieldValuesSelection ()
 {
   if (mFieldType != T_UNKNOWN)
     free_value_range (mFieldType, mRange);
@@ -876,17 +876,17 @@ FieldValuesSelection::~FieldValuesSelection()
 
 
 
-FieldValuesUpdate::~FieldValuesUpdate()
+FieldValuesUpdate::~FieldValuesUpdate ()
 {
   assert ((T_UNKNOWN < GET_BASIC_TYPE (mFieldType))
           || (mFieldType == T_UNKNOWN));
   assert (GET_BASIC_TYPE (mFieldType) < T_UNDETERMINED);
 
   if (IS_ARRAY (mFieldType))
-    _RC (DArray*, mValue)->~DArray();
+    _RC (DArray*, mValue)->~DArray ();
 
   else if (GET_BASIC_TYPE (mFieldType) == T_TEXT)
-    _RC (DText*, mValue)->~DText();
+    _RC (DText*, mValue)->~DText ();
 }
 
 
@@ -1507,7 +1507,7 @@ ParseFieldUpdateValues (ostream* const              os,
                       if (chLen <= 0)
                         return false;
 
-                      assert (ch.IsNull() == false);
+                      assert (ch.IsNull () == false);
 
                       value.Append (ch);
                       offset += chLen;
@@ -1546,7 +1546,7 @@ UpdateTableRow (ostream const*                   os,
                 const ROW_INDEX                  row,
                 const vector<FieldValuesUpdate>& fieldVals)
 {
-  size_t field = fieldVals.size();
+  size_t field = fieldVals.size ();
 
   while (field-- > 0)
     {
@@ -1688,7 +1688,7 @@ static void
 add_rows_to_interval (DArray&           rows,
                       Range<ROW_INDEX>& inoutRange)
 {
-  const uint64_t count = rows.Count();
+  const uint64_t count = rows.Count ();
 
   DROW_INDEX  prev, last, first;
 
@@ -1696,15 +1696,15 @@ add_rows_to_interval (DArray&           rows,
     {
       rows.Get (i, last);
 
-      if (prev.IsNull())
+      if (prev.IsNull ())
         first = prev = last;
 
-      else if (last.Prev() == prev)
+      else if (last.Prev () == prev)
         prev = last;
 
       else
         {
-          assert (first.IsNull() == false);
+          assert (first.IsNull () == false);
 
           inoutRange.Join (Interval<ROW_INDEX> (first.mValue, prev.mValue));
 
@@ -1712,9 +1712,9 @@ add_rows_to_interval (DArray&           rows,
         }
     }
 
-  if (! first.IsNull())
+  if (! first.IsNull ())
     {
-      assert (last.IsNull() == false);
+      assert (last.IsNull () == false);
 
       inoutRange.Join (Interval<ROW_INDEX> (first.mValue, last.mValue));
     }
@@ -1728,8 +1728,8 @@ void match_field_value (ITable&                     table,
 {
   const Range<T>& valRange = * _RC (Range<T>*, values.mRange);
 
-  const size_t rowIntervals = inoutRow.mIntervals.size();
-  const size_t valIntervals = valRange.mIntervals.size();
+  const size_t rowIntervals = inoutRow.mIntervals.size ();
+  const size_t valIntervals = valRange.mIntervals.size ();
 
   Range<ROW_INDEX> fieldRows;
 
@@ -1760,7 +1760,7 @@ void match_field_value (ITable&                     table,
         }
     }
 
-  fieldRows.Complement();
+  fieldRows.Complement ();
   inoutRow.Match (fieldRows);
 }
 
@@ -1769,7 +1769,7 @@ void
 MatchSelectedRows (ITable&             table,
                    RowsSelection&      select)
 {
-  const size_t fieldsCount = select.mSearchedValue.size();
+  const size_t fieldsCount = select.mSearchedValue.size ();
 
   for (size_t i = 0; i < fieldsCount; ++i)
     {
@@ -1870,7 +1870,7 @@ MatchSelectedRows (ITable&             table,
           assert (false);
         }
 
-      fieldRows.Complement();
+      fieldRows.Complement ();
       select.mRows.Match (fieldRows);
     }
 }
@@ -1884,7 +1884,7 @@ print_basic_value (ostream&      os,
 {
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
-  if (value.IsNull())
+  if (value.IsNull ())
     return ;
 
   Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), value);
@@ -1905,7 +1905,7 @@ print_basic_value<DChar> (ostream&        os,
 {
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
-  if (value.IsNull())
+  if (value.IsNull ())
     return ;
 
   Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), true, value);
@@ -1934,7 +1934,7 @@ PrintFieldValue (ostream&             os,
       DArray  array;
       table.Get (row, field, array);
 
-      const uint64_t count = array.Count();
+      const uint64_t count = array.Count ();
       for (uint64_t i = 0; i < count; i++)
         {
           os << ' ';
@@ -2194,8 +2194,8 @@ PrintFieldValue (ostream&             os,
               DText value;
 
               table.Get (row, field, value);
-              const uint64_t textLength = value.Count();
-              if (value.IsNull())
+              const uint64_t textLength = value.Count ();
+              if (value.IsNull ())
                 break;
 
               os << '\'';

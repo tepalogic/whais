@@ -85,7 +85,7 @@ static const uint8_t secondCode[] =
 
 static const uint8_t notDefGlbCode[] =
     "EXTERN LET someGlobal AS UINT32;"
-    "PROCEDURE random_proc_name() RETURN INT32\n"
+    "PROCEDURE random_proc_name () RETURN INT32\n"
     "DO\n"
     "RETURN someGlobal;\n"
     "\n"
@@ -98,7 +98,7 @@ static const uint8_t notDefProcCode[] =
     "                   p1v4 AS DATETIME)\n"
     "RETURN HIRESTIME;\n"
     "\n"
-    "PROCEDURE ref_proc()\n"
+    "PROCEDURE ref_proc ()\n"
     "RETURN HIRESTIME\n"
     "DO\n"
     "RETURN some_proc_name (NULL, NULL, NULL, NULL);\n"
@@ -251,7 +251,7 @@ check_global_def_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::EXTERNAL_FIRST)
+      if (e.Code () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found global with out defintion OK" << std::endl;
           result = true;
@@ -283,7 +283,7 @@ check_global_doubledef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::DUPLICATE_DEFINITION)
+      if (e.Code () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -315,7 +315,7 @@ check_global_diffdef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::EXTERNAL_MISMATCH)
+      if (e.Code () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found global with duplicate defintion OK" << std::endl;
           result = true;
@@ -348,7 +348,7 @@ check_proc_def_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::EXTERNAL_FIRST)
+      if (e.Code () == InterException::EXTERNAL_FIRST)
         {
           std::cout << "Found procedure with out defintion OK" << std::endl;
           result = true;
@@ -380,7 +380,7 @@ check_proc_doubledef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::DUPLICATE_DEFINITION)
+      if (e.Code () == InterException::DUPLICATE_DEFINITION)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -412,7 +412,7 @@ check_proc_diffdef_err (ISession& testSession)
   }
   catch (InterException& e)
   {
-      if (e.Code() == InterException::EXTERNAL_MISMATCH)
+      if (e.Code () == InterException::EXTERNAL_MISMATCH)
         {
           std::cout << "Found procedure with duplicate defintion OK" << std::endl;
           result = true;
@@ -430,11 +430,11 @@ check_proc_diffdef_err (ISession& testSession)
 
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -457,7 +457,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

@@ -35,7 +35,7 @@ namespace whais {
 
 
 
-WIFunctionalUnit::~WIFunctionalUnit()
+WIFunctionalUnit::~WIFunctionalUnit ()
 {
 }
 
@@ -57,7 +57,7 @@ CompiledBufferUnit::CompiledBufferUnit (const uint8_t*     buffer,
 }
 
 
-CompiledBufferUnit::~CompiledBufferUnit()
+CompiledBufferUnit::~CompiledBufferUnit ()
 {
   if (mHandler != NULL)
     wh_compiler_discard (mHandler);
@@ -65,7 +65,7 @@ CompiledBufferUnit::~CompiledBufferUnit()
 
 
 uint_t
-CompiledBufferUnit::TypeAreaSize()
+CompiledBufferUnit::TypeAreaSize ()
 {
   const uint8_t* dummy;
   const uint_t   result = wh_unit_type_descriptors (mHandler, &dummy);
@@ -75,7 +75,7 @@ CompiledBufferUnit::TypeAreaSize()
 
 
 const uint8_t*
-CompiledBufferUnit::RetriveTypeArea()
+CompiledBufferUnit::RetriveTypeArea ()
 {
   const uint8_t* typePool = NULL;
 
@@ -86,7 +86,7 @@ CompiledBufferUnit::RetriveTypeArea()
 
 
 uint_t
-CompiledBufferUnit::ConstsAreaSize()
+CompiledBufferUnit::ConstsAreaSize ()
 {
   const uint8_t* dummy;
   const uint_t   result = wh_unit_constants (mHandler, &dummy);
@@ -96,7 +96,7 @@ CompiledBufferUnit::ConstsAreaSize()
 
 
 const uint8_t*
-CompiledBufferUnit::RetrieveConstArea()
+CompiledBufferUnit::RetrieveConstArea ()
 {
   const uint8_t* constArea = NULL;
 
@@ -107,14 +107,14 @@ CompiledBufferUnit::RetrieveConstArea()
 
 
 uint_t
-CompiledBufferUnit::GlobalsCount()
+CompiledBufferUnit::GlobalsCount ()
 {
   return wh_unit_globals_count (mHandler);
 }
 
 
 uint_t
-CompiledBufferUnit::ProceduresCount()
+CompiledBufferUnit::ProceduresCount ()
 {
   return wh_unit_procedures_count (mHandler);
 }
@@ -437,7 +437,7 @@ CompiledFileUnit::CompiledFileUnit (const char* file)
 }
 
 
-CompiledFileUnit::~CompiledFileUnit()
+CompiledFileUnit::~CompiledFileUnit ()
 {
   for (uint_t count = 0; count < mProcsCount; ++count)
     delete [] mProcData.get ()[count];
@@ -519,34 +519,34 @@ CompiledFileUnit::LoadProcInMemory (const uint_t id)
 }
 
 
-uint_t CompiledFileUnit::TypeAreaSize()
+uint_t CompiledFileUnit::TypeAreaSize ()
 {
   return mTypeAreaSize;
 }
 
 
 const uint8_t*
-CompiledFileUnit::RetriveTypeArea()
+CompiledFileUnit::RetriveTypeArea ()
 {
   return mTypeInfo.get ();
 }
 
 
-uint_t CompiledFileUnit::ConstsAreaSize()
+uint_t CompiledFileUnit::ConstsAreaSize ()
 {
   return mConstAreaSize;
 }
 
 
 const uint8_t*
-CompiledFileUnit::RetrieveConstArea()
+CompiledFileUnit::RetrieveConstArea ()
 {
   return mConstArea.get ();
 }
 
 
 uint_t
-CompiledFileUnit::GlobalsCount()
+CompiledFileUnit::GlobalsCount ()
 {
   return mGlobalsCount;
 }
@@ -640,7 +640,7 @@ CompiledFileUnit::IsGlobalExternal (const uint_t id)
 }
 
 uint_t
-CompiledFileUnit::ProceduresCount()
+CompiledFileUnit::ProceduresCount ()
 {
   return mProcsCount;
 }
@@ -858,21 +858,21 @@ FunctionalUnitException::FunctionalUnitException (const uint32_t     code,
 
 
 Exception*
-FunctionalUnitException::Clone() const
+FunctionalUnitException::Clone () const
 {
   return new FunctionalUnitException (*this);
 }
 
 
 EXCEPTION_TYPE
-FunctionalUnitException::Type() const
+FunctionalUnitException::Type () const
 {
   return FUNCTIONAL_UNIT_EXCEPTION;
 }
 
 
 const char*
-FunctionalUnitException::Description() const
+FunctionalUnitException::Description () const
 {
   return "A request to a functional unit has failed!";
 }

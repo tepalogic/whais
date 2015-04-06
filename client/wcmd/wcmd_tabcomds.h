@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WCMD_TABCMDS_H_
 
 void
-AddOfflineTableCommands();
+AddOfflineTableCommands ();
 
 #endif //WCMD_TABCMDS_H_
 

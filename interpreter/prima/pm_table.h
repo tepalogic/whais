@@ -53,13 +53,13 @@ public:
     return new TableReference (mDbsHnd, mTable.Spawn ());
   }
 
-  void IncrementRefCount()
+  void IncrementRefCount ()
   {
     LockRAII<Lock> _lock (mLock);
     ++mRefCount;
   }
 
-  void DecrementRefCount()
+  void DecrementRefCount ()
   {
     LockRAII<Lock> _lock (mLock);
 
@@ -67,12 +67,12 @@ public:
 
     if (--mRefCount == 0)
       {
-        _lock.Release();
+        _lock.Release ();
         delete this;
       }
   }
 
-  ITable& GetTable()
+  ITable& GetTable ()
   {
     assert (mRefCount > 0);
 
@@ -87,9 +87,9 @@ public:
   }
 
 private:
-  ~TableReference()
+  ~TableReference ()
   {
-    if (&mTable != &GeneralTable::Instance())
+    if (&mTable != &GeneralTable::Instance ())
       mDbsHnd.ReleaseTable (mTable);
   }
 

@@ -334,11 +334,11 @@ test_procedures (ISession&     session,
                  ProcDesc       procedures[],
                  const uint_t   procsCount)
 {
-  if (procsCount != session.ProceduresCount())
+  if (procsCount != session.ProceduresCount ())
     return false;
 
   for (uint_t index = 0;
-       index < session.ProceduresCount();
+       index < session.ProceduresCount ();
        ++index)
     {
       ProcDesc* desc = find_proc_desc (session.ProcedureName (index),
@@ -411,11 +411,11 @@ test_procedures (ISession&     session,
 }
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -453,7 +453,7 @@ main()
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
   DBSRemoveDatabase (test_db1);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

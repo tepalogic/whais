@@ -48,8 +48,8 @@ class IArrayStrategy
   friend class pastra::PrototypeTable;
 
 public:
-  uint64_t Count();
-  DBS_BASIC_TYPE Type();
+  uint64_t Count ();
+  DBS_BASIC_TYPE Type ();
 
   uint_t          Get (const uint64_t index, uint8_t* const dest);
   IArrayStrategy* Set (const DBS_BASIC_TYPE type,
@@ -118,7 +118,7 @@ public:
                        rawValue2);
     }
 
-    uint64_t Count() const
+    uint64_t Count () const
     {
       return mArray.mElementsCount;
     }
@@ -128,7 +128,7 @@ public:
       mPivot = this->operator[] (index);
     }
 
-    const TE& Pivot() const
+    const TE& Pivot () const
     {
       return mPivot;
     }
@@ -140,10 +140,10 @@ public:
 
 protected:
   IArrayStrategy (const DBS_BASIC_TYPE elemsType);
-  virtual ~IArrayStrategy();
+  virtual ~IArrayStrategy ();
 
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
+  virtual uint32_t ReferenceCount () const;
+  virtual uint32_t MirrorsCount () const;
 
   virtual IArrayStrategy* Clone ();
 
@@ -154,7 +154,7 @@ protected:
                          const uint64_t         size,
                          const uint8_t* const   buffer) = 0;
   virtual void ColapseRaw (const uint64_t offset, const uint64_t count) = 0;
-  virtual uint64_t RawSize() const = 0;
+  virtual uint64_t RawSize () const = 0;
 
   uint64_t              mElementsCount;
   uint_t                mMirrorsCount;
@@ -185,8 +185,8 @@ public:
   virtual void  ReleaseReference ();
 
 protected:
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
+  virtual uint32_t ReferenceCount () const;
+  virtual uint32_t MirrorsCount () const;
 
   virtual void RawRead (const uint64_t    offset,
                         const uint64_t    size,
@@ -195,7 +195,7 @@ protected:
                          const uint64_t         size,
                          const uint8_t* const   buffer);
   virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
+  virtual uint64_t RawSize () const;
 };
 
 
@@ -208,7 +208,7 @@ public:
   TemporalArray (const DBS_BASIC_TYPE elemsType);
 
 protected:
-  virtual ~TemporalArray();
+  virtual ~TemporalArray ();
 
   virtual void RawRead (const uint64_t    offset,
                         const uint64_t    size,
@@ -217,7 +217,7 @@ protected:
                          const uint64_t         size,
                          const uint8_t* const   buffer);
   virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
+  virtual uint64_t RawSize () const;
 
   virtual pastra::TemporalContainer& GetTemporalContainer ();
 
@@ -239,7 +239,7 @@ public:
                  const DBS_FIELD_TYPE     type);
 
 protected:
-  ~RowFieldArray();
+  ~RowFieldArray ();
 
   virtual void RawRead (const uint64_t    offset,
                         const uint64_t    size,
@@ -248,7 +248,7 @@ protected:
                          const uint64_t         size,
                          const uint8_t* const   buffer);
   virtual void ColapseRaw (const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
+  virtual uint64_t RawSize () const;
 
   virtual pastra::TemporalContainer& GetTemporalContainer ();
   virtual pastra::VariableSizeStore& GetRowStorage ();

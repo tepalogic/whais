@@ -272,7 +272,7 @@ main (int argc, char** argv)
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
     IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
@@ -356,7 +356,7 @@ main (int argc, char** argv)
   }
 
   DBSRemoveDatabase (db_name);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!testResult)
     {

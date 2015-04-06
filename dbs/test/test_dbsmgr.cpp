@@ -51,7 +51,7 @@ test_fields (ITable& table)
       std::cout << "\t" << field_d.name << std::endl;
     }
 
-  if (table.FieldsCount() != descCount)
+  if (table.FieldsCount () != descCount)
     return false;
 
   field_d = table.DescribeField (table.RetrieveField ("Field_1"));
@@ -97,11 +97,11 @@ test_fields (ITable& table)
 
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase ("baza_date_1");
   }
 
@@ -110,15 +110,15 @@ main()
   ITable& table = handler.RetrievePersistentTable ("table_1");
   handler.ReleaseTable (table);
   DBSReleaseDatabase (handler);
-  DBSShoutdown();
+  DBSShoutdown ();
 
     {
-      DBSInit (DBSSettings());
+      DBSInit (DBSSettings ());
 
       IDBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
       ITable& table = handler.RetrievePersistentTable ("table_1");
 
-      if (table.FieldsCount() != descCount)
+      if (table.FieldsCount () != descCount)
         success = false;
       else
         {
@@ -126,7 +126,7 @@ main()
 
           if (success)
             {
-              ITable& spawnedTable = table.Spawn();
+              ITable& spawnedTable = table.Spawn ();
               success = test_fields (spawnedTable);
               handler.ReleaseTable (spawnedTable);
             }
@@ -135,7 +135,7 @@ main()
 
           DBSReleaseDatabase (handler);
           DBSRemoveDatabase ("baza_date_1");
-          DBSShoutdown();
+          DBSShoutdown ();
         }
     }
 

@@ -34,12 +34,12 @@ namespace whais {
 class EXCEP_SHL Lock
 {
 public:
-  Lock();
-  ~Lock();
+  Lock ();
+  ~Lock ();
 
-  void Acquire();
+  void Acquire ();
   bool TryAcquire ();
-  void Release();
+  void Release ();
 
 private:
   Lock (const Lock&);
@@ -54,9 +54,9 @@ class EXCEP_SHL SpinLock
 public:
   SpinLock ();
 
-  void Acquire();
+  void Acquire ();
   bool TryAcquire ();
-  void Release();
+  void Release ();
 
 private:
   SpinLock (const SpinLock&);
@@ -77,14 +77,14 @@ public:
       Acquire ();
   }
 
-  ~LockRAII()
+  ~LockRAII ()
   {
     Release ();
   }
 
-  void Acquire()
+  void Acquire ()
   {
-    mLock.Acquire();
+    mLock.Acquire ();
     mIsAcquireed = true;
   }
 
@@ -94,11 +94,11 @@ public:
     return mIsAcquireed;
   }
 
-  void Release()
+  void Release ()
   {
     if (mIsAcquireed)
       {
-        mLock.Release();
+        mLock.Release ();
         mIsAcquireed = false;
       }
   }
@@ -126,7 +126,7 @@ public:
       AcquireBoth ();
   }
 
-  ~DoubleLockRAII()
+  ~DoubleLockRAII ()
   {
     ReleaseBoth ();
   }
@@ -142,7 +142,7 @@ public:
 
     while (true)
       {
-        mLock1.Acquire();
+        mLock1.Acquire ();
         mIsAcquireed1 = true;
 
         if (mLock2.TryAcquire ())
@@ -161,7 +161,7 @@ public:
   void ReleaseBoth ()
   {
     if (mIsAcquireed1)
-      mLock1.Release();
+      mLock1.Release ();
 
     if (mIsAcquireed2)
       mLock2.Release ();
@@ -194,7 +194,7 @@ public:
       AcquireAll ();
   }
 
-  ~TripleLockRAII()
+  ~TripleLockRAII ()
   {
     ReleaseAll ();
   }
@@ -203,7 +203,7 @@ public:
   {
     while (true)
       {
-        mLock1.Acquire();
+        mLock1.Acquire ();
         mIsAcquireed1 = true;
 
         if ((&mLock2 == &mLock1)
@@ -225,7 +225,7 @@ public:
   void ReleaseAll ()
   {
     if (mIsAcquireed1)
-      mLock1.Release();
+      mLock1.Release ();
 
     if (mIsAcquireed2)
       mLock2.Release ();
@@ -259,11 +259,11 @@ public:
                  const char*       fmtMsg = NULL,
                  ...);
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 
@@ -280,14 +280,14 @@ public:
 
   void WaitToEnd (const bool throwPending = true);
 
-  void ThrowPendingException();
+  void ThrowPendingException ();
 
   void IgnoreExceptions (bool ignore)
   {
     mIgnoreExceptions = ignore;
   }
 
-  void DiscardException()
+  void DiscardException ()
   {
     mUnkExceptSignaled = false;
 
@@ -295,7 +295,7 @@ public:
     mException = NULL;
   }
 
-  bool HasExceptionPending()
+  bool HasExceptionPending ()
   {
     return (mUnkExceptSignaled || (mException != NULL));
   }
@@ -329,11 +329,11 @@ public:
                    ...);
 
 
-  virtual Exception* Clone() const;
+  virtual Exception* Clone () const;
 
-  virtual EXCEPTION_TYPE Type() const;
+  virtual EXCEPTION_TYPE Type () const;
 
-  virtual const char* Description() const;
+  virtual const char* Description () const;
 };
 
 

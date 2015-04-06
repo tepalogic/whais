@@ -36,7 +36,7 @@ clean_frameworks (FileLogger& log)
 
       vector<DBSDescriptors>::reverse_iterator dbsIterator;
 
-      for (dbsIterator = databases.rbegin();
+      for (dbsIterator = databases.rbegin ();
            dbsIterator != databases.rend ();
            ++dbsIterator)
         {
@@ -62,7 +62,7 @@ clean_frameworks (FileLogger& log)
 
       vector<DBSDescriptors>::reverse_iterator dbsIterator;
 
-      for (dbsIterator = databases.rbegin();
+      for (dbsIterator = databases.rbegin ();
            dbsIterator != databases.rend ();
            ++dbsIterator)
         {
@@ -83,7 +83,7 @@ clean_frameworks (FileLogger& log)
     }
 
   if (sDbsInited)
-    DBSShoutdown();
+    DBSShoutdown ();
 }
 
 
@@ -100,7 +100,7 @@ sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 
 
 static bool
-set_signals()
+set_signals ()
 {
   struct sigaction action;
 
@@ -128,7 +128,7 @@ ServerStopHandler (DWORD)
 }
 
 static BOOL
-set_signals()
+set_signals ()
 {
   return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
 }
@@ -160,7 +160,7 @@ main (int argc, char** argv)
         }
     }
 
-  if (! whs_init())
+  if (! whs_init ())
     {
       cerr << "Could not initialize the network socket framework\n";
       return ENOTSOCK;
@@ -180,7 +180,7 @@ main (int argc, char** argv)
       if (ParseConfigurationSection (*config, sectionLine) == false)
         return -1;
 
-      glbLog.reset (new FileLogger (GetAdminSettings().mLogFile.c_str ()));
+      glbLog.reset (new FileLogger (GetAdminSettings ().mLogFile.c_str ()));
 
   }
   catch (ios_base::failure& e)
@@ -198,7 +198,7 @@ main (int argc, char** argv)
 
   try
   {
-    if (! set_signals())
+    if (! set_signals ())
       throw std::runtime_error ("Signals handlers could not be overwritten.");
 
     vector<DBSDescriptors>::iterator dbsIterator;
@@ -215,8 +215,8 @@ main (int argc, char** argv)
 
         //Inherit some global settings from the server configuration area in
         //case are not set in the context configuration section.
-        dbs.mWaitReqTmo   = GetAdminSettings().mWaitReqTmo;
-        dbs.mSyncInterval = GetAdminSettings().mSyncInterval;
+        dbs.mWaitReqTmo   = GetAdminSettings ().mWaitReqTmo;
+        dbs.mSyncInterval = GetAdminSettings ().mSyncInterval;
 
         if ( ! ParseContextSection (*glbLog, *config, configLine, dbs))
           return -1;
@@ -226,7 +226,7 @@ main (int argc, char** argv)
 
         ostringstream   logEntry;
 
-        for (dbsIterator = databases.begin();
+        for (dbsIterator = databases.begin ();
              dbsIterator != databases.end ();
              ++dbsIterator)
           {
@@ -239,30 +239,30 @@ main (int argc, char** argv)
               }
           }
 
-        if (dbs.mDbsName == GlobalContextDatabase())
-          databases.insert (databases.begin(), dbs);
+        if (dbs.mDbsName == GlobalContextDatabase ())
+          databases.insert (databases.begin (), dbs);
 
         else
           databases.push_back (dbs);
       }
 
-    if (databases.size() == 0)
+    if (databases.size () == 0)
       {
         glbLog->Log (LOG_CRITICAL, "No session were configured.");
         return -1;
       }
-    else if (databases[0].mDbsName != GlobalContextDatabase())
+    else if (databases[0].mDbsName != GlobalContextDatabase ())
       {
         ostringstream noGlbMsg;
 
         noGlbMsg << "No entry for global section '";
-        noGlbMsg << GlobalContextDatabase();
+        noGlbMsg << GlobalContextDatabase ();
         noGlbMsg << "' was found.";
 
         glbLog->Log (LOG_CRITICAL, noGlbMsg.str ());
       }
 
-    const ServerSettings& confSettings = GetAdminSettings();
+    const ServerSettings& confSettings = GetAdminSettings ();
 
     DBSSettings dbsSettings;
     dbsSettings.mTableCacheBlkCount   = confSettings.mTableCacheBlockCount;
@@ -279,7 +279,7 @@ main (int argc, char** argv)
     InitInterpreter (databases[0].mDbsDirectory.c_str ());
     sInterpreterInited = true;
 
-    for (dbsIterator = databases.begin();
+    for (dbsIterator = databases.begin ();
          dbsIterator != databases.end ();
          ++dbsIterator)
       {
@@ -294,14 +294,14 @@ main (int argc, char** argv)
     //TODO: Handle this exception with more specific err messages
 
     logEntry << "Unable to deal with error condition.\n";
-    if (e.Description())
-      logEntry << "Description:\n\t" << e.Description() << endl;
+    if (e.Description ())
+      logEntry << "Description:\n\t" << e.Description () << endl;
 
-    if ( ! e.Message().empty())
-      logEntry << "Message:\n\t" << e.Message() << endl;
+    if ( ! e.Message ().empty ())
+      logEntry << "Message:\n\t" << e.Message () << endl;
 
-    logEntry <<"Extra: " << e.Code() << " (";
-    logEntry << e.File() << ':' << e.Line() << ").\n";
+    logEntry <<"Extra: " << e.Code () << " (";
+    logEntry << e.File () << ':' << e.Line () << ").\n";
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
 
@@ -320,7 +320,7 @@ main (int argc, char** argv)
   {
     ostringstream logEntry;
 
-    logEntry << "General system failure: " << e.what() << endl;
+    logEntry << "General system failure: " << e.what () << endl;
 
     glbLog->Log (LOG_CRITICAL, logEntry.str ());
     clean_frameworks (*glbLog);
@@ -338,7 +338,7 @@ main (int argc, char** argv)
   }
 
   clean_frameworks (*glbLog);
-  whs_clean();
+  whs_clean ();
 
   return 0;
 }

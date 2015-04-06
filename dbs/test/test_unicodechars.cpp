@@ -68,7 +68,7 @@ test_character (const uint32_t codePoint,
 
 
 static bool
-test_latin_base_char_set()
+test_latin_base_char_set ()
 {
   bool result = true;
 
@@ -100,7 +100,7 @@ test_latin_base_char_set()
 
 
 static bool
-test_latin_1_supplement_char_set()
+test_latin_1_supplement_char_set ()
 {
   bool result = true;
 
@@ -253,7 +253,7 @@ test_latin_1_supplement_char_set()
 
 
 static bool
-test_latin_A_extended_char_set()
+test_latin_A_extended_char_set ()
 {
   bool result = true;
 
@@ -522,7 +522,7 @@ test_latin_A_extended_char_set()
 
 
 static bool
-test_latin_B_extended_char_set()
+test_latin_B_extended_char_set ()
 {
   bool result = true;
 
@@ -900,7 +900,7 @@ test_latin_B_extended_char_set()
 }
 
 static bool
-test_latin_IPA_char_set()
+test_latin_IPA_char_set ()
 {
   bool result = true;
 
@@ -920,7 +920,7 @@ test_latin_IPA_char_set()
 
 
 static bool
-test_greek_char_set()
+test_greek_char_set ()
 {
   bool result = true;
 
@@ -1013,7 +1013,7 @@ test_greek_char_set()
 
 
 static bool
-test_cyrillic_char_set()
+test_cyrillic_char_set ()
 {
   bool result = true;
 
@@ -1338,7 +1338,7 @@ test_cyrillic_char_set()
 }
 
 static bool
-test_armenian_char_set()
+test_armenian_char_set ()
 {
   bool result = true;
 
@@ -1368,7 +1368,7 @@ test_armenian_char_set()
 }
 
 static bool
-test_unicode_rest()
+test_unicode_rest ()
 {
   bool result = true;
 
@@ -1394,7 +1394,7 @@ test_unicode_rest()
 
 
 static bool
-test_unicode_evaluation()
+test_unicode_evaluation ()
 {
   bool result = true;
 
@@ -1424,22 +1424,22 @@ main (int argc, char** argv)
 {
   bool success = true;
 
-  DBSInit (DBSSettings());
+  DBSInit (DBSSettings ());
 
-  sVerifiedChars.reset();
+  sVerifiedChars.reset ();
 
-  success = success & test_latin_base_char_set();
-  success = success & test_latin_1_supplement_char_set();
-  success = success & test_latin_A_extended_char_set();
-  success = success & test_latin_B_extended_char_set();
-  success = success & test_latin_IPA_char_set();
-  success = success & test_greek_char_set();
-  success = success & test_cyrillic_char_set();
-  success = success & test_armenian_char_set();
-  success = success & test_unicode_rest();
-  success = success & test_unicode_evaluation();
+  success = success & test_latin_base_char_set ();
+  success = success & test_latin_1_supplement_char_set ();
+  success = success & test_latin_A_extended_char_set ();
+  success = success & test_latin_B_extended_char_set ();
+  success = success & test_latin_IPA_char_set ();
+  success = success & test_greek_char_set ();
+  success = success & test_cyrillic_char_set ();
+  success = success & test_armenian_char_set ();
+  success = success & test_unicode_rest ();
+  success = success & test_unicode_evaluation ();
 
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

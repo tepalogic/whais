@@ -102,7 +102,7 @@ get_enclose_entry (ostream&         os,
 
   bool encEnded = false;
 
-  for (uint_t i = 1; i < line.length(); ++i)
+  for (uint_t i = 1; i < line.length (); ++i)
     {
       char ch = line.at (i);
       if (ch == encChar)
@@ -118,7 +118,7 @@ get_enclose_entry (ostream&         os,
 
 
 const string&
-GlobalContextDatabase()
+GlobalContextDatabase ()
 {
   static const string dbsName ("administrator");
   return dbsName;
@@ -126,7 +126,7 @@ GlobalContextDatabase()
 
 
 const ServerSettings&
-GetAdminSettings()
+GetAdminSettings ()
 {
   return gMainSettings;
 }
@@ -151,7 +151,7 @@ SeekAtConfigurationSection (ifstream& config, uint_t& outConfigLine)
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
 
-      if ((token.length() > 0) && (token.at (0) == COMMENT_CHAR))
+      if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
         continue;
 
       if (token == identifier)
@@ -177,7 +177,7 @@ FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
 
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
-      if ((token.length() > 0) && (token.at (0) == COMMENT_CHAR))
+      if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
         continue;
 
       if (token == identifier)
@@ -195,7 +195,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
   while ( ! config.eof ())
     {
-      const streampos lastPos = config.tellg();
+      const streampos lastPos = config.tellg ();
 
       string line;
       getline (config, line);
@@ -205,7 +205,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
 
-      if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+      if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
         continue;
 
       if (token.at (0) == '[')
@@ -247,9 +247,9 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntEncryption)
         {
           token = NextToken (line, pos, delimiters);
-          std::transform (token.begin(),
+          std::transform (token.begin (),
                          token.end (),
-                         token.begin(),
+                         token.begin (),
                          wh_to_lowercase);
 
           if (token == CIPHER_PLAIN)
@@ -342,7 +342,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntAuthTMO)
         {
           token = NextToken (line, pos, delimiters);
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line "
                    << inoutConfigLine << ".\n";
@@ -362,7 +362,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntRequestTMO)
         {
           token = NextToken (line, pos, delimiters);
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line "
                    << inoutConfigLine << ".\n";
@@ -383,7 +383,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntSyncInterval)
         {
           token = NextToken (line, pos, delimiters);
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line "
                    << inoutConfigLine << ".\n";
@@ -404,7 +404,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       else if (token == gEntSyncWakeup)
        {
          token = NextToken (line, pos, delimiters);
-         if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+         if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
           {
             cerr << "Configuration error at line "
                  << inoutConfigLine << ".\n";
@@ -426,7 +426,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line ";
               cerr << inoutConfigLine << ".\n";
@@ -436,7 +436,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-              const string entry = line.c_str () + pos - token.length();
+              const string entry = line.c_str () + pos - token.length ();
 
               if (get_enclose_entry (cerr,
                                      entry,
@@ -458,7 +458,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line ";
               cerr << inoutConfigLine << ".\n";
@@ -468,7 +468,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-              const string entry = line.c_str () + pos - token.length();
+              const string entry = line.c_str () + pos - token.length ();
 
               if (get_enclose_entry (cerr,
                                      entry,
@@ -486,17 +486,17 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           string& dir = gMainSettings.mWorkDirectory;
 
-          if ((dir.size() != 0)
-              && (dir[dir.size() - 1] != whf_dir_delim()[0]))
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
             {
-              dir += whf_dir_delim();
+              dir += whf_dir_delim ();
             }
         }
       else if (token == gEntWorkDir)
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line ";
               cerr << inoutConfigLine << ".\n";
@@ -506,7 +506,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-              const string entry = line.c_str () + pos - token.length();
+              const string entry = line.c_str () + pos - token.length ();
 
               if (get_enclose_entry (cerr,
                                      entry,
@@ -524,10 +524,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           string& dir = gMainSettings.mTempDirectory;
 
-          if ((dir.size() != 0)
-              && (dir[dir.size() - 1] != whf_dir_delim()[0]))
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
             {
-              dir += whf_dir_delim();
+              dir += whf_dir_delim ();
             }
         }
       else if (token == gEntShowDbg)
@@ -557,7 +557,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
         }
     }
 
-  if (gMainSettings.mWorkDirectory.length() == 0)
+  if (gMainSettings.mWorkDirectory.length () == 0)
     {
       cerr << "The configuration main section does not ";
       cerr << "have a '"<< gEntWorkDir << "' entry.\n";
@@ -565,10 +565,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
       return false;
     }
 
-  if (gMainSettings.mTempDirectory.length() == 0)
+  if (gMainSettings.mTempDirectory.length () == 0)
     gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory;
 
-  if (gMainSettings.mLogFile.length() == 0)
+  if (gMainSettings.mLogFile.length () == 0)
     {
       cerr << "The configuration main section does not ";
       cerr << "have a '"<< gEntLogFile << "' entry.\n";
@@ -591,7 +591,7 @@ ParseContextSection (Logger&          log,
 
   while ( ! config.eof ())
     {
-      const streamoff lastPos = config.tellg();
+      const streamoff lastPos = config.tellg ();
 
       string line;
       getline (config, line);
@@ -601,7 +601,7 @@ ParseContextSection (Logger&          log,
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
 
-      if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+      if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
         continue;
 
       if (token.at (0) == '[')
@@ -617,7 +617,7 @@ ParseContextSection (Logger&          log,
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               logEntry << "Configuration error at line ";
               logEntry << inoutConfigLine << ".\n";
@@ -628,7 +628,7 @@ ParseContextSection (Logger&          log,
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-              const string entry = line.c_str () + pos - token.length();
+              const string entry = line.c_str () + pos - token.length ();
 
               if (get_enclose_entry (logEntry,
                                      entry,
@@ -649,7 +649,7 @@ ParseContextSection (Logger&          log,
        else if (token == gEntRequestTMO)
         {
           token = NextToken (line, pos, delimiters);
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
            {
              cerr << "Configuration error at line "
                   << inoutConfigLine << ".\n";
@@ -670,7 +670,7 @@ ParseContextSection (Logger&          log,
        else if (token == gEntSyncInterval)
         {
           token = NextToken (line, pos, delimiters);
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
            {
              cerr << "Configuration error at line "
                   << inoutConfigLine << ".\n";
@@ -693,7 +693,7 @@ ParseContextSection (Logger&          log,
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line ";
               cerr << inoutConfigLine << ".\n";
@@ -703,7 +703,7 @@ ParseContextSection (Logger&          log,
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-             const string entry = line.c_str () + pos - token.length();
+             const string entry = line.c_str () + pos - token.length ();
 
              if (get_enclose_entry (cerr,
                                     entry,
@@ -722,17 +722,17 @@ ParseContextSection (Logger&          log,
 
           string& dir = output.mDbsDirectory;
 
-          if ((dir.size() != 0)
-              && (dir[dir.size() - 1] != whf_dir_delim()[0]))
+          if ((dir.size () != 0)
+              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
             {
-              dir += whf_dir_delim();
+              dir += whf_dir_delim ();
             }
         }
        else if (token == gEntLogFile)
         {
           token = NextToken (line, pos, delimiters);
 
-          if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line " << inoutConfigLine << ".\n";
               return false;
@@ -740,7 +740,7 @@ ParseContextSection (Logger&          log,
 
           if ((token.at (0) == '\'') || (token.at (0) == '"'))
             {
-              const string entry = line.c_str () + pos - token.length();
+              const string entry = line.c_str () + pos - token.length ();
 
               if (get_enclose_entry (cerr,
                                      entry,
@@ -761,7 +761,7 @@ ParseContextSection (Logger&          log,
         {
            token = NextToken (line, pos, delimiters);
 
-           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
@@ -773,7 +773,7 @@ ParseContextSection (Logger&          log,
            string libEntry;
            if ((token.at (0) == '\'') || (token.at (0) == '"'))
              {
-               const string entry = line.c_str () + pos - token.length();
+               const string entry = line.c_str () + pos - token.length ();
 
                if (get_enclose_entry (logEntry,
                                       entry,
@@ -800,7 +800,7 @@ ParseContextSection (Logger&          log,
         {
            token = NextToken (line, pos, delimiters);
 
-           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
@@ -812,7 +812,7 @@ ParseContextSection (Logger&          log,
            string libEntry;
            if ((token.at (0) == '\'') || (token.at (0) == '"'))
              {
-               const string entry = line.c_str () + pos - token.length();
+               const string entry = line.c_str () + pos - token.length ();
 
                if (get_enclose_entry (logEntry,
                                       entry,
@@ -835,7 +835,7 @@ ParseContextSection (Logger&          log,
         }
        else if (token == gEntRootPasswrd)
         {
-           if (output.mRootPass.size() > 0)
+           if (output.mRootPass.size () > 0)
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ". ";
@@ -847,7 +847,7 @@ ParseContextSection (Logger&          log,
              }
            token = NextToken (line, pos, delimiters);
 
-           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
@@ -858,7 +858,7 @@ ParseContextSection (Logger&          log,
 
            if ((token.at (0) == '\'') || (token.at (0) == '"'))
              {
-               const string entry = line.c_str () + pos - token.length();
+               const string entry = line.c_str () + pos - token.length ();
 
                if (get_enclose_entry (logEntry,
                                       entry,
@@ -879,7 +879,7 @@ ParseContextSection (Logger&          log,
         }
        else if (token == gEntUserPasswrd)
         {
-           if (output.mUserPasswd.size() > 0)
+           if (output.mUserPasswd.size () > 0)
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ". ";
@@ -892,7 +892,7 @@ ParseContextSection (Logger&          log,
 
            token = NextToken (line, pos, delimiters);
 
-           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
@@ -903,7 +903,7 @@ ParseContextSection (Logger&          log,
 
            if ((token.at (0) == '\'') || (token.at (0) == '"'))
              {
-               const string entry = line.c_str () + pos - token.length();
+               const string entry = line.c_str () + pos - token.length ();
 
                if (get_enclose_entry (logEntry,
                                       entry,
@@ -925,7 +925,7 @@ ParseContextSection (Logger&          log,
        else if (token == gEntStackCount)
         {
            token = NextToken (line, pos, delimiters);
-           if ((token.length() == 0) || (token.at (0) == COMMENT_CHAR))
+           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
               cerr << "Configuration error at line "
                    << inoutConfigLine << ".\n";
@@ -961,7 +961,7 @@ PrepareConfigurationSection (Logger& log)
 {
   ostringstream logStream;
 
-  if (gMainSettings.mListens.size() == 0)
+  if (gMainSettings.mListens.size () == 0)
     {
       ListenEntry defaultEnt = {"", DEFAULT_LISTEN_PORT};
       gMainSettings.mListens.push_back (defaultEnt);
@@ -1207,7 +1207,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
 
   ostringstream logStream;
 
-  if (inoutDesc.mUserPasswd.size() == 0)
+  if (inoutDesc.mUserPasswd.size () == 0)
     {
       logStream << "A user password for the database ";
       logStream << "section starting at line ";
@@ -1217,7 +1217,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mRootPass.size() == 0)
+  if (inoutDesc.mRootPass.size () == 0)
     {
       logStream << "A root password for the database ";
       logStream << "section starting at line ";
@@ -1227,7 +1227,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mDbsName.length() == 0)
+  if (inoutDesc.mDbsName.length () == 0)
     {
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
@@ -1237,7 +1237,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mDbsDirectory.length() == 0)
+  if (inoutDesc.mDbsDirectory.length () == 0)
     {
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
@@ -1247,7 +1247,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mDbsLogFile.length() == 0)
+  if (inoutDesc.mDbsLogFile.length () == 0)
     {
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;

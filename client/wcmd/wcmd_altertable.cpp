@@ -88,7 +88,7 @@ copy_basic_field (ITable&           srcTable,
 
   try
   {
-      converter.Operand().GetValue (newValue);
+      converter.Operand ().GetValue (newValue);
   }
   catch (whais::InterException& e)
   {
@@ -127,7 +127,7 @@ copy_array_field (ITable&           srcTable,
 
       try
       {
-          converter.Operand().GetValueAt (i).Operand().GetValue (element);
+          converter.Operand ().GetValueAt (i).Operand ().GetValue (element);
       }
       catch (whais::InterException& e)
       {
@@ -449,7 +449,7 @@ TableAlterRules::TableAlterRules (IDBSHandler&  dbs,
 
 
 
-TableAlterRules::~TableAlterRules()
+TableAlterRules::~TableAlterRules ()
 {
   for (size_t f = 0; f < mDstFields.size (); ++f)
     delete [] mDstFields[f].name;
@@ -570,7 +570,7 @@ TableAlterRules::AddField (const std::string&   name,
 
   DBSFieldDescriptor fd = {0, };
 
-  fd.name = new char[name.length() + 1];
+  fd.name = new char[name.length () + 1];
   strcpy (_CC (char*&, fd.name), name.c_str ());
 
   fd.type    = type;

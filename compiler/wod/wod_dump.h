@@ -61,15 +61,15 @@ public:
       }
   }
 
-  virtual ~DumpException()
+  virtual ~DumpException ()
   {
   };
 
-  virtual Exception* Clone() const { return new DumpException (*this); }
+  virtual Exception* Clone () const { return new DumpException (*this); }
 
-  virtual EXCEPTION_TYPE Type() const { return DUMP_EXCEPTION; }
+  virtual EXCEPTION_TYPE Type () const { return DUMP_EXCEPTION; }
 
-  virtual const char* Description() const
+  virtual const char* Description () const
   {
     return "General exception by object dumper.";
   }

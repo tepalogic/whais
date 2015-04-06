@@ -23,7 +23,7 @@
  ******************************************************************************/
 /*
  * yy.c - Implements a lexical analyzer for our bison generated parser.
- *        (e.g. provides the required yylex() and yyerror() functions).
+ *        (e.g. provides the required yylex () and yyerror () functions).
  */
 
 /* careful whit this to be the same as in
@@ -986,7 +986,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
   return result;
 }
 
-/* this is internally used by yyparse()
+/* this is internally used by yyparse ()
  * it's declaration is found on wisper.y */
 int
 yyerror (struct ParserState* parser, const char* msg)

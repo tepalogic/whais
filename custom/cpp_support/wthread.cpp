@@ -34,7 +34,7 @@ namespace whais
 
 
 
-Lock::Lock()
+Lock::Lock ()
 {
   const uint_t result = wh_lock_init (&mLock);
 
@@ -43,7 +43,7 @@ Lock::Lock()
 }
 
 
-Lock::~Lock()
+Lock::~Lock ()
 {
   const uint_t result = wh_lock_destroy (&mLock);
 
@@ -53,7 +53,7 @@ Lock::~Lock()
 
 
 void
-Lock::Acquire()
+Lock::Acquire ()
 {
   const uint_t result = wh_lock_acquire (&mLock);
   if (result != WOP_OK)
@@ -62,7 +62,7 @@ Lock::Acquire()
 
 
 bool
-Lock::TryAcquire()
+Lock::TryAcquire ()
 {
   bool_t acquired;
 
@@ -77,7 +77,7 @@ Lock::TryAcquire()
 
 
 void
-Lock::Release()
+Lock::Release ()
 {
   const uint_t result = wh_lock_release (&mLock);
 
@@ -167,7 +167,7 @@ Thread::Run (WH_THREAD_ROUTINE routine,
       wh_thread_free (mThread);
       mNeedsClean = false;
 
-      ThrowPendingException();
+      ThrowPendingException ();
     }
 
   assert (mEnded > 0);
@@ -218,7 +218,7 @@ Thread::WaitToEnd (const bool throwPending)
       mNeedsClean = false;
 
       if (throwPending)
-        ThrowPendingException();
+        ThrowPendingException ();
     }
 
   wh_atomic_fetch_dec32 (&mEnded);
@@ -226,16 +226,16 @@ Thread::WaitToEnd (const bool throwPending)
 
 
 void
-Thread::ThrowPendingException()
+Thread::ThrowPendingException ()
 {
   assert (mEnded > 0);
 
-  if (HasExceptionPending() == false)
+  if (HasExceptionPending () == false)
     return;
 
   if (mUnkExceptSignaled)
     {
-      DiscardException();
+      DiscardException ();
 
       wh_atomic_fetch_dec32 (&mEnded);
 
@@ -244,8 +244,8 @@ Thread::ThrowPendingException()
 
   if (mException != NULL)
     {
-      Exception* clone = mException->Clone();
-      DiscardException();
+      Exception* clone = mException->Clone ();
+      DiscardException ();
 
       wh_atomic_fetch_dec32 (&mEnded);
 
@@ -271,7 +271,7 @@ Thread::ThreadWrapperRoutine (void* const args)
   catch (Exception &e)
   {
     if (th->mIgnoreExceptions == false)
-      th->mException = e.Clone();
+      th->mException = e.Clone ();
   }
   catch (Exception* pE)
   {

@@ -15,7 +15,7 @@ static void
 init_state_for_test (struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
-  state->strings = create_string_store();
+  state->strings = create_string_store ();
   state->bufferSize = strlen (buffer);
   wh_array_init (&state->values, sizeof (struct SemValue));
 
@@ -90,13 +90,13 @@ char proc_decl_buffer[] =
   "RETURN TRUE; "
   "ENDPROC "
   " "
-  "PROCEDURE ProcIdTst0() "
+  "PROCEDURE ProcIdTst0 () "
   "RETURN BOOL "
   "DO "
-  "RETURN ProcId0(); "
+  "RETURN ProcId0 (); "
   "ENDPROC "
   " "
-  "PROCEDURE ProcIdTst1() "
+  "PROCEDURE ProcIdTst1 () "
   "RETURN BOOL "
   "DO "
   "LET v1 AS BOOL; "
@@ -118,7 +118,7 @@ char proc_decl_buffer[] =
   "RETURN ProcId1 (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16); "
   "ENDPROC "
   " "
-  "PROCEDURE ProcIdTst2() "
+  "PROCEDURE ProcIdTst2 () "
   "RETURN BOOL "
   "DO "
   "LET v1 AS ARRAY OF DATE; "
@@ -199,7 +199,7 @@ check_procedure_calls (struct ParserState *state)
 }
 
 int
-main()
+main ()
 {
   bool_t test_result = TRUE;
   struct ParserState state = { 0, };
@@ -243,9 +243,9 @@ main()
     }
 
   free_state (&state);
-  printf ("Memory peak: %u bytes \n", test_get_mem_peak());
-  printf ("Current memory usage: %u bytes...", test_get_mem_used());
-  if (test_get_mem_used() != 0)
+  printf ("Memory peak: %u bytes \n", test_get_mem_peak ());
+  printf ("Current memory usage: %u bytes...", test_get_mem_used ());
+  if (test_get_mem_used () != 0)
     {
       test_result = FALSE;
       printf ("FAILED\n");

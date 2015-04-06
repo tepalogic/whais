@@ -16,7 +16,7 @@
 
 using namespace std;
 
-extern const char* DefaultDatabaseName();
+extern const char* DefaultDatabaseName ();
 extern const uint_t  DefaultUserId ();
 extern const char* DefaultUserPassword ();
 
@@ -50,7 +50,7 @@ tc_settup_connection (int              argc,
 {
   const char*   host          = DEFAULT_HOST_SEREVR;
   const char*   port          = DEFAULT_PORT_SERVER;
-  const char*   database      = DefaultDatabaseName();
+  const char*   database      = DefaultDatabaseName ();
   uint_t        userid        = DefaultUserId ();
   const char*   password      = DefaultUserPassword ();
   uint_t        frameSize     = DEFAULT_FRAME_SIZE;

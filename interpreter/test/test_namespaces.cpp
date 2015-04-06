@@ -137,7 +137,7 @@ static const uint8_t db1Code_Fail_4 [] =
     "\n"
     "EXTERN LET tab1 AS TABLE OF (t_field AS int8, vasile as DATE);\n"
     "\n"
-    "PROCEDURE ref_proc()\n"
+    "PROCEDURE ref_proc ()\n"
     "RETURN DATE\n"
     "DO\n"
     "\n"
@@ -189,7 +189,7 @@ static const uint8_t db1_Code_1 [] =
     "RETURN HIRESTIME;\n"
     "\n"
     "\n"
-    "PROCEDURE private_proc() RETURN HIRESTIME\n"
+    "PROCEDURE private_proc () RETURN HIRESTIME\n"
     "DO\n"
     "LET dummy  AS ARRAY OF INT16;\n"
     "LET dummy2 AS ARRAY OF INT8;\n"
@@ -227,7 +227,7 @@ static const uint8_t db1_Code_2 [] =
 static const uint8_t db2_Code_1 [] =
     "LET private_gb1 AS HIRESTIME;\n"
     "\n"
-    "PROCEDURE private_proc() RETURN HIRESTIME\n"
+    "PROCEDURE private_proc () RETURN HIRESTIME\n"
     "DO\n"
     "\n"
     "RETURN private_gb1;\n"
@@ -318,7 +318,7 @@ test_fault (ISession& session,
   }
   catch (InterException& e)
   {
-      if (e.Code() == expectedCode)
+      if (e.Code () == expectedCode)
         {
           std::cout << "Got the expected exception code OK" << std::endl;
           result = true;
@@ -383,11 +383,11 @@ load_unit (ISession&           session,
 }
 
 int
-main()
+main ()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -447,7 +447,7 @@ main()
   DBSRemoveDatabase (admin);
   DBSRemoveDatabase (test_db1);
   DBSRemoveDatabase (test_db2);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

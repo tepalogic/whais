@@ -73,16 +73,16 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
                         const std::string&    name)
   : IDBSHandler (),
     mGlbSettings (settings),
-    mSync(),
+    mSync (),
     mDbsLocationDir (locationDir),
     mName (name),
-    mTables(),
+    mTables (),
     mCreatedTemporalTables (0)
 {
   string fileName = mDbsLocationDir + mName + DBS_FILE_EXT;
   File   inputFile (fileName.c_str (), WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint_t      fileSize = inputFile.Size();
+  const uint_t      fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t*          buffer = fileContent.get ();
 
@@ -158,7 +158,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
 DbsHandler::DbsHandler (const DbsHandler& source)
   : IDBSHandler (),
     mGlbSettings (source.mGlbSettings),
-    mSync(),
+    mSync (),
     mDbsLocationDir (source.mDbsLocationDir),
     mName (source.mName),
     mTables (source.mTables),
@@ -175,9 +175,9 @@ DbsHandler::~DbsHandler ()
 
 
 TABLE_INDEX
-DbsHandler::PersistentTablesCount()
+DbsHandler::PersistentTablesCount ()
 {
-  return mTables.size();
+  return mTables.size ();
 }
 
 
@@ -188,15 +188,15 @@ DbsHandler::RetrievePersistentTable (const TABLE_INDEX index)
 
   LockRAII<Lock> syncHolder (mSync);
 
-  if (iterator >= mTables.size())
+  if (iterator >= mTables.size ())
     {
       throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
                           index,
-                          mTables.size());
+                          mTables.size ());
     }
 
-  TABLES::iterator it = mTables.begin();
+  TABLES::iterator it = mTables.begin ();
 
   while (iterator-- > 0)
     {
@@ -282,7 +282,7 @@ DbsHandler::AddTable (const char* const   name,
                                                              inoutFields,
                                                              fieldsCount)
                                                  ));
-  SyncToFile();
+  SyncToFile ();
 
   //Make sure we can retrieve the table later.
   it = mTables.find (tableName);
@@ -308,7 +308,7 @@ DbsHandler::ReleaseTable (ITable& hndTable)
 
   LockRAII<Lock> syncHolder (mSync);
 
-  if (hndTable.IsTemporal())
+  if (hndTable.IsTemporal ())
     {
       assert (mCreatedTemporalTables > 0);
 
@@ -319,7 +319,7 @@ DbsHandler::ReleaseTable (ITable& hndTable)
       return;
     }
 
-  for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       if (&hndTable == _SC (ITable*, it->second))
         {
@@ -339,15 +339,15 @@ DbsHandler::TableName (const TABLE_INDEX index)
 
   LockRAII<Lock> syncHolder (mSync);
 
-  if (iterator >= mTables.size())
+  if (iterator >= mTables.size ())
     {
       throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
                           index,
-                          mTables.size());
+                          mTables.size ());
     }
 
-  TABLES::iterator it = mTables.begin();
+  TABLES::iterator it = mTables.begin ();
 
   while (iterator-- > 0)
     {
@@ -378,12 +378,12 @@ DbsHandler::DeleteTable (const char* const name)
     it->second = new PersistentTable (*this, it->first);
 
   PersistentTable* const table = it->second;
-  table->RemoveFromDatabase();
+  table->RemoveFromDatabase ();
   delete table;
 
   mTables.erase (it);
 
-  SyncToFile();
+  SyncToFile ();
 }
 
 
@@ -394,15 +394,15 @@ DbsHandler::SyncTableContent (const TABLE_INDEX index)
 
   LockRAII<Lock> syncHolder (mSync);
 
-  if (iterator >= mTables.size())
+  if (iterator >= mTables.size ())
     {
       throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
                           index,
-                          mTables.size());
+                          mTables.size ());
     }
 
-  TABLES::iterator it = mTables.begin();
+  TABLES::iterator it = mTables.begin ();
 
   while (iterator-- > 0)
     {
@@ -412,7 +412,7 @@ DbsHandler::SyncTableContent (const TABLE_INDEX index)
     }
 
   if (it->second != NULL)
-    it->second->Flush();
+    it->second->Flush ();
 }
 
 
@@ -435,7 +435,7 @@ DbsHandler::Discard ()
 {
   LockRAII<Lock> syncHolder (mSync);
 
-  for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       delete it->second;
       it->second = NULL;
@@ -444,7 +444,7 @@ DbsHandler::Discard ()
 
 
 void
-DbsHandler::SyncToFile()
+DbsHandler::SyncToFile ()
 {
   const uint8_t zero = 0;
 
@@ -454,8 +454,8 @@ DbsHandler::SyncToFile()
 
   store_le_int16 (PS_DBS_VER_MAJ, header + PS_DBS_VER_MAJ_OFF);
   store_le_int16 (PS_DBS_VER_MIN, header + PS_DBS_VER_MIN_OFF);
-  store_le_int16 (mTables.size(), header + PS_DBS_NUM_TABLES_OFF);
-  store_le_int64 (MaxFileSize(), header + PS_DBS_MAX_FILE_OFF);
+  store_le_int16 (mTables.size (), header + PS_DBS_NUM_TABLES_OFF);
+  store_le_int64 (MaxFileSize (), header + PS_DBS_MAX_FILE_OFF);
   store_le_int64 (PS_FLAG_NOT_CLOSED, header + PS_DBS_FLAGS_OFF);
 
   const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
@@ -464,10 +464,10 @@ DbsHandler::SyncToFile()
   outFile.Size (0);
   outFile.Write (header, sizeof header);
 
-  for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       outFile.Write (_RC (const uint8_t*, it->first.c_str ()),
-                     it->first.length() + 1);
+                     it->first.length () + 1);
     }
 
   outFile.Write (&zero, 1);
@@ -475,7 +475,7 @@ DbsHandler::SyncToFile()
 
 
 bool
-DbsHandler::HasUnreleasedTables()
+DbsHandler::HasUnreleasedTables ()
 {
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
@@ -488,7 +488,7 @@ DbsHandler::HasUnreleasedTables()
 
 
 void
-DbsHandler::RegisterTableSpawn()
+DbsHandler::RegisterTableSpawn ()
 {
   LockRAII<Lock> syncHolder (mSync);
 
@@ -497,18 +497,18 @@ DbsHandler::RegisterTableSpawn()
 
 
 void
-DbsHandler::RemoveFromStorage()
+DbsHandler::RemoveFromStorage ()
 {
   Discard ();
 
-  for (TABLES::iterator it = mTables.begin(); it != mTables.end (); ++it)
+  for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
       assert (it->first.c_str () != NULL);
       assert (it->second == NULL);
 
       auto_ptr<PersistentTable> table (new PersistentTable (*this, it->first));
 
-      table->RemoveFromDatabase();
+      table->RemoveFromDatabase ();
     }
 
   const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
@@ -540,7 +540,7 @@ DBSInit (const DBSSettings& settings)
 
 
 DBS_SHL void
-DBSShoutdown()
+DBSShoutdown ()
 {
   if (dbsMgrs_.get () == NULL)
     {
@@ -554,7 +554,7 @@ DBSShoutdown()
 
 
 DBS_SHL const DBSSettings&
-DBSGetSeettings()
+DBSGetSeettings ()
 {
   if (dbsMgrs_.get () == NULL)
     {
@@ -614,7 +614,7 @@ DBSValidateDatabase (const char* const name,
   File         inputFile (fileName.c_str (),
                           WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint_t      fileSize = inputFile.Size();
+  const uint_t      fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
@@ -669,7 +669,7 @@ DBSRepairDatabase (const char* const            name,
   File         inputFile (fileName.c_str (),
                           WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
-  const uint64_t    fileSize = inputFile.Size();
+  const uint64_t    fileSize = inputFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
@@ -709,7 +709,7 @@ DBSRepairDatabase (const char* const            name,
   store_le_int64 (headerFlags | PS_FLAG_TO_REPAIR, buffer + PS_DBS_FLAGS_OFF);
   inputFile.Seek (0, WH_SEEK_BEGIN);
   inputFile.Write (buffer, fileSize);
-  inputFile.Close();
+  inputFile.Close ();
 
   IDBSHandler&   dbs          = DBSRetrieveDatabase (name, path);
   uint16_t       tablesCount  = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
@@ -813,11 +813,11 @@ DBSReleaseDatabase (IDBSHandler& hnd)
   DbsManager::DATABASES_MAP&          dbses = dbsMgrs_->mDatabases;
   DbsManager::DATABASES_MAP::iterator it;
 
-  for (it = dbses.begin(); it != dbses.end (); ++it)
+  for (it = dbses.begin (); it != dbses.end (); ++it)
     {
       if (_SC (IDBSHandler*, &it->second.mDbs) == &hnd)
         {
-          if (it->second.mDbs.HasUnreleasedTables())
+          if (it->second.mDbs.HasUnreleasedTables ())
             {
               throw DBSException (_EXTRA (DBSException::DATABASE_IN_USE),
                                   "Could not release a database handler due to"
@@ -897,7 +897,7 @@ DBSRemoveDatabase (const char* const name, const char* path)
                          );
     }
 
-  it->second.mDbs.RemoveFromStorage();
+  it->second.mDbs.RemoveFromStorage ();
   dbses.erase (it);
 }
 

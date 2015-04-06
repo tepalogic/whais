@@ -116,10 +116,10 @@ test_op_stb (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DBool result;
@@ -160,10 +160,10 @@ test_op_stc (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DChar result;
@@ -205,10 +205,10 @@ test_op_std (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DDate result;
@@ -249,10 +249,10 @@ test_op_stdt (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DDateTime result;
@@ -293,10 +293,10 @@ test_op_stht (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DHiresTime result;
@@ -339,10 +339,10 @@ test_op_stXX (Session&       session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DBS_T result;
@@ -383,10 +383,10 @@ test_op_stt (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DText result;
@@ -434,21 +434,21 @@ test_op_stta (Session& session)
   stack.Push (session.DBSHandler (), firstTable);
   stack.Push (session.DBSHandler (), secondTable);
 
-  if (stack[0].Operand ().IsNull() == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
-  if (stack[1].Operand ().IsNull())
+  if (stack[1].Operand ().IsNull ())
     return false;
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
-  ITable& result = stack[0].Operand ().GetTable();
+  ITable& result = stack[0].Operand ().GetTable ();
 
   if (&result != &secondTable)
     return false;
@@ -493,21 +493,21 @@ test_op_stf (Session& session)
   stack.Push (sv1);
   stack.Push (sv2);
 
-  if (stack[0].Operand ().IsNull() == false)
+  if (stack[0].Operand ().IsNull () == false)
     return false;
 
-  if (stack[1].Operand ().IsNull())
+  if (stack[1].Operand ().IsNull ())
     return false;
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
-  ITable& result = stack[0].Operand ().GetTable();
+  ITable& result = stack[0].Operand ().GetTable ();
 
   if (&result != &firstTable)
     return false;
@@ -550,19 +550,19 @@ test_op_sta (Session& session)
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
-  if (stack[0].Operand ().IsNull())
+  if (stack[0].Operand ().IsNull ())
     return false;
 
   DArray result;
   stack[0].Operand ().GetValue (result);
 
-  if (result.Count() != op2.Count())
+  if (result.Count () != op2.Count ())
     return false;
 
-  for (uint_t index = 0; index < result.Count(); ++index)
+  for (uint_t index = 0; index < result.Count (); ++index)
     {
       DUInt8 first, second;
 
@@ -577,12 +577,12 @@ test_op_sta (Session& session)
 }
 
 int
-main()
+main ()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -665,7 +665,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

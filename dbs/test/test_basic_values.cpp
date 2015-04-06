@@ -25,23 +25,23 @@ test_bounds_values (const T min, const T minN, const T max, const T maxP)
 {
   if ((min != T::Min ())
       || (max != T::Max ())
-      || (min.Prev() != T ())
-      || (max.Next() != T ())
-      || (T ().Next() != T ())
-      || (T ().Prev() != T ()))
+      || (min.Prev () != T ())
+      || (max.Next () != T ())
+      || (T ().Next () != T ())
+      || (T ().Prev () != T ()))
   {
     return false;
   }
 
-  if ((minN != T::Min ().Next())
-      || (minN.Prev() != T::Min ())
+  if ((minN != T::Min ().Next ())
+      || (minN.Prev () != T::Min ())
       || (minN <= min))
     {
       return false;
     }
 
-  if ((maxP != T::Max ().Prev())
-      || (maxP.Next() != T::Max ())
+  if ((maxP != T::Max ().Prev ())
+      || (maxP.Next () != T::Max ())
       || (maxP >= max))
   {
     return false;
@@ -53,16 +53,16 @@ test_bounds_values (const T min, const T minN, const T max, const T maxP)
 template <class T> bool
 test_order_value (const T v1, const T v2, const T v3)
 {
-  if ((v1.Next() != v2)
-      || (v2.Prev() != v1)
-      || (v1.Next().Next() != v3))
+  if ((v1.Next () != v2)
+      || (v2.Prev () != v1)
+      || (v1.Next ().Next () != v3))
     {
       return false;
     }
 
-  if ((v3.Prev() != v2)
-      || (v2.Next() != v3)
-      || (v3.Prev().Prev() != v1))
+  if ((v3.Prev () != v2)
+      || (v2.Next () != v3)
+      || (v3.Prev ().Prev () != v1))
     {
       return false;
     }
@@ -72,7 +72,7 @@ test_order_value (const T v1, const T v2, const T v3)
 
 
 int
-main()
+main ()
 {
   bool success = true;
 

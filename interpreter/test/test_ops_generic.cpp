@@ -170,7 +170,7 @@ test_op_cts (Session& session)
 
   session.ExecuteProcedure (cts_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   return true;
@@ -198,7 +198,7 @@ test_op_inull (Session& session)
 
   session.ExecuteProcedure (inull_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
@@ -232,13 +232,13 @@ test_op_nnull (Session& session)
 
   session.ExecuteProcedure (nnull_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DBool result;
   stack[0].Operand ().GetValue (result);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   if (result == DBool (true) )
@@ -258,7 +258,7 @@ test_op_call (Session& session)
 
   session.ExecuteProcedure ("p2", stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DUInt8 result;
@@ -284,7 +284,7 @@ test_op_text_index (Session& session)
 
   session.ExecuteProcedure ("text_index", stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DChar result;
@@ -318,7 +318,7 @@ test_op_array_index (Session& session)
 
   session.ExecuteProcedure ("array_index", stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DInt8 result;
@@ -355,7 +355,7 @@ test_op_table_index (Session& session)
 
   session.ExecuteProcedure ("table_index", stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DInt8 result;
@@ -364,7 +364,7 @@ test_op_table_index (Session& session)
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand ().GetTable();
+  ITable& stackTable = stack[0].Operand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
@@ -395,7 +395,7 @@ test_op_field_index (Session& session)
 
   session.ExecuteProcedure ("field_index", stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DInt8 result;
@@ -404,7 +404,7 @@ test_op_field_index (Session& session)
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand ().GetTable();
+  ITable& stackTable = stack[0].Operand ().GetTable ();
 
   if (&stackTable != &tempTable)
     return false;
@@ -448,7 +448,7 @@ test_op_jfc (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 result;
@@ -464,7 +464,7 @@ test_op_jfc (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
    stack[0].Operand ().GetValue (result);
@@ -507,7 +507,7 @@ test_op_jtc (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 result;
@@ -523,7 +523,7 @@ test_op_jtc (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
    stack[0].Operand ().GetValue (result);
@@ -566,7 +566,7 @@ test_op_jf (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 result;
@@ -582,7 +582,7 @@ test_op_jf (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
    stack[0].Operand ().GetValue (result);
@@ -624,7 +624,7 @@ test_op_jt (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 result;
@@ -640,7 +640,7 @@ test_op_jt (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
    stack[0].Operand ().GetValue (result);
@@ -681,7 +681,7 @@ test_op_jmp (Session& session)
 
   session.ExecuteProcedure (field_proc, stack);
 
-  if (stack.Size() != 1)
+  if (stack.Size () != 1)
     return false;
 
   DInt8 result;
@@ -695,12 +695,12 @@ test_op_jmp (Session& session)
 
 
 int
-main()
+main ()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -735,7 +735,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;

@@ -45,10 +45,10 @@ extern "C"
 #endif
 
 WTime
-wh_get_currtime();
+wh_get_currtime ();
 
 WTICKS
-wh_msec_ticks();
+wh_msec_ticks ();
 
 #ifdef __cplusplus
 }

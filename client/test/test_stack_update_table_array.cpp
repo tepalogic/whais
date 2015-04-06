@@ -980,7 +980,7 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName()
+DefaultDatabaseName ()
 {
   return "test_list_db";
 }

@@ -41,18 +41,18 @@ Logger::~Logger ()
 
 FileLogger::FileLogger (const char* const file, const bool printStart)
   : Logger (),
-    mStartTick (wh_msec_ticks()),
-    mSync(),
-    mOutStream(),
+    mStartTick (wh_msec_ticks ()),
+    mSync (),
+    mOutStream (),
     mLogFile (file),
-    mTodayTime (wh_get_currtime())
+    mTodayTime (wh_get_currtime ())
 {
   mLogFile.append (".wlog.yyyymmdd");
-  SwitchFile();
+  SwitchFile ();
 
   if (printStart)
     {
-      const WTime dayStart = wh_get_currtime();
+      const WTime dayStart = wh_get_currtime ();
 
       mOutStream << "\n* Start of the day: " << (int)dayStart.year;
       mOutStream << '-' << (int)dayStart.month;
@@ -93,7 +93,7 @@ FileLogger::Log (const LOG_TYPE type, const char* str)
       ++str;
     }
   mOutStream << endl;
-  mOutStream.flush();
+  mOutStream.flush ();
 }
 
 
@@ -112,18 +112,18 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
   if (type > LOG_DEBUG)
     type = LOG_UNKNOW;
 
-  const WTime ctime = wh_get_currtime();
+  const WTime ctime = wh_get_currtime ();
 
   if ((ctime.day != mTodayTime.day)
       || (ctime.month != mTodayTime.month)
       || (ctime.year != mTodayTime.year))
     {
       mTodayTime = ctime;
-      SwitchFile();
+      SwitchFile ();
     }
 
-  const char       fill  = mOutStream.fill();
-  const streamsize width = mOutStream.width();
+  const char       fill  = mOutStream.fill ();
+  const streamsize width = mOutStream.width ();
 
   mOutStream << '(' << logIds [type] << ')';
   mOutStream.fill ('0');
@@ -144,12 +144,12 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
 
 
 void
-FileLogger::SwitchFile()
+FileLogger::SwitchFile ()
 {
-  if (mOutStream.is_open())
-    mOutStream.close();
+  if (mOutStream.is_open ())
+    mOutStream.close ();
 
-  snprintf (_CC (char*, mLogFile.c_str () + mLogFile.size() - 14),
+  snprintf (_CC (char*, mLogFile.c_str () + mLogFile.size () - 14),
             15,
             ".wlog.%04u%02u%02u",
             mTodayTime.year,

@@ -61,7 +61,7 @@ class UnitsManager
 {
 public:
   UnitsManager ()
-    : mUnits()
+    : mUnits ()
   {
   }
 
@@ -72,7 +72,7 @@ public:
                     const uint8_t*      constData,
                     const uint32_t      constDataSize);
 
-  void RemoveLastUnit();
+  void RemoveLastUnit ();
 
   Unit& GetUnit (const uint32_t unitIndex);
 

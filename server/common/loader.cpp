@@ -69,7 +69,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
   log.Log (LOG_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
-  if (inoutDesc.mDbsName != GlobalContextDatabase())
+  if (inoutDesc.mDbsName != GlobalContextDatabase ())
     {
       inoutDesc.mSession = &GetInstance (inoutDesc.mDbsName.c_str (),
                                          dbsLogger.get ());
@@ -89,7 +89,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
       logEntry.str (CLEAR_LOG_STREAM);
     }
 
-  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin();
+  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin ();
        it != inoutDesc.mNativeLibs.end ();
        ++it)
     {
@@ -106,7 +106,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
         }
     }
 
-  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin();
+  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();
        it != inoutDesc.mObjectLibs.end ();
        ++it)
     {
@@ -119,7 +119,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
       inoutDesc.mSession->LoadCompiledUnit (unit);
     }
 
-  inoutDesc.mLogger = dbsLogger.release();
+  inoutDesc.mLogger = dbsLogger.release ();
 
   return true;
 }

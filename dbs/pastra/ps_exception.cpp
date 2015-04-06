@@ -47,30 +47,30 @@ DBSException::DBSException (const uint32_t  code,
 }
 
 
-DBSException::~DBSException()
+DBSException::~DBSException ()
 {
 }
 
 
 Exception*
-DBSException::Clone() const
+DBSException::Clone () const
 {
   return new DBSException (*this);
 }
 
 
 EXCEPTION_TYPE
-DBSException::Type() const
+DBSException::Type () const
 {
   return DBS_EXCEPTION;
 }
 
 
 const char*
-DBSException::Description() const
+DBSException::Description () const
 {
 
-  switch (Code())
+  switch (Code ())
   {
   case OPER_NOT_SUPPORTED:
     return "A requested operation is not supported.";

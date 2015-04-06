@@ -117,7 +117,7 @@ test_op_saddXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -165,7 +165,7 @@ test_op_ssubXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -212,7 +212,7 @@ test_op_smulXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -259,7 +259,7 @@ test_op_sdivXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -307,7 +307,7 @@ test_op_smodXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -354,7 +354,7 @@ test_op_sandXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -401,7 +401,7 @@ test_op_sxorXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -448,7 +448,7 @@ test_op_sorXX (Session& session,
 
   session.ExecuteProcedure (procName, stack);
 
-  if (stack.Size() != 2)
+  if (stack.Size () != 2)
     return false;
 
   DBS_T modified;
@@ -471,12 +471,12 @@ test_op_sorXX (Session& session,
 
 
 int
-main()
+main ()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
   }
 
   DBSCreateDatabase (admin);
@@ -582,7 +582,7 @@ main()
 
   CleanInterpreter ();
   DBSRemoveDatabase (admin);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!success)
     {

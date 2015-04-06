@@ -117,13 +117,13 @@ test_table_test_rows_basic (void *)
         switch (wh_rnd ()  % 3)
         {
           case 0:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f, DInt64 (wh_rnd ()));
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows(), f, DInt64 (wh_rnd ()));
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f, DInt64 (wh_rnd ()));
+            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f, DInt64 (wh_rnd ()));
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f, DInt64 ());
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows(), f, DInt64 (wh_rnd ()));
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f, DInt64 ());
+            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f, DInt64 (wh_rnd ()));
             break;
 
           default:
@@ -170,18 +170,18 @@ test_table_test_rows_array (void *)
             for (int el = 0, p = wh_rnd () % 100; el < p; ++el)
               value.Add (DInt64 (wh_rnd ()));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f2, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
 
             if ((wh_rnd () & 1) == 0)
               value.Add (DInt64 (wh_rnd ()));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f1, value);
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows(), f1, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
+            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f1, value);
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f1, value);
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f2, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
 
             break;
 
@@ -235,18 +235,18 @@ test_table_test_rows_text (void *)
             for (int el = 0, p = wh_rnd () % 300; el < p; ++el)
               value.Append (DChar (wh_rnd () % 0xD800));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f2, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
 
             if ((wh_rnd () & 1) == 0)
               value.Append (DChar (wh_rnd () % 0xD800));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f1, value);
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows(), f1, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
+            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f1, value);
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f1, value);
-            refTable->Set (wh_rnd () % refTable->AllocatedRows(), f2, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
+            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
             break;
 
           case 2:
@@ -293,10 +293,10 @@ test_table_rows (void *)
           }
         else
           {
-            refTable->MarkRowForReuse (wh_rnd () % refTable->AllocatedRows());
+            refTable->MarkRowForReuse (wh_rnd () % refTable->AllocatedRows ());
             refTable->GetReusableRow (true);
 
-            refTable2->MarkRowForReuse (wh_rnd () % refTable2->AllocatedRows());
+            refTable2->MarkRowForReuse (wh_rnd () % refTable2->AllocatedRows ());
             refTable2->GetReusableRow (true);
           }
 
@@ -325,7 +325,7 @@ main (int argc, char** argv)
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit (DBSSettings());
+    DBSInit (DBSSettings ());
     DBSCreateDatabase (db_name);
     IDBSHandler& handler = DBSRetrieveDatabase (db_name);
 
@@ -394,7 +394,7 @@ main (int argc, char** argv)
   }
 
   DBSRemoveDatabase (db_name);
-  DBSShoutdown();
+  DBSShoutdown ();
 
   if (!testResult)
     {

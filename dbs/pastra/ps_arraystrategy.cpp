@@ -59,7 +59,7 @@ IArrayStrategy::IArrayStrategy (const DBS_FIELD_TYPE elemsType)
 }
 
 
-IArrayStrategy::~IArrayStrategy()
+IArrayStrategy::~IArrayStrategy ()
 {
 }
 
@@ -67,7 +67,7 @@ IArrayStrategy::~IArrayStrategy()
 uint64_t
 IArrayStrategy::Count ()
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   return mElementsCount;
@@ -77,7 +77,7 @@ IArrayStrategy::Count ()
 DBS_BASIC_TYPE
 IArrayStrategy::Type ()
 {
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   return mElementsType;
@@ -107,7 +107,7 @@ IArrayStrategy::Set (const DBS_BASIC_TYPE type,
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   std::auto_ptr<IArrayStrategy> array (NULL);
@@ -141,8 +141,8 @@ IArrayStrategy::Set (const DBS_BASIC_TYPE type,
   if (index == r->mElementsCount)
     r->mElementsCount++;
 
-  assert (r->RawSize() % r->mElementsCount == 0);
-  assert (r->RawSize() / r->mElementsCount == r->mElementRawSize);
+  assert (r->RawSize () % r->mElementsCount == 0);
+  assert (r->RawSize () / r->mElementsCount == r->mElementRawSize);
 
   array.release ();
   return r;
@@ -156,7 +156,7 @@ IArrayStrategy::Add (const DBS_BASIC_TYPE type,
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   std::auto_ptr<IArrayStrategy> array (NULL);
@@ -188,8 +188,8 @@ IArrayStrategy::Add (const DBS_BASIC_TYPE type,
                     rawValue);
   *outIndex = r->mElementsCount++;
 
-  assert (r->RawSize() % r->mElementsCount == 0);
-  assert (r->RawSize() / r->mElementsCount == r->mElementRawSize);
+  assert (r->RawSize () % r->mElementsCount == 0);
+  assert (r->RawSize () / r->mElementsCount == r->mElementRawSize);
 
   array.release ();
 
@@ -202,7 +202,7 @@ IArrayStrategy::Remove (const uint64_t index)
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (index > mElementsCount)
@@ -263,7 +263,7 @@ IArrayStrategy::Sort (const bool reverse)
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (mElementsCount == 0)
@@ -450,7 +450,7 @@ IArrayStrategy::ReleaseReference ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
   if (MirrorsCount () > 0)
@@ -484,10 +484,10 @@ IArrayStrategy::MakeMirrorCopy ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  if (ReferenceCount() > 1)
+  if (ReferenceCount () > 1)
     return Clone ()->MakeMirrorCopy ();
 
   ++mMirrorsCount;
@@ -503,10 +503,10 @@ IArrayStrategy::MakeClone ()
 {
   LockRAII<Lock> _l (mLock);
 
-  assert ((MirrorsCount () == 0) || (ReferenceCount() == 1));
+  assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  if (MirrorsCount() > 0)
+  if (MirrorsCount () > 0)
     {
       ++mMirrorsCount;
       return this;
@@ -576,7 +576,7 @@ NullArray::ReleaseReference ()
 
 
 uint32_t
-NullArray::ReferenceCount() const
+NullArray::ReferenceCount () const
 {
   return 10; //To force new allocation when it will be modified.
 }
@@ -617,7 +617,7 @@ NullArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 
 
 uint64_t
-NullArray::RawSize() const
+NullArray::RawSize () const
 {
   return 0;
 }
@@ -708,12 +708,12 @@ NullArray::GetSingletoneInstace (const DBS_FIELD_TYPE type)
 
 TemporalArray::TemporalArray (const DBS_FIELD_TYPE type)
   : IArrayStrategy (type),
-    mStorage()
+    mStorage ()
 {
 }
 
 
-TemporalArray::~TemporalArray()
+TemporalArray::~TemporalArray ()
 {
   assert (mCopyReferences == 0);
 }
@@ -753,7 +753,7 @@ TemporalArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 
 
 uint64_t
-TemporalArray::RawSize() const
+TemporalArray::RawSize () const
 {
   assert (mStorage.Size () == mElementRawSize * mElementsCount);
 
@@ -780,7 +780,7 @@ RowFieldArray::RowFieldArray (VariableSizeStore&    storage,
   assert ((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
   assert (mElementRawSize > 0);
 
-  mStorage.RegisterReference();
+  mStorage.RegisterReference ();
   mStorage.IncrementRecordRef (mFirstRecordEntry);
 
   uint8_t elemetsCount[METADATA_SIZE];
@@ -794,7 +794,7 @@ RowFieldArray::RowFieldArray (VariableSizeStore&    storage,
 }
 
 
-RowFieldArray::~RowFieldArray()
+RowFieldArray::~RowFieldArray ()
 {
   if (mFirstRecordEntry > 0)
     {
@@ -912,7 +912,7 @@ RowFieldArray::ColapseRaw (const uint64_t offset, const uint64_t count)
 
 
 uint64_t
-RowFieldArray::RawSize() const
+RowFieldArray::RawSize () const
 {
   return mElementsCount * mElementRawSize;
 }
