@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <cstdio>
+#include <cstdarg>
+#include <cstring>
 
 #include "whais.h"
 #include "utils/wfile.h"
@@ -74,14 +76,29 @@ Exception::Message () const
 
 
 void
-Exception::Message (const char* fmtMsg, std::va_list vl)
+Exception::Message (const char* fmtMsg, const va_list vl)
 {
-  char errMsg[512];
+  std::string msgHolder;
+  va_list     c_vl;
 
-  std::vsnprintf (errMsg, sizeof errMsg, fmtMsg, vl);
-  errMsg[sizeof errMsg - 1] = 0;
+  int maxSize = 128;
 
-  mErrorMessage = errMsg;
+  while (true)
+    {
+      msgHolder.resize (maxSize);
+      memcpy (c_vl, vl, sizeof c_vl);
+
+      const int actualSize = vsnprintf (_CC (char*, msgHolder.c_str ()),
+                                        maxSize,
+                                        fmtMsg,
+                                        c_vl);
+      if ((0 <= actualSize) && (actualSize < maxSize))
+        {
+          mErrorMessage = std::string (msgHolder.c_str ());
+          break;
+        }
+      maxSize *= 2;
+    }
 }
 
 

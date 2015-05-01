@@ -1201,7 +1201,6 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         vector<TableFieldParameter> fields;
         RowsSelection               rows;
 
-
         if (! parse_list_table_fields (*table, cmdLine, linePos, fields))
           goto invalid_args;
 
@@ -1228,7 +1227,8 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
           }
 
         for (ROW_INDEX check = rowDigits;
-             check < rows.mRows.mIntervals.rbegin ()->mTo;
+            (rows.mRows.mIntervals.size () > 0) &&
+                (check < rows.mRows.mIntervals.rbegin ()->mTo);
              ++rowDigits)
           {
             check *= 10;
@@ -1239,7 +1239,7 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
             if (r == 0)
               {
-                cout << left << setfill ('-') << setw (rowDigits + 1) << '+'
+                cout << left << setfill ('-') << setw (rowDigits + 2) << '+'
                      << setw (longestField + 1) << '+'
                      << setw (longestField * 2 + 1) << '+' << '+'
                      << setw(0) << setfill (' ') << endl;
@@ -1249,14 +1249,14 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               {
                 for (size_t f = 0; f < fields.size (); ++f)
                   {
-                    cout << left << setw (rowDigits + 1) << row
-                         << setw (0) << '|'
+                    cout << right << setw (rowDigits + 1) << row
+                         << left << setw (0) << " |"
                          << setw (longestField) << fields[f].mDesc.name
                          << setw (0) << '|';
                     PrintFieldValue (cout, *table, row, fields[f].mField);
                     cout << endl;
                   }
-                cout << left << setfill ('-') << setw (rowDigits + 1) << '+'
+                cout << left << setfill ('-') << setw (rowDigits + 2) << '+'
                      << setw (longestField + 1) << '+'
                      << setw (longestField * 2 + 1) << '+' << '+'
                      << setw(0) << setfill (' ') << endl;
@@ -1294,10 +1294,6 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         MatchSelectedRows (*table, rows);
 
-        const WTICKS matchEnd = wh_msec_ticks ();
-
-        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
-
         for (size_t r = 0; r < rows.mRows.mIntervals.size (); ++r)
           {
             const Interval<ROW_INDEX>& intv = rows.mRows.mIntervals[r];
@@ -1311,6 +1307,9 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   }
               }
           }
+
+        const WTICKS matchEnd = wh_msec_ticks ();
+        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
       }
     else if (token == "add")
       {
@@ -1371,11 +1370,6 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
         MatchSelectedRows (*table, rows);
 
-        const WTICKS matchEnd = wh_msec_ticks ();
-
-        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
-
-
         const size_t rowIntervals = rows.mRows.mIntervals.size ();
         for (size_t rowI = 0; rowI < rowIntervals; ++rowI)
           {
@@ -1384,6 +1378,9 @@ cmdRowsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             for (ROW_INDEX row = r.mFrom; row <= r.mTo; ++row)
               table->MarkRowForReuse (row);
           }
+
+        const WTICKS matchEnd = wh_msec_ticks ();
+        print_match_statistic (cout, *table, rows.mRows, matchBegin, matchEnd);
       }
     else
       {

@@ -83,7 +83,7 @@ static const string gEntTempDir ("temp_directory");
 static const string gEntShowDbg ("show_debug");
 static const string gEntObjectLib ("load_object");
 static const string gEntNativeLib ("load_native");
-static const string gEntRootPasswrd ("root_password");
+static const string gEntRootPasswrd ("admin_password");
 static const string gEntUserPasswrd ("user_password");
 static const string gEntStackCount ("max_stack_count");
 

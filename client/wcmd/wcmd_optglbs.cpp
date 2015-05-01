@@ -28,8 +28,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "wcmd_optglbs.h"
 
-
-
 using namespace std;
 using namespace whais;
 
@@ -39,6 +37,7 @@ static const uint64_t   MINIMUM_FILE_SIZE = 0x100000;    //1 MB
 static const char       DEFAULT_PORT[]    = "1761";
 static const uint_t     DEFAULT_USER      = 1;
 
+static const char*      DB_EXTENSION      = ".db";
 
 static string        sWorkingDirectory (whf_current_dir ());
 static string        sDBName;
@@ -144,6 +143,13 @@ void
 SetWorkingDB (const char* const dbName)
 {
   sDBName = dbName;
+
+  //Remove the database file name extension in case it was supplied by mistake.
+  if (sDBName.rfind (DB_EXTENSION) ==
+        (sDBName.length () - strlen (DB_EXTENSION)))
+    {
+      sDBName.resize (sDBName.length () - strlen (DB_EXTENSION));
+    }
 }
 
 

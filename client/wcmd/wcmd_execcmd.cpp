@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 
 #include "utils/wutf.h"
+#include "utils/valtranslator.h"
 #include "client/whais_connector.h"
 
 #include "wcmd_execcmd.h"
@@ -943,7 +944,7 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
                                const uint64_t        row)
 
 {
-  uint_t         wcs = WCS_OK;
+  uint_t       wcs = WCS_OK;
   const char*  retValue;
 
   if (type != WHC_TYPE_TEXT)
@@ -955,6 +956,22 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
       if (strcmp (retValue, NULL_VALUE) == 0)
         cout << NULL_LABEL;
 
+      else if (type == WHC_TYPE_CHAR)
+        {
+          uint32_t cp, cpLen;
+          char temp[8];
+
+          cpLen = wh_load_utf8_cp (_RC (const uint8_t*, retValue), &cp);
+
+          assert (cpLen > 0);
+          assert (cpLen == strlen (retValue));
+
+          Utf8Translator::Write (_RC (uint8_t*, temp),
+                                 sizeof temp,
+                                 true,
+                                 whais::DChar (cp));
+          cout << '\'' << temp << '\'';
+        }
       else
         cout << '\'' << retValue << '\'';
     }
@@ -983,7 +1000,23 @@ fetch_execution_simple_result (WH_CONNECTION         hnd,
 
               offset += wh_utf8_strlen (_RC (const uint8_t*, retValue));
 
-              cout << retValue;
+              for (size_t i = 0; i < strlen (retValue);)
+                {
+                  uint32_t cp, cpLen;
+                  char temp[8];
+
+                  cpLen = wh_load_utf8_cp (_RC (const uint8_t*, retValue + i),
+                                           &cp);
+                  assert (cpLen > 0);
+                  assert ((i + cpLen) <= strlen (retValue));
+
+                  Utf8Translator::Write (_RC (uint8_t*, temp),
+                                         sizeof temp,
+                                         true,
+                                         whais::DChar (cp));
+                  cout << temp;
+                  i += cpLen;
+                }
             }
           cout << '\'';
         }
@@ -1138,15 +1171,15 @@ fetch_execution_table_result (WH_CONNECTION       hnd,
         {
           if (row == 0)
             {
-              cout << left << setfill ('-') << setw (rowDigits + 1) << '+'
+              cout << left << setfill ('-') << setw (rowDigits + 2) << '+'
                    << setw (longestField + 1) << '+'
                    << setw (longestField * 2 + 1) << '+' << '+'
                    << setw(0) << setfill (' ') << endl;
             }
           for (uint_t i = 0; i < fields.size (); ++i )
             {
-              cout << left << setw (rowDigits + 1) << row
-                   << setw (0) << '|'
+              cout << right << setw (rowDigits + 1) << row
+                   << left << setw (0) << " |"
                    << setw ( longestField) << fields[i].name
                    << setw (0) << "| ";
 
@@ -1174,7 +1207,7 @@ fetch_execution_table_result (WH_CONNECTION       hnd,
                 }
               cout << endl;
             }
-          cout << left << setfill ('-') << setw (rowDigits + 1) << '+'
+          cout << left << setfill ('-') << setw (rowDigits + 2) << '+'
                << setw (longestField + 1) << '+'
                << setw (longestField * 2+ 1) << '+' << '+'
                << setw(0) << setfill (' ') << endl;

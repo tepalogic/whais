@@ -47,6 +47,7 @@ static const char NULL_VALUE[]     = "null";
 static const char NON_NULL_VALUE[] = "set";
 static const char MIN_VALUE[]      = "min";
 static const char MAX_VALUE[]      = "max";
+static const char NULL_LABEL[]     = "(null)";
 
 
 
@@ -1885,7 +1886,10 @@ print_basic_value (ostream&      os,
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
   if (value.IsNull ())
-    return ;
+    {
+      os << NULL_LABEL;
+      return ;
+    }
 
   Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), value);
 
@@ -1906,7 +1910,10 @@ print_basic_value<DChar> (ostream&        os,
   char temp[MAX_VALUE_OUTPUT_SIZE];
 
   if (value.IsNull ())
-    return ;
+    {
+      os << NULL_LABEL;
+      return ;
+    }
 
   Utf8Translator::Write (_RC (uint8_t*, temp), sizeof (temp), true, value);
 
@@ -1944,7 +1951,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DBool value;
                   array.Get (i, value);
-                  print_basic_value<DBool> (os, value, false);
+                  print_basic_value<DBool> (os, value, true);
                 }
               break;
 
@@ -1984,7 +1991,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DInt8 value;
                   array.Get (i, value);
-                  print_basic_value<DInt8> (os, value, false);
+                  print_basic_value<DInt8> (os, value, true);
                 }
               break;
 
@@ -1992,7 +1999,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DInt16 value;
                   array.Get (i, value);
-                  print_basic_value<DInt16> (os, value, false);
+                  print_basic_value<DInt16> (os, value, true);
                 }
               break;
 
@@ -2000,7 +2007,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DInt32 value;
                   array.Get (i, value);
-                  print_basic_value<DInt32> (os, value, false);
+                  print_basic_value<DInt32> (os, value, true);
                 }
               break;
 
@@ -2008,7 +2015,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DInt64 value;
                   array.Get (i, value);
-                  print_basic_value<DInt64> (os, value, false);
+                  print_basic_value<DInt64> (os, value, true);
                 }
               break;
 
@@ -2016,7 +2023,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DUInt8 value;
                   array.Get (i, value);
-                  print_basic_value<DUInt8> (os, value, false);
+                  print_basic_value<DUInt8> (os, value, true);
                 }
               break;
 
@@ -2024,7 +2031,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DUInt16 value;
                   array.Get (i, value);
-                  print_basic_value<DUInt16> (os, value, false);
+                  print_basic_value<DUInt16> (os, value, true);
                 }
               break;
 
@@ -2032,7 +2039,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DUInt32 value;
                   array.Get (i, value);
-                  print_basic_value<DUInt32> (os, value, false);
+                  print_basic_value<DUInt32> (os, value, true);
                 }
               break;
 
@@ -2040,7 +2047,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DUInt64 value;
                   array.Get (i, value);
-                  print_basic_value<DUInt64> (os, value, false);
+                  print_basic_value<DUInt64> (os, value, true);
                 }
               break;
 
@@ -2048,7 +2055,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DReal value;
                   array.Get (i, value);
-                  print_basic_value<DReal> (os, value, false);
+                  print_basic_value<DReal> (os, value, true);
                 }
               break;
 
@@ -2056,7 +2063,7 @@ PrintFieldValue (ostream&             os,
                 {
                   DRichReal value;
                   array.Get (i, value);
-                  print_basic_value<DRichReal> (os, value, false);
+                  print_basic_value<DRichReal> (os, value, true);
                 }
               break;
             default:
@@ -2073,7 +2080,7 @@ PrintFieldValue (ostream&             os,
             {
               DBool value;
               table.Get (row, field, value);
-              print_basic_value<DBool> (os, value, false);
+              print_basic_value<DBool> (os, value, true);
             }
           break;
 
@@ -2113,7 +2120,7 @@ PrintFieldValue (ostream&             os,
             {
               DInt8 value;
               table.Get (row, field, value);
-              print_basic_value<DInt8> (os, value, false);
+              print_basic_value<DInt8> (os, value, true);
             }
           break;
 
@@ -2121,7 +2128,7 @@ PrintFieldValue (ostream&             os,
             {
               DInt16 value;
               table.Get (row, field, value);
-              print_basic_value<DInt16> (os, value, false);
+              print_basic_value<DInt16> (os, value, true);
             }
           break;
 
@@ -2129,7 +2136,7 @@ PrintFieldValue (ostream&             os,
             {
               DInt32 value;
               table.Get (row, field, value);
-              print_basic_value<DInt32> (os, value, false);
+              print_basic_value<DInt32> (os, value, true);
             }
           break;
 
@@ -2137,7 +2144,7 @@ PrintFieldValue (ostream&             os,
             {
               DInt64 value;
               table.Get (row, field, value);
-              print_basic_value<DInt64> (os, value, false);
+              print_basic_value<DInt64> (os, value, true);
             }
           break;
 
@@ -2145,7 +2152,7 @@ PrintFieldValue (ostream&             os,
             {
               DUInt8 value;
               table.Get (row, field, value);
-              print_basic_value<DUInt8> (os, value, false);
+              print_basic_value<DUInt8> (os, value, true);
             }
           break;
 
@@ -2153,7 +2160,7 @@ PrintFieldValue (ostream&             os,
             {
               DUInt16 value;
               table.Get (row, field, value);
-              print_basic_value<DUInt16> (os, value, false);
+              print_basic_value<DUInt16> (os, value, true);
             }
           break;
 
@@ -2161,7 +2168,7 @@ PrintFieldValue (ostream&             os,
             {
               DUInt32 value;
               table.Get (row, field, value);
-              print_basic_value<DUInt32> (os, value, false);
+              print_basic_value<DUInt32> (os, value, true);
             }
           break;
 
@@ -2169,7 +2176,7 @@ PrintFieldValue (ostream&             os,
             {
               DUInt64 value;
               table.Get (row, field, value);
-              print_basic_value<DUInt64> (os, value, false);
+              print_basic_value<DUInt64> (os, value, true);
             }
           break;
 
@@ -2177,7 +2184,7 @@ PrintFieldValue (ostream&             os,
             {
               DReal value;
               table.Get (row, field, value);
-              print_basic_value<DReal> (os, value, false);
+              print_basic_value<DReal> (os, value, true);
             }
           break;
 
@@ -2185,7 +2192,7 @@ PrintFieldValue (ostream&             os,
             {
               DRichReal value;
               table.Get (row, field, value);
-              print_basic_value<DRichReal> (os, value, false);
+              print_basic_value<DRichReal> (os, value, true);
             }
           break;
 
@@ -2198,13 +2205,11 @@ PrintFieldValue (ostream&             os,
               if (value.IsNull ())
                 break;
 
-              os << '\'';
-
               assert (textLength > 0);
 
+              os << '\'';
               for (uint64_t i = 0; i < textLength; ++i)
                 print_basic_value<DChar> (os, value.CharAt (i), false);
-
               os << '\'';
             }
           break;

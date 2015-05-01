@@ -33,89 +33,89 @@ class Utf8Translator
 public:
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DBool* const      outValue);
+                   whais::DBool* const        outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
                    const bool                 checkSpecial,
-                   whais::DChar* const      outValue);
+                   whais::DChar* const        outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DDate* const      outValue);
+                   whais::DDate* const        outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DDateTime* const  outValue);
+                   whais::DDateTime* const    outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DHiresTime* const outValue);
+                   whais::DHiresTime* const  outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DInt8* const      outValue);
+                   whais::DInt8* const        outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DInt16* const     outValue);
+                   whais::DInt16* const       outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DInt32* const     outValue);
+                   whais::DInt32* const       outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DInt64* const     outValue);
+                   whais::DInt64* const       outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DReal* const      outValue);
+                   whais::DReal* const        outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DRichReal* const  outValue);
+                   whais::DRichReal* const    outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DUInt8* const     outValue);
+                   whais::DUInt8* const       outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DUInt16* const    outValue);
+                   whais::DUInt16* const      outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DUInt32* const    outValue);
+                   whais::DUInt32* const      outValue);
 
   static int Read (const uint8_t* const       utf8Src,
                    const uint_t               srcSize,
-                   whais::DUInt64* const    outValue);
+                   whais::DUInt64* const      outValue);
 
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DBool&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
-                       const bool                 checkSpecial,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
+                       const bool               checkSpecial,
                        const whais::DChar&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DDate&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DDateTime&  value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DHiresTime& value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DInt8&      value);
 
   static uint_t Write (uint8_t* const             utf8Dest,
