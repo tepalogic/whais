@@ -64,7 +64,7 @@ public:
   uint32_t            Code () const;
 
   const std::string&  Message () const;
-  void                Message (const char* msg, const va_list vl);
+  void                Message (const char* msg, va_list vl);
   void                Message (const char* msg, ...);
 
   const char*         File () const;

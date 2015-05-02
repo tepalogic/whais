@@ -33,6 +33,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/auto_array.h"
 
 
+#ifndef va_copy
+  #if defined __va_copy
+      #define va_copy(x,y) __va_copy(x,y)
+      #define _va_end_w(x) va_end(x)
+  #elif defined (ARCH_PPC) && defined (_GNU_SOURCE)
+      #define va_copy(x,y) (*x = *y)
+      #define _va_end_w(x)
+  #else
+      #define va_copy(x,y) (x = y)
+      #define _va_end_w(x)
+  #endif
+#else
+  #define _va_end_w(x) va_end(x)
+#endif
+
 
 namespace whais {
 
@@ -76,7 +91,7 @@ Exception::Message () const
 
 
 void
-Exception::Message (const char* fmtMsg, const va_list vl)
+Exception::Message (const char* fmtMsg, va_list vl)
 {
   std::string msgHolder;
   va_list     c_vl;
@@ -86,12 +101,13 @@ Exception::Message (const char* fmtMsg, const va_list vl)
   while (true)
     {
       msgHolder.resize (maxSize);
-      memcpy (c_vl, vl, sizeof c_vl);
+      va_copy (c_vl, vl);
 
       const int actualSize = vsnprintf (_CC (char*, msgHolder.c_str ()),
                                         maxSize,
                                         fmtMsg,
                                         c_vl);
+      _va_end_w (c_vl);
       if ((0 <= actualSize) && (actualSize < maxSize))
         {
           mErrorMessage = std::string (msgHolder.c_str ());

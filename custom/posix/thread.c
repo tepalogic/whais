@@ -211,6 +211,53 @@ wh_atomic_fetch_dec64 (volatile int64_t* const value)
   return __sync_fetch_and_sub (value, (int64_t)1);
 }
 
+
+#if defined (ARCH_PPC)
+/* These functions are quired for by GCC as for PPC (32 bit targets) as those
+ * do not support 64 bit atomic operations. */
+int64_t
+__sync_fetch_and_add_8 (volatile int64_t* const value, int64_t v)
+{
+  static int32_t m;
+
+  int64_t result;
+
+  while (__sync_fetch_and_add (&m, 1) != 0)
+    {
+      __sync_fetch_and_sub (&m, 1);
+      sched_yield ();
+    }
+
+  result  = *value;
+  *value += v;
+
+  __sync_fetch_and_sub (&m, 1);
+
+  return result;
+}
+
+int64_t
+__sync_fetch_and_sub_8 (volatile int64_t* const value, int64_t v)
+{
+  static int32_t m;
+
+  int64_t result;
+
+  while (__sync_fetch_and_add (&m, 1) != 0)
+    {
+      __sync_fetch_and_sub (&m, 1);
+      sched_yield ();
+    }
+
+  result  = *value;
+  *value -= v;
+
+  __sync_fetch_and_sub (&m, 1);
+
+  return result;
+}
+#endif
+
 #else
 
 #error "You need to define the functions for atomic increment and decrement."

@@ -2,7 +2,6 @@ UNIT_EXES+=c_test_glb_list
 c_test_glb_list_SRC=test/test_glb_list.cpp
 c_test_glb_list_LIB=client/wslconnector custom/wslcustom utils/wslutils
 
-UNIT_EXES+=c_test_glb_list_2
 c_test_glb_list_2_SRC=test/test_glb_list_2.cpp
 c_test_glb_list_2_LIB=client/wslconnector custom/wslcustom utils/wslutils 
 
@@ -10,7 +9,6 @@ UNIT_EXES+=c_test_proc_list
 c_test_proc_list_SRC=test/test_proc_list.cpp
 c_test_proc_list_LIB=client/wslconnector custom/wslcustom utils/wslutils 
 
-UNIT_EXES+=c_test_proc_list_2
 c_test_proc_list_2_SRC=test/test_proc_list_2.cpp
 c_test_proc_list_2_LIB=client/wslconnector custom/wslcustom utils/wslutils 
 
@@ -45,4 +43,10 @@ c_test_stack_update_table_array_LIB=client/wslconnector custom/wslcustom utils/w
 UNIT_EXES+=c_test_stack_update_text
 c_test_stack_update_text_SRC=test/test_stack_update_text.cpp
 c_test_stack_update_text_LIB=client/wslconnector custom/wslcustom utils/wslutils 
+
+#Disable this momentarly as it taske too long to link for PPC targets
+ifeq ($(findstring gcc_ppc,$(ARCH)),)
+UNIT_EXES+=c_test_glb_list_2
+UNIT_EXES+=c_test_proc_list_2
+endif
 
