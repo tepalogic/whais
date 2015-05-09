@@ -39,7 +39,7 @@ namespace pastra {
 //Forward declarations
 class PersistentTable;
 class DbsHandler;
-class DbsManager;
+struct DbsManager;
 
 
 class DbsHandler : public IDBSHandler

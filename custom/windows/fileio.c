@@ -27,6 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 #include "whais_fileio.h"
 
+#include <shlwapi.h>
+
 WH_FILE
 whf_open (const char* const file, uint_t mode)
 {
@@ -35,20 +37,20 @@ whf_open (const char* const file, uint_t mode)
   DWORD       dwFlagsAndAttr  = 0;
   WH_FILE     result;
 
-  if (mode & WHC_FILECREATE_NEW)
+  if (mode & WH_FILECREATE_NEW)
     dwCreation |= CREATE_NEW;
 
-  else if (mode & WHC_FILECREATE)
-    dwCreation |= CREATE_ALWAYS;
+  else if (mode & WH_FILECREATE)
+    dwCreation |= OPEN_ALWAYS;
 
   else
     dwCreation |= OPEN_EXISTING;
 
-  dwFlagsAndAttr |= (mode & WHC_FILEDIRECT) ? FILE_FLAG_WRITE_THROUGH : 0;
-  dwFlagsAndAttr |= (mode & WHC_FILESYNC) ? FILE_FLAG_NO_BUFFERING : 0;
+  dwFlagsAndAttr |= (mode & WH_FILEDIRECT) ? FILE_FLAG_WRITE_THROUGH : 0;
+  dwFlagsAndAttr |= (mode & WH_FILESYNC) ? FILE_FLAG_NO_BUFFERING : 0;
 
-  dwDesiredAccess |= (mode & WHC_FILEREAD) ? GENERIC_READ : 0;
-  dwDesiredAccess |= (mode & WHC_FILEWRITE) ? GENERIC_WRITE : 0;
+  dwDesiredAccess |= (mode & WH_FILEREAD) ? GENERIC_READ : 0;
+  dwDesiredAccess |= (mode & WH_FILEWRITE) ? GENERIC_WRITE : 0;
 
   result = CreateFile (file,
                        dwDesiredAccess,
@@ -87,15 +89,15 @@ whf_seek (WH_FILE hnd, int64_t where, int whence)
 
   switch (whence)
     {
-    case WHC_SEEK_BEGIN:
+    case WH_SEEK_BEGIN:
       whence = FILE_BEGIN;
       break;
 
-    case WHC_SEEK_END:
+    case WH_SEEK_END:
       whence = FILE_END;
       break;
 
-    case WHC_SEEK_CURR:
+    case WH_SEEK_CURR:
       whence = FILE_CURRENT;
       break;
 
@@ -200,7 +202,7 @@ whf_tell_size (WH_FILE hnd, uint64_t* const outSize)
 bool_t
 whf_set_size (WH_FILE hnd, const uint64_t newSize)
 {
-  if (whf_seek( hnd, newSize, WHC_SEEK_BEGIN)
+  if (whf_seek( hnd, newSize, WH_SEEK_BEGIN)
       && (SetEndOfFile( hnd) != 0))
     {
       return TRUE;
@@ -241,6 +243,13 @@ whf_remove (const char* const file)
 }
 
 
+void
+whf_move_file (const char* existingFile, const char* newFile )
+{
+  MoveFile (existingFile, newFile);
+}
+
+
 const char*
 whf_dir_delim ()
 {
@@ -250,7 +259,20 @@ whf_dir_delim ()
 const char*
 whf_current_dir ()
 {
-  return ".\\";
+  static char currentDir[MAX_PATH];
+
+  uint_t pathLen;
+
+  GetCurrentDirectory (sizeof currentDir - 2, currentDir);
+
+  pathLen = strlen (currentDir);
+  if (currentDir[pathLen - 1] != '\\')
+    {
+      currentDir[pathLen]     = '\\';
+      currentDir[pathLen + 1] = 0;
+    }
+
+  return currentDir;
 }
 
 bool_t
@@ -258,6 +280,13 @@ whf_is_absolute (const char* const path)
 {
   assert (path != NULL);
 
-  return (path[1] == ':');
+  return ! PathIsRelative (path);
+}
+
+
+bool_t
+whf_file_exists (const char* const file)
+{
+  return PathFileExists (file);
 }
 

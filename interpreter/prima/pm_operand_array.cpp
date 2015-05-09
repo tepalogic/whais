@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include "utils/include/valtranslator.h"
+#include "dbs/dbs_valtranslator.h"
 
 #include "pm_operand.h"
 #include "pm_typemanager.h"

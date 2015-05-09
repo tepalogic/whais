@@ -46,7 +46,9 @@ c_test_stack_update_text_LIB=client/wslconnector custom/wslcustom utils/wslutils
 
 #Disable this momentarly as it taske too long to link for PPC targets
 ifeq ($(findstring gcc_ppc,$(ARCH)),)
+ifeq ($(findstring _vc_x86,$(ARCH)),)
 UNIT_EXES+=c_test_glb_list_2
 UNIT_EXES+=c_test_proc_list_2
+endif
 endif
 

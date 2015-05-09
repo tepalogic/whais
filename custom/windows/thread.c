@@ -56,6 +56,16 @@ wh_lock_acquire (WH_LOCK* const lock)
 
 
 uint_t
+wh_lock_try_acquire (WH_LOCK* const lock,
+                     bool_t* const  outAcquired)
+{
+  *outAcquired = (TryEnterCriticalSection (lock) != 0);
+  return WOP_OK;
+}
+
+
+
+uint_t
 wh_lock_release (WH_LOCK* const lock)
 {
   LeaveCriticalSection (lock);
@@ -111,4 +121,41 @@ wh_sleep (const uint_t millisecs)
     return;
 
   Sleep (millisecs);
+}
+
+
+int16_t
+wh_atomic_fetch_inc16 (volatile int16_t* const value)
+{
+  return _InterlockedIncrement16 (value) - 1;
+}
+
+int16_t
+wh_atomic_fetch_dec16 (volatile int16_t* const value)
+{
+  return _InterlockedDecrement16 (value) + 1;
+}
+
+int32_t
+wh_atomic_fetch_inc32 (volatile int32_t* const value)
+{
+  return InterlockedIncrement (value) - 1;
+}
+
+int32_t
+wh_atomic_fetch_dec32 (volatile int32_t* const value)
+{
+  return InterlockedDecrement (value) + 1;
+}
+
+int64_t
+wh_atomic_fetch_inc64 (volatile int64_t* const value)
+{
+  return InterlockedIncrement64 (value) - 1;
+}
+
+int64_t
+wh_atomic_fetch_dec64 (volatile int64_t* const value)
+{
+  return InterlockedDecrement64 (value) + 1;
 }

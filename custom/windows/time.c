@@ -30,19 +30,20 @@ WTime
 wh_get_currtime ()
 {
   WTime      result;
-  FILETIME   fileTime;
+  FILETIME   fileTime, localTime;
   SYSTEMTIME utcTime;
   uint64_t   usec;
 
   GetSystemTimeAsFileTime (&fileTime);
-  FileTimeToSystemTime (&fileTime, &utcTime);
+  FileTimeToLocalFileTime (&fileTime, &localTime);
+  FileTimeToSystemTime (&localTime, &utcTime);
 
   /* Convert the FILETIME to a real 64 bit integer. */
   usec = fileTime.dwHighDateTime;
   usec <<= 32;
   usec += fileTime.dwLowDateTime;
 
-  /* Get rid of the nanoseconds part. */
+  /* Get rid of the 100 nanoseconds part. */
   usec /= 10;
 
   /* Keep only the microseconds. */

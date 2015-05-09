@@ -14,7 +14,7 @@ wprima_SRC:=prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
            prima/pm_operand_fields.cpp prima/pm_operand_array.cpp\
            prima/pm_general_table.cpp prima/pm_operand_undefined.cpp\
            prima/pm_exception.cpp
-           
+
 wprima_DEF:=USE_INTERP_SHL USE_DBS_SHL INTERP_EXPORTING
 wprima_LIB:=utils/wslutils custom/wslcustom
 wprima_SHL:=dbs/wpastra compiler/wcompiler custom/wcommon

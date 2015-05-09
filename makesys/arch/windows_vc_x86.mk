@@ -7,10 +7,10 @@ ARCH_SHL_PREFIX:=
 ARCH_SHL_EXT:=.dll
 ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
-CC:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
-CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/cl.exe'
-LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/link.exe'
-AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 10.0/VC/bin/lib.exe'
+CC:='/cygdrive/c/Program Files/Microsoft Visual Studio 12.0/VC/bin/cl.exe'
+CXX:='/cygdrive/c/Program Files/Microsoft Visual Studio 12.0/VC/bin/cl.exe'
+LD:='/cygdrive/c/Program Files/Microsoft Visual Studio 12.0/VC/bin/link.exe'
+AR:='/cygdrive/c/Program Files/Microsoft Visual Studio 12.0/VC/bin/lib.exe'
 
 #Default output directories
 WHAIS_OUT_DIR?=/cygdrive/c/WHAIS
@@ -19,7 +19,7 @@ SHLS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 LIBS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 HDRS_OUT_DIR?=$(WHAIS_OUT_DIR)/include/
 
-CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244 /wd4290 /wd4355 
+CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244 /wd4290 /wd4355 /wd4800 
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG=1
@@ -44,8 +44,9 @@ CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_WINDOWS_VC=2
 DEFINES+=INLINE=__inline
-DEFINES+=_CRT_SECURE_NO_WARNINGS
+DEFINES+=_CRT_SECURE_NO_WARNINGS _USING_V110_SDK71_
 DEFINES+=snprintf=_snprintf
+DEFINES+=QWORDS_PER_OP=4
 
 #translate input files
 arch_translate_path=$(subst /,\\,$(1))
@@ -76,7 +77,7 @@ arch_set_output_library=/OUT:$(call arch_translate_path,./bin/$(ARCH)/$(2)/$(ARC
 
 #set the right  flags for the linker
 
-arch_linker_flags=/NOLOGO /FORCE:MULTIPLE
+arch_linker_flags=/NOLOGO /OPT:REF shlwapi.lib
 ifeq ($(DEBUGINFO),yes)
 arch_linker_flags+=/DEBUG
 endif 

@@ -70,7 +70,6 @@ struct FieldValuesUpdate
 
   ~FieldValuesUpdate ();
 
-
   uint_t    mFieldId;
   uint_t    mFieldType;
   uint8_t   mValue[DSIZE];

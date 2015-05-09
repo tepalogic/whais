@@ -27,7 +27,7 @@
 #include <cstring>
 
 #include "utils/wutf.h"
-#include "valtranslator.h"
+#include "dbs_valtranslator.h"
 
 using namespace whais;
 

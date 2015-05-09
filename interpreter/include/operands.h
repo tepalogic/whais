@@ -156,7 +156,7 @@ public:
   {
     IOperand& op = _CC (StackValue&, source).Operand ();
 
-    if (op.PrepareToCopy (mStorage));
+    if (op.PrepareToCopy (mStorage))
       memcpy (mStorage, &source.mStorage, sizeof mStorage);
   }
 
@@ -171,7 +171,7 @@ public:
     IOperand& op = _CC (StackValue&, source).Operand ();
     Clear ();
 
-    if (op.PrepareToCopy (mStorage));
+    if (op.PrepareToCopy (mStorage))
       memcpy (mStorage, &source.mStorage, sizeof mStorage);
 
     return *this;

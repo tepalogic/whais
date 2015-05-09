@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <assert.h>
+#include <algorithm>
 
 #include "utils/endianness.h"
 #include "utils/wutf.h"

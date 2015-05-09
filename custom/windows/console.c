@@ -22,33 +22,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#include "whais.h"
 
-#ifndef WHAIS_TYPES_H_
-#define WHAIS_TYPES_H_
+bool_t
+wh_disable_echo ()
+{
+  return TRUE;
+}
 
-/* Simple type shortcuts */
-#ifndef uint_t
-typedef unsigned int       uint_t;
-#endif
 
-#ifndef ulong_t
-typedef unsigned long      ulong_t;
-#endif
-
-#ifndef llong_t
-typedef long long          llong_t;
-#endif
-
-#ifndef ullong_t
-typedef unsigned long long ullong_t;
-#endif
-
-#ifdef ARCH_LINUX_GCC
-#include "linux_gcc/types.h"
-#endif
-
-#ifdef ARCH_WINDOWS_VC
-#include "windows_vc/types.h"
-#endif
-
-#endif /* WHAIS_TYPES_H_ */
+bool_t
+wh_enable_echo ()
+{
+  return TRUE;
+}

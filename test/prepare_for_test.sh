@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size
+rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size ./logs
 
 if [ "$1" == "--clean" ]; then
 	echo "Clean done!" ;
@@ -8,12 +8,15 @@ if [ "$1" == "--clean" ]; then
 fi
 
 
-mkdir admin_db
+mkdir admin_db logs
+
 if [ $? -ne 0 ]; then
 	echo "Failed to create 'admin_db' directory"
 	exit 1
 fi
-echo 'table_add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
+
+#echo 'add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
+echo 'add users password TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to create 'administrator' database"
 	exit 1

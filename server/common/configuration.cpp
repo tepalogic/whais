@@ -484,7 +484,13 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           else
             gMainSettings.mTempDirectory = token;
 
-          string& dir = gMainSettings.mWorkDirectory;
+          string& dir = gMainSettings.mTempDirectory;
+
+          for (size_t i = 0; i < dir.length (); ++i)
+            {
+              if ((dir[i] == '\\') || (dir[i] == '/'))
+                dir[i] = whf_dir_delim ()[0];
+            }
 
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
@@ -522,12 +528,26 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           else
             gMainSettings.mWorkDirectory = token;
 
-          string& dir = gMainSettings.mTempDirectory;
+          string& dir = gMainSettings.mWorkDirectory;
+
+          for (size_t i = 0; i < dir.length (); ++i)
+            {
+              if ((dir[i] == '\\') || (dir[i] == '/'))
+                dir[i] = whf_dir_delim ()[0];
+            }
 
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
             {
               dir += whf_dir_delim ();
+            }
+
+          if ((dir.length () != 0)
+              && ! whf_is_absolute (dir.c_str ()))
+            {
+              cerr << "Warning: The working directory is not an absolute "
+                      "path. Please make sure you know the working directory "
+                      "where WHAIS server started ('" << dir << "').\n";
             }
         }
       else if (token == gEntShowDbg)
@@ -558,15 +578,34 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
     }
 
   if (gMainSettings.mWorkDirectory.length () == 0)
+    gMainSettings.mWorkDirectory = whf_current_dir ();
+
+  if (gMainSettings.mTempDirectory.length () > 0)
     {
-      cerr << "The configuration main section does not ";
-      cerr << "have a '"<< gEntWorkDir << "' entry.\n";
+      if (! whf_is_absolute (gMainSettings.mTempDirectory.c_str ()))
+        {
+          gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory +
+                                         gMainSettings.mTempDirectory;
+        }
+    }
+  else
+    gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory;
+
+  if (! whf_file_exists (gMainSettings.mWorkDirectory.c_str ()))
+    {
+      cerr << "The working directory does not exists ('"
+           << gMainSettings.mWorkDirectory << "')!\n";
 
       return false;
     }
 
-  if (gMainSettings.mTempDirectory.length () == 0)
-    gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory;
+  if (! whf_file_exists (gMainSettings.mTempDirectory.c_str ()))
+    {
+      cerr << "The directory to hold temporal values does not exists ('"
+           << gMainSettings.mTempDirectory << "')!\n";
+
+      return false;
+    }
 
   if (gMainSettings.mLogFile.length () == 0)
     {
@@ -722,10 +761,22 @@ ParseContextSection (Logger&          log,
 
           string& dir = output.mDbsDirectory;
 
+          for (size_t i = 0; i < dir.length (); ++i)
+            {
+              if ((dir[i] == '\\') || (dir[i] == '/'))
+                dir[i] = whf_dir_delim ()[0];
+            }
+
           if ((dir.size () != 0)
               && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
             {
               dir += whf_dir_delim ();
+            }
+
+          if (! whf_is_absolute (output.mDbsDirectory.c_str ()))
+            {
+              output.mDbsDirectory = gMainSettings.mWorkDirectory +
+                                     output.mDbsDirectory;
             }
         }
        else if (token == gEntLogFile)
@@ -756,6 +807,15 @@ ParseContextSection (Logger&          log,
             }
           else
             output.mDbsLogFile = token;
+
+          for (size_t i = 0; i < output.mDbsLogFile.length (); ++i)
+            {
+              if ((output.mDbsLogFile[i] == '\\')
+                  || (output.mDbsLogFile[i] == '/'))
+                {
+                  output.mDbsLogFile[i] = whf_dir_delim ()[0];
+                }
+            }
         }
        else if (token==gEntObjectLib)
         {
@@ -790,6 +850,13 @@ ParseContextSection (Logger&          log,
              }
            else
              libEntry = token;
+
+           for (size_t i = 0; i < libEntry.length (); ++i)
+             {
+               if ((libEntry[i] == '\\') || (libEntry[i] == '/'))
+                 libEntry[i] = whf_dir_delim ()[0];
+             }
+
 
            if ( ! whf_is_absolute (libEntry.c_str ()))
              libEntry = gMainSettings.mWorkDirectory + libEntry;
@@ -830,6 +897,19 @@ ParseContextSection (Logger&          log,
              }
            else
              libEntry = token;
+
+           bool fixAbsolutePath = false;
+           for (size_t i = 0; i < libEntry.length (); ++i)
+             {
+               if ((libEntry[i] == '\\') || (libEntry[i] == '/'))
+                 {
+                   libEntry[i] = whf_dir_delim ()[0];
+                   fixAbsolutePath = true;
+                 }
+             }
+
+           if (fixAbsolutePath && ! whf_is_absolute (libEntry.c_str ()))
+             libEntry = gMainSettings.mWorkDirectory + libEntry;
 
            output.mNativeLibs.push_back (libEntry);
         }
@@ -1242,6 +1322,17 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
       logStream << " does not have a '" << gEntWorkDir << "' entry.";
+      log.Log (LOG_ERROR, logStream.str ());
+
+      return false;
+    }
+  else if (! whf_file_exists (inoutDesc.mDbsDirectory.c_str ()))
+    {
+      logStream << "Database section starting line ";
+      logStream << inoutDesc.mConfigLine;
+      logStream << "entry '" << gEntWorkDir << "' points to an inexistent "
+                   "directory '" << inoutDesc.mDbsDirectory << "'.";
+
       log.Log (LOG_ERROR, logStream.str ());
 
       return false;

@@ -537,7 +537,7 @@ TypeManager::CreateLocalValue (uint8_t* inoutTypeDesc)
 bool
 TypeManager::IsTypeValid (const uint8_t* const typeDesc)
 {
-  return is_type_spec_valid (_RC (const ::TypeSpec*, typeDesc));
+  return is_type_spec_valid (_RC (const ::TypeSpec*, typeDesc)) != FALSE;
 }
 
 

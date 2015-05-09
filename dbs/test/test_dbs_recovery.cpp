@@ -44,7 +44,7 @@ test_dbs_creation ()
 
       result = false;
   }
-  catch (FileException& e)
+  catch (FileException&)
   {
       result = true;
   }

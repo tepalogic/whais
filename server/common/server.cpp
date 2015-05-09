@@ -152,7 +152,7 @@ private:
   static const uint_t MAX_AUTH_TMO_MS = 200;
 };
 
-static auto_array<Listener>*       sListeners;
+static auto_array<Listener>* volatile  sListeners;
 
 
 void
@@ -550,6 +550,9 @@ StopServer ()
 
   for (uint_t i = 0; i < sListeners->Size (); ++i)
     (*sListeners)[i].Close ();
+
+  sClosingLock.Release ();
+  sClosingLock.Acquire (); //For Windows! Wait until is closed!
 }
 
 #ifdef ENABLE_MEMORY_TRACE

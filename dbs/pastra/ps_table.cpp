@@ -334,7 +334,8 @@ normalize_fields (vector<DBSFieldDescriptor>&   fields,
       memcpy (outFields + fieldNameOff, fields[i].name, nameLen);
       fieldNameOff += nameLen;
 
-      *outRowsSize += Serializer::Size (fields[i].type, fields[i].isArray);
+      *outRowsSize += Serializer::Size (fields[i].type,
+                                        fields[i].isArray != FALSE);
     }
 }
 

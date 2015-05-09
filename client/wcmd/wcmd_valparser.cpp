@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/wutf.h"
 #include "utils/range.h"
-#include "utils/valtranslator.h"
+#include "dbs/dbs_valtranslator.h"
 #include "compiler/whaisc.h"
 
 #include "wcmd_valparser.h"

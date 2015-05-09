@@ -47,7 +47,7 @@ FileLogger::FileLogger (const char* const file, const bool printStart)
     mLogFile (file),
     mTodayTime (wh_get_currtime ())
 {
-  mLogFile.append (".wlog.yyyymmdd");
+  mLogFile.append (".wlog");
   SwitchFile ();
 
   if (printStart)
@@ -118,8 +118,8 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
       || (ctime.month != mTodayTime.month)
       || (ctime.year != mTodayTime.year))
     {
-      mTodayTime = ctime;
       SwitchFile ();
+      mTodayTime = ctime;
     }
 
   const char       fill  = mOutStream.fill ();
@@ -147,14 +147,21 @@ void
 FileLogger::SwitchFile ()
 {
   if (mOutStream.is_open ())
-    mOutStream.close ();
+    {
+      mOutStream.close ();
+      string oldFile;
 
-  snprintf (_CC (char*, mLogFile.c_str () + mLogFile.size () - 14),
-            15,
-            ".wlog.%04u%02u%02u",
-            mTodayTime.year,
-            mTodayTime.month,
-            mTodayTime.day);
+      oldFile.resize (mLogFile.length () + 16);
+
+      sprintf (_CC (char*, oldFile.c_str ()),
+               "%s.%04u%02u%02u",
+               mLogFile.c_str (),
+               mTodayTime.year,
+               mTodayTime.month,
+               mTodayTime.day);
+
+      whf_move_file (mLogFile.c_str (), oldFile.c_str ());
+    }
 
   mOutStream.open (mLogFile.c_str (), ios::app | ios::out);
 }

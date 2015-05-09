@@ -981,7 +981,7 @@ to_canonical_latinB_ext (const uint32_t codePoint)
 
 
 static uint32_t
-to_canonical_greek_coptic (const u_int32_t codePoint)
+to_canonical_greek_coptic (const uint32_t codePoint)
 {
   switch (codePoint)
     {
@@ -1060,7 +1060,7 @@ to_canonical_greek_coptic (const u_int32_t codePoint)
 
 
 static uint32_t
-to_canonical_cyrillic (const u_int32_t codePoint)
+to_canonical_cyrillic (const uint32_t codePoint)
 {
   switch (codePoint)
   {

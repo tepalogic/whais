@@ -27,19 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stddef.h>
 
-/* This section includes compiler specific features */
-#ifdef ARCH_LINUX_GCC
-#include "linux_gcc/types.h"
-#endif
-
-#ifdef ARCH_WINDOWS_VC
-#include "windows_vc/types.h"
-#endif
-
-/* This section contains whais specific data */
-
-
-/* This section will contain some general data */
+#include "whais_types.h"
 #include "general/whais_macros.h"
 #include "whais_shl.h"
 

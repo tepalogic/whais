@@ -188,7 +188,7 @@ add_file_to_deps (const string&         file,
 
 
 static string
-get_tag_value (const string& line, const uint tagLength)
+get_tag_value (const string& line, const uint_t tagLength)
 {
   uint_t from = tagLength;
 
@@ -373,7 +373,7 @@ preprocess_include_directives (const string&                    file,
               guardValue = get_tag_value (guard, strlen (tagIncludeGuard));
               if (guardValue.size () > 0)
                 {
-                  for (uint i = 0; i < includedGuards.size (); ++i)
+                  for (uint_t i = 0; i < includedGuards.size (); ++i)
                     {
                       if (includedGuards[i] == guardValue)
                         {

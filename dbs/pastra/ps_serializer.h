@@ -122,6 +122,157 @@ public:
     return true;
   }
 
+  template<> static bool ValidateBuffer<DBool> (const uint8_t* const buffer)
+  {
+    return (buffer[0] == 0) || (buffer[0] == 1);
+  }
+
+
+  template<> static bool ValidateBuffer<DChar> (const uint8_t* const buffer)
+  {
+    try
+    {
+        DChar (load_le_int32 (buffer));
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    return true;
+  }
+
+
+  template<> static bool ValidateBuffer<DDate> (const uint8_t* const buffer)
+  {
+    try
+    {
+        const int16_t year  = load_le_int16 (buffer);
+        const uint8_t month = buffer[2];
+        const uint8_t day   = buffer[3];
+
+        DDate (year, month, day);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+  }
+
+
+  template<> static bool ValidateBuffer<DDateTime> (const uint8_t* const buffer)
+  {
+    try
+    {
+        const int16_t year    = load_le_int16 (buffer);
+        const uint8_t month   = buffer[2];
+        const uint8_t day     = buffer[3];
+        const uint8_t hours   = buffer[4];
+        const uint8_t mins    = buffer[5];
+        const uint8_t secs    = buffer[6];
+
+        DDateTime (year, month, day, hours, mins, secs);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+  }
+
+
+  template<> static bool ValidateBuffer<DHiresTime> (const uint8_t* const buffer)
+  {
+    try
+    {
+        const int32_t usecs    = load_le_int32 (buffer);
+        const int16_t year     = load_le_int16 (buffer + sizeof (uint32_t));
+        const uint8_t month    = buffer[6];
+        const uint8_t day      = buffer[7];
+        const uint8_t hours    = buffer[8];
+        const uint8_t mins     = buffer[9];
+        const uint8_t secs     = buffer[10];
+
+        DHiresTime (year, month, day, hours, mins, secs, usecs);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    return true;
+  }
+
+
+  template<> static bool ValidateBuffer<DReal> (const uint8_t* const buffer)
+  {
+    const uint_t integerSize    = 5;
+    const uint_t fractionalSize = 3;
+
+    int64_t temp = 0;
+    memcpy (&temp, buffer, integerSize);
+
+    int64_t integer = load_le_int64 (_RC (const uint8_t*, &temp));
+
+    if (integer & 0x8000000000)
+      integer |= ~_SC (int64_t, 0xFFFFFFFFFF);
+
+    temp = 0;
+    memcpy (&temp, buffer + integerSize, fractionalSize);
+
+    int64_t fractional = load_le_int64 (_RC (const uint8_t*, &temp));
+
+    if (fractional & 0x800000)
+      fractional |= ~_SC (int64_t, 0xFFFFFF);
+
+    if ((integer < 0)
+        && ((fractional <= -DBS_REAL_PREC) || (0 < fractional)))
+      {
+        return false;
+      }
+    else if ((integer > 0)
+             && ((fractional < 0) || (DBS_REAL_PREC <= fractional)))
+      {
+        return false;
+      }
+
+    return true;
+  }
+
+
+  template<> static bool ValidateBuffer<DRichReal> (const uint8_t* const buffer)
+  {
+    const uint_t integerSize    = 8;
+    const uint_t fractionalSize = 6;
+
+    int64_t integer = load_le_int64 (buffer);
+
+    int64_t temp = 0;
+    memcpy (&temp, buffer + integerSize, fractionalSize);
+
+    int64_t fractional = load_le_int64 (_RC (const uint8_t*, &temp));
+
+    if (fractional & 0x800000000000)
+      fractional |= ~_SC (int64_t, 0xFFFFFFFFFFFF);
+
+    if ((integer < 0)
+        && ((fractional <= -DBS_RICHREAL_PREC) || (0 < fractional)))
+      {
+        return false;
+      }
+    else if ((integer > 0)
+             && ((fractional < 0) || (DBS_RICHREAL_PREC <= fractional)))
+      {
+        return false;
+      }
+
+    assert ((fractional < 0) || (fractional < DBS_RICHREAL_PREC));
+    assert ((fractional > 0) || (fractional > -DBS_RICHREAL_PREC));
+
+    return true;
+  }
+
+
   typedef bool (*VALUE_VALIDATOR) (const uint8_t* const);
 
   static VALUE_VALIDATOR SelectValidator (const DBS_FIELD_TYPE type);

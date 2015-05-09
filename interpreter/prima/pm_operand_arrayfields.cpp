@@ -22,7 +22,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#include "utils/include/valtranslator.h"
+#include "dbs/dbs_valtranslator.h"
 
 #include "pm_operand.h"
 #include "pm_typemanager.h"

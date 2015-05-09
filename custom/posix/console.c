@@ -56,6 +56,4 @@ wh_enable_echo ()
     return FALSE;
 
   return TRUE;
-
-  return TRUE;
 }

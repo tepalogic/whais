@@ -83,6 +83,9 @@ whf_err_to_str (uint64_t errorCode, char* str, uint_t strSize);
 bool_t
 whf_remove (const char* const file);
 
+void
+whf_move_file (const char* existingFIle, const char* newFile );
+
 const char*
 whf_dir_delim ();
 

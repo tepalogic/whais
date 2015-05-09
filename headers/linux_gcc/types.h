@@ -39,12 +39,6 @@ typedef pthread_t       WH_THREAD;
 typedef int             WH_SOCKET;
 typedef void*           WH_SHLIB;
 
-/* Simple type shortcuts */
-typedef unsigned int       uint_t;
-typedef unsigned long      ulong_t;
-typedef long long          llong_t;
-typedef unsigned long long ullong_t;
-
 #ifndef uint8_t
 typedef u_int8_t      uint8_t;
 #endif

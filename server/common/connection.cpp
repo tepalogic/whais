@@ -378,7 +378,7 @@ ClientConnection::ReciveRawClientFrame ()
 
   if (mCipher == FRAME_ENCTYPE_3K)
     {
-      const uint keyLen = strlen (_RC (const char*, mKey._3K));
+      const uint_t keyLen = strlen (_RC (const char*, mKey._3K));
 
       uint8_t prev = 0;
       for (uint_t i = 0; i < ENC_PLAIN_SIZE_OFF; ++i)

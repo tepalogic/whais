@@ -28,7 +28,7 @@
 
 #include "dbs/dbs_values.h"
 
-class Utf8Translator
+class DBS_SHL Utf8Translator
 {
 public:
   static int Read (const uint8_t* const       utf8Src,
