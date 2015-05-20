@@ -77,7 +77,7 @@ arch_set_output_library=/OUT:$(call arch_translate_path,./bin/$(ARCH)/$(2)/$(ARC
 
 #set the right  flags for the linker
 
-arch_linker_flags=/NOLOGO /OPT:REF shlwapi.lib
+arch_linker_flags=/NOLOGO /OPT:REF shlwapi.lib advapi32.lib
 ifeq ($(DEBUGINFO),yes)
 arch_linker_flags+=/DEBUG
 endif 

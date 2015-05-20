@@ -27,6 +27,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool_t
 wh_disable_echo ()
 {
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD  mode;
+
+  GetConsoleMode(hStdin, &mode);
+  SetConsoleMode(hStdin, mode & ~ENABLE_ECHO_INPUT);
+
   return TRUE;
 }
 
@@ -34,5 +40,11 @@ wh_disable_echo ()
 bool_t
 wh_enable_echo ()
 {
+  HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+  DWORD  mode;
+
+  GetConsoleMode(hStdin, &mode);
+  SetConsoleMode(hStdin, mode | ENABLE_ECHO_INPUT);
+
   return TRUE;
 }

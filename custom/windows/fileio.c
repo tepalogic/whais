@@ -250,27 +250,28 @@ whf_move_file (const char* existingFile, const char* newFile )
 }
 
 
-const char*
+const char
 whf_dir_delim ()
 {
-  return "\\";
+  return '\\' ;
 }
 
 const char*
 whf_current_dir ()
 {
-  static char currentDir[MAX_PATH];
+  /* This is not thread save! */
 
-  uint_t pathLen;
+  static char currentDir[MAX_PATH];
+  int pathLen;
 
   GetCurrentDirectory (sizeof currentDir - 2, currentDir);
 
   pathLen = strlen (currentDir);
   if (currentDir[pathLen - 1] != '\\')
     {
-      currentDir[pathLen]     = '\\';
+      currentDir[pathLen] = '\\';
       currentDir[pathLen + 1] = 0;
-    }
+    };
 
   return currentDir;
 }

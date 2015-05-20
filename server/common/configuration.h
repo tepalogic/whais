@@ -141,7 +141,9 @@ bool
 FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseConfigurationSection (std::ifstream& config, uint_t& inoutConfigLine);
+ParseConfigurationSection (std::ifstream&       config,
+                           uint_t&              inoutConfigLine,
+                           std::ostream&        errOut);
 
 bool
 ParseContextSection (whais::Logger&        log,

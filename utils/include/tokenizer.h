@@ -25,8 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define TOKENIZER_H_
 
 #include <string>
-
-
+#include <istream>
 
 namespace whais
 {
@@ -38,6 +37,8 @@ NextToken (const std::string&       text,
            size_t&                  inoutOff,
            const std::string&       delims);
 
+std::string&
+NormalizeFilePath (std::string& path, const bool isDirectory);
 
 } //namespace whais
 

@@ -826,13 +826,15 @@ main (const int argc, char *argv[])
                 {
                   /*
                    * This message might or might not appear. Though
-                   * the program terminates, if it gets on this path, the
-                   * error message is displayed from time to time.
+                   * the program terminates, if it gets on this path then
+                   * error message is displayed from time to time (this issue
+                   * was spotted when using Linux).
                    *
                    * Probably a tool chain/OS/Bash bug!
                    */
 
-                  cerr << "ERROR: Failed to connect at '"
+                  cerr << "ERROR: Failed to connect at database '"
+                       << GetWorkingDB () << "' from '"
                        << GetRemoteHostName () << '@'
                        << GetConnectionPort () << "'!\n";
 
@@ -850,7 +852,7 @@ main (const int argc, char *argv[])
         set_signals ();
         if (scriptFile != NULL)
           {
-            ifstream script (scriptFile);
+            ifstream script (scriptFile, ios_base::in | ios_base::binary);
             result = ExecuteInteractively (script);
           }
         else

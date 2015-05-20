@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include "utils/wthread.h"
+#include "utils/tokenizer.h"
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_types.h"
 
@@ -157,17 +158,9 @@ struct DbsManager
                            );
       }
 
-    if (mDBSSettings.mWorkDir[mDBSSettings.mWorkDir.length () - 1] !=
-          whf_dir_delim ()[0])
-      {
-        mDBSSettings.mWorkDir += whf_dir_delim ();
-      }
+    NormalizeFilePath (mDBSSettings.mWorkDir, true);
+    NormalizeFilePath (mDBSSettings.mTempDir, true);
 
-    if (mDBSSettings.mTempDir[mDBSSettings.mTempDir.length () - 1] !=
-          whf_dir_delim ()[0])
-      {
-        mDBSSettings.mTempDir += whf_dir_delim ();
-      }
   }
 
   Lock            mSync;

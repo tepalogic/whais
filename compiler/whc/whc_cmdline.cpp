@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include "compiler/whaisc.h"
+#include "utils/tokenizer.h"
 #include "whc_cmdline.h"
 
 
@@ -193,24 +194,6 @@ CmdLineParser::Parse ()
 }
 
 
-static string&
-normalize_path (string& path)
-{
-  const char* const dirDelim = whf_dir_delim ();
-
-  for (uint_t i = 0; i < path.size (); ++i)
-    {
-      if ((path[i] == '/') || (path[i] =='\\'))
-        path[i] = dirDelim[0];
-    }
-
-  if (path[path.size () - 1] != dirDelim[0])
-    path.append (dirDelim);
-
-  return path;
-}
-
-
 void
 CmdLineParser::AddInclusionPaths (const char* const paths)
 {
@@ -225,8 +208,7 @@ CmdLineParser::AddInclusionPaths (const char* const paths)
       if (nextPath == NULL)
         {
           string path (currentPath);
-
-          mInclusionPaths.push_back (normalize_path (path));
+          mInclusionPaths.push_back (NormalizeFilePath (path, true));
         }
       else
         {
@@ -234,8 +216,7 @@ CmdLineParser::AddInclusionPaths (const char* const paths)
           if (pathSize > 0)
             {
               string path (currentPath, pathSize);
-
-              mInclusionPaths.push_back (normalize_path (path));
+              mInclusionPaths.push_back (NormalizeFilePath (path, true));
             }
           currentPath = ++nextPath;
         }

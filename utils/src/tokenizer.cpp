@@ -23,6 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 #include <assert.h>
 
+#include "whais.h"
+
 #include "tokenizer.h"
 
 using namespace std;
@@ -61,6 +63,27 @@ NextToken (const std::string&     text,
   inoutOff = lastPos + 1;
 
   return result;
+}
+
+
+std::string&
+NormalizeFilePath (std::string& path, const bool isDirectory)
+{
+  const char directoryDelimiter = whf_dir_delim ();
+
+  for (size_t i = 0; i < path.length (); ++i)
+    {
+      if ((path[i] == '\\') || (path[i] == '/'))
+        path[i] = directoryDelimiter;
+    }
+
+  if (isDirectory
+      && (path[path.length () - 1] != directoryDelimiter))
+    {
+      path.append (1, directoryDelimiter);
+    }
+
+  return path;
 }
 
 } //namespace whais

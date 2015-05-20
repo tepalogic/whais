@@ -251,10 +251,10 @@ whf_remove (const char* const file)
 }
 
 
-const char*
+const char
 whf_dir_delim ()
 {
-  return "/";
+  return '/';
 }
 
 

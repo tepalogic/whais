@@ -150,7 +150,7 @@ main (int argc, char** argv)
     }
   else
     {
-      config.reset (new ifstream (argv[1]));
+      config.reset (new ifstream (argv[1], ios_base::in | ios_base::binary));
       if (! config->good ())
         {
           cerr << "Could not open the configuration file ";
@@ -162,7 +162,7 @@ main (int argc, char** argv)
 
   if (! whs_init ())
     {
-      cerr << "Could not initialize the network socket framework\n";
+      cerr << "Could not initialize the network socket framework.\n";
       return ENOTSOCK;
     }
 
@@ -177,7 +177,7 @@ main (int argc, char** argv)
 
       assert (sectionLine > 0);
 
-      if (ParseConfigurationSection (*config, sectionLine) == false)
+      if (ParseConfigurationSection (*config, sectionLine, cerr) == false)
         return -1;
 
       glbLog.reset (new FileLogger (GetAdminSettings ().mLogFile.c_str ()));

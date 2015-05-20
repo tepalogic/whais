@@ -86,7 +86,7 @@ whf_remove (const char* const file);
 void
 whf_move_file (const char* existingFIle, const char* newFile );
 
-const char*
+const char
 whf_dir_delim ();
 
 const char*

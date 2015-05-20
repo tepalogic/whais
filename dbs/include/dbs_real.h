@@ -348,43 +348,37 @@ private:
 typedef DBSReal<int64_t, int64_t, DBS_REAL_PREC>      DBS_REAL_T;
 typedef DBSReal<int64_t, int64_t, DBS_RICHREAL_PREC>  DBS_RICHREAL_T;
 
-template<typename T>
-DBS_REAL_T
+template<typename T> DBS_REAL_T
 operator+ (const T op1, const DBS_REAL_T& op2)
 {
-  return op2 + op1;
+  return op2 + DBS_REAL_T (op1);
 }
 
-template<typename T>
-DBS_REAL_T
+template<typename T> DBS_REAL_T
 operator- (const T op1, const DBS_REAL_T& op2)
 {
   return DBS_REAL_T (op1) - op2;
 }
 
-template<typename T>
-DBS_REAL_T
+template<typename T> DBS_REAL_T
 operator* (const T op1, const DBS_REAL_T& op2)
 {
-  return op2 * op1;
+  return op2 * DBS_REAL_T (op1);
 }
 
-template<typename T>
-DBS_RICHREAL_T
+template<typename T> DBS_RICHREAL_T
 operator+ (const T op1, const DBS_RICHREAL_T& op2)
 {
   return op2 + op1;
 }
 
-template<typename T>
-DBS_RICHREAL_T
+template<typename T> DBS_RICHREAL_T
 operator- (const T op1, const DBS_RICHREAL_T& op2)
 {
   return DBS_RICHREAL_T (op1) - op2;
 }
 
-template<typename T>
-DBS_RICHREAL_T
+template<typename T> DBS_RICHREAL_T
 operator* (const T op1, const DBS_RICHREAL_T& op2)
 {
   return op2 * op1;

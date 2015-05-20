@@ -31,6 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whc_preprocess.h"
 #include "utils/wfile.h"
+#include "utils/tokenizer.h"
 
 #include "msglog.h"
 
@@ -262,16 +263,11 @@ search_for_header_file (const vector<string>&    inclusionPaths,
 {
   foundFiles.clear ();
 
-  const char* const dirDelim = whf_dir_delim ();
-  for (uint_t i = 0; i < fileName.size (); ++i)
-    {
-      if ((fileName[i] == '\\') || (fileName[i] == '/'))
-        fileName[i] = dirDelim[0];
-    }
-
   for (uint_t i = 0; i < inclusionPaths.size (); ++i)
     {
-      const string file (inclusionPaths[i] + fileName);
+      string file (inclusionPaths[i] + fileName);
+
+      NormalizeFilePath (file, false);
 
       if (whf_file_exists (file.c_str ()))
         foundFiles.push_back (file);
@@ -305,11 +301,11 @@ preprocess_include_directives (const string&                    file,
                                        lineIndex,
                                        file,
                                        levelSize));
-  while ( ! includedSource.eof ())
+  while ( includedSource.good ())
     {
       string line;
-      getline (includedSource, line);
 
+      getline (includedSource, line);
       process_line (file, lineIndex, tagPairs, line);
 
       if (strncmp (tagInclude, line.c_str (), sizeof tagInclude - 1) == 0)
@@ -425,9 +421,7 @@ preprocess_include_directives (const string&                    file,
                      foundFiles[0] + "' with guard '" + guardValue + "'.";
 
               sourceCode << line << endl;
-
               ++lineIndex;
-
               codeMarks.push_back (SourceCodeMark (sourceCode.tellp (),
                                                   lineIndex,
                                                   file,
@@ -441,6 +435,7 @@ preprocess_include_directives (const string&                    file,
           print_err_tag_no_line_start (codeMarks,
                                        sourceCode.str (),
                                        tagInclude);
+          cerr << line;
           return false;
         }
       else
@@ -448,7 +443,6 @@ preprocess_include_directives (const string&                    file,
           sourceCode << line << endl;
           ++lineIndex;
         }
-
     }
 
   return true;

@@ -142,7 +142,7 @@ SeekAtConfigurationSection (ifstream& config, uint_t& outConfigLine)
   config.clear ();
   config.seekg (0);
 
-  while (! config.eof ())
+  while (config.good ())
     {
       string line;
       getline (config, line);
@@ -167,10 +167,8 @@ FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
   static const string identifier ("[SESSION]");
   static const string delimiters (" \t");
 
-  while (! config.eof ())
+  while (config.good ())
     {
-      assert (config.good ());
-
       string line;
       getline (config, line);
       ++inoutConfigLine;
@@ -189,7 +187,9 @@ FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
 
 
 bool
-ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
+ParseConfigurationSection (ifstream&    config,
+                           uint_t&      inoutConfigLine,
+                           ostream&     errOut)
 {
   static const string delimiters (" \t=");
 
@@ -266,10 +266,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           else
             {
-              cerr << "The cipher '" << token << "' is not supported. ";
-              cerr << "Allowed ciphers are " << CIPHER_PLAIN << ", "
+              errOut << "The cipher '" << token << "' is not supported. ";
+              errOut << "Allowed ciphers are " << CIPHER_PLAIN << ", "
                    << CIPHER_DES << ", " << CIPHER_3DES << " and ";
-              cerr << CIPHER_3K <<".\n";
+              errOut << CIPHER_3K <<".\n";
 
               return false;
             }
@@ -281,8 +281,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if (gMainSettings.mTableCacheBlockCount == 0)
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -294,8 +294,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if (gMainSettings.mTableCacheBlockSize == 0)
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -307,8 +307,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if (gMainSettings.mVLBlockCount == 0)
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -320,8 +320,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if (gMainSettings.mVLBlockSize == 0)
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -333,8 +333,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if (gMainSettings.mTempValuesCache == 0)
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -344,8 +344,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           token = NextToken (line, pos, delimiters);
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line "
-                   << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line "
+                     << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -353,9 +353,11 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           gMainSettings.mAuthTMO = atoi (token.c_str ());
           if (gMainSettings.mAuthTMO <= 0)
             {
-              cerr << "At line " << inoutConfigLine << "the connection timeout"
-                      "parameter should be an integer value bigger than 0 "
-                      "(currently set to " << gMainSettings.mAuthTMO << " ).\n";
+              errOut << "At line " << inoutConfigLine << "the connection "
+                        "timeout parameter should be an integer value bigger "
+                        "than 0 (currently set to "
+                     << gMainSettings.mAuthTMO << " ).\n";
+
               return false;
             }
         }
@@ -364,8 +366,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           token = NextToken (line, pos, delimiters);
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line "
-                   << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line "
+                     << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -373,10 +375,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           gMainSettings.mWaitReqTmo = atoi (token.c_str ());
           if (gMainSettings.mWaitReqTmo <= 0)
             {
-              cerr << "At line " << inoutConfigLine << "the request waiting "
-                      "timeout parameter should be an integer value bigger "
-                      "than 0 (currently set to "
-                   << gMainSettings.mWaitReqTmo << " ).\n";
+              errOut << "At line " << inoutConfigLine << "the request waiting "
+                        "timeout parameter should be an integer value bigger "
+                        "than 0 (currently set to "
+                     << gMainSettings.mWaitReqTmo << " ).\n";
               return false;
             }
         }
@@ -385,7 +387,7 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           token = NextToken (line, pos, delimiters);
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line "
+              errOut << "Configuration error at line "
                    << inoutConfigLine << ".\n";
 
               return false;
@@ -394,10 +396,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
           gMainSettings.mSyncInterval = atoi (token.c_str ());
           if (gMainSettings.mSyncInterval < -1)
             {
-              cerr << "At line " << inoutConfigLine << "the data sync interval "
-                      "timeout parameter should be a positive integer value "
-                      "(currently set to "
-                   << gMainSettings.mSyncInterval << " ).\n";
+              errOut << "At line " << inoutConfigLine << "the data sync "
+                        "interval timeout parameter should be a positive "
+                        "integer value (currently set to "
+                      << gMainSettings.mSyncInterval << " ).\n";
               return false;
             }
         }
@@ -406,8 +408,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
          token = NextToken (line, pos, delimiters);
          if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
           {
-            cerr << "Configuration error at line "
-                 << inoutConfigLine << ".\n";
+            errOut << "Configuration error at line "
+                   << inoutConfigLine << ".\n";
 
             return false;
           }
@@ -415,10 +417,10 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
          gMainSettings.mSyncWakeup = atoi (token.c_str ());
          if (gMainSettings.mSyncWakeup <= 0)
           {
-            cerr << "At line " << inoutConfigLine << "the data sync interval "
-                    "timeout parameter should be an integer value bigger "
-                    "than 0 (currently set to "
-                 << gMainSettings.mSyncWakeup << " ).\n";
+            errOut << "At line " << inoutConfigLine << "the data sync interval "
+                      "timeout parameter should be an integer value bigger "
+                      "than 0 (currently set to "
+                   << gMainSettings.mSyncWakeup << " ).\n";
             return false;
           }
        }
@@ -428,8 +430,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -438,14 +440,14 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
             {
               const string entry = line.c_str () + pos - token.length ();
 
-              if (get_enclose_entry (cerr,
+              if (get_enclose_entry (errOut,
                                      entry,
                                      token.at (0),
                                      gMainSettings.mLogFile) == false)
                 {
-                  cerr << "Unmatched "<< token.at (0)
-                       << " in configuration file at line "
-                       << inoutConfigLine << ".\n";
+                  errOut << "Unmatched "<< token.at (0)
+                         << " in configuration file at line "
+                         << inoutConfigLine << ".\n";
 
                   return false;
                 }
@@ -460,8 +462,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -470,33 +472,23 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
             {
               const string entry = line.c_str () + pos - token.length ();
 
-              if (get_enclose_entry (cerr,
+              if (get_enclose_entry (errOut,
                                      entry,
                                      token.at (0),
                                      gMainSettings.mTempDirectory) == false)
                 {
-                  cerr << "Unmatched "<< token.at (0);
-                  cerr << " in configuration file at line ";
-                  cerr << inoutConfigLine << ".\n";
+                  errOut << "Unmatched "<< token.at (0);
+                  errOut << " in configuration file at line ";
+                  errOut << inoutConfigLine << ".\n";
+
                   return false;
                 }
             }
           else
             gMainSettings.mTempDirectory = token;
 
-          string& dir = gMainSettings.mTempDirectory;
+          NormalizeFilePath (gMainSettings.mTempDirectory, true);
 
-          for (size_t i = 0; i < dir.length (); ++i)
-            {
-              if ((dir[i] == '\\') || (dir[i] == '/'))
-                dir[i] = whf_dir_delim ()[0];
-            }
-
-          if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
-            {
-              dir += whf_dir_delim ();
-            }
         }
       else if (token == gEntWorkDir)
         {
@@ -504,8 +496,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           if ((token.length () == 0) || (token.at (0) == COMMENT_CHAR))
             {
-              cerr << "Configuration error at line ";
-              cerr << inoutConfigLine << ".\n";
+              errOut << "Configuration error at line ";
+              errOut << inoutConfigLine << ".\n";
 
               return false;
             }
@@ -514,40 +506,30 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
             {
               const string entry = line.c_str () + pos - token.length ();
 
-              if (get_enclose_entry (cerr,
+              if (get_enclose_entry (errOut,
                                      entry,
                                      token.at (0),
                                      gMainSettings.mWorkDirectory) == false)
                 {
-                  cerr << "Unmatched "<< token.at (0);
-                  cerr << " in configuration file at line ";
-                  cerr << inoutConfigLine << ".\n";
+                  errOut << "Unmatched "<< token.at (0);
+                  errOut << " in configuration file at line ";
+                  errOut << inoutConfigLine << ".\n";
                   return false;
                 }
             }
           else
             gMainSettings.mWorkDirectory = token;
 
-          string& dir = gMainSettings.mWorkDirectory;
-
-          for (size_t i = 0; i < dir.length (); ++i)
-            {
-              if ((dir[i] == '\\') || (dir[i] == '/'))
-                dir[i] = whf_dir_delim ()[0];
-            }
-
-          if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
-            {
-              dir += whf_dir_delim ();
-            }
+          const string &dir = NormalizeFilePath (gMainSettings.mWorkDirectory,
+                                                 true);
 
           if ((dir.length () != 0)
               && ! whf_is_absolute (dir.c_str ()))
             {
-              cerr << "Warning: The working directory is not an absolute "
-                      "path. Please make sure you know the working directory "
-                      "where WHAIS server started ('" << dir << "').\n";
+              errOut << "Error: The configured working directory cannot be a "
+                        "relative path ('" << dir << "').\n";
+
+              return false;
             }
         }
       else if (token == gEntShowDbg)
@@ -562,17 +544,17 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
           else
             {
-              cerr << "Cannot assign '" << token << "\' to 'show_debug' ";
-              cerr << "at line " << inoutConfigLine << ". ";
-              cerr << "Valid value are only 'true' or 'false'.\n";
+              errOut << "Cannot assign '" << token << "\' to 'show_debug' ";
+              errOut << "at line " << inoutConfigLine << ". ";
+              errOut << "Valid value are only 'true' or 'false'.\n";
 
               return false;
             }
         }
       else
         {
-          cerr << "At line " << inoutConfigLine << ": Don't know what to do ";
-          cerr << "with '" << token <<"'.\n";
+          errOut << "At line " << inoutConfigLine << ": Don't know what to do ";
+          errOut << "with '" << token <<"'.\n";
           return false;
         }
     }
@@ -593,15 +575,15 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
   if (! whf_file_exists (gMainSettings.mWorkDirectory.c_str ()))
     {
-      cerr << "The working directory does not exists ('"
-           << gMainSettings.mWorkDirectory << "')!\n";
+      errOut << "The working directory does not exists ('"
+             << gMainSettings.mWorkDirectory << "')!\n";
 
       return false;
     }
 
   if (! whf_file_exists (gMainSettings.mTempDirectory.c_str ()))
     {
-      cerr << "The directory to hold temporal values does not exists ('"
+      errOut << "The directory to hold temporal values does not exists ('"
            << gMainSettings.mTempDirectory << "')!\n";
 
       return false;
@@ -609,8 +591,8 @@ ParseConfigurationSection (ifstream& config, uint_t& inoutConfigLine)
 
   if (gMainSettings.mLogFile.length () == 0)
     {
-      cerr << "The configuration main section does not ";
-      cerr << "have a '"<< gEntLogFile << "' entry.\n";
+      errOut << "The configuration main section does not ";
+      errOut << "have a '"<< gEntLogFile << "' entry.\n";
 
       return false;
     }
@@ -628,7 +610,7 @@ ParseContextSection (Logger&          log,
   ostringstream logEntry;
   static const string delimiters = " \t=";
 
-  while ( ! config.eof ())
+  while (config.good ())
     {
       const streamoff lastPos = config.tellg ();
 
@@ -759,25 +741,10 @@ ParseContextSection (Logger&          log,
           else
             output.mDbsDirectory = token;
 
-          string& dir = output.mDbsDirectory;
+          const string& dir = NormalizeFilePath (output.mDbsDirectory, true);
 
-          for (size_t i = 0; i < dir.length (); ++i)
-            {
-              if ((dir[i] == '\\') || (dir[i] == '/'))
-                dir[i] = whf_dir_delim ()[0];
-            }
-
-          if ((dir.size () != 0)
-              && (dir[dir.size () - 1] != whf_dir_delim ()[0]))
-            {
-              dir += whf_dir_delim ();
-            }
-
-          if (! whf_is_absolute (output.mDbsDirectory.c_str ()))
-            {
-              output.mDbsDirectory = gMainSettings.mWorkDirectory +
-                                     output.mDbsDirectory;
-            }
+          if (! whf_is_absolute (dir.c_str ()))
+            output.mDbsDirectory = gMainSettings.mWorkDirectory + dir;
         }
        else if (token == gEntLogFile)
         {
@@ -808,14 +775,7 @@ ParseContextSection (Logger&          log,
           else
             output.mDbsLogFile = token;
 
-          for (size_t i = 0; i < output.mDbsLogFile.length (); ++i)
-            {
-              if ((output.mDbsLogFile[i] == '\\')
-                  || (output.mDbsLogFile[i] == '/'))
-                {
-                  output.mDbsLogFile[i] = whf_dir_delim ()[0];
-                }
-            }
+          NormalizeFilePath (output.mDbsLogFile, false);
         }
        else if (token==gEntObjectLib)
         {
@@ -830,7 +790,7 @@ ParseContextSection (Logger&          log,
                return false;
              }
 
-           string libEntry;
+           string entryValue;
            if ((token.at (0) == '\'') || (token.at (0) == '"'))
              {
                const string entry = line.c_str () + pos - token.length ();
@@ -838,7 +798,7 @@ ParseContextSection (Logger&          log,
                if (get_enclose_entry (logEntry,
                                       entry,
                                       token.at (0),
-                                      libEntry) == false)
+                                      entryValue) == false)
                  {
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
@@ -849,19 +809,14 @@ ParseContextSection (Logger&          log,
                  }
              }
            else
-             libEntry = token;
+             entryValue = token;
 
-           for (size_t i = 0; i < libEntry.length (); ++i)
-             {
-               if ((libEntry[i] == '\\') || (libEntry[i] == '/'))
-                 libEntry[i] = whf_dir_delim ()[0];
-             }
+           NormalizeFilePath (entryValue, false);
 
+           if ( ! whf_is_absolute (entryValue.c_str ()))
+             entryValue = gMainSettings.mWorkDirectory + entryValue;
 
-           if ( ! whf_is_absolute (libEntry.c_str ()))
-             libEntry = gMainSettings.mWorkDirectory + libEntry;
-
-           output.mObjectLibs.push_back (libEntry);
+           output.mObjectLibs.push_back (entryValue);
         }
        else if (token==gEntNativeLib)
         {
@@ -903,7 +858,7 @@ ParseContextSection (Logger&          log,
              {
                if ((libEntry[i] == '\\') || (libEntry[i] == '/'))
                  {
-                   libEntry[i] = whf_dir_delim ()[0];
+                   libEntry[i] = whf_dir_delim ();
                    fixAbsolutePath = true;
                  }
              }
