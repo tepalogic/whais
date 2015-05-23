@@ -9,6 +9,10 @@ ifneq ($(findstring windows,$(ARCH)),)
 UNIT_EXES+=whais_srv
 endif
 
+ifneq ($(findstring linux,$(ARCH)),)
+UNIT_EXES+=whaisd
+endif
+
 
 whais_cmn_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
 			common/connection.cpp common/commands.cpp common/stack_cmds.cpp
@@ -24,6 +28,11 @@ whais_srv_SRC:=windows/service.cpp
 whais_srv_DEF:=$(whais_cmn_DEF)
 whais_srv_LIB:=$(whais_LIB)
 whais_srv_SHL:=$(whais_SHL)
+
+whaisd_SRC:=linux/daemon.cpp
+whaisd_DEF:=$(whais_cmn_DEF)
+whaisd_LIB:=$(whais_LIB)
+whaisd_SHL:=$(whais_SHL)
 
 
 $(foreach exe, $(UNIT_EXES), $(eval $(call add_output_executable,$(exe),$(UNIT))))

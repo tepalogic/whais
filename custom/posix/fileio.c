@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <errno.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "whais.h"
 #include "whais_fileio.h"
@@ -250,6 +251,12 @@ whf_remove (const char* const file)
   return FALSE;
 }
 
+
+void
+whf_move_file (const char* existingFile, const char* newFile )
+{
+  rename (existingFile, newFile);
+}
 
 const char
 whf_dir_delim ()

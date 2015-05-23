@@ -150,7 +150,7 @@ clean_frameworks (FileLogger& log)
           ostringstream logEntry;
           logEntry << "Closing session '";
           logEntry << dbsIterator->mDbsName << "'.\n";
-          log.Log (LOG_INFO, logEntry.str ());
+          log.Log (LT_INFO, logEntry.str ());
         }
     }
 
@@ -172,14 +172,14 @@ clean_frameworks (FileLogger& log)
 
           if (dbsIterator->mLogger != NULL)
             {
-              dbsIterator->mLogger->Log (LOG_INFO, "Database context ended!");
+              dbsIterator->mLogger->Log (LT_INFO, "Database context ended!");
               delete dbsIterator->mLogger;
             }
 
           ostringstream logEntry;
           logEntry << "Cleaned resources of database '";
           logEntry << dbsIterator->mDbsName << "'.\n";
-          log.Log (LOG_INFO, logEntry.str ());
+          log.Log (LT_INFO, logEntry.str ());
         }
     }
 
@@ -282,7 +282,7 @@ boot_server (const char* configFile, ostream& errOut)
               {
                 logEntry << "Duplicate entry '" << dbs.mDbsName << "'. ";
                 logEntry << "Ignoring the last configuration entry.\n";
-                glbLog->Log (LOG_ERROR, logEntry.str ());
+                glbLog->Log (LT_ERROR, logEntry.str ());
                 continue;
               }
           }
@@ -296,7 +296,7 @@ boot_server (const char* configFile, ostream& errOut)
 
     if (databases.size () == 0)
       {
-        glbLog->Log (LOG_CRITICAL, "No session were configured.");
+        glbLog->Log (LT_CRITICAL, "No session were configured.");
         return false;
       }
     else if (databases[0].mDbsName != GlobalContextDatabase ())
@@ -307,7 +307,7 @@ boot_server (const char* configFile, ostream& errOut)
         noGlbMsg << GlobalContextDatabase ();
         noGlbMsg << "' was found.";
 
-        glbLog->Log (LOG_CRITICAL, noGlbMsg.str ());
+        glbLog->Log (LT_CRITICAL, noGlbMsg.str ());
       }
 
     const ServerSettings& confSettings = GetAdminSettings ();
@@ -355,7 +355,7 @@ boot_server (const char* configFile, ostream& errOut)
     logEntry <<"Extra: " << e.Code () << " (";
     logEntry << e.File () << ':' << e.Line () << ").\n";
 
-    glbLog->Log (LOG_CRITICAL, logEntry.str ());
+    glbLog->Log (LT_CRITICAL, logEntry.str ());
 
     clean_frameworks (*glbLog);
     whs_clean ();
@@ -366,7 +366,7 @@ boot_server (const char* configFile, ostream& errOut)
   {
     svc_report_status(SERVICE_STOP_PENDING, NO_ERROR, 60000);
 
-    glbLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+    glbLog->Log (LT_CRITICAL, "OUT OF MEMORY!!!");
 
     clean_frameworks (*glbLog);
     whs_clean ();
@@ -381,7 +381,7 @@ boot_server (const char* configFile, ostream& errOut)
 
     logEntry << "General system failure: " << e.what () << endl;
 
-    glbLog->Log (LOG_CRITICAL, logEntry.str ());
+    glbLog->Log (LT_CRITICAL, logEntry.str ());
 
     clean_frameworks (*glbLog);
     whs_clean ();
@@ -394,7 +394,7 @@ boot_server (const char* configFile, ostream& errOut)
 
     svc_report_status(SERVICE_STOP_PENDING, NO_ERROR, 60000);
 
-    glbLog->Log (LOG_CRITICAL, "Unknown exception!");
+    glbLog->Log (LT_CRITICAL, "Unknown exception!");
 
     return false;
   }

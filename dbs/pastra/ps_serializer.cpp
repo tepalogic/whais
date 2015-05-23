@@ -515,55 +515,47 @@ Serializer::Size (const DBS_FIELD_TYPE type, const bool isArray)
 }
 
 
+static bool
+dummy_validator (const uint8_t* )
+{
+  return true;
+}
+
 Serializer::VALUE_VALIDATOR
 Serializer::SelectValidator (const DBS_FIELD_TYPE itemType)
 {
   switch (itemType)
   {
   case T_BOOL:
-    return &Serializer::ValidateBuffer<DBool>;
+    return &Serializer::ValidateDBoolBuffer;
 
   case T_CHAR:
-    return &Serializer::ValidateBuffer<DChar>;
+    return &Serializer::ValidateDCharBuffer;
 
   case T_DATE:
-    return &Serializer::ValidateBuffer<DDate>;
+    return &Serializer::ValidateDDateBuffer;
 
   case T_DATETIME:
-    return &Serializer::ValidateBuffer<DDateTime>;
+    return &Serializer::ValidateDDateTimeBuffer;
 
   case T_HIRESTIME:
-    return &Serializer::ValidateBuffer<DHiresTime>;
+    return &Serializer::ValidateDHiresTimeBuffer;
 
   case T_INT8:
-    return &Serializer::ValidateBuffer<DInt8>;
-
   case T_INT16:
-    return &Serializer::ValidateBuffer<DInt16>;
-
   case T_INT32:
-    return &Serializer::ValidateBuffer<DInt32>;
-
   case T_INT64:
-    return &Serializer::ValidateBuffer<DInt64>;
-
- case T_UINT8:
-    return &Serializer::ValidateBuffer<DUInt8>;
-
+  case T_UINT8:
   case T_UINT16:
-    return &Serializer::ValidateBuffer<DUInt16>;
-
   case T_UINT32:
-    return &Serializer::ValidateBuffer<DUInt32>;
-
   case T_UINT64:
-    return &Serializer::ValidateBuffer<DUInt64>;
+    return dummy_validator;
 
   case T_REAL:
-    return &Serializer::ValidateBuffer<DReal>;
+    return &Serializer::ValidateDRealBuffer;
 
   case T_RICHREAL:
-    return &Serializer::ValidateBuffer<DRichReal>;
+    return &Serializer::ValidateDRichRealBuffer;
 
   default:
     assert (false);

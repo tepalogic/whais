@@ -323,7 +323,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
 
       logEntry << "The shared library does not provide a '";
       logEntry << WSTDLIB_END_FUNC << "' function.";
-      mLog.Log (LOG_WARNING, logEntry.str ());
+      mLog.Log (LT_WARNING, logEntry.str ());
     }
 
   WLIB_START_LIB_FUNC start = _RC (WLIB_START_LIB_FUNC,
@@ -334,11 +334,11 @@ Session::LoadSharedLib (WH_SHLIB shl)
 
       logEntry << "The shared library does not provide a '";
       logEntry << WSTDLIB_START_FUNC << "' function.";
-      mLog.Log (LOG_WARNING, logEntry.str ());
+      mLog.Log (LT_WARNING, logEntry.str ());
     }
   else if (start () != WOP_OK)
     {
-      mLog.Log (LOG_ERROR, "Failed to initialize the library.");
+      mLog.Log (LT_ERROR, "Failed to initialize the library.");
 
       return false;
     }
@@ -352,7 +352,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
       logEntry << "The shared library does not provide a '";
       logEntry << WSTDLIB_DESC_FUNC << "' function.";
 
-      mLog.Log (LOG_ERROR, logEntry.str ());
+      mLog.Log (LT_ERROR, logEntry.str ());
 
       return false;
     }
@@ -360,7 +360,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
   const WLIB_DESCRIPTION* const lib = describe ();
   if (lib == NULL)
     {
-      mLog.Log (LOG_ERROR, "The shared lib doesn't provide its content.");
+      mLog.Log (LT_ERROR, "The shared lib doesn't provide its content.");
 
       return false;
 
@@ -373,7 +373,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
         {
           assert (false);
 
-          mLog.Log (LOG_WARNING, "Found a NULL procedure description!");
+          mLog.Log (LT_WARNING, "Found a NULL procedure description!");
 
           continue;
         }
@@ -384,7 +384,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
 
       logEntry << "Instaling native procedure '" << proc.name << "'...";
 
-      mLog.Log (LOG_INFO, logEntry.str ());
+      mLog.Log (LT_INFO, logEntry.str ());
 
       vector<uint32_t>   typesOffset;
       vector<StackValue> values;
@@ -713,14 +713,14 @@ Session::NotifyEvent (const uint_t     event,
 
   if (event == ISession::SERVER_STOPED)
     {
-      log.Log (LOG_INFO, "Server asked to shutdown!");
+      log.Log (LT_INFO, "Server asked to shutdown!");
       mServerStopped = true;
     }
   else if (event == ISession::MAX_STACK_COUNT)
     {
       if (extra == NULL)
         {
-          log.Log (LOG_ERROR,
+          log.Log (LT_ERROR,
                    "Could not set the maximum stack size, "
                      "the value is missing.");
           return false;
@@ -729,7 +729,7 @@ Session::NotifyEvent (const uint_t     event,
       std::stringstream s;
       s << "Setting the maximum stack count at " << *extra << '.';
 
-      log.Log (LOG_INFO, s.str ());
+      log.Log (LT_INFO, s.str ());
       mMaxStackCount = *extra;
     }
   else
@@ -895,7 +895,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
       message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "' do to invalid type description.";
 
-      mLog.Log (LOG_ERROR, message);
+      mLog.Log (LT_ERROR, message);
 
       throw InterException (_EXTRA (InterException::INVALID_TYPE_DESC),
                             message.c_str ());
@@ -919,7 +919,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
           message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "'.";
 
-          mLog.Log (LOG_ERROR, message);
+          mLog.Log (LT_ERROR, message);
 
           throw InterException (_EXTRA (InterException::EXTERNAL_FIRST),
                                 message.c_str ());
@@ -942,7 +942,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
           message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' has a different type than its definition.";
 
-          mLog.Log (LOG_ERROR, message);
+          mLog.Log (LT_ERROR, message);
 
           throw InterException (_EXTRA (InterException::EXTERNAL_MISMATCH),
                                 message.c_str ());
@@ -954,7 +954,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
       message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "'.";
 
-      mLog.Log (LOG_ERROR, message);
+      mLog.Log (LT_ERROR, message);
 
       throw InterException (_EXTRA (InterException::DUPLICATE_DEFINITION),
                             message.c_str ());
@@ -996,7 +996,7 @@ Session::DefineProcedure (const uint8_t* const   name,
           message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' do to invalid type description of local value.";
 
-          mLog.Log (LOG_ERROR, message);
+          mLog.Log (LT_ERROR, message);
 
           throw InterException (_EXTRA (InterException::INVALID_TYPE_DESC),
                                 message.c_str ());
@@ -1017,7 +1017,7 @@ Session::DefineProcedure (const uint8_t* const   name,
                           nameLength);
           message += "'.";
 
-          mLog.Log (LOG_ERROR, message);
+          mLog.Log (LT_ERROR, message);
 
           throw InterException (_EXTRA (InterException::EXTERNAL_FIRST),
                                 message.c_str ());
@@ -1044,7 +1044,7 @@ Session::DefineProcedure (const uint8_t* const   name,
           message.insert (message.size (), _RC (const char*, name), nameLength);
           message += "' has a different signature than its definition.";
 
-          mLog.Log (LOG_ERROR, message);
+          mLog.Log (LT_ERROR, message);
 
           throw InterException (_EXTRA (InterException::EXTERNAL_MISMATCH),
                                 message.c_str ());
@@ -1059,7 +1059,7 @@ Session::DefineProcedure (const uint8_t* const   name,
       message.insert (message.size (), _RC (const char*, name), nameLength);
       message += "'.";
 
-      mLog.Log (LOG_ERROR, message);
+      mLog.Log (LT_ERROR, message);
 
       throw InterException (_EXTRA (InterException::DUPLICATE_DEFINITION),
                             message.c_str ());

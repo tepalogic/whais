@@ -49,7 +49,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
 
 
   logEntry << "Loading database: " << inoutDesc.mDbsName;
-  log.Log (LOG_INFO, logEntry.str ());
+  log.Log (LT_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
   inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
@@ -59,14 +59,14 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
                                   );
   logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
            << " milliseconds";
-  dbsLogger->Log (LOG_INFO, logEntry.str ());
-  log.Log (LOG_INFO, logEntry.str ());
+  dbsLogger->Log (LT_INFO, logEntry.str ());
+  log.Log (LT_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
   logEntry << "Request timeout interval is set at " << inoutDesc.mWaitReqTmo
            << " milliseconds.";
-  dbsLogger->Log (LOG_INFO, logEntry.str ());
-  log.Log (LOG_INFO, logEntry.str ());
+  dbsLogger->Log (LT_INFO, logEntry.str ());
+  log.Log (LT_INFO, logEntry.str ());
   logEntry.str (CLEAR_LOG_STREAM);
 
   if (inoutDesc.mDbsName != GlobalContextDatabase ())
@@ -84,7 +84,7 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
                   "session '" << inoutDesc.mDbsName << "' at "
                << inoutDesc.mStackCount << " elements.";
 
-      log.Log (LOG_ERROR, logEntry.str ());
+      log.Log (LT_ERROR, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
       logEntry.str (CLEAR_LOG_STREAM);
     }
@@ -94,15 +94,15 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
        ++it)
     {
       logEntry << "... Loading dynamic native library '" << *it << "'.";
-      dbsLogger->Log (LOG_INFO, logEntry.str ());
-      log.Log (LOG_INFO, logEntry.str ());
+      dbsLogger->Log (LT_INFO, logEntry.str ());
+      log.Log (LT_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
       WH_SHLIB shl = wh_shl_load (it->c_str ());
       if ((shl == INVALID_SHL)
           || ! inoutDesc.mSession->LoadSharedLib (shl))
         {
-          log.Log (LOG_ERROR, "Failed to load the dynamic library.");
+          log.Log (LT_ERROR, "Failed to load the dynamic library.");
         }
     }
 
@@ -111,8 +111,8 @@ LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
        ++it)
     {
       logEntry << "... Loading compiled object unit '" << *it << "'.";
-      dbsLogger->Log (LOG_INFO, logEntry.str ());
-      log.Log (LOG_INFO, logEntry.str ());
+      dbsLogger->Log (LT_INFO, logEntry.str ());
+      log.Log (LT_INFO, logEntry.str ());
       logEntry.str (CLEAR_LOG_STREAM);
 
       CompiledFileUnit unit (it->c_str ());

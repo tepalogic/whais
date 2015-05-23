@@ -109,8 +109,8 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
 {
   static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
-  if (type > LOG_DEBUG)
-    type = LOG_UNKNOW;
+  if (type > LT_DEBUG)
+    type = LT_UNKNOW;
 
   const WTime ctime = wh_get_currtime ();
 

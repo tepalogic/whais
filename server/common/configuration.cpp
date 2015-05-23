@@ -642,7 +642,7 @@ ParseContextSection (Logger&          log,
             {
               logEntry << "Configuration error at line ";
               logEntry << inoutConfigLine << ".\n";
-              log.Log (LOG_CRITICAL, logEntry.str ());
+              log.Log (LT_CRITICAL, logEntry.str ());
 
               return false;
             }
@@ -659,7 +659,7 @@ ParseContextSection (Logger&          log,
                   logEntry << "Unmatched "<< token.at (0);
                   logEntry << " in configuration file at line ";
                   logEntry << inoutConfigLine << ".\n";
-                  log.Log (LOG_CRITICAL, logEntry.str ());
+                  log.Log (LT_CRITICAL, logEntry.str ());
 
                   return false;
                 }
@@ -785,7 +785,7 @@ ParseContextSection (Logger&          log,
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -803,7 +803,7 @@ ParseContextSection (Logger&          log,
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
                    logEntry << inoutConfigLine << ".\n";
-                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   log.Log (LT_CRITICAL, logEntry.str ());
 
                    return false;
                  }
@@ -826,7 +826,7 @@ ParseContextSection (Logger&          log,
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -844,7 +844,7 @@ ParseContextSection (Logger&          log,
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
                    logEntry << inoutConfigLine << ".\n";
-                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   log.Log (LT_CRITICAL, logEntry.str ());
 
                    return false;
                  }
@@ -876,7 +876,7 @@ ParseContextSection (Logger&          log,
                logEntry << inoutConfigLine << ". ";
                logEntry << "The root password for this database was ";
                logEntry << "already set.\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -886,7 +886,7 @@ ParseContextSection (Logger&          log,
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -903,7 +903,7 @@ ParseContextSection (Logger&          log,
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
                    logEntry << inoutConfigLine << ".\n";
-                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   log.Log (LT_CRITICAL, logEntry.str ());
 
                    return false;
                  }
@@ -920,7 +920,7 @@ ParseContextSection (Logger&          log,
                logEntry << inoutConfigLine << ". ";
                logEntry << "The user password for this database was ";
                logEntry << "already set.\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -931,7 +931,7 @@ ParseContextSection (Logger&          log,
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ".\n";
-               log.Log (LOG_CRITICAL, logEntry.str ());
+               log.Log (LT_CRITICAL, logEntry.str ());
 
                return false;
              }
@@ -948,7 +948,7 @@ ParseContextSection (Logger&          log,
                    logEntry << "Unmatched "<< token.at (0);
                    logEntry << " in configuration file at line ";
                    logEntry << inoutConfigLine << ".\n";
-                   log.Log (LOG_CRITICAL, logEntry.str ());
+                   log.Log (LT_CRITICAL, logEntry.str ());
 
                    return false;
                  }
@@ -982,7 +982,7 @@ ParseContextSection (Logger&          log,
         {
           logEntry << "At line " << inoutConfigLine << ": Don't know what to do ";
           logEntry << "with '" << token <<"'.\n";
-          log.Log (LOG_CRITICAL, logEntry.str ());
+          log.Log (LT_CRITICAL, logEntry.str ());
 
           return false;
         }
@@ -1006,7 +1006,7 @@ PrepareConfigurationSection (Logger& log)
     {
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The number of maximum simultaneous connections per "
 		     "interface set by default.");
         }
@@ -1015,14 +1015,14 @@ PrepareConfigurationSection (Logger& log)
 
   logStream << "Maximum simultaneous connections per interface set at ";
   logStream << gMainSettings.mMaxConnections << ".";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.mCipher == UNSET_VALUE)
     {
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG, "The communication cipher is set by default.");
+          log.Log (LT_DEBUG, "The communication cipher is set by default.");
         }
       gMainSettings.mCipher = FRAME_ENCTYPE_PLAIN;
     }
@@ -1051,14 +1051,14 @@ PrepareConfigurationSection (Logger& log)
   }
   logStream << "'.";
 
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.mMaxFrameSize == UNSET_VALUE)
     {
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The maximum communication frame size set by default.");
         }
       gMainSettings.mMaxFrameSize = DEFAULT_FRAME_SIZE;
@@ -1069,50 +1069,50 @@ PrepareConfigurationSection (Logger& log)
       logStream << "The maximum frame size set to a invalid value. ";
       logStream << "The value should be set between " << MIN_FRAME_SIZE;
       logStream << " and " << MAX_FRAME_SIZE << " bytes.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
 
   logStream << "Maximum communication frame size set to ";
   logStream << gMainSettings.mMaxFrameSize <<" bytes.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.mTableCacheBlockSize == UNSET_VALUE)
     {
       gMainSettings.mTableCacheBlockSize = DEFAULT_TABLE_CACHE_BLOCK_SIZE;
       if (gMainSettings.mShowDebugLog)
-        log.Log (LOG_DEBUG, "The table cache block size is set by default.");
+        log.Log (LT_DEBUG, "The table cache block size is set by default.");
     }
 
   if (gMainSettings.mTableCacheBlockSize < MIN_TABLE_CACHE_BLOCK_SIZE)
     {
       gMainSettings.mTableCacheBlockSize = MIN_TABLE_CACHE_BLOCK_SIZE;
-      log.Log (LOG_INFO,
+      log.Log (LT_INFO,
                "The table cache block size was set to less than minimum. ");
     }
   logStream << "Table cache block size set at ";
   logStream << gMainSettings.mTableCacheBlockSize << " bytes.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.mTableCacheBlockCount == UNSET_VALUE)
     {
       gMainSettings.mTableCacheBlockCount = DEFAULT_TABLE_CACHE_BLOCK_COUNT;
       if (gMainSettings.mShowDebugLog)
-        log.Log (LOG_DEBUG, "The table cache block count is set by default.");
+        log.Log (LT_DEBUG, "The table cache block count is set by default.");
     }
   if (gMainSettings.mTableCacheBlockCount < MIN_TABLE_CACHE_BLOCK_COUNT)
     {
       gMainSettings.mTableCacheBlockCount = MIN_TABLE_CACHE_BLOCK_COUNT;
-      log.Log (LOG_INFO,
+      log.Log (LT_INFO,
                "The table cache block count was set to less than minimum. ");
     }
 
   logStream << "Table cache block count set at ";
   logStream << gMainSettings.mTableCacheBlockCount << '.';
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //VLS
@@ -1121,7 +1121,7 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mVLBlockSize = DEFAULT_VL_BLOCK_SIZE;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The table VL store cache block size is set by default.");
         }
     }
@@ -1129,12 +1129,12 @@ PrepareConfigurationSection (Logger& log)
   if (gMainSettings.mVLBlockSize < MIN_VL_BLOCK_SIZE)
     {
       gMainSettings.mVLBlockSize = MIN_VL_BLOCK_SIZE;
-      log.Log (LOG_INFO,
+      log.Log (LT_INFO,
                "The table cache block size was set to less than minimum. ");
     }
   logStream << "Table VL store cache block size set at ";
   logStream << gMainSettings.mVLBlockSize << " bytes.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   if (gMainSettings.mVLBlockCount == UNSET_VALUE)
@@ -1142,7 +1142,7 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mVLBlockCount = DEFAULT_VL_BLOCK_COUNT;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The table VL store cache block count is set by default.");
         }
     }
@@ -1151,13 +1151,13 @@ PrepareConfigurationSection (Logger& log)
     {
       gMainSettings.mVLBlockCount = MIN_VL_BLOCK_COUNT;
       log.Log (
-          LOG_INFO,
+          LT_INFO,
           "The table VL store he block count was set to less than minimum."
               );
     }
   logStream << "Table VL store cache block count set at ";
   logStream << gMainSettings.mVLBlockCount << '.';
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Temporal values
@@ -1166,18 +1166,18 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mTempValuesCache = DEFAULT_TEMP_CACHE;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG, "The temporal values cache is set by default");
+          log.Log (LT_DEBUG, "The temporal values cache is set by default");
         }
     }
   if (gMainSettings.mTempValuesCache < MIN_TEMP_CACHE)
     {
       gMainSettings.mTempValuesCache = MIN_TEMP_CACHE;
-      log.Log (LOG_INFO,
+      log.Log (LT_INFO,
                "The temporal values cache was set to less than minimum.");
     }
   logStream << "The temporal values cache set at ";
   logStream << gMainSettings.mTempValuesCache << " bytes.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Authentication timeout
@@ -1186,14 +1186,14 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mAuthTMO = DEFAULT_AUTH_TMO_MS;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The authentication timeout value is set by default.");
         }
     }
 
   logStream << "The authentication timeout value is set at ";
   logStream << gMainSettings.mAuthTMO << " milliseconds.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Syncer wake up
@@ -1202,20 +1202,20 @@ PrepareConfigurationSection (Logger& log)
       gMainSettings.mSyncWakeup = DEFAULT_SYNC_WAKEUP_MS;
       if (gMainSettings.mShowDebugLog)
         {
-          log.Log (LOG_DEBUG,
+          log.Log (LT_DEBUG,
                    "The data syncer wake up interval is set by default value.");
         }
     }
 
   logStream << "The data syncer wake up interval is set at ";
   logStream << gMainSettings.mSyncWakeup << " milliseconds.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Sync data valid interval
   logStream << "The default data flush interval interval is set at ";
   logStream << gMainSettings.mSyncInterval << " milliseconds.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   //Request wait timeout
@@ -1223,12 +1223,12 @@ PrepareConfigurationSection (Logger& log)
     {
       gMainSettings.mWaitReqTmo = DEFAULT_WAIT_TMO_MS;
       if (gMainSettings.mShowDebugLog)
-        log.Log (LOG_DEBUG, "The request waiting timeout is set by default.");
+        log.Log (LT_DEBUG, "The request waiting timeout is set by default.");
     }
 
   logStream << "The request waiting timeout is set at ";
   logStream << gMainSettings.mWaitReqTmo << " milliseconds.";
-  log.Log (LOG_INFO, logStream.str ());
+  log.Log (LT_INFO, logStream.str ());
   logStream.str (CLEAR_LOG_STREAM);
 
   return true;
@@ -1247,7 +1247,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "A user password for the database ";
       logStream << "section starting at line ";
       logStream << inoutDesc.mConfigLine << " was not set.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
@@ -1257,7 +1257,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "A root password for the database ";
       logStream << "section starting at line ";
       logStream << inoutDesc.mConfigLine << " was not set.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
@@ -1267,7 +1267,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
       logStream << " does not have a '" << gEntDBSName << "' entry.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
@@ -1277,7 +1277,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
       logStream << " does not have a '" << gEntWorkDir << "' entry.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
@@ -1288,7 +1288,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "entry '" << gEntWorkDir << "' points to an inexistent "
                    "directory '" << inoutDesc.mDbsDirectory << "'.";
 
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }
@@ -1298,7 +1298,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
       logStream << " does not have a '" << gEntLogFile << "' entry.";
-      log.Log (LOG_ERROR, logStream.str ());
+      log.Log (LT_ERROR, logStream.str ());
 
       return false;
     }

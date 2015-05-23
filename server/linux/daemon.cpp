@@ -1,12 +1,17 @@
-
 #include <errno.h>
 #include <assert.h>
 #include <signal.h>
 #include <memory.h>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <syslog.h>
+#include <fcntl.h>
 #include <stdexcept>
+#include <sstream>
+#include <iostream>
+
 
 #include "whais.h"
 
@@ -19,6 +24,9 @@
 
 using namespace std;
 using namespace whais;
+
+static const char* sConfigFile = "/etc/whais.conf";
+static const char* sPidFile    = NULL;
 
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
@@ -45,6 +53,7 @@ clean_frameworks (FileLogger& log)
             }
 
           ostringstream logEntry;
+
           logEntry << "Closing session '";
           logEntry << dbsIterator->mDbsName << "'.\n";
           log.Log (LT_INFO, logEntry.str ());
@@ -84,9 +93,6 @@ clean_frameworks (FileLogger& log)
     DBSShoutdown ();
 }
 
-
-#ifndef ARCH_WINDOWS_VC
-
 static void
 sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 {
@@ -115,53 +121,28 @@ set_signals ()
  return true;
 }
 
-#else
 
-static BOOL WINAPI
-ServerStopHandler (DWORD)
-{
-  StopServer ();
-
-  return TRUE;
-}
-
-static BOOL
-set_signals ()
-{
-  return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
-}
-
-#endif
-
-
-int
-main (int argc, char** argv)
+static bool
+boot_server ()
 {
   auto_ptr<ifstream>   config (NULL);
   auto_ptr<FileLogger> glbLog (NULL);
 
-  if (argc < 2)
+  config.reset (new ifstream (sConfigFile,
+                              ios_base::in | ios_base::binary));
+  if (! config->good ())
     {
-      cerr << "Main configuration file was not passed as argument!\n";
+      syslog (LOG_CRIT,
+              "Could not open configuration file '%s'.",
+              sConfigFile);
 
-      return EINVAL;
-    }
-  else
-    {
-      config.reset (new ifstream (argv[1], ios_base::in | ios_base::binary));
-      if (! config->good ())
-        {
-          cerr << "Could not open the configuration file ";
-          cerr << '\'' << argv[1] << "'.\n";
-
-          return EINVAL;
-        }
+      return false;
     }
 
   if (! whs_init ())
     {
-      cerr << "Could not initialize the network socket framework.\n";
-      return ENOTSOCK;
+      syslog (LOG_CRIT, "Could not initialize the network socket framework.");
+      return false;
     }
 
   try
@@ -169,40 +150,54 @@ main (int argc, char** argv)
       uint_t sectionLine = 0;
       if (SeekAtConfigurationSection (*config, sectionLine) == false)
         {
-          cerr << "Cannot find the CONFIG section in configuration file!\n";
-          return -1;
+          syslog (LOG_CRIT,
+                  "Cannot find the CONFIG section in configuration file!");
+          return false;
         }
 
       assert (sectionLine > 0);
 
-      if (ParseConfigurationSection (*config, sectionLine, cerr) == false)
-        return -1;
+      ostringstream log;
+      if ( ! ParseConfigurationSection (*config, sectionLine, log))
+        {
+          syslog (LOG_CRIT, log.str ().c_str ());
+
+          return false;
+        }
 
       glbLog.reset (new FileLogger (GetAdminSettings ().mLogFile.c_str ()));
-
   }
   catch (ios_base::failure& e)
   {
-      cerr << "Unexpected error during configuration read:\n";
-      cerr << e.what () << endl;
+      syslog (LOG_CRIT, "Unexpected error: %s.", e.what ());
 
-      return -1;
+      return false;
   }
   catch (...)
   {
-    cerr << "Unknown error encountered during main configuration reading!\n";
-    return -1;
+      syslog (LOG_CRIT,
+              "Unexpected error encoutrered during main "
+                "configuration file read.");
+      return false;
   }
 
   try
   {
+
     if (! set_signals ())
-      throw std::runtime_error ("Signals handlers could not be overwritten.");
+      {
+        syslog (LOG_CRIT, "Signals handlers could not be overwritten.");
+        return false;
+      }
 
     vector<DBSDescriptors>::iterator dbsIterator;
 
+    syslog (LOG_INFO,
+            "Parsing the main configuration section. "
+               "Please follow the configured log files for more information.");
+
     if ( ! PrepareConfigurationSection (*glbLog))
-      return -1;
+      return false;
 
     uint_t configLine = 0;
     config->clear ();
@@ -217,10 +212,10 @@ main (int argc, char** argv)
         dbs.mSyncInterval = GetAdminSettings ().mSyncInterval;
 
         if ( ! ParseContextSection (*glbLog, *config, configLine, dbs))
-          return -1;
+          return false;
 
         if ( ! PrepareContextSection (*glbLog, dbs))
-          return -1;
+          return false;
 
         ostringstream   logEntry;
 
@@ -247,7 +242,7 @@ main (int argc, char** argv)
     if (databases.size () == 0)
       {
         glbLog->Log (LT_CRITICAL, "No session were configured.");
-        return -1;
+        return false;
       }
     else if (databases[0].mDbsName != GlobalContextDatabase ())
       {
@@ -281,7 +276,17 @@ main (int argc, char** argv)
          dbsIterator != databases.end ();
          ++dbsIterator)
       {
+        syslog (LOG_INFO,
+                "Loading database '%s' ... ",
+                dbsIterator->mDbsName.c_str ());
         LoadDatabase (*glbLog, *dbsIterator);
+      }
+
+    syslog (LOG_INFO, "All databases loaded!");
+    if (sPidFile != NULL)
+      {
+        ofstream pidFile (sPidFile, ios_base::out | ios_base::trunc);
+        pidFile << _SC (uint_t, getpid ()) << endl;
       }
 
     StartServer (*glbLog, databases);
@@ -289,7 +294,6 @@ main (int argc, char** argv)
   catch (Exception& e)
   {
     ostringstream logEntry;
-    //TODO: Handle this exception with more specific err messages
 
     logEntry << "Unable to deal with error condition.\n";
     if (e.Description ())
@@ -304,15 +308,18 @@ main (int argc, char** argv)
     glbLog->Log (LT_CRITICAL, logEntry.str ());
 
     clean_frameworks (*glbLog);
+    whs_clean ();
 
-    return -1;
+    return false;
   }
   catch (std::bad_alloc&)
   {
     glbLog->Log (LT_CRITICAL, "OUT OF MEMORY!!!");
-    clean_frameworks (*glbLog);
 
-    return -1;
+    clean_frameworks (*glbLog);
+    whs_clean ();
+
+    return false;
   }
   catch (std::exception& e)
   {
@@ -321,23 +328,141 @@ main (int argc, char** argv)
     logEntry << "General system failure: " << e.what () << endl;
 
     glbLog->Log (LT_CRITICAL, logEntry.str ());
-    clean_frameworks (*glbLog);
 
-    return -1;
+    clean_frameworks (*glbLog);
+    whs_clean ();
+
+    return false;
   }
   catch (...)
   {
     assert (false);
 
     glbLog->Log (LT_CRITICAL, "Unknown exception!");
-    clean_frameworks (*glbLog);
 
-    return -1;
+    return false;
   }
 
   clean_frameworks (*glbLog);
   whs_clean ();
 
-  return 0;
+  return true;
 }
 
+
+static void
+print_usage ()
+{
+  cout << "Whais Server daemon written by Iulian POPA\n";
+  cout << "Use:\n"
+          "  --pidfile file   Write the pid of damon into the 'file'. \n"
+          "  --conf    file   Use the 'file' rather than '/etc/whais.conf'\n"
+          "                   as a configuration file.\n"
+          "  --mask mask      Use the specified mask (octal 0zzz and hexa\n"
+          "                   0xZZZ forms are also accepted) as the daemon\n"
+          "                   process mask (default is 0).\n"
+          "  --skip-fork      Skip the forking step.\n"
+          "  --help, -h       Print this help.\n";
+}
+
+int
+main (int argc, char** argv)
+{
+  uint16_t  mask     = 0;
+  bool      skipFork = false;
+
+  for (int i = 1; i < argc; ++i)
+    {
+      if (strcmp (argv[i], "--pidfile") == 0)
+        {
+          if (++i >= argc)
+            {
+              cerr << "The parameter for '--pidfile' is missing.\n";
+              return EINVAL;
+            }
+          sPidFile = argv[i];
+        }
+      else if (strcmp (argv[i], "--conf") == 0)
+        {
+          if (++i >= argc)
+            {
+              cerr << "The parameter for '--conf' is missing.\n";
+              return EINVAL;
+            }
+          sConfigFile = argv[i];
+        }
+      else if (strcmp (argv[i], "--mask") == 0)
+        {
+          if (++i >= argc)
+            {
+              cerr << "The parameter for '--mask' is missing.\n";
+              return EINVAL;
+            }
+          mask = atoi (argv[i]);
+        }
+      else if (strcmp (argv[i], "--skip-fork") == 0)
+        skipFork = true;
+
+      else if ((strcmp (argv[i], "--help") == 0)
+               || (strcmp (argv[i], "-h") == 0))
+        {
+          print_usage ();
+          return 0;
+        }
+      else
+        {
+          cerr << "I don't know what to do with '" << argv[i] << "'.\n";
+          return -1;
+        }
+    }
+
+  if ( ! skipFork)
+    {
+      const pid_t forkPid = fork ();
+      if (forkPid < 0)
+        {
+          openlog ("whaisd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);
+          syslog (LOG_CRIT, "Failed to fork (%d).", errno);
+          closelog ();
+
+          return -1;
+        }
+
+      else if (forkPid > 0)
+        return 0;
+    }
+
+  openlog ("whaisd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);
+  umask (mask);
+  if ( ! skipFork)
+    {
+      close (STDIN_FILENO);
+      close (STDOUT_FILENO);
+      close (STDERR_FILENO);
+
+      if ((open ("/dev/null", O_RDONLY) < 0)
+          || (open ("/dev/null", O_RDONLY) < 0)
+          || (open ("/dev/null", O_RDONLY) < 0))
+        {
+          syslog (LOG_CRIT,
+                  "Failed to redirect the standard file descriptors to "
+                    "to '/dev/null' (%d).", errno);
+          closelog ();
+          return -1;
+        }
+
+    }
+
+  if ( !  boot_server ())
+    {
+      syslog (LOG_CRIT, "Server stopped due to error conditions.");
+      closelog ();
+
+      return -1;
+    }
+
+  syslog (LOG_INFO, "Server stopped on request.");
+  closelog ();
+
+  return 0;
+}

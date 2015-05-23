@@ -116,19 +116,13 @@ public:
     store_le_int32 (node, _RC (uint8_t*, to));
   }
 
-  template<typename T> static bool
-  ValidateBuffer (const uint8_t* const buffer)
-  {
-    return true;
-  }
-
-  template<> static bool ValidateBuffer<DBool> (const uint8_t* const buffer)
+  static bool ValidateDBoolBuffer (const uint8_t* const buffer)
   {
     return (buffer[0] == 0) || (buffer[0] == 1);
   }
 
 
-  template<> static bool ValidateBuffer<DChar> (const uint8_t* const buffer)
+  static bool ValidateDCharBuffer (const uint8_t* const buffer)
   {
     try
     {
@@ -143,7 +137,7 @@ public:
   }
 
 
-  template<> static bool ValidateBuffer<DDate> (const uint8_t* const buffer)
+  static bool ValidateDDateBuffer (const uint8_t* const buffer)
   {
     try
     {
@@ -161,7 +155,7 @@ public:
   }
 
 
-  template<> static bool ValidateBuffer<DDateTime> (const uint8_t* const buffer)
+  static bool ValidateDDateTimeBuffer (const uint8_t* const buffer)
   {
     try
     {
@@ -182,7 +176,7 @@ public:
   }
 
 
-  template<> static bool ValidateBuffer<DHiresTime> (const uint8_t* const buffer)
+  static bool ValidateDHiresTimeBuffer (const uint8_t* const buffer)
   {
     try
     {
@@ -204,7 +198,7 @@ public:
   }
 
 
-  template<> static bool ValidateBuffer<DReal> (const uint8_t* const buffer)
+  static bool ValidateDRealBuffer (const uint8_t* const buffer)
   {
     const uint_t integerSize    = 5;
     const uint_t fractionalSize = 3;
@@ -240,7 +234,7 @@ public:
   }
 
 
-  template<> static bool ValidateBuffer<DRichReal> (const uint8_t* const buffer)
+  static bool ValidateDRichRealBuffer (const uint8_t* const buffer)
   {
     const uint_t integerSize    = 8;
     const uint_t fractionalSize = 6;

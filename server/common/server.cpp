@@ -121,7 +121,7 @@ public:
               }
 
             mUsersPool[c].mSocket.Close ();
-            sMainLog->Log (LOG_WARNING,
+            sMainLog->Log (LT_WARNING,
                            "Terminated authentication as it took too long...");
             continue ;
           }
@@ -133,7 +133,7 @@ public:
 
         mUsersPool[c].mSocket.Close ();
         mUsersPool[c].mDesc->mLogger->Log (
-                    LOG_WARNING,
+                    LT_WARNING,
                     "Terminated connection due to a long wait for a request..."
                                            );
       }
@@ -235,15 +235,15 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
 
-      sMainLog->Log (LOG_ERROR, logEntry.str ());
+      sMainLog->Log (LT_ERROR, logEntry.str ());
   }
   catch (ConnectionException& e)
   {
       if (client->mDesc != NULL)
-        client->mDesc->mLogger->Log (LOG_ERROR, e.Message ());
+        client->mDesc->mLogger->Log (LT_ERROR, e.Message ());
 
       else
-        sMainLog->Log (LOG_ERROR, e.Message ());
+        sMainLog->Log (LT_ERROR, e.Message ());
   }
   catch (FileException& e)
   {
@@ -260,7 +260,7 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
@@ -278,11 +278,11 @@ client_handler_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
 
-      client->mDesc->mLogger->Log (LOG_ERROR, logEntry.str ());
+      client->mDesc->mLogger->Log (LT_ERROR, logEntry.str ());
   }
   catch (std::bad_alloc&)
   {
-      sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+      sMainLog->Log (LT_CRITICAL, "OUT OF MEMORY!!!");
 
       StopServer ();
   }
@@ -292,13 +292,13 @@ client_handler_routine (void* args)
 
       logEntry << "General system failure: " << e.what () << endl;
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (...)
   {
-      sMainLog->Log (LOG_CRITICAL, "Unknown exception!");
+      sMainLog->Log (LT_CRITICAL, "Unknown exception!");
       StopServer ();
   }
 
@@ -394,7 +394,7 @@ listener_routine (void* args)
                        listener->mInterface);
         logEntry << '@' << listener->mPort << ".\n";
 
-        sMainLog->Log (LOG_INFO, logEntry.str ());
+        sMainLog->Log (LT_INFO, logEntry.str ());
       }
 
     listener->mSocket = Socket (listener->mInterface,
@@ -415,7 +415,7 @@ listener_routine (void* args)
               client.Write (busyResp, sizeof busyResp);
 
               sMainLog->Log (
-                    LOG_INFO,
+                    LT_INFO,
                     "Connection refused because of unavailable slots."
                             );
             }
@@ -435,7 +435,7 @@ listener_routine (void* args)
                 logEntry <<"Extra: " << e.Code () << " (";
                 logEntry << e.File () << ':' << e.Line () << ").\n";
 
-                sMainLog->Log (LOG_ERROR, logEntry.str ());
+                sMainLog->Log (LT_ERROR, logEntry.str ());
               }
         }
         acceptUserConnections = sAcceptUsersConnections;
@@ -456,13 +456,13 @@ listener_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (std::bad_alloc&)
   {
-      sMainLog->Log (LOG_CRITICAL, "OUT OF MEMORY!!!");
+      sMainLog->Log (LT_CRITICAL, "OUT OF MEMORY!!!");
 
       StopServer ();
   }
@@ -472,13 +472,13 @@ listener_routine (void* args)
 
       logEntry << "General system failure: " << e.what () << endl;
 
-      sMainLog->Log (LOG_CRITICAL, logEntry.str ());
+      sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
   }
   catch (...)
   {
-      sMainLog->Log (LOG_CRITICAL, "Listener received unexpected exception!");
+      sMainLog->Log (LT_CRITICAL, "Listener received unexpected exception!");
       StopServer ();
   }
 }
@@ -490,7 +490,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   sDbsDescriptors = &databases;
   sMainLog        = &log;
 
-  log.Log (LOG_DEBUG, "Server started!");
+  log.Log (LT_DEBUG, "Server started!");
 
   assert (databases.size () > 0);
 
@@ -516,12 +516,12 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
           ostringstream logBuffer;
           logBuffer << "Failed to start listener for '"
                     << server.mListens[index].mInterface << '\'';
-          log.Log (LOG_ERROR, logBuffer.str ());
+          log.Log (LT_ERROR, logBuffer.str ());
         }
     }
 
   ticks_routine ();
-  log.Log (LOG_DEBUG, "Ticks routine has stopped.");
+  log.Log (LT_DEBUG, "Ticks routine has stopped.");
 
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);
@@ -529,7 +529,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   LockRAII<Lock> holder (sClosingLock);
   sListeners = NULL;
 
-  log.Log (LOG_DEBUG, "Server stopped!");
+  log.Log (LT_DEBUG, "Server stopped!");
 }
 
 
@@ -541,7 +541,7 @@ StopServer ()
   if ((sListeners == NULL)  || (sMainLog == NULL))
     return; //Ignore! The server probably did not even start.
 
-  sMainLog->Log (LOG_INFO, "Server asked to shutdown.");
+  sMainLog->Log (LT_INFO, "Server asked to shutdown.");
   sAcceptUsersConnections = false;
   sServerStopped          = true;
 

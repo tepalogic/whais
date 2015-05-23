@@ -34,17 +34,15 @@ namespace whais
 {
 
 
-
 enum LOG_TYPE
 {
-  LOG_UNKNOW,
-  LOG_CRITICAL,
-  LOG_ERROR,
-  LOG_WARNING,
-  LOG_INFO,
-  LOG_DEBUG
+  LT_UNKNOW,
+  LT_CRITICAL,
+  LT_ERROR,
+  LT_WARNING,
+  LT_INFO,
+  LT_DEBUG
 };
-
 
 
 class Logger

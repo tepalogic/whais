@@ -1509,7 +1509,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DBool value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DBool> (fieldData))
+                      && ! Serializer::ValidateDBoolBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1536,7 +1536,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DChar value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DChar> (fieldData))
+                      && ! Serializer::ValidateDCharBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1563,7 +1563,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DDate value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DDate> (fieldData))
+                      && ! Serializer::ValidateDDateBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1590,7 +1590,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DDateTime value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DDateTime> (fieldData))
+                      && ! Serializer::ValidateDDateTimeBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1617,7 +1617,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DHiresTime value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DHiresTime> (fieldData))
+                      && ! Serializer::ValidateDHiresTimeBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1643,44 +1643,19 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                 {
                   DInt8 value;
 
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DInt8> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
-
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
 
                   BTree (*indexNodeMgrs[field]).InsertKey(
                                   T_BTreeKey<DInt8> (value, row),
                                   &dummyNode,
-                                  &dummyKey
-                                                            );
+                                  &dummyKey                                                           );
                 }
                 break;
 
               case T_INT16:
                 {
                   DInt16 value;
-
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DInt16> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
 
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
@@ -1697,18 +1672,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                 {
                   DInt32 value;
 
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DInt32> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
-
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
 
@@ -1723,18 +1686,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
               case T_INT64:
                 {
                   DInt64 value;
-
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DInt64> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
 
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
@@ -1752,7 +1703,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DReal value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DReal> (fieldData))
+                      && ! Serializer::ValidateDRealBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1779,7 +1730,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                   DRichReal value;
 
                   if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DRichReal> (fieldData))
+                      && ! Serializer::ValidateDRichRealBuffer (fieldData))
                     {
                       fixCallback (FIX_INFO,
                                    "Detected invalid value of field '%s' at row"
@@ -1804,18 +1755,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                 {
                   DUInt8 value;
 
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DUInt8> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
-
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
 
@@ -1830,18 +1769,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
               case T_UINT16:
                 {
                   DUInt16 value;
-
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DUInt16> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
 
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
@@ -1858,18 +1785,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                 {
                   DUInt32 value;
 
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DUInt32> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
-
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
 
@@ -1885,18 +1800,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                 {
                   DUInt64 value;
 
-                  if ( ! isNullValue
-                      && ! Serializer::ValidateBuffer<DUInt64> (fieldData))
-                    {
-                      fixCallback (FIX_INFO,
-                                   "Detected invalid value of field '%s' at row"
-                                   " %u. Set to NULL.",
-                                   fieldsDescs.get () +
-                                     fds[field].NameOffset (),
-                                   row);
-                      isNullValue = true;
-                    }
-
                   if ( ! isNullValue)
                     Serializer::Load (fieldData, &value);
 
@@ -1907,6 +1810,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                                                             );
                 }
                 break;
+
               default:
                 throw DBSException (
                     _EXTRA (DBSException::GENERAL_CONTROL_ERROR)

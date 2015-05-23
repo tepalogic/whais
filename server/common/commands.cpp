@@ -448,7 +448,7 @@ cmd_execute_procedure (ClientConnection& conn)
           std::ostringstream logEntry;
 
           logEntry << "Failed to find procedure '" << procName << "'.";
-          session.GetLogger ().Log (LOG_ERROR, logEntry.str ());
+          session.GetLogger ().Log (LT_ERROR, logEntry.str ());
         }
         break;
 
@@ -461,7 +461,7 @@ cmd_execute_procedure (ClientConnection& conn)
           logEntry << "Exception " << e.Code () << ": " << e.Description ()
                    << std::endl << e.Message ();
 
-          session.GetLogger ().Log (LOG_ERROR, logEntry.str ());
+          session.GetLogger ().Log (LT_ERROR, logEntry.str ());
         }
         break;
       default:

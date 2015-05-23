@@ -163,7 +163,7 @@ write_log( SessionStack& stack, ISession& session)
       text.RawRead( 0, textRawSize, utf8Reserved);
       utf8Reserved[textRawSize] = 0;
 
-      session.GetLogger().Log (LOG_INFO, _RC (const char*, utf8Reserved));
+      session.GetLogger().Log (LT_INFO, _RC (const char*, utf8Reserved));
       result = true;
     }
   else
@@ -183,7 +183,7 @@ write_log( SessionStack& stack, ISession& session)
 
           offset += chunkSize;
         }
-      session.GetLogger().Log (LOG_INFO, logEntry.str ());
+      session.GetLogger().Log (LT_INFO, logEntry.str ());
       result = true;
     }
 
