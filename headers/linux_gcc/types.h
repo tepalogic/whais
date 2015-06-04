@@ -61,6 +61,7 @@ typedef uint8_t       bool_t;
 
 #define INVALID_SOCKET  ((int)-1)
 #define INVALID_FILE    ((int)-1)
+#define FILE_LOCKED     ((int)-2)
 #define INVALID_SHL     NULL
 
 #define SHL_EXPORT_SYMBOL __attribute__ ((visibility ("default")))

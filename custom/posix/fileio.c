@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "whais.h"
 #include "whais_fileio.h"
@@ -39,6 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 WH_FILE
 whf_open (const char* const file, uint_t mode)
 {
+  struct flock fl;
+
   int         openMode = O_LARGEFILE;
   const int   accMode  = (S_IRUSR | S_IWUSR | S_IRGRP);
   WH_FILE     result   = -1;
@@ -53,7 +57,7 @@ whf_open (const char* const file, uint_t mode)
     openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
   openMode |= (mode & WH_FILEDIRECT) ? O_DIRECT : 0;
-  openMode |= (mode & WH_FILESYNC) ? O_SYNC : 0;
+  openMode |= (mode & WH_FILESYNC) ? O_DSYNC : 0;
 
   if ((mode & WH_FILERDWR) == WH_FILERDWR)
     openMode |= O_RDWR;
@@ -65,16 +69,22 @@ whf_open (const char* const file, uint_t mode)
     }
 
   result = open (file, openMode, accMode);
-  return ((result < 0) ? INVALID_FILE : result);
-}
 
+  if (result < 0)
+    return INVALID_FILE;
 
-WH_FILE
-whf_dup (WH_FILE hnd)
-{
-  WH_FILE result = dup (hnd);
+  fl.l_type   = ((mode & WH_FILEWRITE) != 0) ? F_WRLCK : F_RDLCK;
+  fl.l_whence = SEEK_SET;
+  fl.l_start  = 0;
+  fl.l_len    = 0;
 
-  return (result < 0) ? INVALID_FILE: result;
+  if (fcntl (result, F_SETLK, &fl) < 0)
+    {
+      close (result);
+      result = FILE_LOCKED;
+    }
+
+  return result;
 }
 
 

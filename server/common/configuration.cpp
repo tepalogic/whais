@@ -398,7 +398,7 @@ ParseConfigurationSection (ifstream&    config,
             {
               errOut << "At line " << inoutConfigLine << "the data sync "
                         "interval timeout parameter should be a positive "
-                        "integer value (currently set to "
+                        "integer value (was set to "
                       << gMainSettings.mSyncInterval << " ).\n";
               return false;
             }
@@ -419,7 +419,7 @@ ParseConfigurationSection (ifstream&    config,
           {
             errOut << "At line " << inoutConfigLine << "the data sync interval "
                       "timeout parameter should be an integer value bigger "
-                      "than 0 (currently set to "
+                      "than 0 (was set to "
                    << gMainSettings.mSyncWakeup << " ).\n";
             return false;
           }
@@ -683,7 +683,7 @@ ParseContextSection (Logger&          log,
            {
              cerr << "At line " << inoutConfigLine << "the request waiting "
                      "timeout parameter should be an integer value bigger "
-                     "than 0 (currently set to "
+                     "than 0 (was set to "
                   << gMainSettings.mWaitReqTmo << " ).\n";
              return false;
            }
@@ -699,14 +699,12 @@ ParseContextSection (Logger&          log,
              return false;
            }
 
-
           output.mSyncInterval = atoi (token.c_str ());
           if (output.mSyncInterval < -1)
            {
              cerr << "At line " << inoutConfigLine << "the data sync interval "
                      "timeout parameter should be a positive integer value "
-                     "(currently set to "
-                  << gMainSettings.mSyncInterval << " ).\n";
+                     "(was set to " << gMainSettings.mSyncInterval << " ).\n";
              return false;
            }
         }
@@ -1284,9 +1282,9 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
   else if (! whf_file_exists (inoutDesc.mDbsDirectory.c_str ()))
     {
       logStream << "Database section starting line ";
-      logStream << inoutDesc.mConfigLine;
-      logStream << "entry '" << gEntWorkDir << "' points to an inexistent "
-                   "directory '" << inoutDesc.mDbsDirectory << "'.";
+      logStream << inoutDesc.mConfigLine<< " entry '" << gEntWorkDir
+                << "' points to an inexistent directory '"
+                << inoutDesc.mDbsDirectory << "'.";
 
       log.Log (LT_ERROR, logStream.str ());
 

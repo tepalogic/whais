@@ -45,6 +45,7 @@ static FileLogger*                 sMainLog;
 static bool                        sAcceptUsersConnections;
 static bool                        sServerStopped;
 static Lock                        sClosingLock;
+static int32_t                     sListenersMaxFails;
 
 
 class Listener
@@ -230,7 +231,7 @@ client_handler_routine (void* args)
       logEntry << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
-        logEntry << "Message:\n\t" << e.Message () << endl;
+        logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
@@ -252,10 +253,10 @@ client_handler_routine (void* args)
       logEntry << "Client session exception: Unable to deal "
                   "with error condition.\n";
       if (e.Description ())
-        logEntry << "Description:\n\t" << e.Description () << endl;
+        logEntry << "Description:\n" << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
-        logEntry << "Message:\n\t" << e.Message () << endl;
+        logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
@@ -270,10 +271,10 @@ client_handler_routine (void* args)
 
       logEntry << "Error condition encountered: \n";
       if (e.Description ())
-        logEntry << "Description:\n\t" << e.Description () << endl;
+        logEntry << "Description:\n" << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
-        logEntry << "Message:\n\t" << e.Message () << endl;
+        logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
@@ -317,7 +318,7 @@ ticks_routine ()
   uint_t syncElapsedTicks = 0, reqCheckElapsedTics = 0;
   do
     {
-      if (sServerStopped)
+      if ((sServerStopped) || (sListenersMaxFails <= 0))
         return ;
 
       wh_sleep (SLEEP_TICK_RESOLUTION);
@@ -351,13 +352,19 @@ ticks_routine ()
 
               hnd.SyncTableContent (t);
             }
+
+          if ( ! sServerStopped)
+            {
+              (*sDbsDescriptors)[i].mDbs->SyncAllTablesContent ();
+            }
+
           (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks ();
         }
 
         if (syncElapsedTicks >= syncWakeup)
           syncElapsedTicks = 0;
 
-        if (sServerStopped)
+        if ((sServerStopped) || (sListenersMaxFails <= 0))
           return ;
 
         for (uint_t i = 0;
@@ -427,16 +434,18 @@ listener_routine (void* args)
                 assert (e.Description () != NULL);
                 ostringstream logEntry;
 
-                logEntry << "Description:\n\t" << e.Description () << endl;
+                logEntry << "Description:\n" << e.Description () << endl;
 
                 if ( ! e.Message ().empty ())
-                  logEntry << "Message:\n\t" << e.Message () << endl;
+                  logEntry << "Message:\n" << e.Message () << endl;
 
                 logEntry <<"Extra: " << e.Code () << " (";
                 logEntry << e.File () << ':' << e.Line () << ").\n";
 
                 sMainLog->Log (LT_ERROR, logEntry.str ());
               }
+
+            break ;
         }
         acceptUserConnections = sAcceptUsersConnections;
       }
@@ -448,10 +457,10 @@ listener_routine (void* args)
       ostringstream logEntry;
 
       logEntry << "Unable to deal with this error condition at this point.\n";
-      logEntry << "Description:\n\t" << e.Description () << endl;
+      logEntry << "Description:\n" << e.Description () << endl;
 
       if ( ! e.Message ().empty ())
-        logEntry << "Message:\n\t" << e.Message () << endl;
+        logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
@@ -481,6 +490,8 @@ listener_routine (void* args)
       sMainLog->Log (LT_CRITICAL, "Listener received unexpected exception!");
       StopServer ();
   }
+
+  wh_atomic_fetch_dec32 (&sListenersMaxFails);
 }
 
 
@@ -497,6 +508,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   const ServerSettings& server = GetAdminSettings ();
 
   auto_array<Listener> listeners (server.mListens.size ());
+  sListenersMaxFails = listeners.Size ();
 
   sListeners = &listeners;
 

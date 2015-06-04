@@ -47,9 +47,6 @@ extern "C"
 WH_FILE
 whf_open (const char* const file, uint_t mode);
 
-WH_FILE
-whf_dup (WH_FILE hnd);
-
 bool_t
 whf_read (WH_FILE hnd, uint8_t* dstBuffer, uint_t size);
 

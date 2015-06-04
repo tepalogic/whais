@@ -168,8 +168,7 @@ FileContainer::FileContainer (const char*       baseName,
       if (unit != 0)
         append_int_to_str (unit, baseName);
 
-      File container (baseName.c_str (), openMode);
-      mFilesHandles.push_back (container);
+      mFilesHandles.push_back (File (baseName.c_str (), openMode));
     }
 
   assert (mFilesHandles.size () == unitsCount);

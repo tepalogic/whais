@@ -208,6 +208,7 @@ insert_null_field_value (BTree&                  tree,
 ROW_INDEX
 PrototypeTable::AddRow (const bool skipThreadSafety)
 {
+  MarkRowModification ();
   LockRAII<Lock> _l (mRowsSync, skipThreadSafety);
 
   uint64_t lastRowPosition = mRowsCount * mRowSize;
@@ -215,8 +216,6 @@ PrototypeTable::AddRow (const bool skipThreadSafety)
 
   uint8_t dummyValue[128];
   memset (dummyValue, 0xFF, sizeof dummyValue);
-
-  MarkRowModification ();
 
   mRowCache.FlushItem (mRowsCount - 1);
 
@@ -1005,6 +1004,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 {
   T currentValue;
 
+  MarkRowModification ();
   LockRAII<Lock> syncHolder (mRowsSync, ! threadSafe);
   if (row == mRowsCount)
     AddRow (true);
@@ -1014,8 +1014,6 @@ PrototypeTable::StoreEntry (const ROW_INDEX   row,
 
   if (currentValue == value)
     return; //Nothing to change
-
-  MarkRowModification ();
 
   const uint8_t      bitsSet  = ~0;
   FieldDescriptor&   desc     = GetFieldDescriptorInternal (field);
@@ -1098,8 +1096,8 @@ PrototypeTable::StoreEntry (const ROW_INDEX        row,
 
   assert (Serializer::Size (T_TEXT, false) == 2 * sizeof (uint64_t));
 
-  LockRAII<Lock> syncHolder (mRowsSync, ! threadSafe);
   MarkRowModification ();
+  LockRAII<Lock> syncHolder (mRowsSync, ! threadSafe);
 
   DText::StrategyRAII sMgr = value.GetStrategyRAII ();
   ITextStrategy& s = sMgr;
@@ -1232,6 +1230,7 @@ PrototypeTable::StoreEntry (const ROW_INDEX        row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
+  MarkRowModification ();
   LockRAII<Lock> syncHolder (mRowsSync, ! threadSafe);
 
   DArray::StrategyRAII sMgr = value.GetStrategyRAII ();
@@ -1245,9 +1244,6 @@ PrototypeTable::StoreEntry (const ROW_INDEX        row,
     }
   else if (row > mRowsCount)
     throw DBSException (_EXTRA (DBSException::ROW_NOT_ALLOCATED));
-
-
-  MarkRowModification ();
 
   uint64_t      newFirstEntry     = ~0;
   uint64_t      newFieldValueSize = 0;
@@ -2649,6 +2645,7 @@ PrototypeTable::MarkRowModification ()
   if ( ! mRowModified)
     {
       mRowModified = true;
+      mDbs.NotifyDatabaseUpdate ();
       MakeHeaderPersistent ();
     }
 }

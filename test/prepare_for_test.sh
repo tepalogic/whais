@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size ./logs
+rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size ./test_auto_restore ./logs
 
 if [ "$1" == "--clean" ]; then
 	echo "Clean done!" ;
@@ -15,8 +15,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-#echo 'add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
-echo 'add users password TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
+echo 'add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to create 'administrator' database"
 	exit 1
@@ -39,6 +38,13 @@ create_empty_test_db echo_proc_db
 create_empty_test_db test_exec_db
 create_empty_test_db test_list_db
 create_empty_test_db test_list_db_frame_size
+create_empty_test_db test_auto_restore
+
+echo 'add test_restore field_text TEXT field_int INT8; quit' |  wcmd -u test_auto_restore -d ./test_auto_restore > /dev/null
+if [ $? -ne 0 ]; then
+	echo "Failed to add tables into 'test_auto_restore' database"
+	exit 1
+fi
 
 
 mkdir ./obj

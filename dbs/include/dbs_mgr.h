@@ -61,7 +61,9 @@ public:
                          DBSFieldDescriptor* inoutFields) = 0;
   virtual void DeleteTable (const char* const name) = 0;
 
+  virtual void SyncAllTablesContent () = 0;
   virtual void SyncTableContent (const TABLE_INDEX index) = 0;
+  virtual void NotifyDatabaseUpdate () = 0;
 
   virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields) = 0;

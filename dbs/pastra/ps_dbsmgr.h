@@ -68,7 +68,9 @@ public:
 
   virtual void DeleteTable (const char* const name);
 
+  virtual void SyncAllTablesContent ();
   virtual void SyncTableContent (const TABLE_INDEX index);
+  virtual void NotifyDatabaseUpdate ();
 
   virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields);
@@ -113,10 +115,11 @@ private:
   Lock                    mSync;
   const std::string       mDbsLocationDir;
   const std::string       mName;
+  const std::string       mFileName;
+  File                    mFile;
   TABLES                  mTables;
   int                     mCreatedTemporalTables;
-
-
+  bool                    mNeedsSync;
 };
 
 
@@ -157,10 +160,8 @@ struct DbsManager
             "Cannot create a database manager with the specified parameters."
                            );
       }
-
     NormalizeFilePath (mDBSSettings.mWorkDir, true);
     NormalizeFilePath (mDBSSettings.mTempDir, true);
-
   }
 
   Lock            mSync;

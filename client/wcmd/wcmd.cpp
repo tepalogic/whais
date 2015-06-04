@@ -795,11 +795,12 @@ main (const int argc, char *argv[])
                   string password;
 
                   cout << "Password"
-                      << ((GetUserId () == 0) ? "(root): " : ": ");
+                      << ((GetUserId () == 0) ? "(administrator): " : ": ");
 
                   wh_disable_echo ();
                   getline (cin, password);
                   wh_enable_echo ();
+
                   cout << endl;
 
                   SetUserPassword (password.c_str ());

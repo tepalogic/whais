@@ -118,8 +118,9 @@ typedef uint8_t       bool_t;
 
 
 
-#define INVALID_FILE        INVALID_HANDLE_VALUE
-#define INVALID_SHL         NULL
+#define INVALID_FILE    INVALID_HANDLE_VALUE
+#define FILE_LOCKED     ((HANDLE)-2)
+#define INVALID_SHL     NULL
 
 #define SHL_EXPORT_SYMBOL __declspec (dllexport)
 #define SHL_IMPORT_SYMBOL __declspec (dllimport)

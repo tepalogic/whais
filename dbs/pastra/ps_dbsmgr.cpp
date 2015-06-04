@@ -76,24 +76,25 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mSync (),
     mDbsLocationDir (locationDir),
     mName (name),
+    mFileName (mDbsLocationDir + mName + DBS_FILE_EXT),
+    mFile (mFileName.c_str (),
+           WH_FILEOPEN_EXISTING | WH_FILERDWR | WH_FILESYNC),
     mTables (),
-    mCreatedTemporalTables (0)
+    mCreatedTemporalTables (0),
+    mNeedsSync (false)
 {
-  string fileName = mDbsLocationDir + mName + DBS_FILE_EXT;
-  File   inputFile (fileName.c_str (), WH_FILEOPEN_EXISTING | WH_FILERDWR);
-
-  const uint_t      fileSize = inputFile.Size ();
+  const uint_t      fileSize = mFile.Size ();
   auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t*          buffer = fileContent.get ();
 
-  inputFile.Seek (0, WH_SEEK_BEGIN);
-  inputFile.Read (buffer, fileSize);
+  mFile.Seek (0, WH_SEEK_BEGIN);
+  mFile.Read (buffer, fileSize);
 
   if (memcmp (buffer, DBS_FILE_SIGNATURE, sizeof PS_DBS_SIGNATURE_LEN) != 0)
     {
       throw DBSException (_EXTRA (DBSException::INAVLID_DATABASE),
                           "File '%s' does not contains a valid signature.",
-                          fileName.c_str ());
+                          mFileName.c_str ());
     }
 
   uint64_t headerFlags = load_le_int64 (buffer + PS_DBS_FLAGS_OFF);
@@ -106,7 +107,6 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
                           name.c_str ());
     }
   headerFlags &= ~PS_FLAG_TO_REPAIR;
-  headerFlags |= PS_FLAG_NOT_CLOSED;
   store_le_int64 (headerFlags, buffer + PS_DBS_FLAGS_OFF);
 
   const uint16_t versionMaj = load_le_int16 (buffer + PS_DBS_VER_MAJ_OFF);
@@ -137,8 +137,8 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     }
 
   //Before we continue set the 'in use' flag.
-  inputFile.Seek (0, WH_SEEK_BEGIN);
-  inputFile.Write (buffer, fileSize);
+  mFile.Seek (0, WH_SEEK_BEGIN);
+  mFile.Write (buffer, fileSize);
 
   uint16_t tablesCount = load_le_int16 (buffer + PS_DBS_NUM_TABLES_OFF);
 
@@ -161,8 +161,11 @@ DbsHandler::DbsHandler (const DbsHandler& source)
     mSync (),
     mDbsLocationDir (source.mDbsLocationDir),
     mName (source.mName),
+    mFileName (source.mFileName),
+    mFile (source.mFile),
     mTables (source.mTables),
-    mCreatedTemporalTables (source.mCreatedTemporalTables)
+    mCreatedTemporalTables (source.mCreatedTemporalTables),
+    mNeedsSync (source.mNeedsSync)
 {
   assert (mCreatedTemporalTables == 0);
 }
@@ -388,13 +391,43 @@ DbsHandler::DeleteTable (const char* const name)
 
 
 void
+DbsHandler::SyncAllTablesContent ()
+{
+  LockRAII<Lock> _l (mSync);
+
+  if ( ! mNeedsSync )
+    return ;
+
+  TABLES::iterator it = mTables.begin ();
+
+  while (it != mTables.end ())
+    {
+      if (it->second != NULL)
+        it->second->Flush ();
+
+      ++it;
+    }
+
+  mNeedsSync = false;
+
+  uint8_t flags[sizeof (uint64_t)];
+
+  mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
+  mFile.Read (flags, sizeof flags);
+
+  store_le_int64 (load_le_int64 (flags) & ~PS_FLAG_NOT_CLOSED,
+                  flags);
+
+  mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
+  mFile.Write (flags, sizeof flags);
+}
+
+void
 DbsHandler::SyncTableContent (const TABLE_INDEX index)
 {
-  TABLE_INDEX iterator = index;
-
   LockRAII<Lock> syncHolder (mSync);
 
-  if (iterator >= mTables.size ())
+  if (index >= mTables.size ())
     {
       throw DBSException (_EXTRA (DBSException::TABLE_NOT_FUND),
                           "Cannot retrieve table by index %u (count %u).",
@@ -402,8 +435,8 @@ DbsHandler::SyncTableContent (const TABLE_INDEX index)
                           mTables.size ());
     }
 
-  TABLES::iterator it = mTables.begin ();
-
+  TABLE_INDEX      iterator = index;
+  TABLES::iterator it       = mTables.begin ();
   while (iterator-- > 0)
     {
       assert (it != mTables.end ());
@@ -413,6 +446,28 @@ DbsHandler::SyncTableContent (const TABLE_INDEX index)
 
   if (it->second != NULL)
     it->second->Flush ();
+}
+
+
+void
+DbsHandler::NotifyDatabaseUpdate ()
+{
+  LockRAII<Lock> _l (mSync);
+
+  if (mNeedsSync)
+    return ;
+
+  mNeedsSync = true;
+
+  uint8_t flags[sizeof (uint64_t)];
+
+  mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
+  mFile.Read (flags, sizeof flags);
+
+  store_le_int64 (load_le_int64 (flags) | PS_FLAG_NOT_CLOSED, flags);
+
+  mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
+  mFile.Write (flags, sizeof flags);
 }
 
 
@@ -446,6 +501,8 @@ DbsHandler::Discard ()
 void
 DbsHandler::SyncToFile ()
 {
+  mNeedsSync = true;
+
   const uint8_t zero = 0;
 
   uint8_t header[PS_DBS_HEADER_SIZE];

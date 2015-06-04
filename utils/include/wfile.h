@@ -54,7 +54,7 @@ public:
   explicit File (const char* name, uint_t mode = 0);
 
   File (const File& src);
-  File& operator= (const File&);
+  File& operator= (const File& src);
 
   ~File ();
 
@@ -73,7 +73,6 @@ public:
   void     Size (const uint64_t size);
 
   void     Close ();
-
 
 private:
   static const uint64_t UNKNOWN_SIZE = 0xFFFFFFFFFFFFFFFFull;

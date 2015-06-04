@@ -38,7 +38,13 @@ File::File (const char* name, uint_t mode)
 {
   mHandle = whf_open (name, mode);
 
-  if (mHandle == INVALID_FILE)
+  if (mHandle == FILE_LOCKED)
+    {
+      throw FileException (_EXTRA (whf_last_error ()),
+                           "Cannot be open file '%s'. It's already opened.",
+                           name);
+    }
+  else if (mHandle == INVALID_FILE)
     {
       throw FileException (_EXTRA (whf_last_error ()),
                            "Could not open file '%s'.",
@@ -50,22 +56,17 @@ File::File (const char* name, uint_t mode)
 
 
 File::File (const File &src) :
-  mHandle (whf_dup (src.mHandle)),
+  mHandle (src.mHandle),
   mFileSize (src.mFileSize)
 {
-  if (mHandle == INVALID_FILE)
-    {
-      throw FileException (_EXTRA (whf_last_error ()),
-                           "Failed to duplicate file (%d) handle.",
-                           mHandle);
-    }
+  _CC (File&, src).mHandle = INVALID_FILE;
 }
 
 
 File::~File ()
 {
   /* Close it only if is not already closed */
-  if (mHandle != INVALID_FILE)
+  if ((mHandle != INVALID_FILE) && (mHandle != FILE_LOCKED))
     whf_close (mHandle);
 }
 
@@ -174,7 +175,8 @@ File::Size (const uint64_t size)
 void
 File::Close ()
 {
-  assert (mHandle != INVALID_FILE);
+  if ((mHandle == INVALID_FILE) || (mHandle == FILE_LOCKED))
+    return ;
 
   if ( ! whf_close (mHandle))
     {
@@ -195,13 +197,8 @@ File::operator= (const File &src)
 
   Close (); // Close the old handler
 
-  mHandle = whf_dup (src.mHandle);
-  if (mHandle == INVALID_FILE)
-    {
-      throw FileException (_EXTRA (whf_last_error ()),
-                           "Failed to duplicate file (%d) handle.",
-                           src.mHandle);
-    }
+  mHandle = src.mHandle;
+  _CC (File&, src).mHandle = INVALID_FILE;
 
   return *this;
 }

@@ -60,6 +60,13 @@ whf_open (const char* const file, uint_t mode)
                        dwFlagsAndAttr,
                        NULL);
 
+  if ((result == INVALID_FILE)
+      && (GetLastError () == ERROR_SHARING_VIOLATION))
+    {
+      result = FILE_LOCKED;
+    }
+
+
   return result;
 }
 
