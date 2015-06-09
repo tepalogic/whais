@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 
 #include "utils/endianness.h"
+#include "utils/license.h"
 
 #include "commands.h"
 #include "stack_cmds.h"
@@ -490,6 +491,53 @@ cmd_ping_sever (ClientConnection& conn)
   conn.SendCmdResponse (CMD_PING_SERVER_RSP);
 }
 
+
+static void
+cmd_hello_server (ClientConnection& conn)
+{
+  static const char largeRspMarker = 0xCC;
+
+  static char serverDescription[1024];
+
+  if (strlen (serverDescription) == 0)
+    {
+      std::ostringstream s;
+      displayBanner (s, "Whais Database Server", WVER_MAJ, WVER_MIN);
+
+      if (snprintf (serverDescription,
+                    sizeof serverDescription,
+                    "%s%s\n%s",
+                    s.str ().c_str (),
+                    DescribeDbsEngineVersion (),
+                    DescribeInterpreterEngineVersion ()) >=
+          _SC (int, sizeof serverDescription))
+        {
+          serverDescription[1] = largeRspMarker;
+        }
+    }
+
+  if (conn.DataSize () != 0)
+    {
+      throw ConnectionException (_EXTRA (0),
+                                 "Hello command has invalid format.");
+    }
+
+  if ((serverDescription[0] == largeRspMarker)
+      || (strlen (serverDescription) >= (conn.MaxSize () - sizeof (uint32_t))))
+    {
+      store_le_int32 (WCS_LARGE_RESPONSE, conn.Data ());
+      conn.DataSize (sizeof (uint32_t));
+    }
+  else
+    {
+      store_le_int32 (WCS_OK, conn.Data ());
+      strcpy (_RC (char*, conn.Data ()) + sizeof (uint32_t), serverDescription);
+      conn.DataSize (sizeof (uint32_t) + strlen (serverDescription) + 1);
+    }
+
+  conn.SendCmdResponse (CMD_HELLO_SERVER_RSP);
+}
+
 static void
 cmd_list_globals (ClientConnection& conn)
 {
@@ -850,7 +898,8 @@ static COMMAND_HANDLER saUserCmds[] =
         cmd_read_stack,                  // CMD_READ_STACK
         cmd_update_stack,                // CMD_UPDATE_STACK
         cmd_execute_procedure,           // CMD_EXEC_PROC
-        cmd_ping_sever                   // CMD_PING_SERVER
+        cmd_ping_sever,                  // CMD_PING_SERVER
+        cmd_hello_server                 // CMD_HELLO_SERVER
     };
 
 

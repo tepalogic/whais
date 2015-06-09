@@ -14,14 +14,15 @@ wpastra_SRC:=pastra/ps_values.cpp pastra/ps_container.cpp pastra/ps_table.cpp\
 		   	pastra/ps_btree_index.cpp pastra/ps_btree_fields.cpp pastra/ps_templatetable.cpp\
 		   	pastra/ps_exception.cpp pastra/ps_valtranslator.cpp
 
+wpastra_cmn_DEF:=WVER_MAJ=1 WVER_MIN=0
 wpastra_LIB:=utils/wslutils custom/wslcustom
 wpastra_SHL:=custom/wcommon
-wpastra_DEF:=USE_DBS_SHL DBS_EXPORTING
+wpastra_DEF:=USE_DBS_SHL DBS_EXPORTING $(wpastra_cmn_DEF)
 	   
 wpastra_MAJ=.1
 wpastra_MIN=.0
 
-wslpastra_DEF:=
+wslpastra_DEF:=$(wpastra_cmn_DEF)
 wslpastra_SRC:=$(wpastra_SRC)
 wslpastra_INC:=$(wpastra_INC)
 

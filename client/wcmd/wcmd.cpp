@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 #include "utils/enc_des.h"
-
+#include "utils/license.h"
 #include "dbs/dbs_mgr.h"
 #include "client/whais_connector.h"
 
@@ -45,12 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace whais;
 
-
-
-#define VER_MAJOR       1
-#define VER_MINOR       0
-
-
+static const char sProgramName[] = "Whais Commander";
+static const char sProgramDesc[] = "A database maintenance tool.";
 
 static const char usageDescription[] =
 "Usage: wcmd --create db_name [OPTIONS]\n"
@@ -93,7 +89,7 @@ static const char usageDescription[] =
 "    -t, --validate         Check the database integrity.\n"
 "    -f, --auto_yes         Auto answer with 'yes' to all questions related\n"
 "                           to database validation.\n"
-"    -v, --verbose level    Set the verbosity level. Level values:\n"
+"    --verbose level       Set the verbosity level. Level values:\n"
 "                            0: No out put.\n"
 "                            1: Print the status of the executed command.\n"
 "                            2: Print the error messages in addition.\n"
@@ -104,6 +100,7 @@ static const char usageDescription[] =
 "    -s, --script file      Execute the commands from the supplied file,\n"
 "                           rather to execute interactively.\n"
 "\n"
+"    --nologo               Do not display startup information.\n"
 "    -l, --license          Prints license terms.\n"
 "\n"
 "Examples:\n"
@@ -118,9 +115,6 @@ static const char descExtExit[] = "Exit this program.\n"
                                     "Usage:\n"
                                     "  quit";
 static bool sFinishInteraction = false;
-
-
-
 
 #ifndef ARCH_WINDOWS_VC
 
@@ -181,15 +175,7 @@ set_signals ()
 static void
 PrintHelpUsage ()
 {
-  cout << "Whais Commander v" << VER_MAJOR << '.';
-
-  cout.width (2); cout.fill ('0');
-  cout << VER_MINOR;
-  cout.width (0);
-
-  cout <<
-    " by Iulian POPA (popaiulian@gmail.com)\n";
-
+  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
   cout << usageDescription;
 }
 
@@ -197,6 +183,8 @@ PrintHelpUsage ()
 static void
 PrintWrongUsage (const char* const arg)
 {
+  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
+
   if (arg != NULL)
     cerr << "Cannot handle argument '" << arg << "' correctly. Use --help!\n";
 
@@ -503,6 +491,8 @@ main (const int argc, char *argv[])
   bool          useDB               = false;
   bool          autoYes             = false;
   bool          checkDbForErrors    = false;
+  bool          showLogo            = true;
+  bool          showLicense         = false;
   const char*   scriptFile = NULL;
   string        dbDirectory;
 
@@ -516,7 +506,6 @@ main (const int argc, char *argv[])
   if (argc == currentArg)
     {
       PrintWrongUsage (NULL);
-
       return EINVAL;
     }
 
@@ -624,8 +613,7 @@ main (const int argc, char *argv[])
 
           SetWorkingDirectory (argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-v") == 0) ||
-               (strcmp (argv[currentArg], "--verbose" ) == 0))
+      else if (strcmp (argv[currentArg], "--verbose" ) == 0)
         {
           ++currentArg;
           if (currentArg >= argc)
@@ -656,6 +644,7 @@ main (const int argc, char *argv[])
               return EINVAL;
             }
           scriptFile = argv [currentArg++];
+          showLogo = false;
         }
       else if ((strcmp (argv[currentArg], "-m") == 0) ||
                (strcmp (argv[currentArg], "--file_size" ) == 0))
@@ -666,7 +655,6 @@ main (const int argc, char *argv[])
               ( ! SetMaximumFileSize (argv[currentArg])))
             {
               PrintWrongUsage (argv[currentArg - 1]);
-
               return EINVAL;
             }
           else
@@ -686,13 +674,31 @@ main (const int argc, char *argv[])
 
           checkDbForErrors = true;
         }
+      else if (strcmp (argv[currentArg], "--nologo") == 0)
+        {
+          ++currentArg,
+          showLogo = false;
+        }
+      else if ((strcmp (argv[currentArg], "-l") == 0)
+               || (strcmp (argv[currentArg], "--license") == 0))
+        {
+          ++currentArg,
+          showLicense = true;
+        }
       else
         {
           cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
-
           return EINVAL;
         }
     }
+
+  if (showLicense)
+    {
+      displayLicenseInformation (cout, sProgramName, sProgramDesc);
+      return 0;
+    }
+  else if (showLogo)
+    displayBanner (cout, "Whais Commander", WVER_MAJ, WVER_MIN);
 
   if (! (useDB || createDB || removeDB))
     {
@@ -761,6 +767,9 @@ main (const int argc, char *argv[])
 
   try
   {
+      if (! IsOnlineDatabase() && showLogo)
+        cout << DescribeDbsEngineVersion() << endl << endl;
+
       if (checkDbForErrors)
         {
           assert (useDB && ! IsOnlineDatabase ());

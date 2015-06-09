@@ -32,6 +32,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whais {
 namespace wod {
 
+
+static const char sProgramName[] = "Whais Object Dumper";
+
+
 class CmdLineParser
 {
 public:
@@ -61,6 +65,8 @@ private:
   const char*   mSourceFile;
   std::ostream* mOutStream;
   bool          mShowHelp;
+  bool          mShowLogo;
+  bool          mShowLicense;
 
 };
 

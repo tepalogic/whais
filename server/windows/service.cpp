@@ -21,6 +21,9 @@
 using namespace std;
 using namespace whais;
 
+static const char sProgramName[] = "Whais";
+static const char sProgramDesc[] = "A database server Windows service.";
+
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
 
@@ -409,11 +412,13 @@ boot_server (const char* configFile, ostream& errOut)
 static void
 print_usage ()
 {
-  cout << sServiceDesc << " written by Iulian POPA\n";
+  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
   cout << "Use:\n"
           "  /r file Register the service and use 'file' for configuration.\n"
           "  /u      Unregister the service.\n"
           "  /h      Print this help message.\n";
+          "  /v      Print the version of this program.\n"
+          "  /l      Print informations about the license.\n";
 }
 
 

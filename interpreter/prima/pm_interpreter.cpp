@@ -26,6 +26,7 @@
 #include <iostream>
 #include <sstream>
 #include <map>
+#include <memory.h>
 
 #include "utils/wthread.h"
 #include "dbs/dbs_mgr.h"
@@ -151,6 +152,23 @@ CleanInterpreter (const bool forced)
   gmNameSpaces.clear ();
 }
 
+
+INTERP_SHL const char*
+DescribeInterpreterEngineVersion ()
+{
+  static char description[64];
+
+  if (strlen (description) == 0)
+    {
+      snprintf (description,
+                sizeof description,
+                "Interpreter Engine: PRIMA version: %u.%02u",
+                WVER_MAJ,
+                WVER_MIN);
+    }
+
+  return description;
+}
 
 
 

@@ -12,6 +12,7 @@
 
 #include "dbs/dbs_mgr.h"
 #include "utils/logger.h"
+#include "utils/license.h"
 
 #include "../common/configuration.h"
 #include "../common/loader.h"
@@ -19,6 +20,9 @@
 
 using namespace std;
 using namespace whais;
+
+static const char sProgramName[] = "Whais";
+static const char sProgramDesc[] = "A database server (generic).";
 
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
@@ -139,6 +143,9 @@ main (int argc, char** argv)
 {
   auto_ptr<ifstream>   config (NULL);
   auto_ptr<FileLogger> glbLog (NULL);
+
+  displayLicenseInformation (cout, sProgramName, sProgramDesc);
+  cout << endl << endl;
 
   if (argc < 2)
     {
@@ -289,7 +296,6 @@ main (int argc, char** argv)
   catch (Exception& e)
   {
     ostringstream logEntry;
-    //TODO: Handle this exception with more specific err messages
 
     logEntry << "Unable to deal with error condition.\n";
     if (e.Description ())

@@ -16,7 +16,8 @@ endif
 
 whais_cmn_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
 			common/connection.cpp common/commands.cpp common/stack_cmds.cpp
-whais_cmn_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL
+whais_cmn_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL\
+				WVER_MAJ=1 WVER_MIN=1
 
 
 whais_SRC:=common/server_main.cpp

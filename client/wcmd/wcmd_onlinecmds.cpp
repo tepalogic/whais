@@ -522,6 +522,55 @@ cmd_ping_exit:
 }
 
 
+static const char greetShowDesc[]    = "Greet the database sever. ";
+static const char greetShowDescExt[] =
+  "Greet the database server to get a description of it.\n"
+  "Usage:\n"
+  "  greet";
+
+
+static bool
+cmdGreet (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+{
+  const char*   servAns = NULL;
+  WH_CONNECTION conHdl  = NULL;
+  uint32_t      cs      = WConnect (GetRemoteHostName ().c_str (),
+                                    GetConnectionPort ().c_str (),
+                                    GetWorkingDB ().c_str (),
+                                    GetUserPassword ().c_str (),
+                                    GetUserId (),
+                                    DEFAULT_FRAME_SIZE,
+                                    &conHdl);
+  if (cs != WCS_OK)
+    goto cmd_greet_exit;
+
+  cs = WGreetServer (conHdl, &servAns);
+
+cmd_greet_exit:
+  if (cs != WCS_OK)
+    {
+      WClose (conHdl);
+      cout << wcmd_translate_status (cs) << endl;
+
+      return false;
+    }
+  else
+    {
+      assert (servAns != NULL);
+
+      if (strlen (servAns) == 0)
+        cout << "No answer from server.\n";
+
+      else
+        cout << "Server says:\n" << servAns << endl;
+
+      WClose (conHdl);
+    }
+
+  return true;
+}
+
+
 
 static const char execShowDesc[]    = "Execute a procedure. ";
 static const char execShowDescExt[] =
@@ -602,6 +651,13 @@ AddOnlineTableCommands ()
   entry.mDesc         = pingShowDesc;
   entry.mExtendedDesc = pingShowDescExt;
   entry.mCmd          = cmdPing;
+
+
+  entry.mShowStatus   = false;
+  entry.mName         = "greet";
+  entry.mDesc         = greetShowDesc;
+  entry.mExtendedDesc = greetShowDescExt;
+  entry.mCmd          = cmdGreet;
 
   RegisterCommand (entry);
 

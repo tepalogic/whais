@@ -31,13 +31,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "compiler/whaisc.h"
 #include "utils/tokenizer.h"
+#include "utils/license.h"
 #include "whc_cmdline.h"
-
-
 
 using namespace std;
 
 
+static const char sProgramName[] = "Whais Compiler";
+static const char sProgramDesc[] = "A tool to create procedures for data"
+                                   " record handling.";
 
 namespace whais {
 namespace whc {
@@ -62,6 +64,8 @@ CmdLineParser::CmdLineParser (int argc, char** argv)
     mOutputFileOwn (true),
     mPreprocessOnly (false),
     mBuildDependencies (false),
+    mShowLogo (false),
+    mShowLicense (false),
     mInclusionPaths (),
     mReplacementTags ()
 {
@@ -169,6 +173,18 @@ CmdLineParser::Parse ()
 
           mOutputFileOwn = false;
         }
+      else if (isStrEqual (mArgs[index], "-v")
+               || isStrEqual (mArgs[index], "--version"))
+        {
+          mShowLogo = true;
+          ++index;
+        }
+      else if (isStrEqual (mArgs[index], "-l")
+               || isStrEqual (mArgs[index], "--license"))
+        {
+          mShowLicense = true;
+          ++index;
+        }
       else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
         {
           if (mSourceFile != NULL)
@@ -230,6 +246,16 @@ CmdLineParser::CheckArguments ()
   if (mShowHelp)
     {
       DisplayUsage ();
+      exit (0);
+    }
+  else if (mShowLicense)
+    {
+      displayLicenseInformation (cout, sProgramName, sProgramDesc);
+      exit (0);
+    }
+  else if (mShowLogo)
+    {
+      displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
       exit (0);
     }
   else if (mSourceFile == NULL)
@@ -308,17 +334,8 @@ CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
-  unsigned int ver_maj, ver_min;
-  wh_compiler_libver (&ver_maj, &ver_min);
-
-  cout << "Whais Compiler v" << ver_maj << '.';
-
-  cout.width (2); cout.fill ('0');
-  cout << ver_min;
-  cout.width (0);
-
+  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
   cout <<
-    " by Iulian POPA (popaiulian@gmail.com)\n"
     "Usage: whc [options] input_file\n"
     "Options:\n"
     "-D 'tag=text'   Define a replace tag (e.g -D 'user_name=The Coder).\n"
@@ -329,7 +346,9 @@ CmdLineParser::DisplayUsage () const
     "--make_deps     Generate the dependencies list of this file (in a 'make'\n"
     "                recognized way) on the standard output.\n"
     "-o file         Use 'file' as the compilation output file.\n"
-    "-P              Preprocess only. Display the result on standard output.\n";
+    "-P              Preprocess only. Display the result on standard output.\n"
+    "-v, --version   Show version information.\n"
+    "-l, --license   Print the license details.\n";
 }
 
 

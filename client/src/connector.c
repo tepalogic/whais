@@ -656,7 +656,40 @@ WPingServer (const WH_CONNECTION hnd)
 
 exit_ping_server:
   return cs;
-};
+}
+
+
+uint_t
+WGreetServer (const WH_CONNECTION hnd, const char** outAnswer)
+{
+  struct INTERNAL_HANDLER* const hnd_ = (struct INTERNAL_HANDLER*)hnd;
+
+  uint_t   cs   = WCS_OK;
+  uint16_t type = CMD_INVALID_RSP;
+
+  if ((hnd == NULL) || (outAnswer == NULL))
+    return WCS_INVALID_ARGS;
+
+  else if (hnd_->buildingCmd != CMD_INVALID)
+    return WCS_INCOMPLETE_CMD;
+
+  set_data_size (hnd_, 0);
+  if ((cs = send_command (hnd_, CMD_HELLO_SERVER)) != WCS_OK)
+    goto exit_greet_server;
+
+  if ((cs = recieve_answer (hnd_, &type)) != WCS_OK)
+    goto exit_greet_server;
+
+  if (type != CMD_HELLO_SERVER_RSP)
+    cs = WCS_INVALID_FRAME;
+
+  if ( cs == WCS_OK)
+    *outAnswer = (const char*)(data (hnd) + sizeof (uint32_t));
+
+exit_greet_server:
+  return cs;
+}
+
 
 static uint_t
 list_globals (struct INTERNAL_HANDLER* const hnd,

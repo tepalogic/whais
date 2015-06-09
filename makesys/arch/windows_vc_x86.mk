@@ -47,6 +47,8 @@ DEFINES+=INLINE=__inline
 DEFINES+=_CRT_SECURE_NO_WARNINGS _USING_V110_SDK71_
 DEFINES+=snprintf=_snprintf
 DEFINES+=QWORDS_PER_OP=4
+DEFINES+=WOS=Windows
+DEFINES+=WARCH=x86_32bit
 
 #translate input files
 arch_translate_path=$(subst /,\\,$(1))

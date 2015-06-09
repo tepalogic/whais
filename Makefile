@@ -39,8 +39,6 @@ ifeq ($(MEMORY_TRACE),yes)
 DEFINES+=ENABLE_MEMORY_TRACE=1
 endif
 
-DEFINES+=$(ARCH)=0
-
 include ./makesys/arch/$(ARCH).mk
 include ./makesys/defs.mk
 include $(foreach unit, $(ALL_UNITS), ./$(unit)/unit.mk) 

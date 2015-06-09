@@ -205,6 +205,9 @@ INTERP_SHL void
 CleanInterpreter (const bool force = false);
 
 
+INTERP_SHL const char*
+DescribeInterpreterEngineVersion ();
+
 } // namespace whais
 
 #endif /* INTERPRETER_H_ */

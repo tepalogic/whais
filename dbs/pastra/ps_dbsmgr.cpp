@@ -26,6 +26,7 @@
 #include <memory>
 #include <memory.h>
 #include <assert.h>
+#include <stdio.h>
 
 #include "dbs/dbs_exception.h"
 #include "utils/wfile.h"
@@ -959,7 +960,22 @@ DBSRemoveDatabase (const char* const name, const char* path)
 }
 
 
+DBS_SHL const char*
+DescribeDbsEngineVersion ()
+{
+  static char description[128];
 
+  if (strlen (description) == 0)
+    {
+      snprintf (description,
+                sizeof description,
+                "Data Storage Engine: PASTRA version: %u.%02u",
+                WVER_MAJ,
+                WVER_MIN);
+    }
+
+  return description;
+}
 
 } //namespace whais
 

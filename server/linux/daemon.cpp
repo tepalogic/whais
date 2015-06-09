@@ -17,6 +17,7 @@
 
 #include "dbs/dbs_mgr.h"
 #include "utils/logger.h"
+#include "utils/license.h"
 
 #include "../common/configuration.h"
 #include "../common/loader.h"
@@ -24,6 +25,9 @@
 
 using namespace std;
 using namespace whais;
+
+static const char sProgramName[] = "Whais";
+static const char sProgramDesc[] = "A database server daemon.";
 
 static const char* sConfigFile = "/etc/whais.conf";
 static const char* sPidFile    = NULL;
@@ -353,7 +357,7 @@ boot_server ()
 static void
 print_usage ()
 {
-  cout << "Whais Server daemon written by Iulian POPA\n";
+  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
   cout << "Use:\n"
           "  --pidfile file   Write the pid of damon into the 'file'. \n"
           "  --conf    file   Use the 'file' rather than '/etc/whais.conf'\n"
@@ -362,14 +366,16 @@ print_usage ()
           "                   0xZZZ forms are also accepted) as the daemon\n"
           "                   process mask (default is 0).\n"
           "  --skip-fork      Skip the forking step.\n"
-          "  --help, -h       Print this help.\n";
+          "  --help, -h       Print this help.\n"
+          "  -v, --version    Show the program versions.\n"
+          "  -l, --license    Show information about the license.\n";
 }
 
 int
 main (int argc, char** argv)
 {
-  uint16_t  mask     = 0;
-  bool      skipFork = false;
+  uint16_t  mask        = 0;
+  bool      skipFork    = false;
 
   for (int i = 1; i < argc; ++i)
     {
@@ -407,6 +413,18 @@ main (int argc, char** argv)
                || (strcmp (argv[i], "-h") == 0))
         {
           print_usage ();
+          return 0;
+        }
+      else if ((strcmp (argv[i], "--version") == 0)
+               || (strcmp (argv[i], "-v") == 0))
+        {
+          displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
+          return 0;
+        }
+      else if ((strcmp (argv[i], "--license") == 0)
+               || (strcmp (argv[i], "-l") == 0))
+        {
+          displayLicenseInformation (cout, sProgramName, sProgramDesc);
           return 0;
         }
       else

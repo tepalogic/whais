@@ -55,7 +55,8 @@ DEFINES+=ARCH_LINUX_GCC=1
 DEFINES+=INLINE=__inline__
 DEFINES+=_GNU_SOURCE
 DEFINES+=QWORDS_PER_OP=4
-
+DEFINES+=WOS=GNU/Linux
+DEFINES+=WARCH=x86_64bit
 
 #translate input files
 arch_translate_path=$(1)

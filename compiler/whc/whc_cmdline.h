@@ -96,6 +96,8 @@ private:
   bool        mOutputFileOwn;
   bool        mPreprocessOnly;
   bool        mBuildDependencies;
+  bool        mShowLogo;
+  bool        mShowLicense;
 
   std::vector<std::string>            mInclusionPaths;
   std::vector<ReplacementTag>         mReplacementTags;

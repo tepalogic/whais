@@ -152,6 +152,9 @@ DBSRemoveDatabase (const char* const     name,
                    const char* const     path = NULL);
 
 
+DBS_SHL const char*
+DescribeDbsEngineVersion ();
+
 } //namespace whais
 
 #endif /* DBS_MGR_H_ */

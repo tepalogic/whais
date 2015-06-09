@@ -279,8 +279,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CMD_PING_SERVER         (CMD_EXEC_PROC_RSP + 1)
 #define CMD_PING_SERVER_RSP     (CMD_PING_SERVER + 1)
 
+/* Get a server a description */
+#define CMD_HELLO_SERVER         (CMD_PING_SERVER_RSP + 1)
+#define CMD_HELLO_SERVER_RSP     (CMD_HELLO_SERVER + 1)
+
 #define ADMIN_CMDS_COUNT        ((CMD_DESC_PROC_PARAM / 2) + 1)
-#define USER_CMDS_COUNT         ((CMD_PING_SERVER - USER_CMD_BASE) / 2 + 1)
+#define USER_CMDS_COUNT         ((CMD_HELLO_SERVER - USER_CMD_BASE) / 2 + 1)
 
 #endif /* SERVER_PROTOCOL_H_ */
 

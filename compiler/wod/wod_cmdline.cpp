@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 
 #include "wod_cmdline.h"
+#include "utils/license.h"
 
 using namespace std;
 
@@ -36,11 +37,6 @@ using namespace std;
 namespace whais {
 namespace wod {
 
-
-
-
-#define VER_MAJOR       1
-#define VER_MINOR       0
 
 static inline bool
 isStrEqual (const char* str1, const char* str2)
@@ -53,7 +49,9 @@ CmdLineParser::CmdLineParser (int argc, char ** argv)
     mArgs (argv),
     mSourceFile (NULL),
     mOutStream (&cout),
-    mShowHelp (false)
+    mShowHelp (false),
+    mShowLogo (false),
+    mShowLicense (false)
 {
   Parse ();
 }
@@ -84,6 +82,18 @@ CmdLineParser::Parse ()
           isStrEqual (mArgs[index], "--help"))
         {
           mShowHelp = true;
+          ++index;
+        }
+      else if (isStrEqual (mArgs[index], "-v")
+               || isStrEqual (mArgs[index], "--version"))
+        {
+          mShowLogo = true;
+          ++index;
+        }
+      else if (isStrEqual (mArgs[index], "-l")
+               || isStrEqual (mArgs[index], "--license"))
+        {
+          mShowLicense = true;
           ++index;
         }
       else if (isStrEqual (mArgs[index], "-o"))
@@ -132,6 +142,16 @@ CmdLineParser::CheckArguments ()
       DisplayUsage ();
       exit (0);
     }
+  else if (mShowLogo)
+    {
+      displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
+      exit (0);
+    }
+  else if (mShowLicense)
+    {
+      displayLicenseInformation (cout, sProgramName, NULL);
+      exit (0);
+    }
   else if (mSourceFile == NULL)
     throw CmdLineException (_EXTRA (0), "The input file was not specified.");
 }
@@ -142,19 +162,14 @@ CmdLineParser::DisplayUsage () const
 {
   using namespace std;
 
-
-  cout << "Whais Object Dumper v" << VER_MAJOR << '.';
-
-  cout.width (2); cout.fill ('0');
-  cout << VER_MINOR;
-  cout.width (0);
-
+  displayBanner (cout, sProgramName,  WVER_MAJ, WVER_MIN);
   cout <<
-    " by Iulian POPA (popaiulian@gmail.com)\n"
     "Usage: wod [options] input_file\n"
     "Options:\n"
     "-h, --help      Display this help.\n"
-    "-o file         Use 'file' as the output file.\n";
+    "-o file         Use 'file' as the output file.\n"
+    "-v, --version   Display the program's version.\n"
+    "-l, --license   Display the license information.\n";
 }
 
 

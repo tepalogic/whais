@@ -159,9 +159,27 @@ WClose (WH_CONNECTION hnd);
  * connection healthiness.
  *
  * @hnd                 The connection handle.
+ *
+ * @return              WCS_OK in case of success, other way it will return the
+ *                      error's case corresponding code.
  */
 uint_t
 WPingServer (const WH_CONNECTION hnd);
+
+
+/* Send a greeting command to server.
+ *
+ * This command is used to retrieve a text description of the database
+ * server. The server description is optional and the format is of arbitrary
+ * content.
+ *
+ * @hnd                 The connection handle.
+ *
+ * @return              WCS_OK in case of success, other way it will return the
+ *                      error's case corresponding code.
+ */
+uint_t
+WGreetServer (const WH_CONNECTION hnd, const char** outAnswer);
 
 /* Get the list of the global values.
  *
