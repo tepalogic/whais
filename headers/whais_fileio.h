@@ -28,8 +28,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WH_FILECREATE          0x00000001
 #define WH_FILECREATE_NEW      0x00000002
 #define WH_FILEOPEN_EXISTING   0x00000004
-#define WH_FILEDIRECT          0x00000008
-#define WH_FILESYNC            0x00000010
+#define WH_FILETRUNC           0x00000008
+#define WH_FILEDIRECT          0x00000010
+#define WH_FILESYNC            0x00000020
 
 #define WH_FILEREAD            0x00000100
 #define WH_FILEWRITE           0x00000200

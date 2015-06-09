@@ -56,15 +56,16 @@ whf_open (const char* const file, uint_t mode)
   else
     openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
+  openMode |= (mode & WH_FILETRUNC)  ? O_TRUNC  : 0;
   openMode |= (mode & WH_FILEDIRECT) ? O_DIRECT : 0;
-  openMode |= (mode & WH_FILESYNC) ? O_DSYNC : 0;
+  openMode |= (mode & WH_FILESYNC)   ? O_DSYNC  : 0;
 
   if ((mode & WH_FILERDWR) == WH_FILERDWR)
     openMode |= O_RDWR;
 
   else
     {
-      openMode |= (mode & WH_FILEREAD) ? O_RDONLY : 0;
+      openMode |= (mode & WH_FILEREAD)  ? O_RDONLY : 0;
       openMode |= (mode & WH_FILEWRITE) ? O_WRONLY : 0;
     }
 

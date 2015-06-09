@@ -123,7 +123,8 @@ VariableSizeStore::Init (const char*        baseName,
 
   mEntriesContainer.reset (new FileContainer (baseName,
                                               maxFileSize,
-                                              unitsCount));
+                                              unitsCount,
+                                              false));
 
   mEntriesCount = mEntriesContainer->Size () / sizeof (StoreEntry);
 

@@ -954,8 +954,9 @@ PersistentTable::InitFromFile (const string& tableName)
   mTableData.reset (new FileContainer(
                           mFileNamePrefix.c_str (),
                           mMaxFileSize,
-                          (mainTableSize + mMaxFileSize - 1) / mMaxFileSize
-                                         ));
+                          (mainTableSize + mMaxFileSize - 1) / mMaxFileSize,
+                          false
+                                     ));
 }
 
 
@@ -964,11 +965,12 @@ PersistentTable::InitVariableStorages ()
 {
   // Loading the rows regular should be done up front.
   mRowsData.reset(
-              new FileContainer(
+              new FileContainer (
                 (mFileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str (),
                 mMaxFileSize,
-                ((mRowSize * mRowsCount) + mMaxFileSize - 1) / mMaxFileSize
-                        )
+                ((mRowSize * mRowsCount) + mMaxFileSize - 1) / mMaxFileSize,
+                false
+                                )
                   );
 
   //Check if are fields demanding variable size store.
@@ -1023,7 +1025,8 @@ PersistentTable::InitIndexedFields ()
       auto_ptr<IDataContainer> indexContainer(
                              new FileContainer (containerName.c_str (),
                                                 mMaxFileSize,
-                                                field.IndexUnitsCount () )
+                                                field.IndexUnitsCount (),
+                                                false)
                                                );
       mvIndexNodeMgrs.push_back(
             new FieldIndexNodeManager (indexContainer,
@@ -1108,7 +1111,8 @@ PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 
   return new FileContainer (containerNameBase.c_str (),
                             mDbsSettings.mMaxFileSize,
-                            0);
+                            0,
+                            false);
 }
 
 
@@ -1353,7 +1357,8 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
       auto_ptr<IDataContainer> indexContainer(
                              new FileContainer (containerName.c_str (),
                                                 settings.mMaxFileSize,
-                                                0 )
+                                                0,
+                                                false)
                                               );
       indexNodeMgrs.push_back(
             new FieldIndexNodeManager (indexContainer,
@@ -1364,11 +1369,15 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                                 );
     }
 
-  FileContainer tableData (fileNamePrefix.c_str (), settings.mMaxFileSize, 1);
+  FileContainer tableData (fileNamePrefix.c_str (),
+                           settings.mMaxFileSize,
+                           1,
+                           false);
   FileContainer rowsData ((fileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str (),
                           settings.mMaxFileSize,
                           ((rowSize * rowsCount) + settings.mMaxFileSize - 1) /
-                          settings.mMaxFileSize);
+                          settings.mMaxFileSize,
+                          false);
 
   RepairTableNodeManager tableNodeMgr (dbs, tableData);
 

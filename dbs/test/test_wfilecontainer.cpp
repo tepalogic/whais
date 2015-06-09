@@ -25,7 +25,7 @@ const char fileName[] = "./test_file.tm";
 static bool
 create_container (uint_t max_file_size, const uint_t container_size)
 {
-  FileContainer container (fileName, max_file_size, 0);
+  FileContainer container (fileName, max_file_size, 0, true);
   uint8_t marker = 0;
   uint64_t current_pos = 0;
   uint_t left_to_write = container_size;
@@ -48,8 +48,10 @@ check_container (uint_t max_file_size,
                  const uint_t container_size,
                  const uint8_t marker_start, const uint8_t marker_increment)
 {
-  FileContainer container (fileName, max_file_size,
-                           (container_size / max_file_size) + 1);
+  FileContainer container (fileName,
+                           max_file_size,
+                           (container_size / max_file_size) + 1,
+                           false);
   uint64_t current_pos = 0;
   uint8_t marker = marker_start;
   uint_t left_to_read = container_size;
@@ -77,7 +79,8 @@ colapse_container (uint_t max_file_size, const uint_t container_size)
 {
   uint64_t current_pos = 0;
   FileContainer container (fileName, max_file_size,
-                           (container_size / max_file_size) + 1);
+                           (container_size / max_file_size) + 1,
+                           false);
   uint64_t new_container_size = container.Size ();
 
   if (new_container_size != container_size)

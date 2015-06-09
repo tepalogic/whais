@@ -107,7 +107,8 @@ class FileContainer : public IDataContainer
 public:
   FileContainer (const char*       baseFile,
                  const uint64_t    maxFileSize,
-                 const uint64_t    unitsCount);
+                 const uint64_t    unitsCount,
+                 const bool        ignoreExistingData);
 
   virtual ~FileContainer ();
 
@@ -133,6 +134,7 @@ private:
   std::vector<File>    mFilesHandles;
   std::string          mFileNamePrefix;
   bool                 mToRemove;
+  bool                 mIgnoreExistingData;
 };
 
 

@@ -150,17 +150,29 @@ IDataContainer::~IDataContainer ()
 
 FileContainer::FileContainer (const char*       baseName,
                               const uint64_t    maxFileSize,
-                              const uint64_t    unitsCount)
+                              const uint64_t    unitsCount,
+                              const bool        truncate)
   : mMaxFileUnitSize (maxFileSize),
     mFilesHandles (),
     mFileNamePrefix (baseName),
-    mToRemove (false)
+    mToRemove (false),
+    mIgnoreExistingData (truncate)
 {
   uint_t openMode;
 
-  openMode  = (unitsCount > 0) ? WH_FILEOPEN_EXISTING : WH_FILECREATE_NEW;
-  openMode |= WH_FILERDWR;
+  if (unitsCount > 0)
+    {
+      assert (truncate == false);
 
+      openMode = WH_FILEOPEN_EXISTING;
+    }
+  else if (mIgnoreExistingData)
+    openMode = WH_FILECREATE | WH_FILETRUNC;
+
+  else
+    openMode = WH_FILECREATE_NEW;
+
+  openMode |= WH_FILERDWR;
   for (uint_t unit = 0; unit < unitsCount; ++unit)
     {
       string baseName = mFileNamePrefix;
@@ -456,7 +468,10 @@ FileContainer::ExtendContainer ()
   if (count != 0)
     append_int_to_str (count, baseName);
 
-  File unitFile (baseName.c_str (), WH_FILECREATE_NEW | WH_FILERDWR);
+  const uint_t openMode = mIgnoreExistingData
+                            ? WH_FILECREATE | WH_FILETRUNC | WH_FILERDWR
+                            : WH_FILECREATE_NEW | WH_FILERDWR;
+  File unitFile (baseName.c_str (), openMode);
   mFilesHandles.push_back (unitFile);
 }
 
@@ -464,7 +479,7 @@ FileContainer::ExtendContainer ()
 
 TemporalFileContainer::TemporalFileContainer (const char*    baseName,
                                               const uint32_t maxFileSize)
-  : FileContainer (baseName, maxFileSize, 0)
+  : FileContainer (baseName, maxFileSize, 0, true)
 {
   MarkForRemoval ();
 }
@@ -820,7 +835,7 @@ TemporalContainer::FillCache (uint64_t position)
   if (mFileContainer.get () == NULL)
     {
       const uint64_t currentId = wh_atomic_fetch_inc64 (_RC (int64_t*,
-                                                       &smTemporalsCount));
+                                                        &smTemporalsCount));
 
       assert (mCacheStartPos_1 == 0);
       assert (mCacheEndPos_1 == mCacheSize);

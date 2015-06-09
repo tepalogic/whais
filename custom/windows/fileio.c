@@ -46,10 +46,11 @@ whf_open (const char* const file, uint_t mode)
   else
     dwCreation |= OPEN_EXISTING;
 
+  dwFlagsAndAttr |= (mode & WH_FILETRUNC)  ? TRUNCATE_EXISTING       : 0;
   dwFlagsAndAttr |= (mode & WH_FILEDIRECT) ? FILE_FLAG_WRITE_THROUGH : 0;
-  dwFlagsAndAttr |= (mode & WH_FILESYNC) ? FILE_FLAG_NO_BUFFERING : 0;
+  dwFlagsAndAttr |= (mode & WH_FILESYNC)   ? FILE_FLAG_NO_BUFFERING  : 0;
 
-  dwDesiredAccess |= (mode & WH_FILEREAD) ? GENERIC_READ : 0;
+  dwDesiredAccess |= (mode & WH_FILEREAD)  ? GENERIC_READ  : 0;
   dwDesiredAccess |= (mode & WH_FILEWRITE) ? GENERIC_WRITE : 0;
 
   result = CreateFile (file,
@@ -65,7 +66,6 @@ whf_open (const char* const file, uint_t mode)
     {
       result = FILE_LOCKED;
     }
-
 
   return result;
 }
