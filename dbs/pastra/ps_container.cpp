@@ -444,7 +444,6 @@ FileContainer::Fix (const char* const           baseFile,
       else
         {
           File unitFile (fileName.c_str (), WH_FILECREATE | WH_FILEWRITE);
-
           if (newContainerSize - size >= maxFileSize)
             {
               unitFile.Size (maxFileSize);

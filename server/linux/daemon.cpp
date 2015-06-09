@@ -440,7 +440,7 @@ main (int argc, char** argv)
       if (forkPid < 0)
         {
           openlog ("whaisd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);
-          syslog (LOG_CRIT, "Failed to fork (%d).", errno);
+          syslog (LOG_CRIT, "Failed to fork (errno: %d).", errno);
           closelog ();
 
           return -1;
@@ -448,6 +448,15 @@ main (int argc, char** argv)
 
       else if (forkPid > 0)
         return 0;
+
+      if (setsid () < 0)
+        {
+          openlog ("whaisd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);
+          syslog (LOG_CRIT, "Failed to setsid (errno: %d).", errno);
+          closelog ();
+
+          return -1;
+        }
     }
 
   openlog ("whaisd", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_DAEMON);

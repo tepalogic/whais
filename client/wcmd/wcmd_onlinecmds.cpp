@@ -652,6 +652,7 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = pingShowDescExt;
   entry.mCmd          = cmdPing;
 
+  RegisterCommand (entry);
 
   entry.mShowStatus   = false;
   entry.mName         = "greet";
