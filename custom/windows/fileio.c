@@ -38,17 +38,16 @@ whf_open (const char* const file, uint_t mode)
   WH_FILE     result;
 
   if (mode & WH_FILECREATE_NEW)
-    dwCreation |= CREATE_NEW;
+    dwCreation = CREATE_NEW;
 
   else if (mode & WH_FILECREATE)
-    dwCreation |= OPEN_ALWAYS;
+    dwCreation = OPEN_ALWAYS;
 
   else
-    dwCreation |= OPEN_EXISTING;
+    dwCreation = OPEN_EXISTING;
 
-  dwFlagsAndAttr |= (mode & WH_FILETRUNC)  ? TRUNCATE_EXISTING       : 0;
-  dwFlagsAndAttr |= (mode & WH_FILEDIRECT) ? FILE_FLAG_WRITE_THROUGH : 0;
-  dwFlagsAndAttr |= (mode & WH_FILESYNC)   ? FILE_FLAG_NO_BUFFERING  : 0;
+  dwFlagsAndAttr |= (mode & WH_FILESYNC) ? FILE_FLAG_WRITE_THROUGH : 0;
+  dwFlagsAndAttr |= FILE_FLAG_RANDOM_ACCESS;
 
   dwDesiredAccess |= (mode & WH_FILEREAD)  ? GENERIC_READ  : 0;
   dwDesiredAccess |= (mode & WH_FILEWRITE) ? GENERIC_WRITE : 0;
@@ -65,6 +64,18 @@ whf_open (const char* const file, uint_t mode)
       && (GetLastError () == ERROR_SHARING_VIOLATION))
     {
       result = FILE_LOCKED;
+    }
+
+  if (mode & WH_FILETRUNC)
+    {
+      if (! whf_set_size (result, 0))
+        {
+          const DWORD lastError = GetLastError ();
+          CloseHandle (result);
+          SetLastError (lastError);
+
+          result = INVALID_FILE;
+        }
     }
 
   return result;

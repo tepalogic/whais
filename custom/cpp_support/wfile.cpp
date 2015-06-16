@@ -33,7 +33,7 @@ namespace whais {
 
 
 File::File (const char* name, uint_t mode)
-  : mHandle (0),
+  : mHandle (INVALID_FILE),
     mFileSize (UNKNOWN_SIZE)
 {
   mHandle = whf_open (name, mode);

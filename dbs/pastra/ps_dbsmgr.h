@@ -114,7 +114,6 @@ private:
   const DBSSettings&      mGlbSettings;
   Lock                    mSync;
   const std::string       mDbsLocationDir;
-  const std::string       mName;
   const std::string       mFileName;
   File                    mFile;
   TABLES                  mTables;

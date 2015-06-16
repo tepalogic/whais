@@ -42,13 +42,13 @@ endif
 CXX_FLAGS:=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc $(EXT_CXX_FLAGS)
 CC_FLAGS+=$(EXT_CC_FLAGS)
 
-DEFINES+=ARCH_WINDOWS_VC=2
+DEFINES+=ARCH_WINDOWS_VC
 DEFINES+=INLINE=__inline
 DEFINES+=_CRT_SECURE_NO_WARNINGS _USING_V110_SDK71_
 DEFINES+=snprintf=_snprintf
 DEFINES+=QWORDS_PER_OP=4
 DEFINES+=WOS=Windows
-DEFINES+=WARCH=x86_32bit
+DEFINES+=WARCH=x86_32
 
 #translate input files
 arch_translate_path=$(subst /,\\,$(1))

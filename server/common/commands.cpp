@@ -495,7 +495,7 @@ cmd_ping_sever (ClientConnection& conn)
 static void
 cmd_hello_server (ClientConnection& conn)
 {
-  static const char largeRspMarker = 0xCC;
+  static const char largeRspMarker = 0x7F;
 
   static char serverDescription[1024];
 

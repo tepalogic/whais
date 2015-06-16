@@ -15,6 +15,7 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
+echo 'Create administrator database...'
 echo 'add users password TEXT username TEXT; quit' |  wcmd -c administrator -d ./admin_db > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to create 'administrator' database"
@@ -40,6 +41,7 @@ create_empty_test_db test_list_db
 create_empty_test_db test_list_db_frame_size
 create_empty_test_db test_auto_restore
 
+echo 'Create test_auto_restore database...'
 echo 'add test_restore field_text TEXT field_int INT8; quit' |  wcmd -u test_auto_restore -d ./test_auto_restore > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to add tables into 'test_auto_restore' database"

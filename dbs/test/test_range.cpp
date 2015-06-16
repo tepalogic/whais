@@ -87,7 +87,7 @@ INTERVAL Rv17_s[] = { _I(0, 1), _I(5, 7), _I(14, 16), _I(77, 99), _I(112, 115), 
 INTERVAL Rv17_r[] = { _I(0, 1), _I(3, 7), _I(10, 66), _I(77, 110),_I(112, 115), _I(220, 230), _I(255, 255) };
 
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
 INTERVAL Iv1_f[] = { _I(10, 33) };
 INTERVAL Iv1_s[] = { _I(2, 7) };
 INTERVAL Iv1_r[0];
@@ -122,7 +122,7 @@ INTERVAL Iv8_f[] = { _I(10, 33), _I (50, 100) };
 INTERVAL Iv8_s[] = { _I(27, 83) };
 INTERVAL Iv8_r[] = { _I(27, 33), _I (50, 83) };
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
 INTERVAL Iv9_f[] = { _I(10, 33), _I (50, 100) };
 INTERVAL Iv9_s[] = { _I(34, 49) };
 INTERVAL Iv9_r[0];
@@ -132,7 +132,7 @@ INTERVAL Iv10_f[] = { _I(10, 33), _I (50, 100), _I (110, 121) };
 INTERVAL Iv10_s[] = { _I(9, 120) };
 INTERVAL Iv10_r[] = { _I(10, 33), _I (50, 100), _I(110, 120) };
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
 INTERVAL Iv11_f[] = { _I(10, 33), _I (50, 100), _I (110, 121) };
 INTERVAL Iv11_s[] = { _I(1, 3), _I(101, 108), _I(234, 236), _I(255, 255) };
 INTERVAL Iv11_r[0];
@@ -167,7 +167,7 @@ INTERVAL Iv18_s[] = { _I(115, 140)  };
 INTERVAL Iv18_r[] = { _I(115, 121), _I (135, 140) };
 
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
 INTERVAL Cv1_f[0];
 INTERVAL Cv1_r[] = { _I(0, 255) };
 #endif
@@ -382,7 +382,7 @@ main ()
 
   std::cout << "Testing range match ... \n";
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_match (TO_RANGE (Iv1_f), TO_RANGE (Iv1_s), TO_RANGE (Iv1_r));
   success = success & test_match (TO_RANGE (Iv2_f), TO_RANGE (Iv2_s), TO_RANGE (Iv2_r));
 #endif
@@ -392,12 +392,12 @@ main ()
   success = success & test_match (TO_RANGE (Iv6_f), TO_RANGE (Iv6_s), TO_RANGE (Iv6_r));
   success = success & test_match (TO_RANGE (Iv7_f), TO_RANGE (Iv7_s), TO_RANGE (Iv7_r));
   success = success & test_match (TO_RANGE (Iv8_f), TO_RANGE (Iv8_s), TO_RANGE (Iv8_r));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_match (TO_RANGE (Iv9_f), TO_RANGE (Iv9_s), TO_RANGE (Iv9_r));
 #endif
   success = success & test_match (TO_RANGE (Iv10_f), TO_RANGE (Iv10_s), TO_RANGE (Iv10_r));
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_match (TO_RANGE (Iv11_f), TO_RANGE (Iv11_s), TO_RANGE (Iv11_r));
 #endif
   success = success & test_match (TO_RANGE (Iv12_f), TO_RANGE (Iv12_s), TO_RANGE (Iv12_r));
@@ -413,7 +413,7 @@ main ()
 
   std::cout << "Testing range complement ... \n";
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement (TO_RANGE (Cv1_f), TO_RANGE (Cv1_r));
 #endif
 
@@ -433,7 +433,7 @@ main ()
 
   std::cout << "Testing range complement relations ... \n";
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv1_f));
   success = success & test_complement_rel (TO_RANGE (Iv2_f));
 #endif
@@ -443,11 +443,11 @@ main ()
   success = success & test_complement_rel (TO_RANGE (Iv6_f));
   success = success & test_complement_rel (TO_RANGE (Iv7_f));
   success = success & test_complement_rel (TO_RANGE (Iv8_f));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv9_f));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv10_f));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv11_f));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv12_f));
@@ -458,7 +458,7 @@ main ()
   success = success & test_complement_rel (TO_RANGE (Iv17_f));
   success = success & test_complement_rel (TO_RANGE (Iv18_f));
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv1_s));
   success = success & test_complement_rel (TO_RANGE (Iv2_s));
 #endif
@@ -468,11 +468,11 @@ main ()
   success = success & test_complement_rel (TO_RANGE (Iv6_s));
   success = success & test_complement_rel (TO_RANGE (Iv7_s));
   success = success & test_complement_rel (TO_RANGE (Iv8_s));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv9_s));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv10_s));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv11_s));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv12_s));
@@ -483,7 +483,7 @@ main ()
   success = success & test_complement_rel (TO_RANGE (Iv17_s));
   success = success & test_complement_rel (TO_RANGE (Iv18_s));
 
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv1_r));
   success = success & test_complement_rel (TO_RANGE (Iv2_r));
 #endif
@@ -493,11 +493,11 @@ main ()
   success = success & test_complement_rel (TO_RANGE (Iv6_r));
   success = success & test_complement_rel (TO_RANGE (Iv7_r));
   success = success & test_complement_rel (TO_RANGE (Iv8_r));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv9_r));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv10_r));
-#if !defined (windows_vc_x86)
+#if !defined (ARCH_WINDOWS_VC)
   success = success & test_complement_rel (TO_RANGE (Iv11_r));
 #endif
   success = success & test_complement_rel (TO_RANGE (Iv12_r));

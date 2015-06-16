@@ -252,11 +252,21 @@ reset_array_variables (void *)
         }
 
   }
+  catch (Exception& e)
+  {
+      testResult = false;
+      testEnd = true;
+      cout << "Got an exception in " << __FUNCTION__ << ":\n\t"
+           << e.Description () << '(' << e.Code () << '/' << e.Type () << ")\n"
+           << e.Message () << endl;
+
+      throw;
+  }
   catch (...)
   {
       testResult = false;
       testEnd = true;
-      cout << "Got exception in " << __FUNCTION__ << endl;
+      cout << "Got an unknown exception in " << __FUNCTION__ << endl;
       throw;
   }
 

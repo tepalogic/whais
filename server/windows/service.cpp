@@ -13,6 +13,7 @@
 
 #include "dbs/dbs_mgr.h"
 #include "utils/logger.h"
+#include "utils/license.h"
 
 #include "../common/configuration.h"
 #include "../common/loader.h"

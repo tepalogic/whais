@@ -31,7 +31,6 @@ namespace whais
 {
 
 
-
 const std::string
 NextToken (const std::string&       text,
            size_t&                  inoutOff,

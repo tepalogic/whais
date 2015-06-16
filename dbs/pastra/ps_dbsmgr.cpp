@@ -76,8 +76,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mGlbSettings (settings),
     mSync (),
     mDbsLocationDir (locationDir),
-    mName (name),
-    mFileName (mDbsLocationDir + mName + DBS_FILE_EXT),
+    mFileName (mDbsLocationDir + name + DBS_FILE_EXT),
     mFile (mFileName.c_str (),
            WH_FILEOPEN_EXISTING | WH_FILERDWR | WH_FILESYNC),
     mTables (),
@@ -161,7 +160,6 @@ DbsHandler::DbsHandler (const DbsHandler& source)
     mGlbSettings (source.mGlbSettings),
     mSync (),
     mDbsLocationDir (source.mDbsLocationDir),
-    mName (source.mName),
     mFileName (source.mFileName),
     mFile (source.mFile),
     mTables (source.mTables),
@@ -416,8 +414,7 @@ DbsHandler::SyncAllTablesContent ()
   mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
   mFile.Read (flags, sizeof flags);
 
-  store_le_int64 (load_le_int64 (flags) & ~PS_FLAG_NOT_CLOSED,
-                  flags);
+  store_le_int64 (load_le_int64 (flags) & ~PS_FLAG_NOT_CLOSED, flags);
 
   mFile.Seek (PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
   mFile.Write (flags, sizeof flags);
@@ -516,19 +513,16 @@ DbsHandler::SyncToFile ()
   store_le_int64 (MaxFileSize (), header + PS_DBS_MAX_FILE_OFF);
   store_le_int64 (PS_FLAG_NOT_CLOSED, header + PS_DBS_FLAGS_OFF);
 
-  const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
-  File outFile (fileName.c_str (), WH_FILECREATE | WH_FILEWRITE);
-
-  outFile.Size (0);
-  outFile.Write (header, sizeof header);
+  mFile.Size (0);
+  mFile.Write (header, sizeof header);
 
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)
     {
-      outFile.Write (_RC (const uint8_t*, it->first.c_str ()),
-                     it->first.length () + 1);
+      mFile.Write (_RC (const uint8_t*, it->first.c_str ()),
+                   it->first.length () + 1);
     }
 
-  outFile.Write (&zero, 1);
+  mFile.Write (&zero, 1);
 }
 
 
@@ -569,9 +563,7 @@ DbsHandler::RemoveFromStorage ()
       table->RemoveFromDatabase ();
     }
 
-  const string fileName (mDbsLocationDir + mName + DBS_FILE_EXT);
-
-  whf_remove (fileName.c_str ());
+  whf_remove (mFileName.c_str ());
 }
 
 

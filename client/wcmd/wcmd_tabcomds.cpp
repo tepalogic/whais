@@ -468,7 +468,6 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       assert (token.length () > 0);
 
       fieldsNames.push_back (token);
-      desc.name = fieldsNames.back ().c_str ();
 
       if ( ! parse_field_type (cmdLine, &linePos, &desc.type, &desc.isArray))
         goto invalid_args;
@@ -484,6 +483,11 @@ cmdTableAdd (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       assert (fields.size () == fieldsNames.size ());
     }
   while (linePos < cmdLine.length ());
+
+  assert (fields.size () == fieldsNames.size ());
+
+  for (size_t i = 0; i < fieldsNames.size (); ++i)
+    fields[i].name = fieldsNames[i].c_str ();
 
   try
   {
