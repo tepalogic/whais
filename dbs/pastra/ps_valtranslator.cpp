@@ -1186,6 +1186,15 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
        strcpy (_RC (char*, utf8Dest + result), tempBuffer);
        result += strlen (tempBuffer);
      }
+   else
+     {
+       if (result + 2 >= maxSize)
+         return 0;
+
+       utf8Dest[result++] = '.';
+       utf8Dest[result++] = '0';
+       utf8Dest[result]   = 0;
+     }
 
    assert (result < maxSize);
    assert ((strlen (_RC (char*, utf8Dest))) == result);
@@ -1276,6 +1285,16 @@ Utf8Translator::Write (uint8_t* const      utf8Dest,
        strcpy (_RC (char*, utf8Dest + result), tempBuffer);
        result += strlen (tempBuffer);
      }
+   else
+     {
+       if (result + 2 >= maxSize)
+         return 0;
+
+       utf8Dest[result++] = '.';
+       utf8Dest[result++] = '0';
+       utf8Dest[result]   = 0;
+     }
+
 
    assert (result < maxSize);
    assert ((strlen (_RC (char*, utf8Dest))) == result);

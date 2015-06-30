@@ -1922,7 +1922,6 @@ class IArrayStrategy;
 class DBS_SHL DArray
 {
 public:
-
   DArray ();
   explicit DArray (const DBool* const array, const uint64_t count = 0);
   explicit DArray (const DChar* const array, const uint64_t count = 0);

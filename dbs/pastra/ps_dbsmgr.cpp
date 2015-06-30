@@ -514,6 +514,7 @@ DbsHandler::SyncToFile ()
   store_le_int64 (PS_FLAG_NOT_CLOSED, header + PS_DBS_FLAGS_OFF);
 
   mFile.Size (0);
+  mFile.Seek (0, WH_SEEK_BEGIN);
   mFile.Write (header, sizeof header);
 
   for (TABLES::iterator it = mTables.begin (); it != mTables.end (); ++it)

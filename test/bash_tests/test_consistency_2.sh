@@ -23,11 +23,11 @@ TEXT_VAL_5="<<To be or not to be?>> ... That should the question!"
 EXEC_DIR=$(dirname $0)/../
 
 get_whais_pid () {
-	WHAIS_PID=$(pidof whais | cut -f 1 -d ' ')
+	WHAIS_PID=$(pgrep -d ' ' whais | cut -f 1 -d ' ')
 }
 
 fail_test () {
-	killall whais &> /dev/null
+	pkill whais &> /dev/null
 	echo "$1"
 	echo "TEST RESULT:  FAIL"
 	exit 1
@@ -42,7 +42,7 @@ start_whais () {
 	get_whais_pid
 	[ -n "$WHAIS_PID" ] || fail_test "Whais did not start!!!"
 	wcmd -H localhost -P 1761 -u $DB_NAME -p $DB_PASWD  <<< " exec get_table_value U32'' "
-	[ $? -eq 0 ] || "Whais did start ... but the healty check did not go well."
+	[ $? -eq 0 ] || fail_test "Connection failed ... "
 	sleep 1
 	get_whais_pid
 	[ -n "$WHAIS_PID" ] || fail_test "Whais is not here anymore."
@@ -77,13 +77,13 @@ update_table () {
 
 
 echo "Testing database consistency recovery..."
-killall whais &> /dev/null
+pkill whais &> /dev/null
 sleep 2
 ( cd $EXEC_DIR ; ./prepare_for_test.sh )
 start_whais
 get_whais_pid
 update_table
-kill -9 $WHAIS_PID &> /dev/null
+pkill -9 whais &> /dev/null
 [ $? -eq 0 ] || fail_test "Failed to kill Whais (PID $WHAIS_PID)."
 echo "Killed Whais proc (PID $WHAIS_PID) "
 sleep 2
@@ -91,7 +91,7 @@ start_whais_fail
 echo Fixing $DB_NAME an try again
 ( cd $EXEC_DIR ;   wcmd -u $DB_NAME -d ./test_auto_restore/ -t -f)
 start_whais
-kill -9 $WHAIS_PID &> /dev/null
+pkill -9 whais &> /dev/null
 ( cd $EXEC_DIR ; ./prepare_for_test.sh --clean )
 echo "TEST RESULT: PASS"
 

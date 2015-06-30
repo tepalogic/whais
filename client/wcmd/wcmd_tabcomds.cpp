@@ -1,5 +1,5 @@
 /******************************************************************************
-  WCMD - An utility to manage whais database files.
+  WCMD - An utility to manage Whais database files.
   Copyright (C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
@@ -98,8 +98,8 @@ static const char tableAddDescExt[]  =
 
 static const char tableCopyDesc[]    = "Create a copy of a table.";
 static const char tableCopeDescExt[] =
-  "Creates a copy of persistent table. The user may supply a selection of\n"
-  "rows based on the row numeber and/or some fields values from the\n"
+  "Creates a persistent copy of a table. The user may supply a selection of\n"
+  "rows based on the row numbers and/or some fields values from the\n"
   "that should be copied in the new table"
   "of the table.)\n"
   "Usage:\n"
@@ -107,8 +107,8 @@ static const char tableCopeDescExt[] =
   "Example:\n"
   " copy t1 t2\n"
   " copy t1 t2 name@username,pass\n"
-  " copy t1 t2 name@username,pass@password * id=5 \n"
-  " copy t1 t2 name,pass@password 1,3-100,1000- year=2001, \n"
+  " copy t1 t2 name@username,pass@password * id=5 year=2011 month=min@max\n"
+  " copy t1 t2 name,pass@password 1,3-100,1000- year=2001,null \n"
   "Note:\n"
   "  The syntax used to provide the selected rows is the same as the one\n"
   "  to list the rows of a value. Have a look at 'help rows' for more\n"
@@ -145,30 +145,30 @@ static const char rowsDescExt[] =
   "            rows TableName field1,field2 1,3,5,70-90,100-\n"
   "\n"
   "          List only field1 and field2 from rows 1,3,5, 70 to 90 included\n"
-  "          and 100 to rows count. While\n"
+  "          and 100 to tables's rows count. While\n"
   "\n"
-  "            rows TableName * 10,20- field1=n,100@200 field2=min@max\n"
+  "            rows TableName * 10,20- field1=null,100@200 field2=min@max\n"
   "\n"
-  "          List all fields from rows 10 and 20 to rows count, and further\n"
-  "          only ones that have field1 set to null of from 100 to 200, and\n"
+  "          list all fields from rows 10 and 20 to rows count, and further\n"
+  "          only ones that have field1 set to null or from 100 to 200, and\n"
   "          field2 is not null.\n"
   "  add     Used to add a new table row. Example:\n"
   "\n"
-  "             rows Table field1=\"Some text value\",field5='2001/2/3'\n"
+  "             rows TableName add field1=\"Some text value\",field5=null\n"
   "\n"
   "          Add a new row to the table, set all fields by default to null,\n"
   "          except field1 that's set to 'Some text value' and field5\n"
-  "          that's set to 3rd Feb 2001.\n"
+  "          that's set to a null value.\n"
   "  reuse   Reuse does the same thing as 'add' but it tries not to increase\n"
-  "          the table. First it searches for an available row (e.g one that\n"
-  "          has all fields set to null).\n"
+  "          the table's rows count. It searches first for an available row\n"
+  "          (e.g one that has all fields set to null).\n"
   "  update  Updates a selected set of table rows. Example:\n"
-  "             rows Table update * qnty=100,price=0.99 productId=190\n"
+  "             rows Table update qnty=100,price=0.99 * productId=190\n"
   "  remove  Remove a select set of rows from a table. By removing it's\n"
   "          understood that all of fields values of the corresponding rows\n"
   "          will be set to null such way the can be reused latter. Example:\n"
   "\n"
-  "             rows Table remove * field1=n,field2=min,field3=max\n"
+  "             rows Table remove * field1=null field2=min field3=max\n"
   "\n"
   "          Will remove all rows that have field1 is null, field2 is set to\n"
   "          minimum and field3 is set to maximum.\n"
@@ -185,47 +185,41 @@ static const char rowsDescExt[] =
   "  rows Products list Supplier,Received * qnty=0 price=null\n"
   "  rows Products reuse Supplier='Smart DBs',Recieved='2011/12/15',qnty=100\n"
   "  rows Products update price=10.99 * price=0.99,productId=891\n"
-  "  rows Products remove * qnty=null,0\n";
+  "  rows Products remove * qnty=null,0 year=min@2014\n";
 
 static const char fieldsDesc[]    = "Manipulate table fields.";
 static const char fieldsDescExt[] = ""
-  "This commands is used to the manage the fields of a table. It can be\n"
-  "used to add fields to add fields into a table, remove fields from a\n"
-  "table, rename or change a table's fields. The following sub commands are\n"
-  "supported:\n"
-  "  add     Add a new field into a table.\n"
+  "This command is used to the manage the fields of a table. It can be\n"
+  "used to add fields to a table, remove fields from a table, rename or\n"
+  "change the fields of a table. The following sub commands are supported:\n"
+  "  add     Add a new field to a table.\n"
   "\n"
-  "             fields Table add field1 TEXT field2 ARRAY DATE\n"
+  "             fields MyTable add field1 TEXT field2 ARRAY DATE\n"
   "\n"
-  "          This commands adds two fields to table Table, field1 as a\n"
-  "          text and field2 as an array of dates.\n"
-  "\n"
+  "          This command adds two fields to table MyTable, field1 as a\n"
+  "          text field and field2 as an array of dates field.\n"
   "  remove  Remove a field from a table.\n"
   "\n"
-  "             fields Table remove field1 field2\n"
+  "             fields MyTable remove field1 field2\n"
   "\n"
-  "          Drops the fields name field1 and field2 from table Table.\n"
-  "\n"
+  "          Drops the fields name field1 and field2 from table MyTable.\n"
   "  rename  Rename fields of a table.\n"
   "\n"
-  "             fields Table rename field1 new_field1 field2 new_field2\n"
+  "             fields MyTable rename field1 new_field1 field2 new_field2\n"
   "\n"
-  "          Renames the fields name field1 and field2 from table Table, to\n"
-  "\n"
-  "          new_field1 and respectively to new_filed2.\n"
-  "\n"
+  "          Renames the fields name field1 and field2 from table MyTable, to\n"
+  "          new_field1 and to new_filed2 respectively.\n"
   "  retype  Change the type of the fields of a table.\n"
   "\n"
   "             fields Table retype field1 TEXT field2 ARRAY DATETIME\n"
   "\n"
   "          Attempts to change the types of table Table field field1 to\n"
-  "          TEXT and of field2 to an array of date and times. Depending on\n"
-  "          the old fields types this operations might fail (e.g. the new\n"
-  "          and old field's types are incompatible and there is at least\n"
-  "          one non null value that has to be converted).\n"
+  "          text and of field2 to an array of date and times. Depending on\n"
+  "          the old fields types, these operations might fail (e.g. the new\n"
+  "          and old field's types are incompatible).\n"
   "          Hint: If you want to change the type of a field but skip its\n"
-  "          value conversion, it is better to remove the field first and\n"
-  "          after add it again with the new type.\n"
+  "          value conversion, it is better to remove the field first and add\n"
+  "          add it again with the new type.\n"
   "Usage:\n"
   "  alter Table {subcommand}[,{subcommand}[,{subcommand}]]\n"
   "Where {subcommands}:\n"
@@ -239,16 +233,11 @@ static const char fieldsDescExt[] = ""
   "  alter Table add username TEXT\n"
   "  alter Table rename hash username_hash\n"
   "Note:\n"
-  "1. Due to performance reasons it is better to group as much of this sub \n"
-  "   commands as much as possible. Also because if one of the sub commands\n"
-  "   fails then all group of them will be canceled.\n"
-  "2. The exact syntax for the fields specified in care of add or retype\n"
-  "   sub commands it is the same as the one specified in the case of\n"
-  "   'table_add' commands. See its help description for more details.\n"
-  "3. Any indexed fields associated with the table will be discarded. So\n"
-  "   they have to be rebuild after a successful completion of such a\n"
-  "   command.\n";
-
+  "1. Due to performance reasons it is better to group as much of the sub \n"
+  "   commands as much as possible. Also if one of the sub commands fails\n"
+  "   all sub commands group will be canceled.\n"
+  "2. Some sub commands might remove the fields indexes as side effect.\n"
+  "   Consequently a index rebuilds might be required.\n\n";
 
 
 static void
@@ -1024,7 +1013,7 @@ cmdFieldsMgm (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             if (token == "add")
               {
                 if (level >= VL_INFO)
-                  cout << "\n..add fields: ";
+                  cout << "\n...add fields: ";
 
                 DBS_FIELD_TYPE type;
                 bool_t         isArray;
@@ -1433,7 +1422,7 @@ AddOfflineTableCommands ()
 
   entry.mContext = &(GetDBSHandler ());
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "table";
   entry.mDesc         = tableShowDesc;
   entry.mExtendedDesc = tableShowDescExt;

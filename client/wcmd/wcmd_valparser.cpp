@@ -938,10 +938,25 @@ ParseFieldUpdateValues (ostream* const              os,
 
       if (fd.isArray)
         {
-          if (str[offset++] != '[')
-            return false;
-
+          uint_t type = fd.type;
           DArray arrayVal;
+
+          MARK_ARRAY (type);
+          if (strncmp (str + offset,
+                       NULL_VALUE,
+                       strlen (NULL_VALUE)) == 0)
+            {
+              offset += strlen (NULL_VALUE);
+              outUpdates.push_back (FieldValuesUpdate (fieldId,
+                                                       type,
+                                                       arrayVal));
+              if (str[offset] == ',')
+                  ++offset;
+
+              continue;
+            }
+          else if (str[offset++] != '[')
+            return false;
 
           while ((str[offset] != 0) && (str[offset] != ']'))
             {
@@ -1202,9 +1217,6 @@ ParseFieldUpdateValues (ostream* const              os,
 
           if (str[offset++] != ']')
             return false;
-
-          uint_t type = fd.type;
-          MARK_ARRAY (type);
 
           outUpdates.push_back (FieldValuesUpdate (fieldId, type, arrayVal));
         }
@@ -1485,19 +1497,30 @@ ParseFieldUpdateValues (ostream* const              os,
 
             case T_TEXT:
                 {
+                  DText value;
+
+                  if (strncmp (str + offset,
+                               NULL_VALUE,
+                               strlen (NULL_VALUE)) == 0)
+                    {
+                      offset += strlen (NULL_VALUE);
+                      offset -= temp;
+                      outUpdates.push_back (FieldValuesUpdate (fieldId,
+                                                               fd.type,
+                                                               value));
+                      break ;
+                    }
+
                   const bool specialChars = (str[offset] == '\"');
                   const char delimCh      = specialChars ? '\"' : '\'';
 
                   if (str[offset++] != delimCh)
                     return false;
 
-                  DText  value;
-
                   const size_t strSize = strlen (str);
                   while ((str[offset] != 0) && (str[offset] != delimCh))
                     {
                       DChar  ch;
-
 
                       const int chLen = Utf8Translator::Read (
                                           _RC (const uint8_t*, str) + offset,
@@ -1877,8 +1900,7 @@ MatchSelectedRows (ITable&             table,
 }
 
 
-template<typename T>
-void
+template<typename T> void
 print_basic_value (ostream&      os,
                    const T&      value,
                    const bool    apostrophe)
@@ -1938,10 +1960,16 @@ PrintFieldValue (ostream&             os,
 
   if (fd.isArray)
     {
-      DArray  array;
+      DArray array;
       table.Get (row, field, array);
 
       const uint64_t count = array.Count ();
+      if (count == 0)
+        {
+          os << ' ' << NULL_LABEL;
+          return ;
+        }
+
       for (uint64_t i = 0; i < count; i++)
         {
           os << ' ';
@@ -2203,7 +2231,10 @@ PrintFieldValue (ostream&             os,
               table.Get (row, field, value);
               const uint64_t textLength = value.Count ();
               if (value.IsNull ())
-                break;
+                {
+                  os << NULL_LABEL;
+                  return ;
+                }
 
               assert (textLength > 0);
 

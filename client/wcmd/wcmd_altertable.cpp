@@ -590,7 +590,6 @@ TableAlterRules::CommitToTable (const string&           newTableName,
 
   assert (mSrcFields.size () <= mDstFields.size ());
 
-
   mDbs.AddTable (newTableName.c_str (), dummy.size (), &dummy[0]);
 
   try
@@ -637,19 +636,22 @@ TableAlterRules::CommitToTable (ITable&                 table,
                                        mSrcFields[f].isArray,
                                        mDstFields[f].type,
                                        mDstFields[f].isArray);
-
       rules.push_back (assoc);
     }
 
   if (rules.size () == 0)
     return ;
 
+  const ROW_INDEX rowsCount = mTable->AllocatedRows ();
   for (size_t ri = 0; ri < selectedRows.mIntervals.size (); ++ri)
     {
       const Interval<ROW_INDEX>& intv = selectedRows.mIntervals[ri];
 
       for (ROW_INDEX row = intv.mFrom; row <= intv.mTo; ++row)
         {
+          if (row >= rowsCount)
+            continue;
+
           const ROW_INDEX dstRow = table.AddRow ();
           for (size_t r = 0; r < rules.size (); ++r)
             {
@@ -672,14 +674,9 @@ TableAlterRules::Commit ()
 
   vector<DBSFieldDescriptor> dummy = mDstFields;
   ITable* table = NULL;
-
   Range<ROW_INDEX> allRows;
 
-  if (mTable->AllocatedRows () > 0)
-    allRows.Join (Interval<ROW_INDEX> (0, mTable->AllocatedRows ()));
-
-  else
-    return ;
+  allRows.Join (Interval<ROW_INDEX> (0, mTable->AllocatedRows ()));
 
   try
   {
@@ -689,7 +686,7 @@ TableAlterRules::Commit ()
   catch (const DBSException& e)
   {
       if (e.Code () != DBSException::FIELD_TYPE_INVALID)
-        mDbs.DeleteTable ("_temporal_persitent_table_");
+        mDbs.DeleteTable (temporalTableName);
 
       throw ;
   }
@@ -697,7 +694,7 @@ TableAlterRules::Commit ()
   {
       assert (table == NULL);
 
-      mDbs.DeleteTable ("_temporal_persitent_table_");
+      mDbs.DeleteTable (temporalTableName);
       throw ;
   }
 
@@ -707,7 +704,11 @@ TableAlterRules::Commit ()
 
       mDbs.ReleaseTable (*mTable);
       mTable = NULL;
+      mDbs.SyncAllTablesContent ();
       mDbs.DeleteTable (mTableName.c_str ());
+
+      allRows.Clear ();
+      allRows.Join (Interval<ROW_INDEX> (0, table->AllocatedRows ()));
 
       TableAlterRules copyBack (mDbs, *table);
       table = NULL;

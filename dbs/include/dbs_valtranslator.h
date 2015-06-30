@@ -118,40 +118,40 @@ public:
                        const uint_t             maxSize,
                        const whais::DInt8&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DInt16&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DInt32&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DInt64&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DReal&      value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DRichReal&  value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DUInt8&     value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DUInt16&    value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DUInt32&    value);
 
-  static uint_t Write (uint8_t* const             utf8Dest,
-                       const uint_t               maxSize,
+  static uint_t Write (uint8_t* const           utf8Dest,
+                       const uint_t             maxSize,
                        const whais::DUInt64&    value);
 };
 

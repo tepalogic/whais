@@ -57,7 +57,6 @@ whf_open (const char* const file, uint_t mode)
     openMode |= 0; /* WHC_FILEOPEN_EXISTING */
 
   openMode |= (mode & WH_FILETRUNC)  ? O_TRUNC  : 0;
-  openMode |= (mode & WH_FILEDIRECT) ? O_DIRECT : 0;
   openMode |= (mode & WH_FILESYNC)   ? O_DSYNC  : 0;
 
   if ((mode & WH_FILERDWR) == WH_FILERDWR)

@@ -630,7 +630,7 @@ AddOnlineTableCommands ()
 
   CmdEntry entry;
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "global";
   entry.mDesc         = globalShowDesc;
   entry.mExtendedDesc = globalShowDescExt;
@@ -638,7 +638,7 @@ AddOnlineTableCommands ()
 
   RegisterCommand (entry);
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "procedure";
   entry.mDesc         = procShowDesc;
   entry.mExtendedDesc = procShowDescExt;
@@ -646,7 +646,7 @@ AddOnlineTableCommands ()
 
   RegisterCommand (entry);
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "ping";
   entry.mDesc         = pingShowDesc;
   entry.mExtendedDesc = pingShowDescExt;
@@ -654,7 +654,7 @@ AddOnlineTableCommands ()
 
   RegisterCommand (entry);
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "greet";
   entry.mDesc         = greetShowDesc;
   entry.mExtendedDesc = greetShowDescExt;
@@ -662,7 +662,7 @@ AddOnlineTableCommands ()
 
   RegisterCommand (entry);
 
-  entry.mShowStatus   = false;
+  entry.mShowStatus   = true;
   entry.mName         = "exec";
   entry.mDesc         = execShowDesc;
   entry.mExtendedDesc = execShowDescExt;

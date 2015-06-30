@@ -848,7 +848,7 @@ main (const int argc, char *argv[])
                        << GetRemoteHostName () << '@'
                        << GetConnectionPort () << "'!\n";
 
-                  return 0;
+                  return EINVAL;
                 }
 
               AddOnlineTableCommands ();

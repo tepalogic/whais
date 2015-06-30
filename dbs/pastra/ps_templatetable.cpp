@@ -844,6 +844,8 @@ PrototypeTable::LoadNode (const NODE_INDEX nodeId)
     }
   else
     {
+      MarkRowModification ();
+
       //Reserve space for this node
       assert (TableContainer ().Size () == (nodeId * NodeRawSize ()));
 
@@ -862,7 +864,6 @@ PrototypeTable::LoadNode (const NODE_INDEX nodeId)
 void
 PrototypeTable::SaveNode (IBTreeNode* const node)
 {
-
   if (node->IsDirty () == false)
     return ;
 
