@@ -16,8 +16,8 @@
 PROCEDURE null_test_1 ()
 RETURN TABLE
 DO
-    LET row AS UINT64;
-    LET result AS TABLE OF (field1 AS BOOL,
+    VAR row AS UINT64;
+    VAR result AS TABLE OF (field1 AS BOOL,
                             field2 AS CHAR,
                             field3 AS DATE,
                             field4 AS DATETIME,
@@ -74,8 +74,8 @@ ENDPROC
 PROCEDURE null_test_1_1 ()
 RETURN BOOL
 DO
-    LET row AS UINT64;
-    LET result AS TABLE OF (field1 AS BOOL,
+    VAR row AS UINT64;
+    VAR result AS TABLE OF (field1 AS BOOL,
                             field2 AS CHAR,
                             field3 AS DATE,
                             field4 AS DATETIME,
@@ -412,8 +412,8 @@ ENDPROC
 PROCEDURE null_test_1_2 ()
 RETURN TABLE
 DO
-    LET row AS UINT64;
-    LET result AS TABLE OF (field1 AS ARRAY OF BOOL,
+    VAR row AS UINT64;
+    VAR result AS TABLE OF (field1 AS ARRAY OF BOOL,
                             field2 AS ARRAY OF CHAR,
                             field3 AS ARRAY OF DATE,
                             field4 AS ARRAY OF DATETIME,
@@ -475,7 +475,7 @@ ENDPROC
 PROCEDURE null_test_1_3 ()
 RETURN BOOL
 DO
-    LET result AS TABLE OF (field1 AS ARRAY OF BOOL,
+    VAR result AS TABLE OF (field1 AS ARRAY OF BOOL,
                             field2 AS ARRAY OF CHAR,
                             field3 AS ARRAY OF DATE,
                             field4 AS ARRAY OF DATETIME,
@@ -491,7 +491,7 @@ DO
                             field14 AS ARRAY OF REAL,
                             field15 AS ARRAY OF RICHREAL,
                             field16 AS TEXT);
-    LET row AS UINT64;
+    VAR row AS UINT64;
     
     write_log ("Start of null_test_1_3");
     IF (row != NULL) DO
@@ -1038,8 +1038,8 @@ ENDPROC
 PROCEDURE null_test_1_4 ()
 RETURN BOOL
 DO
-    LET row AS UINT64;
-    LET tab AS TABLE OF (field1 AS DATE);
+    VAR row AS UINT64;
+    VAR tab AS TABLE OF (field1 AS DATE);
 
     write_log ("Start of null_test_1_4");
     IF (row != NULL) DO
@@ -1078,8 +1078,8 @@ ENDPROC
 PROCEDURE null_test_1_5 ()
 RETURN BOOL
 DO
-    LET tab AS TABLE OF (field1 AS DATE);
-    LET fld AS FIELD OF DATE;
+    VAR tab AS TABLE OF (field1 AS DATE);
+    VAR fld AS FIELD OF DATE;
 
     write_log ("Start of null_test_1_5");
     IF (tab != NULL) DO
@@ -1125,7 +1125,7 @@ ENDPROC
 PROCEDURE null_test_2 ()
 RETURN ARRAY
 DO
-    LET result AS ARRAY OF INT32;
+    VAR result AS ARRAY OF INT32;
     
     write_log ("Start of null_test_2");
     IF (result != NULL) DO
@@ -1150,22 +1150,22 @@ PROCEDURE null_test_2_1 ()
 RETURN BOOL
 DO
 
-    LET array1 AS ARRAY OF BOOL;
-    LET array2 AS ARRAY OF CHAR;
-    LET array3 AS ARRAY OF DATE;
-    LET array4 AS ARRAY OF DATETIME;
-    LET array5 AS ARRAY OF HIRESTIME;
-    LET array6 AS ARRAY OF INT8;
-    LET array7 AS ARRAY OF INT16;
-    LET array8 AS ARRAY OF INT32;
-    LET array9 AS ARRAY OF INT64;
-    LET array10 AS ARRAY OF UINT8;
-    LET array11 AS ARRAY OF UINT16;
-    LET array12 AS ARRAY OF UINT32;
-    LET array13 AS ARRAY OF UINT64;
-    LET array14 AS ARRAY OF REAL;
-    LET array15 AS ARRAY OF RICHREAL;
-    LET array16 AS TEXT;
+    VAR array1 AS ARRAY OF BOOL;
+    VAR array2 AS ARRAY OF CHAR;
+    VAR array3 AS ARRAY OF DATE;
+    VAR array4 AS ARRAY OF DATETIME;
+    VAR array5 AS ARRAY OF HIRESTIME;
+    VAR array6 AS ARRAY OF INT8;
+    VAR array7 AS ARRAY OF INT16;
+    VAR array8 AS ARRAY OF INT32;
+    VAR array9 AS ARRAY OF INT64;
+    VAR array10 AS ARRAY OF UINT8;
+    VAR array11 AS ARRAY OF UINT16;
+    VAR array12 AS ARRAY OF UINT32;
+    VAR array13 AS ARRAY OF UINT64;
+    VAR array14 AS ARRAY OF REAL;
+    VAR array15 AS ARRAY OF RICHREAL;
+    VAR array16 AS TEXT;
 
     write_log ("Start of null_test_2_1");
         
@@ -1702,7 +1702,7 @@ ENDPROC
 PROCEDURE null_test_2_2 ()
 RETURN ARRAY
 DO
-    LET result AS ARRAY OF INT8;
+    VAR result AS ARRAY OF INT8;
 
     write_log ("Start of null_test_2_2");
     IF (result != NULL) DO
@@ -1742,7 +1742,7 @@ ENDPROC
 PROCEDURE null_test_2_3 ()
 RETURN BOOL
 DO
-    LET tab AS TABLE OF (field1 AS ARRAY OF DATE);
+    VAR tab AS TABLE OF (field1 AS ARRAY OF DATE);
 
     write_log ("Started test null_test_2_3");
 
@@ -1799,22 +1799,22 @@ ENDPROC
 #Call this function twice and make sure it returns TRUE in both cases.
 PROCEDURE null_test_3 () RETURN BOOL
 DO
-    LET b AS BOOL;
-    LET c AS CHAR;
-    LET d AS DATE;
-    LET dt AS DATETIME;
-    LET ht AS HIRESTIME;
-    LET i8 AS INT8;
-    LET i16 AS INT16;
-    LET i32 AS INT32;
-    LET i64 AS INT64;
-    LET u8 AS  UINT8;
-    LET u16 AS UINT16;
-    LET u32 AS UINT32;
-    LET u64 AS UINT64;
-    LET r AS REAL;
-    LET rr AS RICHREAL;
-    LET t AS TEXT;
+    VAR b AS BOOL;
+    VAR c AS CHAR;
+    VAR d AS DATE;
+    VAR dt AS DATETIME;
+    VAR ht AS HIRESTIME;
+    VAR i8 AS INT8;
+    VAR i16 AS INT16;
+    VAR i32 AS INT32;
+    VAR i64 AS INT64;
+    VAR u8 AS  UINT8;
+    VAR u16 AS UINT16;
+    VAR u32 AS UINT32;
+    VAR u64 AS UINT64;
+    VAR r AS REAL;
+    VAR rr AS RICHREAL;
+    VAR t AS TEXT;
     
     write_log ("Started test null_test_3");
     
@@ -1938,22 +1938,22 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_3_1 () RETURN BOOL
 DO
-    LET b AS BOOL;
-    LET c AS CHAR;
-    LET d AS DATE;
-    LET dt AS DATETIME;
-    LET ht AS HIRESTIME;
-    LET i8 AS INT8;
-    LET i16 AS INT16;
-    LET i32 AS INT32;
-    LET i64 AS INT64;
-    LET u8 AS  UINT8;
-    LET u16 AS UINT16;
-    LET u32 AS UINT32;
-    LET u64 AS UINT64;
-    LET r AS REAL;
-    LET rr AS RICHREAL;
-    LET t AS TEXT;
+    VAR b AS BOOL;
+    VAR c AS CHAR;
+    VAR d AS DATE;
+    VAR dt AS DATETIME;
+    VAR ht AS HIRESTIME;
+    VAR i8 AS INT8;
+    VAR i16 AS INT16;
+    VAR i32 AS INT32;
+    VAR i64 AS INT64;
+    VAR u8 AS  UINT8;
+    VAR u16 AS UINT16;
+    VAR u32 AS UINT32;
+    VAR u64 AS UINT64;
+    VAR r AS REAL;
+    VAR rr AS RICHREAL;
+    VAR t AS TEXT;
     
     write_log ("Started test null_test_3_1");
     
@@ -2176,7 +2176,7 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_4 () RETURN BOOL
 DO
-    LET t AS TEXT;
+    VAR t AS TEXT;
 
     write_log ("Started test null_test_4");
 
@@ -2221,7 +2221,7 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_4_1 () RETURN BOOL
 DO
-    LET tab AS TABLE OF (field1 AS TEXT);
+    VAR tab AS TABLE OF (field1 AS TEXT);
 
     write_log ("Started test null_test_4_1");
 

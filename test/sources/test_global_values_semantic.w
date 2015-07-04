@@ -5,21 +5,21 @@
 
 #@include whais_std.wh
 
-LET test_global_value1 AS INT32;
-LET test_global_value2 AS ARRAY OF INT64;
-LET test_global_value3 AS TEXT;
-LET test_global_value4 AS FIELD OF INT32;
-LET test_global_value5 AS FIELD OF ARRAY OF INT32;
-LET test_global_value6 AS FIELD OF TEXT;
+VAR test_global_value1 AS INT32;
+VAR test_global_value2 AS ARRAY OF INT64;
+VAR test_global_value3 AS TEXT;
+VAR test_global_value4 AS FIELD OF INT32;
+VAR test_global_value5 AS FIELD OF ARRAY OF INT32;
+VAR test_global_value6 AS FIELD OF TEXT;
 
-LET test_global_value7 AS TABLE OF (f1 AS INT32, 
+VAR test_global_value7 AS TABLE OF (f1 AS INT32, 
                                     f2 AS ARRAY OF INT32,
                                     f3 AS TEXT,
                                     f1_2 AS INT32,
                                     f2_2 AS ARRAY OF INT32,
                                     f3_2 AS TEXT);
 
-LET test_global_values_inited AS BOOL;
+VAR test_global_values_inited AS BOOL;
 
 
 PROCEDURE test_global_value_semantic_init () RETURN BOOL

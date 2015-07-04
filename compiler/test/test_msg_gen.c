@@ -70,14 +70,14 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 char test_prog_1[] = ""
   "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
-  "LET some_var AS DATE; \n"
+  "VAR some_var AS DATE; \n"
   "RETURN some_var; \n"
   "ENDPROC \n";
 
 char test_prog_2[] = ""
   "PROCEDURE Proc_1 () RETURN DATE \n"
   "DO \n"
-  "LET some_var AS DATE; \n"
+  "VAR some_var AS DATE; \n"
   "RETURN some_var; \n"
   "ENDPROC \n"
   " \n"
@@ -97,8 +97,8 @@ char test_prog_4[] = ""
 char test_prog_5[] = ""
   "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
-  "LET some_var AS DATE; \n"
-  "LET some_int AS INT8; \n"
+  "VAR some_var AS DATE; \n"
+  "VAR some_int AS INT8; \n"
   "SYNC \n"
   "SYNC \n"
   "some_int = 0; \n"
@@ -107,8 +107,8 @@ char test_prog_5[] = ""
 char test_prog_6[] = ""
   "PROCEDURE Proc () RETURN ARRAY OF DATE \n"
   "DO \n"
-  "LET some_var AS DATE; \n"
-  "LET some_int as INT32; \n"
+  "VAR some_var AS DATE; \n"
+  "VAR some_int as INT32; \n"
   " \n"
   "SYNC \n"
   "some_int = 0; \n"
@@ -1140,19 +1140,19 @@ char test_prog_6[] = ""
 
 char test_prog_7[] = ""
   "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE OF (v1 AS TEXT, v2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+  "DO \n" "VAR some_var AS TABLE OF (v1 AS TEXT, v2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_8[] = ""
   "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
+  "DO \n" "VAR some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "RETURN some_var; \n" "ENDPROC \n";
 
 char test_prog_9[] = ""
   "PROCEDURE Proc () RETURN TABLE OF (f1 AS TEXT, f2 AS DATE) \n"
-  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "some_var=NULL; \n" "ENDPROC \n";
+  "DO \n" "VAR some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n" "some_var=NULL; \n" "ENDPROC \n";
 
 char test_prog_10[] = ""
   "PROCEDURE Proc () RETURN BOOL \n"
-  "DO \n" "LET some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n"
+  "DO \n" "VAR some_var AS TABLE OF (f1 AS TEXT, f2 AS UINT8); \n"
   " IF (some_var != NULL) RETURN TRUE; ELSE RETURN FALSE;\n some_var=NULL; \n" "ENDPROC \n";
 
 

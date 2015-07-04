@@ -5,7 +5,7 @@
 
 PROCEDURE if_test () RETURN BOOL
 DO
-	LET a, b, c AS BOOL;
+	VAR a, b, c AS BOOL;
 
 	IF a THEN
 		b = TRUE;
@@ -16,7 +16,7 @@ ENDPROC
 
 PROCEDURE if_else_test () RETURN BOOL
 DO
-	LET a, b, c, d AS BOOL;
+	VAR a, b, c, d AS BOOL;
 
 	IF a THEN
 		b = TRUE;
@@ -29,7 +29,7 @@ ENDPROC
 
 PROCEDURE if_elif_test () RETURN BOOL
 DO
-	LET a, b, c, d AS BOOL;
+	VAR a, b, c, d AS BOOL;
 
 	IF a THEN
 		b = TRUE;
@@ -42,7 +42,7 @@ ENDPROC
 
 PROCEDURE if_elif_else_test () RETURN BOOL
 DO
-	LET a, b, c, d AS BOOL;
+	VAR a, b, c, d AS BOOL;
 
 	IF a THEN
 		b = TRUE;
@@ -57,7 +57,7 @@ ENDPROC
 
 PROCEDURE if_elif_else_empty_test () RETURN BOOL
 DO
-	LET a, b, c, d AS BOOL;
+	VAR a, b, c, d AS BOOL;
 
 	IF a THEN
 		#Empty statement

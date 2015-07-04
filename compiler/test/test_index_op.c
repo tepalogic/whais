@@ -50,7 +50,7 @@ check_used_vals (struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "LET gb AS INT16; "
+  "VAR gb AS INT16; "
   "PROCEDURE ProcId1 (v1 AS ARRAY OF INT16) RETURN INT16 "
   "DO " "RETURN v1[gb]; " "ENDPROC\n\n" ""
   "PROCEDURE ProcId2 (v1 AS TEXT) RETURN CHAR "

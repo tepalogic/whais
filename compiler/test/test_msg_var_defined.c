@@ -70,7 +70,7 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 
 char test_prog_1[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
-  "DO \n" "LET v1 AS INT64; \n" "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
+  "DO \n" "VAR v1 AS INT64; \n" "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
 char test_prog_2[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v1 AS INT8) RETURN INT32 \n"
@@ -80,36 +80,36 @@ char test_prog_3[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
   "DO \n"
   "v1 = v1 + v2;\n "
-  "LET v1 as DATE;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
+  "VAR v1 as DATE;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
 char test_prog_4[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
   "DO \n"
-  "LET v3 as INT8;\n "
+  "VAR v3 as INT8;\n "
   "v3 = v1 + v2;\n "
-  "LET v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
+  "VAR v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
 char test_prog_5[] = ""
-  "LET a AS INT32; \n"
-  "LET b AS INT32; \n"
-  "LET a AS INT32; \n";
+  "VAR a AS INT32; \n"
+  "VAR b AS INT32; \n"
+  "VAR a AS INT32; \n";
 
 char test_prog_6[] = ""
-  "LET a AS INT32; \n"
-  "LET b AS INT32; \n"
-  "EXTERN LET a AS INT32; \n";
+  "VAR a AS INT32; \n"
+  "VAR b AS INT32; \n"
+  "EXTERN VAR a AS INT32; \n";
 
 char test_prog_7[] = ""
-  "EXTERN LET a AS ARRAY OF INT32; \n"
-  "LET b AS INT32; \n"
-  "LET a AS INT32; \n";
+  "EXTERN VAR a AS ARRAY OF INT32; \n"
+  "VAR b AS INT32; \n"
+  "VAR a AS INT32; \n";
 
 char test_prog_8[] = ""
   "PROCEDURE ProcId1 (v1 AS INT8, v2 AS INT8) RETURN INT32 \n"
   "DO \n"
-  "EXTERN LET v3 as INT8;\n "
+  "EXTERN VAR v3 as INT8;\n "
   "v3 = v1 + v2;\n "
-  "LET v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
+  "VAR v3 as INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
 
 bool_t

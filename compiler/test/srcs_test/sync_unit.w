@@ -4,7 +4,7 @@
 
 PROCEDURE lots_of_sync_test () return BOOL
 DO
-	LET a AS BOOL;
+	VAR a AS BOOL;
 
 	SYNC a = TRUE; ENDSYNC
 	SYNC a = TRUE; ENDSYNC
@@ -268,7 +268,7 @@ ENDPROC
 
 PROCEDURE more_complex_sync_test () return BOOL
 DO
-	LET a, b, c AS BOOL;
+	VAR a, b, c AS BOOL;
 
 	SYNC
 		if a == TRUE

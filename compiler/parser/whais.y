@@ -47,7 +47,6 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token INT16
 %token INT32
 %token INT64
-%token LET
 %token OF
 %token PROCEDURE
 %token REAL
@@ -62,6 +61,7 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token UINT64
 %token UNDEFINED
 %token UNTIL
+%token VAR
 %token WHILE
 %token WHAIS_NULL
 %token W_FALSE
@@ -108,7 +108,7 @@ global_block_statement: /* empty */
                         global_block_statement
 ;
 
-var_decl_stmt: LET id_list AS type_spec ';'
+var_decl_stmt: VAR id_list AS type_spec ';'
                   { $$ = add_list_declaration (state, $2, $4); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  

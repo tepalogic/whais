@@ -20,7 +20,7 @@ static const char procName[] = "p1";
 const uint8_t dummyProgram[] = ""
     "PROCEDURE p1 (a1 AS INT8, a2 AS INT8) RETURN BOOL\n"
     "DO\n"
-      "LET hd1, hd2 AS HIRESTIME\n;"
+      "VAR hd1, hd2 AS HIRESTIME\n;"
       "\n"
       "hd1 = '2012/12/12 13:00:00.100';\n"
       "hd2 = '2012/12/11 13:00:00';\n"

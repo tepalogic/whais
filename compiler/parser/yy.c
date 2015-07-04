@@ -289,7 +289,6 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"INT16", INT16},
                                         {"INT32", INT32},
                                         {"INT64", INT64},
-                                        {"LET", LET},
                                         {"OF", OF},
                                         {"OR", OR},
                                         {"NOT", NOT},
@@ -308,6 +307,7 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"UINT64", UINT64},
                                         {"UNDEFINED", UNDEFINED},
                                         {"UNTIL", UNTIL},
+                                        {"VAR", VAR},
                                         {"WHILE", WHILE},
                                         {"XOR", XOR},
 

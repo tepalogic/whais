@@ -4,7 +4,7 @@
 
 PROCEDURE while_test () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 	
 	WHILE a DO
 		b = NULL;
@@ -16,7 +16,7 @@ ENDPROC
 
 PROCEDURE while_cont_test () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 	
 	WHILE a DO
 		b = NULL;
@@ -29,7 +29,7 @@ ENDPROC
 
 PROCEDURE while_break_test () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 	
 	WHILE a DO
 		b = NULL;
@@ -42,7 +42,7 @@ ENDPROC
 
 PROCEDURE while_break_cont_test () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 	
 	WHILE a DO
 		if b == NULL THEN
@@ -60,7 +60,7 @@ ENDPROC
 
 PROCEDURE until_stmt () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 
 	DO
 		b = FALSE;
@@ -71,7 +71,7 @@ ENDPROC
 
 PROCEDURE until_break_stmt () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 
 	DO
 		IF b == TRUE THEN
@@ -87,7 +87,7 @@ ENDPROC
 
 PROCEDURE until_cont_stmt () RETURN BOOL
 DO
-	LET a, b AS BOOL;
+	VAR a, b AS BOOL;
 
 	DO
 		IF b == TRUE THEN
@@ -103,7 +103,7 @@ ENDPROC
 
 PROCEDURE until_break_cont_stmt () RETURN BOOL
 DO
-	LET a, b, c AS BOOL;
+	VAR a, b, c AS BOOL;
 
 	DO
 		IF b == TRUE THEN

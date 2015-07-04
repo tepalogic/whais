@@ -67,11 +67,11 @@ static GlobalDescs admin_glbs [ADMIN_GLBS_COUNT] =
     };
 
 static const uint8_t commonCode[] =
-    "LET gb1_1 AS DATE;\n"
-    "LET gb1_2 AS UINT32;\n"
-    "LET gb1_3 AS ARRAY OF UINT32;\n"
-    "LET tab1 AS TABLE OF (tab1_f1 AS INT8, tab1_f2 as TEXT, tab1_f3 AS ARRAY OF DATE);\n"
-    "LET field1 AS FIELD OF TEXT;";
+    "VAR gb1_1 AS DATE;\n"
+    "VAR gb1_2 AS UINT32;\n"
+    "VAR gb1_3 AS ARRAY OF UINT32;\n"
+    "VAR tab1 AS TABLE OF (tab1_f1 AS INT8, tab1_f2 as TEXT, tab1_f3 AS ARRAY OF DATE);\n"
+    "VAR field1 AS FIELD OF TEXT;";
 
 static GlobalDescs user_glbs [USERS_GLBS_COUNT] =
     {
@@ -100,13 +100,13 @@ static GlobalDescs user_glbs [USERS_GLBS_COUNT] =
     };
 
 static const uint8_t userCode[] =
-    "LET us1_1 AS DATETIME;\n"
-    "LET us1_2 AS INT64;\n"
-    "LET us1_3 AS ARRAY OF DATE;\n"
-    "LET tab2 AS TABLE OF (tab2_f1 AS INT8, tab2_f2 as DATE, tab2_f3 AS ARRAY OF DATE);\n"
-    "LET tab3 AS TABLE OF (tab3_f1 AS CHAR, tab3_f2 AS ARRAY OF INT8);\n"
-    "LET field2 AS FIELD OF DATETIME;\n"
-    "LET tab4 AS TABLE OF (tab4_f1 AS TEXT);\n";
+    "VAR us1_1 AS DATETIME;\n"
+    "VAR us1_2 AS INT64;\n"
+    "VAR us1_3 AS ARRAY OF DATE;\n"
+    "VAR tab2 AS TABLE OF (tab2_f1 AS INT8, tab2_f2 as DATE, tab2_f3 AS ARRAY OF DATE);\n"
+    "VAR tab3 AS TABLE OF (tab3_f1 AS CHAR, tab3_f2 AS ARRAY OF INT8);\n"
+    "VAR field2 AS FIELD OF DATETIME;\n"
+    "VAR tab4 AS TABLE OF (tab4_f1 AS TEXT);\n";
 
 
 static const char *MSG_PREFIX[] = {

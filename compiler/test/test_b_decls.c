@@ -50,21 +50,21 @@ check_used_vals (struct ParserState *state)
 }
 
 char buffer[] =
-  "LET _var_01 AS BOOL;\n"
-  "LET _var_02 AS CHAR;\n"
-  "LET _var_03 AS DATE;\n"
-  "LET _var_04 AS DATETIME;\n"
-  "LET _var_05 AS HIRESTIME;\n"
-  "LET _var_06 AS INT8;\n"
-  "LET _var_07 AS INT16;\n"
-  "LET _var_08 AS INT32;\n"
-  "LET _var_09, second_var AS INT64;\n"
-  "LET _var_10, _1, a2, _a3 AS REAL;\n"
-  "LET _var_11, b4c AS RICHREAL;\n"
-  "LET _var_12 AS TEXT;\n"
-  "LET _var_13 AS UINT8;\n"
-  "LET _var_14 AS UINT16;\n"
-  "LET _var_15 AS UINT32;\n" "LET _var_16 AS UINT64;\n";
+  "VAR _var_01 AS BOOL;\n"
+  "VAR _var_02 AS CHAR;\n"
+  "VAR _var_03 AS DATE;\n"
+  "VAR _var_04 AS DATETIME;\n"
+  "VAR _var_05 AS HIRESTIME;\n"
+  "VAR _var_06 AS INT8;\n"
+  "VAR _var_07 AS INT16;\n"
+  "VAR _var_08 AS INT32;\n"
+  "VAR _var_09, second_var AS INT64;\n"
+  "VAR _var_10, _1, a2, _a3 AS REAL;\n"
+  "VAR _var_11, b4c AS RICHREAL;\n"
+  "VAR _var_12 AS TEXT;\n"
+  "VAR _var_13 AS UINT8;\n"
+  "VAR _var_14 AS UINT16;\n"
+  "VAR _var_15 AS UINT32;\n" "VAR _var_16 AS UINT64;\n";
 
 static bool_t
 check_declared_var (struct Statement *stm,

@@ -50,8 +50,8 @@ check_used_vals (struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "LET tab_glb AS TABLE OF ( field_t AS DATE); "
-  "LET tab_glb2 AS TABLE OF ( field2 AS TEXT, field_t AS DATE); "
+  "VAR tab_glb AS TABLE OF ( field_t AS DATE); "
+  "VAR tab_glb2 AS TABLE OF ( field2 AS TEXT, field_t AS DATE); "
   "PROCEDURE ProcId1 (v1 AS CHAR, v2 AS CHAR) RETURN CHAR "
   "DO "
   "RETURN v1 = v2; "

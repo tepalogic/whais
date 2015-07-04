@@ -1,14 +1,14 @@
 #Test file to check if the different constants are properly handled.
 
-LET glb0 AS BOOL;
-LET glb1 AS UINT;
-LET glb2 AS DATE;
-LET glb3 AS DATETIME;
-LET glb4 AS HIRESTIME;
-LET glb5 AS INT64;
-LET glb6 AS REAL;
-LET glb7 AS RICHREAL;
-LET glb8 AS TEXT;
+VAR glb0 AS BOOL;
+VAR glb1 AS UINT;
+VAR glb2 AS DATE;
+VAR glb3 AS DATETIME;
+VAR glb4 AS HIRESTIME;
+VAR glb5 AS INT64;
+VAR glb6 AS REAL;
+VAR glb7 AS RICHREAL;
+VAR glb8 AS TEXT;
 
 PROCEDURE test () RETURN BOOL
 DO
