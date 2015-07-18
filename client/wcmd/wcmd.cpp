@@ -27,9 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <assert.h>
 #include <signal.h>
-
 
 #include "utils/enc_des.h"
 #include "utils/license.h"
@@ -89,7 +89,11 @@ static const char usageDescription[] =
 "    -t, --validate         Check the database integrity.\n"
 "    -f, --auto_yes         Auto answer with 'yes' to all questions related\n"
 "                           to database validation.\n"
-"    --verbose level       Set the verbosity level. Level values:\n"
+"\n"
+"    -G, --globals          Generate the declaration of external globals\n"
+"                           variables for all tables found in the database.\n"
+"\n"
+"    --verbose level        Set the verbosity level. Level values:\n"
 "                            0: No out put.\n"
 "                            1: Print the status of the executed command.\n"
 "                            2: Print the error messages in addition.\n"
@@ -97,8 +101,10 @@ static const char usageDescription[] =
 "                            4: Print the various information in addition.\n"
 "                            5: Print the debug information in addition.\n"
 "                           Default values is 2.\n"
+"\n"
 "    -s, --script file      Execute the commands from the supplied file,\n"
 "                           rather to execute interactively.\n"
+"    -S, --cmd script       Execute a script provided by parameter 'script'.\n"
 "\n"
 "    --nologo               Do not display startup information.\n"
 "    -l, --license          Prints license terms.\n"
@@ -360,7 +366,10 @@ ExecuteInteractively (istream& is)
             {
               line.resize (line.length () - 1);
               if ( ! ExecuteCommandStmt (commandStmt))
-                sFinishInteraction = true;
+                {
+                  sFinishInteraction = true;
+                  return EINVAL;
+                }
 
               commandStmt.resize (0);
             }
@@ -368,7 +377,7 @@ ExecuteInteractively (istream& is)
       else if ((&is != &cin) && (commandStmt.length () > 0))
         {
           cerr << "Error! A script statement does not end with ';'.\n";
-          return 1;
+          return EINVAL;
         }
       else
         break;
@@ -493,7 +502,9 @@ main (const int argc, char *argv[])
   bool          checkDbForErrors    = false;
   bool          showLogo            = true;
   bool          showLicense         = false;
-  const char*   scriptFile = NULL;
+  bool          genHeader           = false;
+  const char*   scriptFile          = NULL;
+  const char*   cmdScript           = NULL;
   string        dbDirectory;
 
   if (! whs_init ())
@@ -613,6 +624,13 @@ main (const int argc, char *argv[])
 
           SetWorkingDirectory (argv[currentArg++]);
         }
+      else if ((strcmp (argv[currentArg], "-G") == 0)
+               || (strcmp (argv[currentArg], "--globals") == 0))
+        {
+          genHeader = true;
+          showLogo  = false;
+          ++currentArg;
+        }
       else if (strcmp (argv[currentArg], "--verbose" ) == 0)
         {
           ++currentArg;
@@ -644,6 +662,19 @@ main (const int argc, char *argv[])
               return EINVAL;
             }
           scriptFile = argv [currentArg++];
+          showLogo = false;
+        }
+      else if ((strcmp (argv[currentArg], "-S") == 0) ||
+               (strcmp (argv[currentArg], "--cmd" ) == 0))
+        {
+          ++currentArg;
+          if (currentArg == argc)
+            {
+              PrintWrongUsage (argv[currentArg - 1]);
+
+              return EINVAL;
+            }
+          cmdScript = argv [currentArg++];
           showLogo = false;
         }
       else if ((strcmp (argv[currentArg], "-m") == 0) ||
@@ -729,11 +760,17 @@ main (const int argc, char *argv[])
       return EINVAL;
     }
 
-  if (IsOnlineDatabase ())
+  if (IsOnlineDatabase () || genHeader)
     {
       if (removeDB || createDB)
         {
-          cerr << "Cannot remove nor create a database on a remote host.\n";
+          if (genHeader)
+            {
+              cerr << "Cannot generate header file for a database that will be "
+                   << (createDB ? "created" : "removed.") << endl;
+            }
+          else
+            cerr << "Cannot remove nor create a database on a remote host.\n";
           return EINVAL;
         }
 
@@ -860,9 +897,19 @@ main (const int argc, char *argv[])
             }
 
         set_signals ();
-        if (scriptFile != NULL)
+        if (genHeader)
+          {
+            PrintExternalDeclarations (cout);
+            result = 0;
+          }
+        else if (scriptFile != NULL)
           {
             ifstream script (scriptFile, ios_base::in | ios_base::binary);
+            result = ExecuteInteractively (script);
+          }
+        else if (cmdScript != NULL)
+          {
+            istringstream script (cmdScript);
             result = ExecuteInteractively (script);
           }
         else

@@ -25,8 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WCMD_TABCMDS_H_
 #define WCMD_TABCMDS_H_
 
+
+#include <iostream>
+
 void
 AddOfflineTableCommands ();
+
+void
+PrintExternalDeclarations (std::ostream& os);
 
 #endif //WCMD_TABCMDS_H_
 

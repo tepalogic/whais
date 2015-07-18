@@ -151,8 +151,10 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   string              token     = CmdLineNextToken (cmdLine, linePos);
   string              globals;
   WH_CONNECTION       conHdl    = NULL;
-  unsigned int        glbsCount = 0;
+  uint_t              glbsCount = 0;
+  uint_t              glbsSel   = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel ();
+  vector<string>      subStrs;
 
   assert (token == "global");
 
@@ -172,51 +174,70 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  if (linePos >= cmdLine.length ())
+  while (linePos <= cmdLine.length ())
     {
-      cs = WStartGlobalsList (conHdl, &glbsCount);
-      if (level >= VL_DEBUG)
-        {
-          if (cs == WCS_OK)
-            cout << "Got " << glbsCount << " globals.\n";
+      token = CmdLineNextToken (cmdLine, linePos);
+      if (token.length () == 0)
+        break;
 
-          else
-            cout << "Listing globals variables has failed\n";
+      subStrs.push_back (token);
+    }
+
+  cs = WStartGlobalsList (conHdl, &glbsCount);
+  if (level >= VL_DEBUG)
+    {
+      if (cs == WCS_OK)
+        cout << "Got " << glbsCount << " globals.\n";
+
+      else
+        cout << "Listing globals variables has failed\n";
+    }
+
+  uint_t glbIt = glbsCount;
+  while ((cs == WCS_OK)
+          && (glbIt-- > 0))
+    {
+      const char* glbName = NULL;
+      cs = WFetchGlobal (conHdl, &glbName);
+      if ((cs != WCS_OK) && (level < VL_DEBUG))
+        cout << "Fetching global value name has failed.\n";
+
+      assert (glbName != NULL);
+
+      if (subStrs.size () > 0)
+        {
+          for (size_t i = 0; i < subStrs.size(); ++i)
+            {
+              if (strstr (glbName, subStrs[i].c_str ()) != NULL)
+                {
+                  globals += ' ';
+                  globals += glbName;
+                  ++glbsSel;
+
+                  break;
+                }
+            }
         }
-
-      while ((cs == WCS_OK)
-              && (glbsCount-- > 0))
+      else
         {
-          const char* glbName = NULL;
-          cs = WFetchGlobal (conHdl, &glbName);
-
-          assert (glbName != NULL);
-
           globals += ' ';
           globals += glbName;
-
-          if ((cs != WCS_OK) && (level < VL_DEBUG))
-            cout << "Fetching global value name has failed.\n";
+          ++glbsSel;
         }
-      linePos = 0;
     }
-  else
-    globals = cmdLine;
 
   if (cs != WCS_OK)
     goto cmdGlobalList_exit;
 
+  linePos = 0;
   do
     {
       unsigned int rawType = 0;
-
-      token = CmdLineNextToken (globals, linePos);
-
+      token   = CmdLineNextToken (globals, linePos);
       if (token.length () == 0)
 	    break;
 
       cs = WDescribeGlobal (conHdl, token.c_str (), &rawType);
-
       if (cs != WCS_OK)
         {
           if (level <= VL_DEBUG)
@@ -273,6 +294,13 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   while ((linePos < globals.length ())
          && (cs == WCS_OK));
 
+  if ((cs == WCS_OK)
+      && (level >= VL_INFO))
+    {
+      cout << "Listed " << glbsSel << '(' << glbsCount << ") globals.\n";
+    }
+
+
 cmdGlobalList_exit:
   WClose (conHdl);
 
@@ -299,8 +327,10 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   string              token       = CmdLineNextToken (cmdLine, linePos);
   string              procedures;
   WH_CONNECTION       conHdl      = NULL;
-  unsigned int        procsCount  = 0;
+  uint_t              procsCount  = 0;
+  uint_t              procsSelect = 0;
   const VERBOSE_LEVEL level       = GetVerbosityLevel ();
+  vector<string>      subStrs;
 
   uint32_t cs = WConnect (GetRemoteHostName ().c_str (),
                           GetConnectionPort ().c_str (),
@@ -322,45 +352,67 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  if (linePos >= cmdLine.length ())
+  while (linePos <= cmdLine.length ())
     {
-      cs = WStartProceduresList (conHdl, &procsCount);
-      if (level >= VL_DEBUG)
-        {
-          if (cs == WCS_OK)
-            cout << "Got " << procsCount << " procedures.\n";
+      token = CmdLineNextToken (cmdLine, linePos);
+      if (token.length () == 0)
+        break;
 
-          else
-            cout << "Listing procedures has failed\n";
+      subStrs.push_back (token);
+    }
+
+  cs = WStartProceduresList (conHdl, &procsCount);
+  if (level >= VL_DEBUG)
+    {
+      if (cs == WCS_OK)
+        cout << "Got " << procsCount << " procedures.\n";
+
+      else
+        cout << "Listing procedures has failed\n";
+    }
+
+  uint_t procIt = procsCount;
+  while ((cs == WCS_OK)
+          && (procIt-- > 0))
+    {
+      const char* procName = NULL;
+      cs = WFetchProcedure (conHdl, &procName);
+      if ((cs != WCS_OK) && (level < VL_DEBUG))
+        cout << "Fetching procedure name has failed.\n";
+
+      assert (procName != NULL);
+
+      if (subStrs.size () > 0)
+        {
+          for (size_t i = 0; i < subStrs.size(); ++i)
+            {
+              if (strstr (procName, subStrs[i].c_str ()) != NULL)
+                {
+                  procedures += ' ';
+                  procedures += procName;
+                  ++procsSelect;
+
+                  break;
+                }
+            }
         }
-
-      while ((cs == WCS_OK)
-              && (procsCount-- > 0))
+      else
         {
-          const char* procName = NULL;
-          cs = WFetchProcedure (conHdl, &procName);
-
-          assert (procName != NULL);
-
           procedures += ' ';
           procedures += procName;
-
-          if ((cs != WCS_OK) && (level < VL_DEBUG))
-            cout << "Fetching procedure name has failed.\n";
+          ++procsSelect;
         }
-      linePos = 0;
     }
-  else
-    procedures = cmdLine;
 
   if (cs != WCS_OK)
     goto cmdProcList_exit;
 
+  linePos = 0;
   do
     {
       uint_t procsParametersCount;
 
-      token = CmdLineNextToken (procedures, linePos);
+      token   = CmdLineNextToken (procedures, linePos);
       if (token.size () == 0)
         break;
 
@@ -465,6 +517,13 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
   while ((linePos < procedures.length ())
          && (cs == WCS_OK));
+
+  if ((cs == WCS_OK)
+      && (level >= VL_INFO))
+    {
+      cout << "Listed " << procsSelect << '(' << procsCount
+           << ") procedures.\n";
+    }
 
 cmdProcList_exit:
   WClose (conHdl);

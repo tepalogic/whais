@@ -239,6 +239,71 @@ static const char fieldsDescExt[] = ""
   "2. Some sub commands might remove the fields indexes as side effect.\n"
   "   Consequently a index rebuilds might be required.\n\n";
 
+static void
+print_field_desc (const DBSFieldDescriptor& desc,
+                  ostream&                  os)
+{
+  if (desc.isArray)
+    os << "ARRAY OF ";
+
+  if (desc.type == T_BOOL)
+    os << "BOOL";
+
+  else if (desc.type == T_CHAR)
+    os << "CHAR";
+
+  else if (desc.type == T_DATE)
+    os << "DATE";
+
+  else if (desc.type == T_DATETIME)
+    os << "DATETIME";
+
+  else if (desc.type == T_HIRESTIME)
+    os << "HIRESTIME";
+
+  else if (desc.type == T_INT8)
+    os << "INT8";
+
+  else if (desc.type == T_INT16)
+    os << "INT16";
+
+  else if (desc.type == T_INT32)
+    os << "INT32";
+
+  else if (desc.type == T_INT64)
+    os << "INT64";
+
+  else if (desc.type == T_UINT8)
+    os << "UINT8";
+
+  else if (desc.type == T_UINT16)
+    os << "UINT16";
+
+  else if (desc.type == T_UINT32)
+    os << "UINT32";
+
+  else if (desc.type == T_UINT64)
+    os << "UINT64";
+
+  else if (desc.type == T_REAL)
+    os << "REAL";
+
+  else if (desc.type == T_RICHREAL)
+    os << "RICHREAL";
+
+  else if (desc.type == T_RICHREAL)
+    os << "RICHREAL";
+
+  else if (desc.type == T_TEXT)
+    os << "TEXT";
+
+  else
+    {
+      assert (false);
+
+      os << "??";
+    }
+}
 
 static void
 print_field_desc (const DBSFieldDescriptor& desc,
@@ -247,71 +312,15 @@ print_field_desc (const DBSFieldDescriptor& desc,
 {
   cout << left << setw (longestField) << desc.name << setw (0) << " : ";
 
-  if (desc.isArray)
-    cout << "ARRAY OF ";
-
-  if (desc.type == T_BOOL)
-    cout << "BOOL";
-
-  else if (desc.type == T_CHAR)
-    cout << "CHAR";
-
-  else if (desc.type == T_DATE)
-    cout << "DATE";
-
-  else if (desc.type == T_DATETIME)
-    cout << "DATETIME";
-
-  else if (desc.type == T_HIRESTIME)
-    cout << "HIRESTIME";
-
-  else if (desc.type == T_INT8)
-    cout << "INT8";
-
-  else if (desc.type == T_INT16)
-    cout << "INT16";
-
-  else if (desc.type == T_INT32)
-    cout << "INT32";
-
-  else if (desc.type == T_INT64)
-    cout << "INT64";
-
-  else if (desc.type == T_UINT8)
-    cout << "UINT8";
-
-  else if (desc.type == T_UINT16)
-    cout << "UINT16";
-
-  else if (desc.type == T_UINT32)
-    cout << "UINT32";
-
-  else if (desc.type == T_UINT64)
-    cout << "UINT64";
-
-  else if (desc.type == T_REAL)
-    cout << "REAL";
-
-  else if (desc.type == T_RICHREAL)
-    cout << "RICHREAL";
-
-  else if (desc.type == T_RICHREAL)
-    cout << "RICHREAL";
-
-  else if (desc.type == T_TEXT)
-    cout << "TEXT";
-
-  else
-    {
-      assert (false);
-      cout << "??";
-    }
+  print_field_desc (desc, cout);
 
   if (indexed)
     cout << " (indexed)";
 
   cout << endl;
 }
+
+
 
 
 static bool
@@ -695,6 +704,8 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
             uint_t longestField = 8;
 
             token = CmdLineNextToken (cmdLine, linePos);
+
+            assert (token.size () > 0);
 
             ITable& table = dbs.RetrievePersistentTable (token.c_str ());
 
@@ -1485,5 +1496,37 @@ AddOfflineTableCommands ()
   entry.mCmd          = cmdRowsMgm;
 
   RegisterCommand (entry);
+}
+
+
+void
+PrintExternalDeclarations (ostream& os)
+{
+  IDBSHandler&      dbs         = GetDBSHandler ();
+  const TABLE_INDEX tablesCount = dbs.PersistentTablesCount ();
+
+  for (TABLE_INDEX t = 0; t < tablesCount; ++t)
+    {
+      os << "EXTERN VAR " << dbs.TableName (t) << " AS TABLE OF (";
+
+      ITable& table = dbs.RetrievePersistentTable (dbs.TableName (t));
+      const FIELD_INDEX fieldsCount = table.FieldsCount ();
+
+      assert (fieldsCount > 0);
+
+      for (FIELD_INDEX f = 0; f < fieldsCount; ++f)
+        {
+          DBSFieldDescriptor fd = table.DescribeField (f);
+
+          if (f > 0)
+            os << ',';
+
+          os << "\n\t" << fd.name << " AS ";
+          print_field_desc (fd, os);
+        }
+
+      os << ");\n\n";
+      dbs.ReleaseTable (table);
+    }
 }
 

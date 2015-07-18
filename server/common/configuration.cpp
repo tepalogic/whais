@@ -150,7 +150,6 @@ SeekAtConfigurationSection (ifstream& config, uint_t& outConfigLine)
 
       size_t pos   = 0;
       string token = NextToken (line, pos, delimiters);
-
       if ((token.length () > 0) && (token.at (0) == COMMENT_CHAR))
         continue;
 
@@ -164,7 +163,7 @@ SeekAtConfigurationSection (ifstream& config, uint_t& outConfigLine)
 bool
 FindNextContextSection (std::ifstream& config, uint_t& inoutConfigLine)
 {
-  static const string identifier ("[SESSION]");
+  static const string identifier ("[DATABASE]");
   static const string delimiters (" \t");
 
   while (config.good ())

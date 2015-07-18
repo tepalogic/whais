@@ -54,7 +54,7 @@ FileLogger::FileLogger (const char* const file, const bool printStart)
     {
       const WTime dayStart = wh_get_currtime ();
 
-      mOutStream << "\n* Start of the day: " << (int)dayStart.year;
+      mOutStream << "\n* Server start on: " << (int)dayStart.year;
       mOutStream << '-' << (int)dayStart.month;
       mOutStream << "-" << (int)dayStart.day;
       mOutStream << ' ' << (int)dayStart.hour;
@@ -120,6 +120,13 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
     {
       SwitchFile ();
       mTodayTime = ctime;
+
+      mOutStream << "\n* Hello on: " << (int)mTodayTime.year;
+      mOutStream << '-' << (int)mTodayTime.month;
+      mOutStream << "-" << (int)mTodayTime.day;
+      mOutStream << ' ' << (int)mTodayTime.hour;
+      mOutStream << ':' << (int)mTodayTime.min;
+      mOutStream << ':' << (int)mTodayTime.sec << "\n\n";
     }
 
   const char       fill  = mOutStream.fill ();
