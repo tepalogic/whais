@@ -52,6 +52,7 @@ extern whais::WLIB_PROC_DESCRIPTION       gTextCharsCount;
 extern whais::WLIB_PROC_DESCRIPTION       gTextHash;
 extern whais::WLIB_PROC_DESCRIPTION       gCharFind;
 extern whais::WLIB_PROC_DESCRIPTION       gTextFind;
+extern whais::WLIB_PROC_DESCRIPTION       gTextReplace;
 extern whais::WLIB_PROC_DESCRIPTION       gTextCompare;
 
 

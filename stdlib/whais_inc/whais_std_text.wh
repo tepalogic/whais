@@ -199,11 +199,27 @@ EXTERN PROCEDURE find_char( source AS TEXT,
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
 EXTERN PROCEDURE find_substring( source AS TEXT,
-                                 str AS CHAR, 
+                                 str AS TEXT, 
                                  case AS BOOL,
                                  from AS UINT64,
                                  to AS UINT64) RETURN UINT64;
-
+                                 
+#Replace a substring in a text.
+#In:
+#   @source - Text source text.
+#   @str    - The substring to look for.
+#   @newStr - The new substring
+#   @case   - TRUE to ignore casing.
+#   @from   - The start position to look from.
+#   @to     - Last position to look to.
+#Out:
+#   A text holding the resulted content.
+EXTERN PROCEDURE replace_substring (source AS TEXT,
+                                    str AS TEXT,
+                                    newStr AS TEXT, 
+                                    case AS BOOL,
+                                    from AS UINT64,
+                                    to AS UINT64) RETURN TEXT;
 # Compare to text string.
 #In:
 #   @first  - Text source text.

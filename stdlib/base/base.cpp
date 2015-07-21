@@ -194,6 +194,7 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gTextHash,
                                                     &gCharFind,
                                                     &gTextFind,
+                                                    &gTextReplace,
                                                     &gTextCompare,
                           /* Array procedures */
                                                     &gProcArrayCount,

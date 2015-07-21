@@ -70,6 +70,7 @@ WLIB_PROC_DESCRIPTION       gTextHash;
 
 WLIB_PROC_DESCRIPTION       gCharFind;
 WLIB_PROC_DESCRIPTION       gTextFind;
+WLIB_PROC_DESCRIPTION       gTextReplace;
 
 WLIB_PROC_DESCRIPTION       gTextCompare;
 
@@ -540,6 +541,47 @@ find_substring_offset( SessionStack& stack, ISession&)
 
 
 static WLIB_STATUS
+replace_substring_offset( SessionStack& stack, ISession&)
+{
+  DText   text, substring, newString;
+  DUInt64 from, to;
+  DBool   ignoreCase;
+
+  stack[stack.Size() - 6].Operand().GetValue( text);
+  stack[stack.Size() - 5].Operand().GetValue( substring);
+  stack[stack.Size() - 4].Operand().GetValue( newString);
+  stack[stack.Size() - 3].Operand().GetValue( ignoreCase);
+  stack[stack.Size() - 2].Operand().GetValue( from);
+  stack[stack.Size() - 1].Operand().GetValue( to);
+  stack.Pop (6);
+
+  if (text.IsNull())
+    {
+      stack.Push( DText ());
+      return WOP_OK;
+    }
+  else if (substring.IsNull ())
+    {
+      stack.Push( text);
+
+      return WOP_OK;
+    }
+
+  const bool     igCase  = (ignoreCase == DBool( true));
+  const uint64_t fromOff = from.IsNull() ? 0 : from.mValue;
+  const uint64_t endOff  = MIN ((to.IsNull() ? ~0ull : to.mValue),
+                                text.Count());
+
+  stack.Push ( text.ReplaceSubstring (substring,
+                                      newString,
+                                      igCase,
+                                      fromOff,
+                                      endOff));
+  return WOP_OK;
+}
+
+
+static WLIB_STATUS
 compare_texts( SessionStack& stack, ISession&)
 {
   DText text1, text2;
@@ -735,6 +777,22 @@ base_text_init()
   gTextFind.localsCount       = 6;
   gTextFind.localsTypes       = findTextLocals;
   gTextFind.code              = find_substring_offset;
+
+
+  static const uint8_t* replaceTextLocals[] = {
+                                             gTextType,
+                                             gTextType,
+                                             gTextType,
+                                             gTextType,
+                                             gBoolType,
+                                             gUInt64Type,
+                                             gUInt64Type
+                                            };
+
+  gTextReplace.name          = "replace_substring";
+  gTextReplace.localsCount   = 7;
+  gTextReplace.localsTypes   = replaceTextLocals;
+  gTextReplace.code          = replace_substring_offset;
 
 
   static const uint8_t* textCompareLocals[] = {
