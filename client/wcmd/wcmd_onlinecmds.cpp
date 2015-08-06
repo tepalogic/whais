@@ -413,7 +413,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       uint_t procsParametersCount;
 
       token   = CmdLineNextToken (procedures, linePos);
-      if (token.size () == 0)
+      if (token.empty ())
         break;
 
       cs = WProcParamsCount (conHdl, token.c_str (), &procsParametersCount);

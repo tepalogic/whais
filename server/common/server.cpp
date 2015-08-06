@@ -519,7 +519,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
     {
       Listener* const listener = &listeners[index];
 
-      listener->mInterface = (server.mListens[index].mInterface.size () == 0)
+      listener->mInterface = (server.mListens[index].mInterface.empty ())
                               ? NULL
                               : server.mListens[index].mInterface.c_str ();
       listener->mPort = server.mListens[index].mService.c_str ();

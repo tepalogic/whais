@@ -73,7 +73,7 @@ public:
     return mInclusionPaths;
   }
 
-  const std::vector<ReplacementTag>& ReplacementTags () const
+  std::vector<ReplacementTag>& ReplacementTags ()
   {
     return mReplacementTags;
   }

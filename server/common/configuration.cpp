@@ -867,7 +867,7 @@ ParseContextSection (Logger&          log,
         }
        else if (token == gEntRootPasswrd)
         {
-           if (output.mRootPass.size () > 0)
+           if ( ! output.mRootPass.empty ())
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ". ";
@@ -911,7 +911,7 @@ ParseContextSection (Logger&          log,
         }
        else if (token == gEntUserPasswrd)
         {
-           if (output.mUserPasswd.size () > 0)
+           if ( ! output.mUserPasswd.empty ())
              {
                logEntry << "Configuration error at line ";
                logEntry << inoutConfigLine << ". ";
@@ -1239,7 +1239,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
 
   ostringstream logStream;
 
-  if (inoutDesc.mUserPasswd.size () == 0)
+  if (inoutDesc.mUserPasswd.empty ())
     {
       logStream << "A user password for the database ";
       logStream << "section starting at line ";
@@ -1249,7 +1249,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mRootPass.size () == 0)
+  if (inoutDesc.mRootPass.empty ())
     {
       logStream << "A root password for the database ";
       logStream << "section starting at line ";
@@ -1259,7 +1259,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mDbsName.length () == 0)
+  if (inoutDesc.mDbsName.empty ())
     {
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;
@@ -1269,7 +1269,7 @@ PrepareContextSection (Logger& log, DBSDescriptors& inoutDesc)
       return false;
     }
 
-  if (inoutDesc.mDbsDirectory.length () == 0)
+  if (inoutDesc.mDbsDirectory.empty ())
     {
       logStream << "Database section starting line ";
       logStream << inoutDesc.mConfigLine;

@@ -705,7 +705,7 @@ cmdTablePrint (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
             token = CmdLineNextToken (cmdLine, linePos);
 
-            assert (token.size () > 0);
+            assert ( ! token.empty ());
 
             ITable& table = dbs.RetrievePersistentTable (token.c_str ());
 

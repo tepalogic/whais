@@ -70,7 +70,7 @@ GetConnectionPort ()
 {
   assert (IsOnlineDatabase ());
 
-  if (sConnectPort.size () == 0)
+  if (sConnectPort.empty ())
     sConnectPort = DEFAULT_PORT;
 
   return sConnectPort;
@@ -244,7 +244,7 @@ GetDBSHandler ()
 bool
 IsOnlineDatabase ()
 {
-  if (GetRemoteHostName ().size () > 0)
+  if ( ! GetRemoteHostName ().empty ())
     return true;
 
   return false;

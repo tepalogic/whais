@@ -2532,6 +2532,10 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
                                     ROW_INDEX         toRow,
                                     const FIELD_INDEX field)
 {
+  DArray result;
+  if (mRowsCount == 0)
+    return result;
+
   FieldDescriptor& desc = GetFieldDescriptorInternal (field);
 
   if ((desc.Type () & PS_TABLE_ARRAY_MASK)
@@ -2541,11 +2545,10 @@ PrototypeTable::MatchRowsWithIndex (const T&          min,
       throw DBSException (_EXTRA (DBSException::FIELD_TYPE_INVALID));
     }
 
-  toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));
+  toRow = MIN (toRow, mRowsCount - 1);
 
   FieldIndexNodeManager* const nodeMgr = mvIndexNodeMgrs[field];
 
-  DArray                       result;
   NODE_INDEX                   nodeId;
   KEY_INDEX                    keyIndex;
   const T_BTreeKey<T>          firstKey (min, fromRow);
@@ -2621,13 +2624,15 @@ PrototypeTable::MatchRowsNoIndex (const T&          min,
                                   ROW_INDEX         toRow,
                                   const FIELD_INDEX field)
 {
-  toRow = MIN (toRow, ((mRowsCount > 0) ? mRowsCount - 1 : 0));
-
   DArray result;
-  T      rowValue;
 
+  if (mRowsCount == 0)
+    return result;
+
+  toRow = MIN (toRow, mRowsCount - 1);
   for (ROW_INDEX row = fromRow; row <= toRow; ++row)
     {
+      T rowValue;
       Get (row, field, rowValue);
 
       if ((rowValue < min) || (max < rowValue))

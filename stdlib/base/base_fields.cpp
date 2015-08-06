@@ -186,7 +186,7 @@ proc_field_find_range( SessionStack& stack, ISession&)
   const ROW_INDEX fromRow = row.IsNull() ? 0 : row.mValue;
 
   opToRow.GetValue( row);
-  const ROW_INDEX toRow = row.IsNull() ? table.AllocatedRows() : row.mValue;
+  const ROW_INDEX toRow = row.IsNull() ? table.AllocatedRows() - 1 : row.mValue;
 
   const FIELD_INDEX field = opField.GetField();
   switch( GET_BASIC_TYPE( fieldType))

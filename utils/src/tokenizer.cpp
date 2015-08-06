@@ -48,7 +48,50 @@ NextToken (const std::string&     text,
   assert (inoutOff != string::npos);
   assert (inoutOff < text.length ());
 
-  size_t lastPos = text.find_first_of (delims, inoutOff);
+  size_t lastPos = inoutOff;
+  if (text[lastPos] == '"')
+    {
+      bool ignoreEnd = false;
+
+      while ((text[++lastPos] != '"') || ignoreEnd)
+        {
+          ignoreEnd = (text[lastPos] == '\\') ? ~ignoreEnd : false;
+          if (text[lastPos] == 0)
+            {
+              //Most likely an error, but not our jub to handle it!
+              lastPos = string::npos;
+              break;
+            }
+        }
+
+      if (lastPos != string::npos)
+        {
+          assert (text[lastPos] == '"');
+          ++lastPos;
+        }
+    }
+  else if (text[lastPos] == '\'')
+    {
+      bool ignoreEnd = false;
+      while ((text[++lastPos] != '\'') || ignoreEnd)
+        {
+          ignoreEnd = (text[lastPos] == '\\') ? ~ignoreEnd : false;
+          if (text[lastPos] == 0)
+            {
+              //Most likely an error, but not our jub to handle it!
+              lastPos = string::npos;
+              break;
+            }
+        }
+
+      if (lastPos != string::npos)
+        {
+          assert (text[lastPos] == '\'');
+          ++lastPos;
+        }
+    }
+  else
+    lastPos = text.find_first_of (delims, inoutOff);
 
   if (lastPos == string::npos)
     lastPos = text.length () - 1;
@@ -58,7 +101,7 @@ NextToken (const std::string&     text,
 
   assert (inoutOff <= lastPos);
 
-  string result = text.substr (inoutOff, lastPos - inoutOff + 1);
+  const string result = text.substr (inoutOff, lastPos - inoutOff + 1);
 
   inoutOff = lastPos + 1;
 

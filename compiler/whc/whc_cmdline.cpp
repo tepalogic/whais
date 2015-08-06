@@ -120,12 +120,12 @@ CmdLineParser::Parse ()
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
               throw CmdLineException (_EXTRA (0),
-                                      "Missing values for parameter '-D'.");
+                                      "Incorrect use of parameter '-D'.");
             }
           else if (mArgs[index][0] == '=')
             {
               throw CmdLineException (_EXTRA (0),
-                                      "Missing tag value for parameter '-D'.");
+                                      "Missing tag name for parameter '-D'.");
             }
 
           const string param (mArgs[index]);
@@ -133,16 +133,25 @@ CmdLineParser::Parse ()
 
           if (separatorPos == string::npos)
             {
-              mReplacementTags.push_back (
-                  ReplacementTag (param.substr (0, separatorPos),
-                                  string ())
-                                         );
+              throw CmdLineException (
+                        _EXTRA (0),
+                        "Missing tag value name for parameter '-D'."
+                                     );
             }
           else
             {
+              const string value = param.substr (separatorPos + 1);
+              if (value.empty ())
+                {
+                  throw CmdLineException (
+                            _EXTRA (0),
+                            "Missing tag value name for parameter '-D'."
+                                         );
+                }
               mReplacementTags.push_back (
                   ReplacementTag (param.substr (0, separatorPos),
-                                  param.substr (separatorPos + 1))
+                                  value,
+                                  ReplacementTag::CMDLINE_OFF)
                                          );
             }
           ++index;
@@ -280,6 +289,7 @@ CmdLineParser::CheckArguments ()
     mOutputFile = tempBuffer;
   }
 
+  AddInclusionPaths (whf_current_dir ());
   const char* const defaultIncDirs = getenv ("WHAIS_INC");
   if (defaultIncDirs != NULL)
     AddInclusionPaths (defaultIncDirs);
@@ -288,25 +298,25 @@ CmdLineParser::CheckArguments ()
   const WTime t  = wh_get_currtime ();
 
   snprintf (temp, sizeof temp, "%d", t.year);
-  mReplacementTags.push_back (ReplacementTag ("YEAR", temp));
+  mReplacementTags.push_back (ReplacementTag ("_YEAR_", temp));
 
   snprintf (temp, sizeof temp, "%02u", t.month);
-  mReplacementTags.push_back (ReplacementTag ("MONTH", temp));
+  mReplacementTags.push_back (ReplacementTag ("_MONTH_", temp));
 
   snprintf (temp, sizeof temp, "%02u", t.day);
-  mReplacementTags.push_back (ReplacementTag ("DAY", temp));
+  mReplacementTags.push_back (ReplacementTag ("_DAY_", temp));
 
   snprintf (temp, sizeof temp, "%02u", t.hour);
-  mReplacementTags.push_back (ReplacementTag ("HOUR", temp));
+  mReplacementTags.push_back (ReplacementTag ("_HOUR_", temp));
 
   snprintf (temp, sizeof temp, "%02u", t.min);
-  mReplacementTags.push_back (ReplacementTag ("MIN", temp));
+  mReplacementTags.push_back (ReplacementTag ("_MIN_", temp));
 
   snprintf (temp, sizeof temp, "%02u", t.sec);
-  mReplacementTags.push_back (ReplacementTag ("SEC", temp));
+  mReplacementTags.push_back (ReplacementTag ("_SEC_", temp));
 
   snprintf (temp, sizeof temp, "%06u", t.usec);
-  mReplacementTags.push_back (ReplacementTag ("USEC", temp));
+  mReplacementTags.push_back (ReplacementTag ("_USEC_", temp));
 
   snprintf (temp,
             sizeof temp,
@@ -319,13 +329,11 @@ CmdLineParser::CheckArguments ()
             t.sec,
             t.usec);
 
-  mReplacementTags.push_back (ReplacementTag ("TIME_STAMP", temp));
+  mReplacementTags.push_back (ReplacementTag ("_TIME_STAMP_", temp));
 
-  for (size_t i = 0; i < mReplacementTags.size (); ++i)
-    {
-      mReplacementTags[i].mTagName.insert (0, "%");
-      mReplacementTags[i].mTagName.push_back ('%');
-    }
+  //Just place holders! These are supposed to be dealt with differently!
+  mReplacementTags.push_back (ReplacementTag ("_FILE_", ""));
+  mReplacementTags.push_back (ReplacementTag ("_LINE_", ""));
 }
 
 

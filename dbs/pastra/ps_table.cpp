@@ -1099,7 +1099,7 @@ PersistentTable::RemoveFromDatabase ()
 IDataContainer*
 PersistentTable::CreateIndexContainer (const FIELD_INDEX field)
 {
-  assert (mFileNamePrefix.size () > 0);
+  assert (! mFileNamePrefix.empty ());
 
   DBSFieldDescriptor desc = DescribeField (field);
 

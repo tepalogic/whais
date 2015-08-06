@@ -29,30 +29,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "whais.h"
-
 #include "utils/auto_array.h"
-
 #include "msglog.h"
 
 
 
 struct ReplacementTag
 {
-  ReplacementTag (const std::string& tagName, const std::string& tagValue)
+  ReplacementTag (const std::string& tagName,
+                  const std::string& tagValue,
+                  int                offset = BUILDIN_OFF)
     : mTagName (tagName),
-      mTagValue (tagValue)
+      mTagValue (tagValue),
+      mDefinitionOffset (offset)
   {
   }
 
   std::string mTagName;
   std::string mTagValue;
+  int         mDefinitionOffset;
+
+  static const int CMDLINE_OFF = -1;
+  static const int BUILDIN_OFF = -2;
 };
 
 
 bool
 preprocess_source (const std::string&                  sourceFile,
                    const std::vector<std::string>&     inclusionPaths,
-                   const std::vector<ReplacementTag>&  tagPairs,
+                   std::vector<ReplacementTag>&        tagPairs,
                    std::ostringstream&                 sourceCode,
                    std::vector<SourceCodeMark>&        codeMarks,
                    std::vector<std::string>&           usedFiles);
