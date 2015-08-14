@@ -265,7 +265,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               continue;
             }
 
-          cout << "TABLE OF (";
+          cout << "TABLE (";
           for (uint_t field = 0; field < fieldsCount; field++)
             {
               const char* fieldName;
@@ -277,7 +277,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               if (field > 0)
                 cout << ", ";
 
-              cout << fieldName << " AS " << wcmd_decode_typeinfo (rawType);
+              cout << fieldName << " " << wcmd_decode_typeinfo (rawType);
             }
           cout << ")\n";
         }
@@ -285,8 +285,7 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         {
           rawType &= ~WHC_TYPE_FIELD_MASK;
 
-          cout << "FIELD OF ";
-          cout << wcmd_decode_typeinfo (rawType) << endl;
+          cout << wcmd_decode_typeinfo (rawType) << " FIELD\n";
         }
       else
         cout << wcmd_decode_typeinfo (rawType) << endl;
@@ -474,7 +473,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   continue;
                 }
 
-              cout << "TABLE OF (";
+              cout << "TABLE (";
               for (uint_t field = 0; field < fieldsCount; field++)
                 {
                   const char* fieldName;
@@ -491,7 +490,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   if (field > 0)
                     cout << ", ";
 
-                  cout << fieldName << " AS " << wcmd_decode_typeinfo (paramType);
+                  cout << fieldName << " " << wcmd_decode_typeinfo (paramType);
                 }
               cout << ')';
             }
@@ -503,10 +502,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 cout << "FIELD";
 
               else
-                {
-                  cout << "FIELD OF ";
-                  cout << wcmd_decode_typeinfo (paramType);
-                }
+                cout << wcmd_decode_typeinfo (paramType) << " FIELD";
             }
           else
             cout << wcmd_decode_typeinfo (paramType);

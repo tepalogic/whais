@@ -49,27 +49,27 @@ check_used_vals (struct ParserState *state)
   return FALSE;                        /* no value in use */
 }
 
-char proc_decl_buffer[] = "PROCEDURE ProcId0 (v1 AS INT8) RETURN INT8 "
+char proc_decl_buffer[] = "PROCEDURE ProcId0 (v1 INT8) RETURN INT8 "
   "DO "
   "RETURN NOT v1; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId1 (v1 AS INT16) RETURN INT16 "
+  "PROCEDURE ProcId1 (v1 INT16) RETURN INT16 "
   "DO "
   "RETURN NOT v1; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId2 (v1 AS INT32) RETURN INT32 "
+  "PROCEDURE ProcId2 (v1 INT32) RETURN INT32 "
   "DO "
   "RETURN NOT v1; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId3 (v1 AS INT64) RETURN INT64 "
+  "PROCEDURE ProcId3 (v1 INT64) RETURN INT64 "
   "DO "
   "RETURN NOT v1; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId4 (v1 AS BOOL) RETURN BOOL "
+  "PROCEDURE ProcId4 (v1 BOOL) RETURN BOOL "
   "DO " "RETURN NOT v1; " "ENDPROC\n\n" "";
 
 const enum W_OPCODE _opcodes_expected [] = {

@@ -34,49 +34,49 @@
 #   @c - The character.
 #Out:
 #   TRUE if the character is upper case.
-EXTERN PROCEDURE is_upper (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_upper (c CHAR) RETURN BOOL;
 
 #Check if the character is a lower case character.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is lower case.
-EXTERN PROCEDURE is_lower (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_lower (c CHAR) RETURN BOOL;
 
 #Check if the character is a decimal digit.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is a decimal digit.
-EXTERN PROCEDURE is_digit (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_digit (c CHAR) RETURN BOOL;
 
 #Check if the character is an alpha character.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is an alpha character.
-EXTERN PROCEDURE is_alpha (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_alpha (c CHAR) RETURN BOOL;
 
 #Check if the character is a space character.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is a space (e.g. white space, tab, etc.) character.
-EXTERN PROCEDURE is_space (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_space (c CHAR) RETURN BOOL;
 
 #Check if the character is a punctuation mark.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is a punctuation mark (e.g. .;:!? etc.).
-EXTERN PROCEDURE is_punct (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_punct (c CHAR) RETURN BOOL;
 
 #Check if the character is printable.
 #In:
 #   @c - The character.
 #Out:
 #   TRUE if the character is printable.
-EXTERN PROCEDURE is_print (c AS CHAR) RETURN BOOL;
+EXTERN PROCEDURE is_print (c CHAR) RETURN BOOL;
 
 
 #Retrieve the Unicode code point of a WHAIS character,
@@ -84,7 +84,7 @@ EXTERN PROCEDURE is_print (c AS CHAR) RETURN BOOL;
 #   @c - The character.
 #Out:
 #   An integer value holding the code point value.
-EXTERN PROCEDURE unicode_cp (c AS CHAR) RETURN UINT32;
+EXTERN PROCEDURE unicode_cp (c CHAR) RETURN UINT32;
 
 #Retrieve the upper case correspondent of a WHAIS character.
 #In:
@@ -92,7 +92,7 @@ EXTERN PROCEDURE unicode_cp (c AS CHAR) RETURN UINT32;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not have an upper case corresponded.
-EXTERN PROCEDURE uppercase_char (c AS CHAR) RETURN CHAR;
+EXTERN PROCEDURE uppercase_char (c CHAR) RETURN CHAR;
 
 #Retrieve the lower case correspondent of a WHAIS character.
 #In:
@@ -100,7 +100,7 @@ EXTERN PROCEDURE uppercase_char (c AS CHAR) RETURN CHAR;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not not have a lower case corresponded.
-EXTERN PROCEDURE lowercase_char (c AS CHAR) RETURN CHAR;
+EXTERN PROCEDURE lowercase_char (c CHAR) RETURN CHAR;
 
 #Get the converted all to upper case text.
 #In:
@@ -108,7 +108,7 @@ EXTERN PROCEDURE lowercase_char (c AS CHAR) RETURN CHAR;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   upper case converted.
-EXTERN PROCEDURE uppercase_text (t AS TEXT) RETURN TEXT;
+EXTERN PROCEDURE uppercase_text (t TEXT) RETURN TEXT;
 
 #Get the converted all to lower case text.
 #In:
@@ -116,63 +116,63 @@ EXTERN PROCEDURE uppercase_text (t AS TEXT) RETURN TEXT;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   lower case converted.
-EXTERN PROCEDURE lowercase_text (t AS TEXT) RETURN TEXT;
+EXTERN PROCEDURE lowercase_text (t TEXT) RETURN TEXT;
 
 #Get the UTF-8 representation of a text.
 #In:
 #   @t - The text.
 #Out:
 #   An array holding the UTF-8 representation.
-EXTERN PROCEDURE text_to_utf8 (t AS TEXT) RETURN ARRAY OF UINT8;
+EXTERN PROCEDURE text_to_utf8 (t TEXT) RETURN  UINT8 ARRAY;
 
 #Get the a WHAIS text from the UTF-8 representation.
 #In:
 #   @s - An array holding the UTF-8 code units.
 #Out:
 #   A text holding the corresponded of the UTF-8 text.
-EXTERN PROCEDURE text_from_utf8 (s AS ARRAY OF UINT8) RETURN TEXT;
+EXTERN PROCEDURE text_from_utf8 (s UINT8 ARRAY) RETURN TEXT;
 
 #Get the UTF-16 representation of a text.
 #In:
 #   @t - The text.
 #Out:
 #   An array holding the UTF-16 representation.
-EXTERN PROCEDURE text_to_utf16 (t AS TEXT) RETURN ARRAY OF UINT16;
+EXTERN PROCEDURE text_to_utf16 (t TEXT) RETURN  UINT16 ARRAY;
 
 #Get the a WHAIS text from the UTF-16 representation.
 #In:
 #   @s - An array holding the UTF-16 code units.
 #Out:
 #   A text holding the corresponded of the UTF-16 text.
-EXTERN PROCEDURE text_from_utf16 (s AS ARRAY OF UINT16) RETURN TEXT;
+EXTERN PROCEDURE text_from_utf16 (s UINT16 ARRAY) RETURN TEXT;
 
 #Transform a WHAIS text an array of characters.
 #In:
 #   @t - The text.
 #Out:
 #   An array holding the original text characters.
-EXTERN PROCEDURE text_to_array (t AS TEXT) RETURN ARRAY OF CHAR;
+EXTERN PROCEDURE text_to_array (t TEXT) RETURN  CHAR ARRAY;
 
 #Convert an array of characters to a text.
 #In:
 #   @s - An array holding the text characters.
 #Out:
 #   The corresponding text value,
-EXTERN PROCEDURE text_from_array (s AS ARRAY OF CHAR) RETURN TEXT;
+EXTERN PROCEDURE text_from_array (s CHAR ARRAY) RETURN TEXT;
 
 #Get the characters text count.
 #In:
 #   @t - The text value.
 #Out:
 #   The count of the text's characters.
-EXTERN PROCEDURE text_length (t AS TEXT) RETURN UINT64;
+EXTERN PROCEDURE text_length (t TEXT) RETURN UINT64;
 
 #Get a hash code for a text.
 #In:
 #   @t - The text value.
 #Out:
 #   The hash code.
-EXTERN PROCEDURE hash_text (t AS TEXT) RETURN UINT64;
+EXTERN PROCEDURE hash_text (t TEXT) RETURN UINT64;
 
 #Find a character in a text.
 #In:
@@ -183,11 +183,11 @@ EXTERN PROCEDURE hash_text (t AS TEXT) RETURN UINT64;
 #   @to     - Last position to look to.
 #Out:
 #   The offset position where the character was found, NULL if it was not found.
-EXTERN PROCEDURE find_char( source AS TEXT,
-                            ch AS CHAR, 
-                            case AS BOOL,
-                            from AS UINT64,
-                            to AS UINT64) RETURN UINT64;
+EXTERN PROCEDURE find_char( source TEXT,
+                            ch CHAR, 
+                            case BOOL,
+                            from UINT64,
+                            to UINT64) RETURN UINT64;
 
 #Find a substring in a text.
 #In:
@@ -198,11 +198,11 @@ EXTERN PROCEDURE find_char( source AS TEXT,
 #   @to     - Last position to look to.
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
-EXTERN PROCEDURE find_substring( source AS TEXT,
-                                 str AS TEXT, 
-                                 case AS BOOL,
-                                 from AS UINT64,
-                                 to AS UINT64) RETURN UINT64;
+EXTERN PROCEDURE find_substring( source TEXT,
+                                 str TEXT, 
+                                 case BOOL,
+                                 from UINT64,
+                                 to UINT64) RETURN UINT64;
                                  
 #Replace a substring in a text.
 #In:
@@ -214,12 +214,12 @@ EXTERN PROCEDURE find_substring( source AS TEXT,
 #   @to     - Last position to look to.
 #Out:
 #   A text holding the resulted content.
-EXTERN PROCEDURE replace_substring (source AS TEXT,
-                                    str AS TEXT,
-                                    newStr AS TEXT, 
-                                    case AS BOOL,
-                                    from AS UINT64,
-                                    to AS UINT64) RETURN TEXT;
+EXTERN PROCEDURE replace_substring (source TEXT,
+                                    str TEXT,
+                                    newStr TEXT, 
+                                    case BOOL,
+                                    from UINT64,
+                                    to UINT64) RETURN TEXT;
 # Compare to text string.
 #In:
 #   @first  - Text source text.
@@ -228,7 +228,7 @@ EXTERN PROCEDURE replace_substring (source AS TEXT,
 #   @alph   - TRUE to compare alphabetically.
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
-EXTERN PROCEDURE text_compare( first AS TEXT,
-                               second AS TEXT, 
-                               case AS BOOL,
-                               alph AS BOOL) RETURN INT32;
+EXTERN PROCEDURE text_compare( first TEXT,
+                               second TEXT, 
+                               case BOOL,
+                               alph BOOL) RETURN INT32;

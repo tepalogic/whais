@@ -34,28 +34,28 @@
 #   @f - The field value.
 #Out:
 #   If successfully this will return the table holding the provided field.
-EXTERN PROCEDURE table_of_field(f AS FIELD) RETURN TABLE;
+EXTERN PROCEDURE table_of_field(f FIELD) RETURN TABLE;
 
 #Check if the value of a table field are indexed.
 #In:
 #   @f - The field value.
 #Out:
 #   TRUE if the field values are indexed. 
-EXTERN PROCEDURE field_values_indexed(f AS FIELD) RETURN BOOL;
+EXTERN PROCEDURE field_values_indexed(f FIELD) RETURN BOOL;
 
 #Get the associated name of a table field.
 #In:
 #   @f - The field value.
 #Out:
 #   A text holding the field name. 
-EXTERN PROCEDURE field_name(f AS FIELD) RETURN TEXT;
+EXTERN PROCEDURE field_name(f FIELD) RETURN TEXT;
 
 #Get the index of a table field.
 #In:
 #   @f - The field value.
 #Out:
 #   The field index. 
-EXTERN PROCEDURE field_index(f AS FIELD) RETURN UINT64;
+EXTERN PROCEDURE field_index(f FIELD) RETURN UINT64;
 
 #Retrieves the rows indexes holding values that are in a supplied interval 
 #of values.
@@ -68,11 +68,11 @@ EXTERN PROCEDURE field_index(f AS FIELD) RETURN UINT64;
 #Out:
 #   An array holding the rows indexes that holds value in the interval hold by
 #   [@v_min, @v_max].
-EXTERN PROCEDURE match_rows( f AS FIELD,
-                             v_min AS UNDEFINED,
-                             v_max AS UNDEFINED,
-                             from_row AS UINT64,
-                             to_row AS UINT64) RETURN ARRAY OF UINT64;
+EXTERN PROCEDURE match_rows( f FIELD,
+                             v_min UNDEFINED,
+                             v_max UNDEFINED,
+                             from_row UINT64,
+                             to_row UINT64) RETURN  UINT64 ARRAY;
 
 #Retrieve a row holding the biggest from the specified field values.
 #In:
@@ -80,7 +80,7 @@ EXTERN PROCEDURE match_rows( f AS FIELD,
 #Out:
 #   If successfully this will return a row index that holds
 #   the respective value.
-EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UINT64;
+EXTERN PROCEDURE field_biggest (f FIELD) RETURN UINT64;
 
 #Retrieve a row holding the lowest from the specified field values.
 #In:
@@ -88,7 +88,7 @@ EXTERN PROCEDURE field_biggest (f AS FIELD) RETURN UINT64;
 #Out:
 #   If successfully this will return a row index that holds
 #   the respective value.
-EXTERN PROCEDURE field_smallest (f AS FIELD) RETURN UINT64;
+EXTERN PROCEDURE field_smallest (f FIELD) RETURN UINT64;
 
 
 #Computes the average value for fields holding numeric values.
@@ -97,7 +97,7 @@ EXTERN PROCEDURE field_smallest (f AS FIELD) RETURN UINT64;
 #Out:
 #   If successfully this will return a row index that holds
 #   the respective value.
-EXTERN PROCEDURE field_average (f AS FIELD) RETURN RICHREAL;
+EXTERN PROCEDURE field_average (f FIELD) RETURN RICHREAL;
 
 #Sort a table based on the values of the specified field.
 #In:
@@ -105,4 +105,4 @@ EXTERN PROCEDURE field_average (f AS FIELD) RETURN RICHREAL;
 #   @r - TRUE to sort reversely.
 #Out:
 #   If successfully this will the sorted table.
-EXTERN PROCEDURE field_sort_table (f AS FIELD, r AS BOOL) RETURN TABLE;
+EXTERN PROCEDURE field_sort_table (f FIELD, r BOOL) RETURN TABLE;

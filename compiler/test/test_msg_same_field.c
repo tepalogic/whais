@@ -65,9 +65,9 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 }
 
 char test_prog_1[] = ""
-  "PROCEDURE Proc_1 (v1 AS BOOL) RETURN BOOL\n "
+  "PROCEDURE Proc_1 (v1 BOOL) RETURN BOOL\n "
   "DO\n "
-  "VAR table_1 AS TABLE OF (field_t AS UINT64, field_t AS DATE);\n "
+  "VAR table_1 TABLE (field_t UINT64, field_t DATE);\n "
   "RETURN v1;\n "
   "ENDPROC\n ";
 

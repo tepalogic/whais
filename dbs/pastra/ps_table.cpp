@@ -94,49 +94,49 @@ field_type_to_text (const uint_t type)
       switch (GET_BASIC_TYPE (type))
       {
       case T_BOOL:
-        return "ARRAY OF BOOL";
+        return "BOOL ARRAY";
 
       case T_CHAR:
-        return "ARRAY OF CHAR";
+        return "CHAR ARRAY";
 
       case T_DATE:
-        return "ARRAY OF DATE";
+        return "DATE ARRAY";
 
       case T_DATETIME:
-        return "ARRAY OF DATETIME";
+        return "DATETIME ARRAY";
 
       case T_HIRESTIME:
-        return "ARRAY OF HIRESTIME";
+        return "HIRESTIME ARRAY";
 
       case T_UINT8:
-        return "ARRAY OF UINT8";
+        return "UINT8 ARRAY";
 
       case T_UINT16:
-        return "ARRAY OF UINT16";
+        return "UINT16 ARRAY";
 
       case T_UINT32:
-        return "ARRAY OF UINT32";
+        return "UINT32 ARRAY";
 
       case T_UINT64:
-        return "ARRAY OF UINT64";
+        return "UINT64 ARRAY";
 
       case T_INT8:
-        return "ARRAY OF INT8";
+        return "INT8 ARRAY";
 
       case T_INT16:
-        return "ARRAY OF INT16";
+        return "INT16 ARRAY";
 
       case T_INT32:
-        return "ARRAY OF INT32";
+        return "INT32 ARRAY";
 
       case T_INT64:
-        return "ARRAY OF INT64";
+        return "INT64 ARRAY";
 
       case T_REAL:
-        return "ARRAY OF REAL";
+        return "REAL ARRAY";
 
       case T_RICHREAL:
-        return "ARRAY OF RICHREAL";
+        return "RICHREAL ARRAY";
 
       default:
         assert (false);

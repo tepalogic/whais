@@ -30,7 +30,7 @@
 
 
 #Get the count of elements from an array.
-EXTERN PROCEDURE array_count( a AS ARRAY) RETURN UINT64;
+EXTERN PROCEDURE array_count( a ARRAY) RETURN UINT64;
 
 #Sort the elements of array
 #In:
@@ -38,7 +38,7 @@ EXTERN PROCEDURE array_count( a AS ARRAY) RETURN UINT64;
 #   @r - Set to TRUE to sort reversely.
 #Out:
 #   Another array but with the elements sort based on the specified order.
-EXTERN PROCEDURE array_sort( a AS ARRAY, r AS BOOL) RETURN ARRAY;
+EXTERN PROCEDURE array_sort( a ARRAY, r BOOL) RETURN ARRAY;
 
 #Binary search for an array element
 #In:
@@ -49,9 +49,9 @@ EXTERN PROCEDURE array_sort( a AS ARRAY, r AS BOOL) RETURN ARRAY;
 #                     < 0 match of biggest prev;
 #Out:
 #   An index in the array holding the required criteria, NULL if not found.
-EXTERN PROCEDURE array_binary_search (a AS ARRAY,
-                                      v AS UNDEFINED,
-                                      s AS INT8) RETURN UINT64;
+EXTERN PROCEDURE array_binary_search (a ARRAY,
+                                      v UNDEFINED,
+                                      s INT8) RETURN UINT64;
 
 
 #Search for an array element
@@ -60,40 +60,40 @@ EXTERN PROCEDURE array_binary_search (a AS ARRAY,
 #   @v - A generic value
 #Out:
 #   The index in the array holding the requested element, NULL if not found.
-EXTERN PROCEDURE array_search (a AS ARRAY,
-                               v AS UNDEFINED) RETURN UINT64;
+EXTERN PROCEDURE array_search (a ARRAY,
+                               v UNDEFINED) RETURN UINT64;
 
 #Search the smallest element.
 #In:
 #   @a - The array.
 #Out:
 #   The index in the array holding the smallest element.
-EXTERN PROCEDURE array_min (a AS ARRAY) RETURN UINT64;
+EXTERN PROCEDURE array_min (a ARRAY) RETURN UINT64;
 
 #Search the biggest element.
 #In:
 #   @a - The array.
 #Out:
 #   The index in the array holding the biggest element.
-EXTERN PROCEDURE array_max (a AS ARRAY) RETURN UINT64;
+EXTERN PROCEDURE array_max (a ARRAY) RETURN UINT64;
 
 #For arrays holding numerical values, compute the average of the values.
 #In:
 #   @a - The array.
 #Out:
 #   The computed average value.
-EXTERN PROCEDURE array_average (a AS ARRAY) RETURN RICHREAL;
+EXTERN PROCEDURE array_average (a ARRAY) RETURN RICHREAL;
 
 #Set operations with array elements.
-EXTERN PROCEDURE array_intersection (a1 AS ARRAY, a2 AS ARRAY) RETURN ARRAY;
-EXTERN PROCEDURE array_union (a1 AS ARRAY, a2 AS ARRAY) RETURN ARRAY;
-EXTERN PROCEDURE array_diff (a1 AS ARRAY, a2 AS ARRAY) RETURN ARRAY;
+EXTERN PROCEDURE array_intersection (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
+EXTERN PROCEDURE array_union (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
+EXTERN PROCEDURE array_diff (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
 
 #Add an element into an array
-EXTERN PROCEDURE array_pushback (a1 AS ARRAY, v AS UNDEFINED) RETURN ARRAY;
+EXTERN PROCEDURE array_pushback (a1 ARRAY, v UNDEFINED) RETURN ARRAY;
 
 #Truncate an array.
-EXTERN PROCEDURE array_truncate (a1 AS ARRAY, c AS UINT64) RETURN ARRAY;
+EXTERN PROCEDURE array_truncate (a1 ARRAY, c UINT64) RETURN ARRAY;
 
 #Compute the corresponding array hash value.
-EXTERN PROCEDURE array_hash (a AS ARRAY) RETURN UINT64;
+EXTERN PROCEDURE array_hash (a ARRAY) RETURN UINT64;

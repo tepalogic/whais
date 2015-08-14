@@ -166,9 +166,8 @@ next_token (const char*     buffer,
            || (*buffer == '&' || *buffer == '^' || *buffer == '|')
            || (*buffer == '='))
     {
-      buffer++;
-
-      if (*buffer == '=')
+      const char oldCh = *buffer++;
+      if (*buffer == oldCh || *buffer == '=')
         buffer++;
 
       result = TK_OPERATOR;
@@ -267,7 +266,6 @@ typedef struct
 static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"AND", AND},
                                         {"ARRAY", ARRAY},
-                                        {"AS", AS},
                                         {"BOOL", BOOL},
                                         {"BREAK", BREAK},
                                         {"CHAR", CHAR},
@@ -289,7 +287,6 @@ static TOKEN_SEMANTIC sgKeywords[] = {
                                         {"INT16", INT16},
                                         {"INT32", INT32},
                                         {"INT64", INT64},
-                                        {"OF", OF},
                                         {"OR", OR},
                                         {"NOT", NOT},
                                         {"NULL", WHAIS_NULL},
@@ -361,6 +358,8 @@ static TOKEN_SEMANTIC sgMultiCharOps[] = {
                                            {"&=", SAND},
                                            {"^=", SXOR},
                                            {"|=", SOR},
+                                           {"&&", AND},
+                                           {"||", OR},
                                            {NULL, 0}
                                          };
 
@@ -863,7 +862,6 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
                        IGNORE_BUFFER_POS,
                        parser->bufferPos,
                        MSG_NO_MEM);
-
           return 0; /* error */
         }
     }
@@ -874,7 +872,12 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       return result;
     }
   else if (tokenLen == 1)
-    return *pToken; /* The token is most likely an operator. */
+    {
+      if (*pToken == '!')
+        return NOT;
+
+      return *pToken; /* The token is most likely an operator. */
+    }
 
   /* Initialise the semantic value, based on the token type. */
   switch (tokenType)

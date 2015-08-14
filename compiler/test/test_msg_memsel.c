@@ -67,20 +67,20 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 char test_prog_1[] = ""
   "PROCEDURE Proc_1 () RETURN FIELD\n "
   "DO\n "
-  "VAR test_table AS TABLE OF (field1 AS INT8, field2 AS UINT8);\n "
+  "VAR test_table TABLE (field1 INT8, field2 UINT8);\n "
   "RETURN test_table.field3;\n " "ENDPROC\n ";
 
 char test_prog_2[] = ""
   "PROCEDURE Proc_1 () RETURN BOOL\n "
   "DO\n "
-  "VAR test AS BOOL; \n "
+  "VAR test BOOL; \n "
   "RETURN test[10, some_field];\n "
   "ENDPROC\n ";
 
 char test_prog_3[] = ""
   "PROCEDURE Proc_1 () RETURN BOOL\n "
   "DO\n "
-  "VAR test AS BOOL; \n "
+  "VAR test BOOL; \n "
   "RETURN test.some_field;\n "
   "ENDPROC\n ";
 

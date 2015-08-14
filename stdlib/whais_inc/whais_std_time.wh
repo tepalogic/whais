@@ -39,49 +39,49 @@ EXTERN PROCEDURE now () RETURN HIRESTIME;
 #    @d - The date value.
 #Out:
 #    The year part of the date.
-EXTERN PROCEDURE year (d AS DATE) RETURN INT16;
+EXTERN PROCEDURE year (d DATE) RETURN INT16;
 
 #Get the month part from a date.
 #In:
 #   @d - The date value.
 #Out:
 #   The month part of the date (counting from 1 for January).
-EXTERN PROCEDURE month (d AS DATE) RETURN UINT8;
+EXTERN PROCEDURE month (d DATE) RETURN UINT8;
 
 #Get the day part from a date.
 #In:
 #   @d - The date value.
 #Out:
 #   The day part of the date (counting from 1 for the first day of month).
-EXTERN PROCEDURE day (d AS DATE) RETURN UINT8;
+EXTERN PROCEDURE day (d DATE) RETURN UINT8;
 
 #Get the hours part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The hours part.
-EXTERN PROCEDURE hours (t AS DATETIME) RETURN UINT8;
+EXTERN PROCEDURE hours (t DATETIME) RETURN UINT8;
 
 #Get the minutes part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The minutes part.
-EXTERN PROCEDURE minutes (t AS DATETIME) RETURN UINT8;
+EXTERN PROCEDURE minutes (t DATETIME) RETURN UINT8;
 
 #Get the seconds part from a time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The seconds part.
-EXTERN PROCEDURE seconds (t AS DATETIME) RETURN UINT8;
+EXTERN PROCEDURE seconds (t DATETIME) RETURN UINT8;
 
 #Get the microseconds part from a high resolution time value.
 #In:
 #   @t - The time value.
 #Out:
 #   The seconds part.
-EXTERN PROCEDURE microsecs (t AS HIRESTIME) RETURN UINT8;
+EXTERN PROCEDURE microsecs (t HIRESTIME) RETURN UINT8;
 
 #Calculate the difference in days between to dates.
 #In:
@@ -90,7 +90,7 @@ EXTERN PROCEDURE microsecs (t AS HIRESTIME) RETURN UINT8;
 #Out:
 #   The number of days between those dates. The result is negative if the
 #   @first date is newer than @second.
-EXTERN PROCEDURE days_diff (first AS DATE, second AS DATE) RETURN INT32;
+EXTERN PROCEDURE days_diff (first DATE, second DATE) RETURN INT32;
 
 #Calculate the difference in seconds between to time related values.
 #In:
@@ -99,8 +99,8 @@ EXTERN PROCEDURE days_diff (first AS DATE, second AS DATE) RETURN INT32;
 #Out:
 #   The number of seconds between those values. The result is negative if the
 #   @first value is newer than @second.
-EXTERN PROCEDURE seconds_diff (first AS DATETIME, 
-                               second AS DATETIME) RETURN INT64;
+EXTERN PROCEDURE seconds_diff (first DATETIME, 
+                               second DATETIME) RETURN INT64;
 
 #Calculate the difference in microseconds between to high resolution
 #time values.
@@ -110,16 +110,16 @@ EXTERN PROCEDURE seconds_diff (first AS DATETIME,
 #Out:
 #   The number of microseconds between those values. The result is negative if
 #   the @first value is newer than @second.
-EXTERN PROCEDURE microsecs_diff (first AS HIRESTIME, 
-                                 second AS HIRESTIME) RETURN INT64;
+EXTERN PROCEDURE microsecs_diff (first HIRESTIME, 
+                                 second HIRESTIME) RETURN INT64;
 
-EXTERN PROCEDURE add_days (time AS HIRESTIME, days AS INT64) RETURN HIRESTIME;
-EXTERN PROCEDURE add_seconds (time AS HIRESTIME, secs AS INT64) RETURN HIRESTIME;
-EXTERN PROCEDURE add_microsecs (time AS HIRESTIME, usecs AS INT64) RETURN HIRESTIME;
-EXTERN PROCEDURE year_leaps (y AS INT64) RETURN BOOL;
+EXTERN PROCEDURE add_days (time HIRESTIME, days INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE add_seconds (time HIRESTIME, secs INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE add_microsecs (time HIRESTIME, usecs INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE year_leaps (y INT64) RETURN BOOL;
 
 #Get the week of the year for a date.
-EXTERN PROCEDURE week (d AS DATE) RETURN UINT8;
+EXTERN PROCEDURE week (d DATE) RETURN UINT8;
 
 #Get the last date of week.
 #In:
@@ -128,7 +128,7 @@ EXTERN PROCEDURE week (d AS DATE) RETURN UINT8;
 #Out:
 #   The last date of the week from the specified year or a NULL value in case
 #   of invalid inputs.
-EXTERN PROCEDURE last_week_date (y AS INT16, w AS UINT8) RETURN DATE;
+EXTERN PROCEDURE last_week_date (y INT16, w UINT8) RETURN DATE;
 
 
 #Get the weekday of a date.
@@ -136,4 +136,4 @@ EXTERN PROCEDURE last_week_date (y AS INT16, w AS UINT8) RETURN DATE;
 #   @d - The date value.
 #Out:
 #   The weekday date (counting from 0 for Monday).
-EXTERN PROCEDURE weekday (d AS DATE) RETURN UINT8;
+EXTERN PROCEDURE weekday (d DATE) RETURN UINT8;

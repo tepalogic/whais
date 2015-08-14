@@ -129,7 +129,7 @@ InterException::Description () const
     return "Cannot retrieve an array value due to null index operand.";
 
   case TEXT_ARRAY_NOT_SUPP:
-    return "This implementation cannot handle ARRAY OF TEXT typed variables.";
+    return "This implementation cannot handle TEXT ARRAY typed variables.";
 
   case ROW_INDEX_NULL:
     return "Cannot retrieve an table row due to null index operand.";

@@ -50,10 +50,10 @@ check_used_vals (struct ParserState *state)
 }
 
 char buffer[] =
-  "VAR aVar01_ AS ARRAY OF INT32;\n"
-  "VAR aVar02_ AS ARRAY OF REAL;\n"
-  "VAR aVar031 AS ARRAY OF REAL;\n"
-  "VAR aVar04, __array_2_ AS ARRAY OF TEXT;\n";
+  "VAR aVar01_ INT32 ARRAY;\n"
+  "VAR aVar02_ REAL ARRAY;\n"
+  "VAR aVar031 REAL ARRAY;\n"
+  "VAR aVar04, __array_2_ TEXT ARRAY;\n";
 
 static bool_t
 check_declared_var (struct Statement *stm,

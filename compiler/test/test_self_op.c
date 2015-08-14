@@ -52,12 +52,12 @@ check_used_vals (struct ParserState *state)
 }
 
 char proc_decl_buffer[] =
-  "PROCEDURE ProcId1 (v1 AS TABLE OF ( field_1 AS DATE)) RETURN FIELD "
+  "PROCEDURE ProcId1 (v1 TABLE ( field_1 DATE)) RETURN FIELD "
   "DO "
   "RETURN v1.field_1; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId2 (v1 AS TABLE OF (field_2 AS DATE)) RETURN DATE "
+  "PROCEDURE ProcId2 (v1 TABLE (field_2 DATE)) RETURN DATE "
   "DO "
   "RETURN v1[0, field_2]; "
   "ENDPROC\n\n";

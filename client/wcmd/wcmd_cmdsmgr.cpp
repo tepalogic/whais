@@ -44,7 +44,7 @@ static const uint_t MAX_DECODED_STRING = 256;
 
 
 
-static const char*
+static string
 decode_basic_type (const uint16_t type)
 {
   switch (GET_BASIC_TYPE (type))
@@ -111,29 +111,13 @@ decode_basic_type (const uint16_t type)
 string
 wcmd_decode_typeinfo (unsigned int type)
 {
-  string result;
-  bool   arrayDesc = false;
+  if ( ! IS_ARRAY (type))
+    return decode_basic_type (type);
 
-  assert ((IS_FIELD (type) || IS_TABLE (type)) == false );
+  if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
+    return "ARRAY";
 
-  if (IS_ARRAY (type))
-    {
-      result    += "ARRAY";
-      arrayDesc  = true;
-    }
-
-  if (arrayDesc)
-    {
-      if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
-        return result;
-
-      result += " OF ";
-      result += decode_basic_type (GET_BASIC_TYPE (type));
-
-      return result;
-    }
-
-  return decode_basic_type (GET_BASIC_TYPE (type));
+  return decode_basic_type (GET_BASIC_TYPE (type)) + " ARRAY";
 }
 
 

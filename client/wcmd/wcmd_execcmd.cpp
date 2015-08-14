@@ -1255,7 +1255,7 @@ fetch_execution_result (WH_CONNECTION hnd)
           return true;
         }
 
-      cout << "TABLE OF (";
+      cout << "TABLE (";
       for (uint_t i = 0; i < fieldsCount; ++i)
         {
           WField        fd;
@@ -1276,7 +1276,7 @@ fetch_execution_result (WH_CONNECTION hnd)
           if (i > 0)
             cout << ", ";
 
-          cout << fd.name << " AS ";
+          cout << fd.name << " ";
           cout << wcmd_decode_typeinfo (fd.type);
         }
       cout << ")\n";
@@ -1290,8 +1290,8 @@ fetch_execution_result (WH_CONNECTION hnd)
     }
   else if (stackResut & WHC_TYPE_FIELD_MASK)
     {
-      cout << "FIELD OF ";
-      cout << wcmd_decode_typeinfo (stackResut & ~WHC_TYPE_FIELD_MASK) << endl;
+      cout << wcmd_decode_typeinfo (stackResut & ~WHC_TYPE_FIELD_MASK)
+           << " FIELD\n";
 
       if ( ! fetch_execution_field_result (hnd,
                                            stackResut & ~WHC_TYPE_FIELD_MASK))

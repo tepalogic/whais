@@ -13,9 +13,9 @@ extern int yyparse (struct ParserState *);
 
 
 char buffer[] =
-  "VAR field2 AS FIELD OF ARRAY OF DATE;\n"
-  "VAR field3 AS FIELD OF INT8;\n"
-  "VAR vTable2, vTable3 AS TABLE OF (v2 AS DATE, t2 AS DATETIME, t3 as INT16);\n";
+  "VAR field2 DATE ARRAY FIELD;\n"
+  "VAR field3 INT8 FIELD;\n"
+  "VAR vTable2, vTable3 TABLE (v2 DATE, t2 DATETIME, t3 INT16);\n";
 
 
 extern bool_t is_type_spec_valid (const struct TypeSpec *spec);

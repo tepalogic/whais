@@ -176,27 +176,13 @@ decode_basic_type (const uint16_t type)
 static string
 decode_array_typeinfo (unsigned int type)
 {
-  string result;
-  bool   arrayDesc = false;
+  if ( ! IS_ARRAY (type))
+    return decode_basic_type (type);
 
-  if (IS_ARRAY (type))
-    {
-      result    += "ARRAY";
-      arrayDesc  = true;
-    }
+  if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
+    return "ARRAY";
 
-  if (arrayDesc)
-    {
-      if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
-        return result;
-
-      result += " OF ";
-      result += decode_basic_type (GET_BASIC_TYPE (type));
-
-      return result;
-    }
-
-  return decode_basic_type (GET_BASIC_TYPE (type));
+  return decode_basic_type (GET_BASIC_TYPE (type)) + " ARRAY";
 }
 
 static string
@@ -207,7 +193,7 @@ decode_field_typeinfo (unsigned int type)
   if (GET_FIELD_TYPE (type) == T_UNDETERMINED)
     return "FIELD";
 
-  return "FIELD OF " + decode_array_typeinfo (GET_FIELD_TYPE (type));
+  return decode_array_typeinfo (GET_FIELD_TYPE (type)) + " FIELD";
 }
 
 

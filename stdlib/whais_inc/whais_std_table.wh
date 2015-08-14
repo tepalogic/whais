@@ -28,20 +28,20 @@
 
 
 #@guard whais_std_table
-
+    
 #Check if a table is persistent.
 #In:
 #   @t - The table value.
 #Out:
 #   TRUE if the table is persistent.
-EXTERN PROCEDURE table_is_persistent( t AS TABLE) RETURN BOOL;
+EXTERN PROCEDURE table_is_persistent( t TABLE) RETURN BOOL;
 
 #Get the fields count of a table.
 #In:
 #   @t - The table value.
 #Out:
 #   The fields count of the supplied tabled.
-EXTERN PROCEDURE table_fields_count( t AS TABLE) RETURN UINT64;
+EXTERN PROCEDURE table_fields_count( t TABLE) RETURN UINT64;
 
 #Get a field of a table by id.
 #In:
@@ -49,22 +49,22 @@ EXTERN PROCEDURE table_fields_count( t AS TABLE) RETURN UINT64;
 #   @i - Field index.
 #Out:
 #   A value holding the corresponding field.
-EXTERN PROCEDURE table_field_by_id( t AS TABLE, 
-                                    i AS UINT64) RETURN FIELD;
+EXTERN PROCEDURE table_field_by_id( t TABLE, 
+                                    i UINT64) RETURN FIELD;
  
 #Get the rows count of a table.
 #In:
 #   @t - The table value.
 #Out:
 #   The numbers of rows allocated by the supplied table.
-EXTERN PROCEDURE table_rows( t AS TABLE) RETURN UINT64;
+EXTERN PROCEDURE table_rows( t TABLE) RETURN UINT64;
 
 #Get the count of reusable rows of a table.
 #In:
 #   @t - The table value.
 #Out:
 #   The numbers of rows allocated by the supplied table.
-EXTERN PROCEDURE table_reusable_rows ( t AS TABLE) RETURN UINT64;
+EXTERN PROCEDURE table_reusable_rows ( t TABLE) RETURN UINT64;
 
 
 #Allocate a row into a table.
@@ -72,7 +72,7 @@ EXTERN PROCEDURE table_reusable_rows ( t AS TABLE) RETURN UINT64;
 #   @t - The table value.
 #Out:
 #   The index of the allocated row.
-EXTERN PROCEDURE table_add_row( t AS TABLE) RETURN UINT64;
+EXTERN PROCEDURE table_add_row( t TABLE) RETURN UINT64;
 
 #Find a reusable row onto a table (or allocates a row if none is found).
 #A row is considered to be reusable if all fields values are set to NULL.
@@ -80,7 +80,7 @@ EXTERN PROCEDURE table_add_row( t AS TABLE) RETURN UINT64;
 #   @t - The table value.
 #Out:
 #   The founded row index.
-EXTERN PROCEDURE table_reusable_row( t AS TABLE) RETURN UINT64;
+EXTERN PROCEDURE table_reusable_row( t TABLE) RETURN UINT64;
 
 #Mark a row to reuse (e.g. set all rows's field values to NULL).
 #In:
@@ -88,8 +88,8 @@ EXTERN PROCEDURE table_reusable_row( t AS TABLE) RETURN UINT64;
 #   @r - The tables' row.
 #Out:
 #   The provided row index.
-EXTERN PROCEDURE table_reuse_row( t AS TABLE,
-                                  r AS UINT64) RETURN BOOL;
+EXTERN PROCEDURE table_reuse_row( t TABLE,
+                                  r UINT64) RETURN BOOL;
                                      
 #Exchange the content of two tables' rows.
 #In:
@@ -98,9 +98,9 @@ EXTERN PROCEDURE table_reuse_row( t AS TABLE,
 #   @r2 - Second row.
 #Out:
 #    TRUE if the exchange was made.
-EXTERN PROCEDURE table_exchg_rows( t AS TABLE,
-                                   r1 AS UINT64,
-                                   r2 AS UINT64) RETURN BOOL;
+EXTERN PROCEDURE table_exchg_rows( t TABLE,
+                                   r1 UINT64,
+                                   r2 UINT64) RETURN BOOL;
 
 #Sort table rows.
 #In:
@@ -110,6 +110,6 @@ EXTERN PROCEDURE table_exchg_rows( t AS TABLE,
 #        is the case (e.g. set the value from the same array index to TRUE).
 #Out:
 #   The same table provided.
-EXTERN PROCEDURE table_sort( t AS TABLE,
-                             fields AS ARRAY,
-                             reverse AS ARRAY OF BOOL) RETURN TABLE;
+EXTERN PROCEDURE table_sort( t TABLE,
+                             fields ARRAY,
+                             reverse BOOL ARRAY) RETURN TABLE;

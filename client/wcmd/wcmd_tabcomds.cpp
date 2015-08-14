@@ -243,9 +243,6 @@ static void
 print_field_desc (const DBSFieldDescriptor& desc,
                   ostream&                  os)
 {
-  if (desc.isArray)
-    os << "ARRAY OF ";
-
   if (desc.type == T_BOOL)
     os << "BOOL";
 
@@ -303,6 +300,9 @@ print_field_desc (const DBSFieldDescriptor& desc,
 
       os << "??";
     }
+
+  if (desc.isArray)
+    os << " ARRAY";
 }
 
 static void
@@ -1524,7 +1524,7 @@ PrintExternalDeclarations (ostream& os)
 
   for (TABLE_INDEX t = 0; t < tablesCount; ++t)
     {
-      os << "EXTERN VAR " << dbs.TableName (t) << " AS TABLE OF (";
+      os << "EXTERN VAR " << dbs.TableName (t) << " TABLE (";
 
       ITable& table = dbs.RetrievePersistentTable (dbs.TableName (t));
       const FIELD_INDEX fieldsCount = table.FieldsCount ();
@@ -1538,7 +1538,7 @@ PrintExternalDeclarations (ostream& os)
           if (f > 0)
             os << ',';
 
-          os << "\n\t" << fd.name << " AS ";
+          os << "\n\t" << fd.name << " ";
           print_field_desc (fd, os);
         }
 

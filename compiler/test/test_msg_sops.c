@@ -66,67 +66,67 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 }
 
 char test_prog_0[] = ""
-  "PROCEDURE Proc_1 (arg AS HIRESTIME) RETURN HIRESTIME\n "
+  "PROCEDURE Proc_1 (arg HIRESTIME) RETURN HIRESTIME\n "
   "DO\n " "RETURN arg += arg;\n " "ENDPROC\n ";
 
 char test_prog_1[] = ""
-  "PROCEDURE Proc_1 (arg AS INT8) RETURN INT8\n "
+  "PROCEDURE Proc_1 (arg INT8) RETURN INT8\n "
   "DO\n " "RETURN( arg + arg) += 10;\n " "ENDPROC\n ";
 
 char test_prog_2[] = ""
-  "PROCEDURE Proc_1 (arg AS DATE) RETURN DATE\n "
+  "PROCEDURE Proc_1 (arg DATE) RETURN DATE\n "
   "DO\n " "RETURN arg -= arg;\n " "ENDPROC\n ";
 
 char test_prog_3[] = ""
-  "PROCEDURE Proc_1 (arg AS INT16) RETURN INT16\n "
+  "PROCEDURE Proc_1 (arg INT16) RETURN INT16\n "
   "DO\n " "RETURN( arg + arg) -= 10;\n " "ENDPROC\n ";
 
 char test_prog_4[] = ""
-  "PROCEDURE Proc_1 (arg AS CHAR) RETURN CHAR\n "
+  "PROCEDURE Proc_1 (arg CHAR) RETURN CHAR\n "
   "DO\n " "RETURN arg *= arg;\n " "ENDPROC\n ";
 
 char test_prog_5[] = ""
-  "PROCEDURE Proc_1 (arg AS UINT32) RETURN UINT32\n "
+  "PROCEDURE Proc_1 (arg UINT32) RETURN UINT32\n "
   "DO\n " "RETURN( arg + arg) *= 10;\n " "ENDPROC\n ";
 
 char test_prog_6[] = ""
-  "PROCEDURE Proc_1 (arg AS DATETIME) RETURN DATETIME\n "
+  "PROCEDURE Proc_1 (arg DATETIME) RETURN DATETIME\n "
   "DO\n " "RETURN arg /= arg;\n " "ENDPROC\n ";
 
 char test_prog_7[] = ""
-  "PROCEDURE Proc_1 (arg AS REAL) RETURN REAL\n "
+  "PROCEDURE Proc_1 (arg REAL) RETURN REAL\n "
   "DO\n " "RETURN( arg + arg) /= 10;\n " "ENDPROC\n ";
 
 char test_prog_8[] = ""
-  "PROCEDURE Proc_1 (arg AS DATETIME) RETURN DATETIME\n "
+  "PROCEDURE Proc_1 (arg DATETIME) RETURN DATETIME\n "
   "DO\n " "RETURN arg %= arg;\n " "ENDPROC\n ";
 
 char test_prog_9[] = ""
-  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
+  "PROCEDURE Proc_1 (arg UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) %= 10;\n " "ENDPROC\n ";
 
 char test_prog_10[] = ""
-  "PROCEDURE Proc_1 (arg AS TEXT) RETURN TEXT\n "
+  "PROCEDURE Proc_1 (arg TEXT) RETURN TEXT\n "
   "DO\n " "RETURN arg &= arg;\n " "ENDPROC\n ";
 
 char test_prog_11[] = ""
-  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
+  "PROCEDURE Proc_1 (arg UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) &= 10;\n " "ENDPROC\n ";
 
 char test_prog_12[] = ""
-  "PROCEDURE Proc_1 (arg AS TEXT) RETURN TEXT\n "
+  "PROCEDURE Proc_1 (arg TEXT) RETURN TEXT\n "
   "DO\n " "RETURN arg ^= arg;\n " "ENDPROC\n ";
 
 char test_prog_13[] = ""
-  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
+  "PROCEDURE Proc_1 (arg UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) ^= 10;\n " "ENDPROC\n ";
 
 char test_prog_14[] = ""
-  "PROCEDURE Proc_1 (arg AS TEXT) RETURN TEXT\n "
+  "PROCEDURE Proc_1 (arg TEXT) RETURN TEXT\n "
   "DO\n " "RETURN arg |= arg;\n " "ENDPROC\n ";
 
 char test_prog_15[] = ""
-  "PROCEDURE Proc_1 (arg AS UINT8) RETURN UINT8\n "
+  "PROCEDURE Proc_1 (arg UINT8) RETURN UINT8\n "
   "DO\n " "RETURN( arg + arg) |= 10;\n " "ENDPROC\n ";
 
 

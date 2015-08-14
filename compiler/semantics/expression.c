@@ -218,54 +218,54 @@ array_to_text (uint_t type)
   assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
 
   if (type == T_BOOL)
-    return "ARRAY OF BOOL";
+    return "BOOL ARRAY FIELD";
 
   else if (type == T_CHAR)
-    return "ARRAY OF CHAR";
+    return "CHAR ARRAY FIELD";
 
   else if (type == T_DATE)
-    return "ARRAY OF DATE";
+    return "DATE ARRAY FIELD";
 
   else if (type == T_DATETIME)
-    return "ARRAY OF DATETIME";
+    return "DATETIME ARRAY FIELD";
 
   else if (type == T_HIRESTIME)
-    return "ARRAY OF HIRESTIME";
+    return "HIRESTIME ARRAY FIELD";
 
   else if (type == T_INT8)
-    return "ARRAY OF INT8";
+    return "INT8 ARRAY FIELD";
 
   else if (type == T_INT16)
-    return "ARRAY OF INT16";
+    return "INT16 ARRAY FIELD";
 
   else if (type == T_INT32)
-    return "ARRAY OF INT32";
+    return "INT32 ARRAY";
 
   else if (type == T_INT64)
-    return "ARRAY OF INT64";
+    return "INT64 ARRAY";
 
   else if (type == T_REAL)
-    return "ARRAY OF REAL";
+    return "REAL ARRAY";
 
   else if (type == T_RICHREAL)
-    return "ARRAY OF RICHREAL";
+    return "RICHREAL ARRAY";
 
   else if (type == T_TEXT)
-    return "ARRAY OF TEXT";
+    return "TEXT ARRAY";
 
   else if (type == T_UINT8)
-    return "ARRAY OF UINT8";
+    return "UINT8 ARRAY";
 
   else if (type == T_UINT16)
-    return "ARRAY OF UINT16";
+    return "UINT16 ARRAY";
 
   else if (type == T_UINT32)
-    return "ARRAY OF UINT32";
+    return "UINT32 ARRAY";
 
   else if (type == T_UINT64)
-    return "ARRAY OF UINT64";
+    return "UINT64 ARRAY";
 
-  return "ARRAY OF UNDEFINED";
+  return "UNDEFINED ARRAY";
 }
 
 
@@ -280,52 +280,52 @@ field_to_text (uint_t type)
           && (GET_BASIC_TYPE( type) <= T_UNDETERMINED));
 
   if (type == T_BOOL)
-    return "FIELD OF BOOL";
+    return "BOOL FIELD";
 
   else if (type == T_CHAR)
-    return "FIELD OF CHAR";
+    return "CHAR FIELD";
 
   else if (type == T_DATE)
-    return "FIELD OF DATE";
+    return "DATE FIELD";
 
   else if (type == T_DATETIME)
-    return "FIELD OF DATETIME";
+    return "DATETIME FIELD";
 
   else if (type == T_HIRESTIME)
-    return "FIELD OF HIRESTIME";
+    return "HIRESTIME FIELD";
 
   else if (type == T_INT8)
-    return "FIELD OF INT8";
+    return "INT8 FIELD";
 
   else if (type == T_INT16)
-    return "FIELD OF INT16";
+    return "INT16 FIELD";
 
   else if (type == T_INT32)
-    return "FIELD OF INT32";
+    return "INT32 FIELD";
 
   else if (type == T_INT64)
-    return "FIELD OF INT64";
+    return "INT64 FIELD";
 
   else if (type == T_REAL)
-    return "FIELD OF REAL";
+    return "REAL FIELD";
 
   else if (type == T_RICHREAL)
-    return "FIELD OF RICHREAL";
+    return "RICHREAL FIELD";
 
   else if (type == T_TEXT)
-    return "FIELD OF TEXT";
+    return "TEXT FIELD";
 
   else if (type == T_UINT8)
-    return "FIELD OF UINT8";
+    return "UINT8 FIELD";
 
   else if (type == T_UINT16)
-    return "FIELD OF UINT16";
+    return "UINT16 FIELD";
 
   else if (type == T_UINT32)
-    return "FIELD OF UINT32";
+    return "UINT32 FIELD";
 
   else if (type == T_UINT64)
-    return "FIELD OF UINT64";
+    return "UINT64 FIELD";
 
   else if (IS_ARRAY( type))
     {
@@ -333,58 +333,58 @@ field_to_text (uint_t type)
       assert (type > T_UNKNOWN || type <= T_UNDETERMINED);
 
       if (type == T_BOOL)
-        return "FIELD OF ARRAY OF BOOL";
+        return "BOOL ARRAY FIELD";
 
       else if (type == T_CHAR)
-        return "FIELD OF ARRAY OF CHAR";
+        return "CHAR ARRAY FIELD";
 
       else if (type == T_DATE)
-        return "FIELD OF ARRAY OF DATE";
+        return "DATE ARRAY FIELD";
 
       else if (type == T_DATETIME)
-        return "FIELD OF ARRAY OF DATETIME";
+        return "DATETIME ARRAY FIELD";
 
       else if (type == T_HIRESTIME)
-        return "FIELD OF ARRAY OF HIRESTIME";
+        return "HIRESTIME ARRAY FIELD";
 
       else if (type == T_INT8)
-        return "FIELD OF ARRAY OF INT8";
+        return "INT8 ARRAY FIELD";
 
       else if (type == T_INT16)
-        return "FIELD OF ARRAY OF INT16";
+        return "INT16 ARRAY FIELD";
 
       else if (type == T_INT32)
-        return "FIELD OF ARRAY OF INT32";
+        return "INT32 ARRAY FIELD";
 
       else if (type == T_INT64)
-        return "FIELD OF ARRAY OF INT64";
+        return "INT64 ARRAY FIELD";
 
       else if (type == T_REAL)
-        return "FIELD OF ARRAY OF REAL";
+        return "REAL ARRAY FIELD";
 
       else if (type == T_RICHREAL)
-        return "FIELD OF ARRAY OF RICHREAL";
+        return "RICHREAL ARRAY FIELD";
 
       else if (type == T_TEXT)
-        return "FIELD OF ARRAY OF TEXT";
+        return "TEXT ARRAY FIELD";
 
       else if (type == T_UINT8)
-        return "FIELD OF ARRAY OF UINT8";
+        return "UINT8 ARRAY FIELD";
 
       else if (type == T_UINT16)
-        return "FIELD OF ARRAY OF UINT16";
+        return "UINT16 ARRAY FIELD";
 
       else if (type == T_UINT32)
-        return "FIELD OF ARRAY OF UINT32";
+        return "UINT32 ARRAY FIELD";
 
       else if (type == T_UINT64)
-        return "FIELD OF ARRAY OF UINT64";
+        return "UINT64 ARRAY FIELD";
 
       else if (type == T_UNDETERMINED)
-	return "FIELD OF ARRAY OF UNDEFINED";
+	return "UNDEFINED ARRAY FIELD";
     }
 
-  return "FIELD OF UNDEFINED";
+  return "UNDEFINED FIELD";
 }
 
 

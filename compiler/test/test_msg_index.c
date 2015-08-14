@@ -65,15 +65,15 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 }
 
 char test_prog_1[] = ""
-  "PROCEDURE Proc_1 (v1 as DATE) RETURN DATE\n "
+  "PROCEDURE Proc_1 (v1 DATE) RETURN DATE\n "
   "DO\n " "RETURN v1[10];\n " "ENDPROC\n ";
 
 char test_prog_2[] = ""
-  "PROCEDURE Proc_1 (v1 AS ARRAY OF DATE, v2 AS REAL) RETURN DATE\n "
+  "PROCEDURE Proc_1 (v1 DATE ARRAY, v2 REAL) RETURN DATE\n "
   "DO\n " "RETURN v1[v2];\n " "ENDPROC\n ";
 
 char test_prog_3[] = ""
-  "PROCEDURE Proc_1 (v1 AS ARRAY, v2 AS UINT16) RETURN DATE\n "
+  "PROCEDURE Proc_1 (v1 ARRAY, v2 UINT16) RETURN DATE\n "
   "DO\n " "RETURN v1[v2];\n " "ENDPROC\n ";
 
 bool_t

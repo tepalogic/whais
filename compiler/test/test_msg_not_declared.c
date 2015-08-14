@@ -65,13 +65,13 @@ my_postman (WLOG_FUNC_CONTEXT bag,
 }
 
 char test_prog_1[] = ""
-  "PROCEDURE Proc_1 (v1 AS INT8, v2 AS DATE) RETURN INT8 "
+  "PROCEDURE Proc_1 (v1 INT8, v2 DATE) RETURN INT8 "
   "DO\n "
   "RETURN v1 + the_most_long_string_that_needs_to_be_truncated_it_has_to_be_at_least_128_chars_and_I_bored_to_write_all_this_kind_here_just_to_check_if_something_is_working_prperly;\n "
   "ENDPROC\n " "\n ";
 
 char test_prog_2[] = ""
-  "PROCEDURE Proc_2 (v1 AS DATE)\n RETURN DATE "
+  "PROCEDURE Proc_2 (v1 DATE)\n RETURN DATE "
   "DO\n " "v2 = v1;\n " "RETURN v2;\n " "ENDPROC\n " "\n " "";
 
 bool_t

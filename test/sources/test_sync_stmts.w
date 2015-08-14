@@ -5,14 +5,14 @@
 
 #@include whais_std.wh
 
-VAR gTestTableSync AS TABLE OF (entryId AS UINT32, rndValue AS UINT64);
-VAR gEntryCount, gRequestsCount AS UINT32;
+VAR gTestTableSync TABLE (entryId UINT32, rndValue UINT64);
+VAR gEntryCount, gRequestsCount UINT32;
 
 EXTERN PROCEDURE HandleSyncTestRequest () RETURN UINT32;
 
-PROCEDURE AddTableRow (failure AS UINT32) RETURN UINT32
+PROCEDURE AddTableRow (failure UINT32) RETURN UINT32
 DO
-	VAR result AS UINT32;
+	VAR result UINT32;
 
 	SYNC
 		IF (gEntryCount == NULL)
@@ -46,7 +46,7 @@ ENDPROC
 
 PROCEDURE proxyAddTable_2 () RETURN UINT32
 DO
-	VAR r AS UINT32;
+	VAR r UINT32;
 	r = AddTableRow (random (5));
 
 	RETURN r;
@@ -54,7 +54,7 @@ ENDPROC
 
 PROCEDURE proxyAddTable_3 () RETURN UINT32
 DO
-	VAR r AS UINT32;
+	VAR r UINT32;
 
 	SYNC
 	r = AddTableRow (random (5));
@@ -65,7 +65,7 @@ ENDPROC
 
 PROCEDURE proxyAddTable_4 () RETURN UINT32
 DO
-	VAR r AS UINT32;
+	VAR r UINT32;
 
 	SYNC
 		return  AddTableRow (random (5));
@@ -74,7 +74,7 @@ ENDPROC
 
 PROCEDURE HandleSyncTestRequest () RETURN UINT32
 DO
-	VAR c as UINT32;
+	VAR c UINT32;
 
 	SYNC
 		IF (gRequestsCount == NULL)
@@ -113,7 +113,7 @@ DO
 	RETURN TRUE;
 ENDPROC
 
-PROCEDURE GetSyncTestTable () RETURN TABLE OF (entryId AS UINT32, rndValue AS UINT64)
+PROCEDURE GetSyncTestTable () RETURN TABLE (entryId UINT32, rndValue UINT64)
 DO
 	RETURN gTestTableSync;
 ENDPROC

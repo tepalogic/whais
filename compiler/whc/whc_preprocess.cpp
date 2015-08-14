@@ -52,7 +52,8 @@ static const uint_t errTagMultipleGuard      = errTagMissingValue         + 1;
 static const uint_t errTooNestedInclude      = errTagMultipleGuard        + 1;
 static const uint_t errIncompleteDefinition  = errTooNestedInclude        + 1;
 static const uint_t errTagDefinedAlready     = errIncompleteDefinition    + 1;
-static const uint_t errTagDefinedBuildin     = errTagDefinedAlready       + 1;
+static const uint_t errTagInvalidChars       = errTagDefinedAlready       + 1;
+static const uint_t errTagDefinedBuildin     = errTagInvalidChars         + 1;
 static const uint_t errTagDefinedCmdline     = errTagDefinedBuildin       + 1;
 static const uint_t errTagDefinedSrcOffset   = errTagDefinedCmdline       + 1;
 
@@ -181,17 +182,35 @@ print_err_def_no_value (vector<SourceCodeMark>&   codeMarks,
 
 static bool
 add_tag_definition (vector<SourceCodeMark>&     codeMarks,
-                    string                      source,
+                    ostringstream&              source,
                     vector<ReplacementTag>&     tags,
                     const ReplacementTag&       tag)
 {
-  bool alreadyDefined = false;
+  for (size_t c = 0; c < tag.mTagName.length (); ++c)
+    {
+      if (((c == 0) && isdigit (tag.mTagName[c]))
+          || ! (isalnum (tag.mTagName[c]) || (tag.mTagName[c] == '_')))
+        {
+          const string src = source.str ();
+          WHC_MESSAGE_CTX ctxt (codeMarks, src.c_str ());
 
+          whc_messenger (&ctxt,
+                         tag.mDefinitionOffset,
+                         errTagInvalidChars,
+                         0,
+                         "The defined contains invalid characters [a-zA-Z0-9_]"
+                         " or it starts with a digit.");
+          return false;
+        }
+    }
+
+  bool alreadyDefined = false;
   for (size_t i = 0; i < tags.size (); ++i)
     {
       if (tags[i].mTagName == tag.mTagName)
         {
-          WHC_MESSAGE_CTX ctxt (codeMarks, _RC (const char*, &source[0]));
+          const string src = source.str ();
+          WHC_MESSAGE_CTX ctxt (codeMarks, src.c_str ());
 
           if ( ! alreadyDefined)
             {
@@ -296,20 +315,59 @@ get_tag_value (const string& line, const char* const tag)
 
 
 static void
-process_line (const string&                     file,
-              const uint_t                      lineIndex,
-              vector<ReplacementTag>&           tagPairs,
-              string&                           line)
+process_line_tags (const string&                     file,
+                   const uint_t                      lineIndex,
+                   vector<ReplacementTag>&           tagPairs,
+                   string&                           line)
 {
   size_t inoutOff = 0, lastOff = 0;
 
   string token, newLine, tags;
-  while ((token = NextToken(line, inoutOff, "\t ;")).length() > 0)
+  while ( ! (token = NextToken(line, inoutOff, "\t ")).empty ())
     {
-      newLine += line.substr(lastOff, inoutOff - lastOff - token.length());
-      lastOff = inoutOff;
+      do {
+          const char ch = token[0];
+          if ( ! (isalpha (ch)
+                  || (ch == '_') || (ch == '#' )
+                  || (ch == '\'') || (ch == '\"')))
+            {
+              token.erase (0, 1);
+            }
 
-      if (token[0] == '#')
+          else
+            break;
+      }
+      while (! token.empty ());
+
+      newLine += line.substr(lastOff, inoutOff - lastOff - token.length ());
+      lastOff = inoutOff;
+      if (token.empty ())
+        continue;
+
+      do
+        {
+          const char ch = token[token.length ()  - 1];
+          if ( ! (isalpha (ch)
+                  || (ch == '_') || (ch == '#' )
+                  || (ch == '\'') || (ch == '\"')))
+            {
+              lastOff--;
+              token.erase (token.length () - 1);
+            }
+
+          else
+            break;
+        }
+      while ( ! token.empty ());
+
+      if (token.empty ())
+        {
+          newLine += line.substr (lastOff, inoutOff - lastOff);
+          lastOff = inoutOff;
+          continue;
+        }
+
+      else if (token[0] == '#')
         {
           newLine += token;
           break;
@@ -424,7 +482,7 @@ preprocess_directives (const string&                    file,
       string line;
 
       getline (includedSource, line);
-      process_line (file, lineIndex, tagPairs, line);
+      process_line_tags (file, lineIndex, tagPairs, line);
 
       if (((occurence = strstr (line.c_str (), cmdDefined)) != NULL)
           && check_preprocess_tag (line.c_str(), cmdDefined, occurence))
@@ -445,7 +503,7 @@ preprocess_directives (const string&                    file,
           do
             {
               token = NextToken (line, inoutOffset, "\t ");
-              if (token[0] == '#')
+              if ((token[0] == '#') || token.empty ())
                 break;
 
               if ( ! value.empty ())
@@ -463,7 +521,7 @@ preprocess_directives (const string&                    file,
 
           if ( ! add_tag_definition (
                           codeMarks,
-                          sourceCode.str (),
+                          sourceCode,
                           tagPairs,
                           ReplacementTag (tag, value, sourceCode.tellp ()))
                                     )

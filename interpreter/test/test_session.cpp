@@ -20,20 +20,20 @@ using namespace whais;
 static const char admin[] = "administrator";
 
 static const uint8_t firstCode[] =
-    "VAR gb0 AS DATE;\n"
-    "VAR gb1 AS UINT32;\n"
-    "VAR tab1 AS TABLE OF (t_field AS int8, vasile as TEXT);\n"
+    "VAR gb0 DATE;\n"
+    "VAR gb1 UINT32;\n"
+    "VAR tab1 TABLE (t_field int8, vasile TEXT);\n"
     "\n"
-    "PROCEDURE proced_1 (p1v1 AS TEXT,\n"
-    "                   p1v2 AS ARRAY OF INT8, \n"
-    "                   p1v3 AS ARRAY,\n"
-    "                   p1v4 AS DATETIME)\n"
+    "PROCEDURE proced_1 (p1v1 TEXT,\n"
+    "                   p1v2 INT8 ARRAY, \n"
+    "                   p1v3 ARRAY,\n"
+    "                   p1v4 DATETIME)\n"
     "RETURN HIRESTIME\n"
     "DO\n"
     "\n"
-    "VAR p1 AS TEXT;\n"
-    "VAR p2 AS ARRAY OF UINT8;\n"
-    "VAR p3 AS UINT64;\n"
+    "VAR p1 TEXT;\n"
+    "VAR p2 UINT8 ARRAY;\n"
+    "VAR p3 UINT64;\n"
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
@@ -46,11 +46,11 @@ static const uint8_t firstCode[] =
     "\n"
     "PROCEDURE proc_2 () RETURN HIRESTIME\n"
     "DO\n"
-    "VAR dummy AS ARRAY OF HIRESTIME;\n"
-    "VAR dummy2 AS ARRAY OF INT8;\n"
-    "VAR p1 as INT8;\n"
-    "VAR p2 as UINT8;\n"
-    "VAR p3 as INT64;\n"
+    "VAR dummy HIRESTIME ARRAY;\n"
+    "VAR dummy2 INT8 ARRAY;\n"
+    "VAR p1 INT8;\n"
+    "VAR p2 UINT8;\n"
+    "VAR p3 INT64;\n"
     "\n"
     "dummy2[p3] = p1;\n"
     "p1 = p3;\n"
@@ -61,20 +61,20 @@ static const uint8_t firstCode[] =
     "ENDPROC\n";
 
 static const uint8_t secondCode[] =
-    "EXTERN VAR gb1 AS UINT32;\n"
+    "EXTERN VAR gb1 UINT32;\n"
     "\n"
-    "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
-    "                   p1v2 AS ARRAY OF INT8, \n"
-    "                   p1v3 AS ARRAY,\n"
-    "                   p1v4 AS DATETIME)\n"
+    "EXTERN PROCEDURE proced_1 (p1v1 TEXT,\n"
+    "                   p1v2 INT8 ARRAY, \n"
+    "                   p1v3 ARRAY,\n"
+    "                   p1v4 DATETIME)\n"
     "RETURN HIRESTIME;\n"
     "\n"
     "\n"
     "PROCEDURE proc_3 () RETURN HIRESTIME\n"
     "DO\n"
-    "VAR dummy  AS ARRAY OF UINT16;\n"
-    "VAR dummy2 AS ARRAY OF INT8;\n"
-    "VAR p3 as INT64;\n"
+    "VAR dummy  UINT16 ARRAY;\n"
+    "VAR dummy2 INT8 ARRAY;\n"
+    "VAR p3 INT64;\n"
     "\n"
     "p3 = 1;\n"
     "dummy2[p3] = gb1;\n"
@@ -84,7 +84,7 @@ static const uint8_t secondCode[] =
     "ENDPROC\n";
 
 static const uint8_t notDefGlbCode[] =
-    "EXTERN VAR someGlobal AS UINT32;"
+    "EXTERN VAR someGlobal UINT32;"
     "PROCEDURE random_proc_name () RETURN INT32\n"
     "DO\n"
     "RETURN someGlobal;\n"
@@ -92,10 +92,10 @@ static const uint8_t notDefGlbCode[] =
     "ENDPROC\n";
 
 static const uint8_t notDefProcCode[] =
-    "EXTERN PROCEDURE some_proc_name (p1v1 AS TEXT,\n"
-    "                   p1v2 AS ARRAY OF INT8, \n"
-    "                   p1v3 AS ARRAY,\n"
-    "                   p1v4 AS DATETIME)\n"
+    "EXTERN PROCEDURE some_proc_name (p1v1 TEXT,\n"
+    "                   p1v2 INT8 ARRAY, \n"
+    "                   p1v3 ARRAY,\n"
+    "                   p1v4 DATETIME)\n"
     "RETURN HIRESTIME;\n"
     "\n"
     "PROCEDURE ref_proc ()\n"
@@ -108,8 +108,8 @@ static const uint8_t notDefProcCode[] =
 
 
 static const uint8_t doubleDefGlbCode[] =
-    "EXTERN VAR gb1 AS UINT32;\n"
-    "VAR gb0 AS UINT32;"
+    "EXTERN VAR gb1 UINT32;\n"
+    "VAR gb0 UINT32;"
     "PROCEDURE random_proc_name_2 () RETURN INT32\n"
     "DO\n"
     "RETURN gb1;\n"
@@ -117,22 +117,22 @@ static const uint8_t doubleDefGlbCode[] =
     "ENDPROC\n";
 
 static const uint8_t doubleDefProcCode[] =
-    "EXTERN PROCEDURE proced_1 (p1v1 AS TEXT,\n"
-    "                   p1v2 AS ARRAY OF INT8, \n"
-    "                   p1v3 AS ARRAY,\n"
-    "                   p1v4 AS DATETIME)\n"
+    "EXTERN PROCEDURE proced_1 (p1v1 TEXT,\n"
+    "                   p1v2 INT8 ARRAY, \n"
+    "                   p1v3 ARRAY,\n"
+    "                   p1v4 DATETIME)\n"
     "RETURN HIRESTIME;\n"
     "\n"
     "PROCEDURE proc_2 () RETURN HIRESTIME\n"
     "DO\n"
-    "VAR dummy AS ARRAY OF INT8;\n"
-    "VAR dummy2 AS ARRAY OF INT8;\n"
+    "VAR dummy INT8 ARRAY;\n"
+    "VAR dummy2 INT8 ARRAY;\n"
     "RETURN proced_1 (\"Iulian\", dummy2, dummy, '1981/11/11');\n"
     "\n"
     "ENDPROC\n";
 
 static const uint8_t diffDefGlbCode[] =
-    "EXTERN VAR gb1 AS UINT64;\n"
+    "EXTERN VAR gb1 UINT64;\n"
     "PROCEDURE random_proc_name_4 () RETURN INT64\n"
     "DO\n"
     "RETURN gb1;\n"
@@ -140,10 +140,10 @@ static const uint8_t diffDefGlbCode[] =
     "ENDPROC\n";
 
 static const uint8_t diffDefProcCode[] =
-    "EXTERN PROCEDURE proced_1 (p1v1 AS DATE,\n"
-    "                   p1v2 AS ARRAY OF INT8, \n"
-    "                   p1v3 AS ARRAY,\n"
-    "                   p1v4 AS DATETIME)\n"
+    "EXTERN PROCEDURE proced_1 (p1v1 DATE,\n"
+    "                   p1v2 INT8 ARRAY, \n"
+    "                   p1v3 ARRAY,\n"
+    "                   p1v4 DATETIME)\n"
     "RETURN HIRESTIME;\n"
     "\n"
     "PROCEDURE ref_proc_2 ()\n"

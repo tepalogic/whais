@@ -26,7 +26,6 @@ void yyerror(struct ParserState *state,  const char *msg);
 %}
 
 %token ARRAY
-%token AS
 %token BOOL
 %token BREAK
 %token CHAR
@@ -47,7 +46,6 @@ void yyerror(struct ParserState *state,  const char *msg);
 %token INT16
 %token INT32
 %token INT64
-%token OF
 %token PROCEDURE
 %token REAL
 %token RETURN
@@ -108,8 +106,8 @@ global_block_statement: /* empty */
                         global_block_statement
 ;
 
-var_decl_stmt: VAR id_list AS type_spec ';'
-                  { $$ = add_list_declaration (state, $2, $4); CHK_SEM_ERROR; }
+var_decl_stmt: VAR id_list type_spec ';'
+                  { $$ = add_list_declaration (state, $2, $3); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  
             { $$ = add_id_to_list(NULL, $1); }
@@ -165,30 +163,30 @@ basic_type_spec: BOOL
                        { $$ = create_type_spec(state, T_UNDETERMINED);  CHK_SEM_ERROR; }
 ;
 
-array_type_spec: ARRAY array_of_clause
-                    {    $$ = $2; MARK_ARRAY (($$)->val.u_tspec.type); }
+array_type_spec: array_of_clause ARRAY
+                    {    $$ = $1; MARK_ARRAY (($$)->val.u_tspec.type); }
 ;
 
 array_of_clause: /* empty */
                     { $$ = create_type_spec(state, T_UNDETERMINED); 
                       CHK_SEM_ERROR;
                     }
-               | OF basic_type_spec
-                       { $$ = $2; }
+               | basic_type_spec
+                    { $$ = $1; }
 ;
 
-field_type_spec: FIELD field_of_clause
-                    {   $$ = $2; MARK_FIELD (($$)->val.u_tspec.type); }
+field_type_spec: field_of_clause FIELD
+                    {   $$ = $1; MARK_FIELD (($$)->val.u_tspec.type); }
 ;
 
 field_of_clause: /* empty */
                     { $$ = create_type_spec(state, T_UNDETERMINED); 
                       CHK_SEM_ERROR;
                     }
-               | OF basic_type_spec
-                    { $$ = $2; }
-               | OF array_type_spec
-                    { $$ = $2; }
+               | basic_type_spec
+                    { $$ = $1; }
+               | array_type_spec
+                    { $$ = $1; }
 ;
 
 table_type_spec: TABLE cont_clause
@@ -202,41 +200,41 @@ cont_clause: /* empty */
                 CHK_SEM_ERROR;
                 $$->val.u_tspec.extra = NULL;
              }
-             | OF '(' container_type_decl ')'
+             | '(' container_type_decl ')'
                  {
                  /* set the type spec later */
                 $$ = create_type_spec(state, 0);
                 CHK_SEM_ERROR;
-                $$->val.u_tspec.extra = $3;                     
+                $$->val.u_tspec.extra = $2;                     
                 }
 ;
 
-container_type_decl: IDENTIFIER AS basic_type_spec ',' container_type_decl
+container_type_decl: IDENTIFIER basic_type_spec ',' container_type_decl
                         {
-                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            MARK_TABLE_FIELD ($2->val.u_tspec.type);
                             $$ = add_field_declaration(state,
-                                $1, $3, (struct DeclaredVar *)$5);
+                                $1, $2, (struct DeclaredVar *)$4);
                             CHK_SEM_ERROR;
                         } 
-                   | IDENTIFIER AS array_type_spec ',' container_type_decl
+                   | IDENTIFIER array_type_spec ',' container_type_decl
                         {
-                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            MARK_TABLE_FIELD ($2->val.u_tspec.type);
                             $$ = add_field_declaration(state,
-                                $1, $3, (struct DeclaredVar *)$5);
+                                $1, $2, (struct DeclaredVar *)$4);
                             CHK_SEM_ERROR;
                         }                
-                   | IDENTIFIER AS basic_type_spec
+                   | IDENTIFIER basic_type_spec
                         {
-                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            MARK_TABLE_FIELD ($2->val.u_tspec.type);
                             $$ = add_field_declaration(state,
-                                $1, $3, NULL);
+                                $1, $2, NULL);
                             CHK_SEM_ERROR;
                         }                
-                   | IDENTIFIER AS array_type_spec
+                   | IDENTIFIER array_type_spec
                         {
-                            MARK_TABLE_FIELD ($3->val.u_tspec.type);
+                            MARK_TABLE_FIELD ($2->val.u_tspec.type);
                             $$ = add_field_declaration(state,
-                                $1, $3, NULL);
+                                $1, $2, NULL);
                             CHK_SEM_ERROR;
                         }
 ;
@@ -315,14 +313,14 @@ procedure_parameter_decl: /* empty */
                             { $$ = $1; }
 ;
 
-list_of_paramaters_decl: IDENTIFIER AS type_spec
+list_of_paramaters_decl: IDENTIFIER type_spec
                            {
-                                $$ =  add_proc_param_decl(NULL, $1, $3);
+                                $$ =  add_proc_param_decl(NULL, $1, $2);
                                 CHK_SEM_ERROR;
                            }
-                       | IDENTIFIER AS type_spec ',' list_of_paramaters_decl
+                       | IDENTIFIER  type_spec ',' list_of_paramaters_decl
                            {
-                                $$ = add_proc_param_decl($5, $1, $3);
+                                $$ = add_proc_param_decl($4, $1, $2);
                                 CHK_SEM_ERROR;
                            }
 ;

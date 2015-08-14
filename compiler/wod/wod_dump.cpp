@@ -200,7 +200,7 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
 
       type = GET_FIELD_TYPE (type);
       if (type != T_UNDETERMINED)
-        output << " OF ";
+        output << " ";
 
       else
         return;
@@ -212,7 +212,7 @@ wod_dump_nontable_type_info (ostream& output, uint16_t type)
 
       type = GET_BASIC_TYPE (type);
       if (type != T_UNDETERMINED)
-        output << " OF ";
+        output << " ";
 
       else
         return;
@@ -313,7 +313,7 @@ wod_dump_table_type_inf (const uint8_t* typeDesc, ostream& output)
     {
       bool_t printComma = FALSE;
 
-      output << " OF (";
+      output << " (";
       while (typeDesc[0] != ';' && typeDesc[1] != 0)
         {
           if (printComma)
@@ -322,7 +322,7 @@ wod_dump_table_type_inf (const uint8_t* typeDesc, ostream& output)
           else
             printComma = TRUE;
 
-          output << typeDesc << " AS ";
+          output << typeDesc << " ";
           typeDesc += strlen (_RC (const char *, typeDesc)) + 1;
 
           uint16_t type = load_le_int16 (typeDesc);

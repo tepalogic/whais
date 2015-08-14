@@ -16,23 +16,23 @@
 PROCEDURE null_test_1 ()
 RETURN TABLE
 DO
-    VAR row AS UINT64;
-    VAR result AS TABLE OF (field1 AS BOOL,
-                            field2 AS CHAR,
-                            field3 AS DATE,
-                            field4 AS DATETIME,
-                            field5 AS HIRESTIME,
-                            field6 AS INT8,
-                            field7 AS INT16,
-                            field8 AS INT32,
-                            field9 AS INT64,
-                            field10 AS UINT8,
-                            field11 AS UINT16,
-                            field12 AS UINT32,
-                            field13 AS UINT64,
-                            field14 AS REAL,
-                            field15 AS RICHREAL,
-                            field16 AS TEXT);
+    VAR row UINT64;
+    VAR result TABLE (field1 BOOL,
+                            field2 CHAR,
+                            field3 DATE,
+                            field4 DATETIME,
+                            field5 HIRESTIME,
+                            field6 INT8,
+                            field7 INT16,
+                            field8 INT32,
+                            field9 INT64,
+                            field10 UINT8,
+                            field11 UINT16,
+                            field12 UINT32,
+                            field13 UINT64,
+                            field14 REAL,
+                            field15 RICHREAL,
+                            field16 TEXT);
 
     write_log ("Start of null_test_1");
     IF (row != NULL) DO
@@ -74,23 +74,23 @@ ENDPROC
 PROCEDURE null_test_1_1 ()
 RETURN BOOL
 DO
-    VAR row AS UINT64;
-    VAR result AS TABLE OF (field1 AS BOOL,
-                            field2 AS CHAR,
-                            field3 AS DATE,
-                            field4 AS DATETIME,
-                            field5 AS HIRESTIME,
-                            field6 AS INT8,
-                            field7 AS INT16,
-                            field8 AS INT32,
-                            field9 AS INT64,
-                            field10 AS UINT8,
-                            field11 AS UINT16,
-                            field12 AS UINT32,
-                            field13 AS UINT64,
-                            field14 AS REAL,
-                            field15 AS RICHREAL,
-                            field16 AS TEXT);
+    VAR row UINT64;
+    VAR result TABLE (field1 BOOL,
+                            field2 CHAR,
+                            field3 DATE,
+                            field4 DATETIME,
+                            field5 HIRESTIME,
+                            field6 INT8,
+                            field7 INT16,
+                            field8 INT32,
+                            field9 INT64,
+                            field10 UINT8,
+                            field11 UINT16,
+                            field12 UINT32,
+                            field13 UINT64,
+                            field14 REAL,
+                            field15 RICHREAL,
+                            field16 TEXT);
 
     write_log ("Start of null_test_1_1");
     IF (row != NULL) DO
@@ -412,23 +412,23 @@ ENDPROC
 PROCEDURE null_test_1_2 ()
 RETURN TABLE
 DO
-    VAR row AS UINT64;
-    VAR result AS TABLE OF (field1 AS ARRAY OF BOOL,
-                            field2 AS ARRAY OF CHAR,
-                            field3 AS ARRAY OF DATE,
-                            field4 AS ARRAY OF DATETIME,
-                            field5 AS ARRAY OF HIRESTIME,
-                            field6 AS ARRAY OF INT8,
-                            field7 AS ARRAY OF INT16,
-                            field8 AS ARRAY OF INT32,
-                            field9 AS ARRAY OF INT64,
-                            field10 AS ARRAY OF UINT8,
-                            field11 AS ARRAY OF UINT16,
-                            field12 AS ARRAY OF UINT32,
-                            field13 AS ARRAY OF UINT64,
-                            field14 AS ARRAY OF REAL,
-                            field15 AS ARRAY OF RICHREAL,
-                            field16 AS TEXT);
+    VAR row UINT64;
+    VAR result TABLE (field1 BOOL ARRAY,
+                            field2 CHAR ARRAY,
+                            field3 DATE ARRAY,
+                            field4 DATETIME ARRAY,
+                            field5 HIRESTIME ARRAY,
+                            field6 INT8 ARRAY,
+                            field7 INT16 ARRAY,
+                            field8 INT32 ARRAY,
+                            field9 INT64 ARRAY,
+                            field10 UINT8 ARRAY,
+                            field11 UINT16 ARRAY,
+                            field12 UINT32 ARRAY,
+                            field13 UINT64 ARRAY,
+                            field14 REAL ARRAY,
+                            field15 RICHREAL ARRAY,
+                            field16 TEXT);
 
     write_log ("Start of null_test_1_2");
     IF (row != NULL) DO
@@ -475,23 +475,23 @@ ENDPROC
 PROCEDURE null_test_1_3 ()
 RETURN BOOL
 DO
-    VAR result AS TABLE OF (field1 AS ARRAY OF BOOL,
-                            field2 AS ARRAY OF CHAR,
-                            field3 AS ARRAY OF DATE,
-                            field4 AS ARRAY OF DATETIME,
-                            field5 AS ARRAY OF HIRESTIME,
-                            field6 AS ARRAY OF INT8,
-                            field7 AS ARRAY OF INT16,
-                            field8 AS ARRAY OF INT32,
-                            field9 AS ARRAY OF INT64,
-                            field10 AS ARRAY OF UINT8,
-                            field11 AS ARRAY OF UINT16,
-                            field12 AS ARRAY OF UINT32,
-                            field13 AS ARRAY OF UINT64,
-                            field14 AS ARRAY OF REAL,
-                            field15 AS ARRAY OF RICHREAL,
-                            field16 AS TEXT);
-    VAR row AS UINT64;
+    VAR result TABLE (field1 BOOL ARRAY,
+                            field2 CHAR ARRAY,
+                            field3 DATE ARRAY,
+                            field4 DATETIME ARRAY,
+                            field5 HIRESTIME ARRAY,
+                            field6 INT8 ARRAY,
+                            field7 INT16 ARRAY,
+                            field8 INT32 ARRAY,
+                            field9 INT64 ARRAY,
+                            field10 UINT8 ARRAY,
+                            field11 UINT16 ARRAY,
+                            field12 UINT32 ARRAY,
+                            field13 UINT64 ARRAY,
+                            field14 REAL ARRAY,
+                            field15 RICHREAL ARRAY,
+                            field16 TEXT);
+    VAR row UINT64;
     
     write_log ("Start of null_test_1_3");
     IF (row != NULL) DO
@@ -1038,8 +1038,8 @@ ENDPROC
 PROCEDURE null_test_1_4 ()
 RETURN BOOL
 DO
-    VAR row AS UINT64;
-    VAR tab AS TABLE OF (field1 AS DATE);
+    VAR row UINT64;
+    VAR tab TABLE (field1 DATE);
 
     write_log ("Start of null_test_1_4");
     IF (row != NULL) DO
@@ -1078,8 +1078,8 @@ ENDPROC
 PROCEDURE null_test_1_5 ()
 RETURN BOOL
 DO
-    VAR tab AS TABLE OF (field1 AS DATE);
-    VAR fld AS FIELD OF DATE;
+    VAR tab TABLE (field1 DATE);
+    VAR fld DATE FIELD;
 
     write_log ("Start of null_test_1_5");
     IF (tab != NULL) DO
@@ -1125,7 +1125,7 @@ ENDPROC
 PROCEDURE null_test_2 ()
 RETURN ARRAY
 DO
-    VAR result AS ARRAY OF INT32;
+    VAR result INT32 ARRAY;
     
     write_log ("Start of null_test_2");
     IF (result != NULL) DO
@@ -1150,22 +1150,22 @@ PROCEDURE null_test_2_1 ()
 RETURN BOOL
 DO
 
-    VAR array1 AS ARRAY OF BOOL;
-    VAR array2 AS ARRAY OF CHAR;
-    VAR array3 AS ARRAY OF DATE;
-    VAR array4 AS ARRAY OF DATETIME;
-    VAR array5 AS ARRAY OF HIRESTIME;
-    VAR array6 AS ARRAY OF INT8;
-    VAR array7 AS ARRAY OF INT16;
-    VAR array8 AS ARRAY OF INT32;
-    VAR array9 AS ARRAY OF INT64;
-    VAR array10 AS ARRAY OF UINT8;
-    VAR array11 AS ARRAY OF UINT16;
-    VAR array12 AS ARRAY OF UINT32;
-    VAR array13 AS ARRAY OF UINT64;
-    VAR array14 AS ARRAY OF REAL;
-    VAR array15 AS ARRAY OF RICHREAL;
-    VAR array16 AS TEXT;
+    VAR array1 BOOL ARRAY;
+    VAR array2 CHAR ARRAY;
+    VAR array3 DATE ARRAY;
+    VAR array4 DATETIME ARRAY;
+    VAR array5 HIRESTIME ARRAY;
+    VAR array6 INT8 ARRAY;
+    VAR array7 INT16 ARRAY;
+    VAR array8 INT32 ARRAY;
+    VAR array9 INT64 ARRAY;
+    VAR array10 UINT8 ARRAY;
+    VAR array11 UINT16 ARRAY;
+    VAR array12 UINT32 ARRAY;
+    VAR array13 UINT64 ARRAY;
+    VAR array14 REAL ARRAY;
+    VAR array15 RICHREAL ARRAY;
+    VAR array16 TEXT;
 
     write_log ("Start of null_test_2_1");
         
@@ -1702,7 +1702,7 @@ ENDPROC
 PROCEDURE null_test_2_2 ()
 RETURN ARRAY
 DO
-    VAR result AS ARRAY OF INT8;
+    VAR result INT8 ARRAY;
 
     write_log ("Start of null_test_2_2");
     IF (result != NULL) DO
@@ -1742,7 +1742,7 @@ ENDPROC
 PROCEDURE null_test_2_3 ()
 RETURN BOOL
 DO
-    VAR tab AS TABLE OF (field1 AS ARRAY OF DATE);
+    VAR tab TABLE (field1 DATE ARRAY);
 
     write_log ("Started test null_test_2_3");
 
@@ -1799,22 +1799,22 @@ ENDPROC
 #Call this function twice and make sure it returns TRUE in both cases.
 PROCEDURE null_test_3 () RETURN BOOL
 DO
-    VAR b AS BOOL;
-    VAR c AS CHAR;
-    VAR d AS DATE;
-    VAR dt AS DATETIME;
-    VAR ht AS HIRESTIME;
-    VAR i8 AS INT8;
-    VAR i16 AS INT16;
-    VAR i32 AS INT32;
-    VAR i64 AS INT64;
-    VAR u8 AS  UINT8;
-    VAR u16 AS UINT16;
-    VAR u32 AS UINT32;
-    VAR u64 AS UINT64;
-    VAR r AS REAL;
-    VAR rr AS RICHREAL;
-    VAR t AS TEXT;
+    VAR b BOOL;
+    VAR c CHAR;
+    VAR d DATE;
+    VAR dt DATETIME;
+    VAR ht HIRESTIME;
+    VAR i8 INT8;
+    VAR i16 INT16;
+    VAR i32 INT32;
+    VAR i64 INT64;
+    VAR u8  UINT8;
+    VAR u16 UINT16;
+    VAR u32 UINT32;
+    VAR u64 UINT64;
+    VAR r REAL;
+    VAR rr RICHREAL;
+    VAR t TEXT;
     
     write_log ("Started test null_test_3");
     
@@ -1938,22 +1938,22 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_3_1 () RETURN BOOL
 DO
-    VAR b AS BOOL;
-    VAR c AS CHAR;
-    VAR d AS DATE;
-    VAR dt AS DATETIME;
-    VAR ht AS HIRESTIME;
-    VAR i8 AS INT8;
-    VAR i16 AS INT16;
-    VAR i32 AS INT32;
-    VAR i64 AS INT64;
-    VAR u8 AS  UINT8;
-    VAR u16 AS UINT16;
-    VAR u32 AS UINT32;
-    VAR u64 AS UINT64;
-    VAR r AS REAL;
-    VAR rr AS RICHREAL;
-    VAR t AS TEXT;
+    VAR b BOOL;
+    VAR c CHAR;
+    VAR d DATE;
+    VAR dt DATETIME;
+    VAR ht HIRESTIME;
+    VAR i8 INT8;
+    VAR i16 INT16;
+    VAR i32 INT32;
+    VAR i64 INT64;
+    VAR u8  UINT8;
+    VAR u16 UINT16;
+    VAR u32 UINT32;
+    VAR u64 UINT64;
+    VAR r REAL;
+    VAR rr RICHREAL;
+    VAR t TEXT;
     
     write_log ("Started test null_test_3_1");
     
@@ -2176,7 +2176,7 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_4 () RETURN BOOL
 DO
-    VAR t AS TEXT;
+    VAR t TEXT;
 
     write_log ("Started test null_test_4");
 
@@ -2221,7 +2221,7 @@ ENDPROC
 #This function should return true
 PROCEDURE null_test_4_1 () RETURN BOOL
 DO
-    VAR tab AS TABLE OF (field1 AS TEXT);
+    VAR tab TABLE (field1 TEXT);
 
     write_log ("Started test null_test_4_1");
 
@@ -2274,7 +2274,7 @@ ENDPROC
 
 #TEST: null_test_5
 #This function should return a null table with the correct signature.
-PROCEDURE null_test_5 () RETURN TABLE OF (field1 AS TEXT, field2 AS UINT32)
+PROCEDURE null_test_5 () RETURN TABLE (field1 TEXT, field2 UINT32)
 DO
     write_log ("Started test null_test_5");
     write_log ("End of null_test_5");
@@ -2284,7 +2284,7 @@ ENDPROC
 
 #TEST: null_test_5_1
 #This function should return a null table with the correct signature.
-PROCEDURE null_test_5_1 () RETURN ARRAY OF INT32
+PROCEDURE null_test_5_1 () RETURN INT32 ARRAY
 DO
     write_log ("Started test null_test_5_1");
     write_log ("End of null_test_5_1");
