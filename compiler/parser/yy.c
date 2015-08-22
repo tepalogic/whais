@@ -50,30 +50,17 @@ struct ParserState;
 #include "parser.h"
 #include "../semantics/wlog.h"
 
-
-INLINE static bool_t
-is_space (char c)
-{
-  return (c == ' ' || c == '\t' || c == 0x0A || c == 0x0D);
-}
-
 INLINE static bool_t
 is_numeric (const char c, const bool_t isHex)
 {
-  return (c >= '0' && c <= '9') ||
-         (isHex && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
-}
-
-INLINE static bool_t
-is_alpha (const char c)
-{
-  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+  return isdigit (c)
+         || (isHex && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
 }
 
 INLINE static bool_t
 is_idlegal (const char c)
 {
-  return is_numeric (c, FALSE) || is_alpha (c) || (c == '_');
+  return is_numeric (c, FALSE) || isalpha (c) || (c == '_');
 }
 
 INLINE static bool_t
@@ -110,7 +97,7 @@ next_token (const char*     buffer,
   assert (outToken != NULL);
   assert (outTokenLen != NULL);
 
-  while (is_space( *buffer))
+  while (isspace (*buffer))
     ++buffer;
 
   if (*buffer == '#')
@@ -382,6 +369,7 @@ parse_multichar_operator (const char* op)
 static uint_t
 parse_integer (const char*      buffer,
                uint_t           bufferLen,
+               const bool_t     checkForUnsigned,
                uint64_t* const  outValue,
                bool_t* const    outSigned)
 {
@@ -394,7 +382,7 @@ parse_integer (const char*      buffer,
   assert (outValue != NULL);
 
   *outValue    = 0;
-  *outSigned   = FALSE;
+  *outSigned   = TRUE;
   if ((buffer[0] == '-')
       && (bufferLen > 1)
       && is_numeric (buffer[1], FALSE))
@@ -412,9 +400,6 @@ parse_integer (const char*      buffer,
     }
   else if (buffer[0] == '0')
     ++buffer, --bufferLen;
-
-  if (negative)
-    *outSigned = TRUE;
 
   while (bufferLen > 0)
     {
@@ -445,6 +430,9 @@ parse_integer (const char*      buffer,
 
   if (negative)
     *outValue *= -1;
+
+  if (checkForUnsigned && ((*buffer == 'u') || (*buffer == 'U')))
+    --bufferLen, *outSigned = FALSE;
 
   return (oldLen - bufferLen);
 }
@@ -594,11 +582,11 @@ parse_character (const char* buffer,
         }
       else if (is_numeric( *buffer, FALSE))
         {
-          uint64_t  value    = 0;
-          bool_t    negative = FALSE;
+          uint64_t  value = 0;
+          bool_t    dummy = FALSE;
 
-          result += parse_integer (buffer, bufferLen, &value, &negative);
-          if (negative || (value > 0xFFFFFFFF))
+          result += parse_integer (buffer, bufferLen, FALSE, &value, &dummy);
+          if (value > 0xFFFFFFFF)
             return 0;
 
           *outChar = value;
@@ -672,7 +660,11 @@ parse_time_value (const char*      buffer,
   outTime->month = outTime->day = 1;
 
   /* found the year part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t*)&intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t*)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -696,7 +688,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the month part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t*)&intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t*)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -720,7 +716,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the day part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t *)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -744,7 +744,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the hour part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t *)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -765,7 +769,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the minute part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t *)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -789,7 +797,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the second part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t *)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -813,7 +825,11 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the microsecond part */
-  intValLen = parse_integer (buffer, bufferLen, (uint64_t *) & intVal, &dummy);
+  intValLen = parse_integer (buffer,
+                             bufferLen,
+                             FALSE,
+                             (uint64_t *)&intVal,
+                             &dummy);
   if (intValLen > 0)
     {
       result    += intValLen;
@@ -872,14 +888,9 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       return result;
     }
   else if (tokenLen == 1)
-    {
-      if (*pToken == '!')
-        return NOT;
+    return *pToken;
 
-      return *pToken; /* The token is most likely an operator. */
-    }
-
-  /* Initialise the semantic value, based on the token type. */
+  /* Initialize the semantic value, based on the token type. */
   switch (tokenType)
     {
     case TK_IDENTIFIER:
@@ -897,6 +908,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
     case TK_NUMERIC:
       result = parse_integer (pToken,
                               tokenLen,
+                              TRUE,
                               &((*lvalp)->val.u_int.value),
                               &((*lvalp)->val.u_int.isSigned));
       if (result != 0)
@@ -994,7 +1006,25 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
 int
 yyerror (struct ParserState* parser, const char* msg)
 {
-  log_message (parser, parser->bufferPos, MSG_COMPILER_ERR);
+  char temp[128] = {0, };
+
+  int i, lastTokenOffset = parser->bufferPos;
+  while ((lastTokenOffset > 0) && ! isspace (parser->buffer[lastTokenOffset]))
+    --lastTokenOffset;
+
+  for (i = 0;
+      (i < sizeof (temp)) && (lastTokenOffset + i < parser->bufferSize);
+      ++i)
+    {
+      temp[i] = parser->buffer[lastTokenOffset + i];
+      if ((temp [i] == '\n') || (temp[i] == '#'))
+        {
+          temp[i] = 0;
+          break;
+        }
+    }
+
+  log_message (parser, parser->bufferPos, MSG_COMPILER_ERR, temp);
 
   return 0;
 }

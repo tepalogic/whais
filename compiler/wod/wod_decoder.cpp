@@ -521,6 +521,12 @@ const FDECODE_OPCODE wod_dec_w_sxorb = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sor  = wod_dec_w_ldnull;
 const FDECODE_OPCODE wod_dec_w_sorb = wod_dec_w_ldnull;
 
+const FDECODE_OPCODE wod_dec_w_itbf  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_itbl  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_itn   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_itp   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_ldnull;
+
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
 
@@ -683,7 +689,13 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_sxorb,
 
   wod_dec_w_sor,
-  wod_dec_w_sorb
+  wod_dec_w_sorb,
+
+  wod_dec_w_itbf,
+  wod_dec_w_itbl,
+  wod_dec_w_itn,
+  wod_dec_w_itp,
+  wod_dec_w_itoff
 };
 
 const char *wod_str_table[] = {
@@ -848,7 +860,13 @@ const char *wod_str_table[] = {
   "sxorb",
 
   "sor",
-  "sorb"
+  "sorb",
+
+  "itf",
+  "itl",
+  "itn",
+  "itp",
+  "itoff"
 };
 
 } //namespace wod

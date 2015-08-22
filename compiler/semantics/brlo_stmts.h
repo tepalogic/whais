@@ -87,8 +87,15 @@ enum LOOP_ELEMENT_TYPE
 struct Loop
 {
   enum LOOP_ELEMENT_TYPE type;
-  uint32_t               startPos;
-  int32_t                endPos;
+  uint32_t               continueMark;
+  int32_t                breakMark;
+};
+
+struct LoopIterator {
+  const char* name;
+  uint32_t    nameLen;
+  uint32_t    localIndex;
+  uint16_t    type;
 };
 
 
@@ -98,6 +105,11 @@ begin_for_stmt (struct ParserState* const parser,
                 YYSTYPE                   exp2,
                 YYSTYPE                   exp3);
 
+void
+begin_foreach_stmt (struct ParserState* const parser,
+                    YYSTYPE                   id,
+                    YYSTYPE                   exp,
+                    const bool_t              reverse);
 void
 finalize_for_stmt (struct ParserState* const parser);
 

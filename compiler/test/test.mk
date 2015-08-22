@@ -179,3 +179,7 @@ UNIT_EXES+=test_msg_sops
 test_msg_sops_SRC=test/test_msg_sops.c 
 test_msg_sops_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom
 
+UNIT_EXES+=test_itoffset_op
+test_itoffset_op_SRC=test/test_itoffset_op.c 
+test_itoffset_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom
+

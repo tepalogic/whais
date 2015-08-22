@@ -196,6 +196,12 @@ enum W_OPCODE
   W_SOR,
   W_SORB,
 
+  W_ITF,
+  W_ITL,
+  W_ITN,
+  W_ITP,
+  W_ITOFF,
+
   W_OP_END_MARK
 };
 

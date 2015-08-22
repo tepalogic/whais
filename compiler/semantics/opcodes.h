@@ -55,5 +55,8 @@ encode_opcode (struct WOutputStream *stream, const enum W_OPCODE opcode);
 enum W_OPCODE
 decode_opcode (const uint8_t* instrs);
 
+uint_t
+opcode_bytes (const enum W_OPCODE);
+
 #endif /* OPCODES_H_ */
 

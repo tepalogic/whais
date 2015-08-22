@@ -37,6 +37,7 @@ enum EXP_OPERATION
 {
   OP_NULL = 0,
 
+  OP_OFFSET,
   OP_NOT,
 
   OP_INULL,
@@ -93,6 +94,9 @@ translate_return_exp (struct ParserState* const  parser, YYSTYPE exp);
 
 bool_t
 translate_bool_exp (struct ParserState* const parser, YYSTYPE exp);
+
+uint16_t
+translate_iterable_exp (struct ParserState* const parser, YYSTYPE exp);
 
 YYSTYPE
 create_arg_link (struct ParserState* const parser, YYSTYPE arg, YYSTYPE next);

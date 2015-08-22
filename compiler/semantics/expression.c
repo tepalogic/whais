@@ -559,7 +559,7 @@ translate_add_exp (struct ParserState* const         parser,
   switch (opcode)
     {
     case W_ADD:
-      if (is_unsigned( GET_TYPE (opType1->type)) !=
+      if (is_unsigned (GET_TYPE (opType1->type)) !=
           is_unsigned (GET_TYPE( opType2->type)))
         {
           log_message (parser, parser->bufferPos, MSG_ADD_SIGN);
@@ -2012,6 +2012,7 @@ translate_index_exp (struct ParserState* const         parser,
   return result;
 }
 
+
 static struct ExpResultType
 translate_opcode_exp (struct ParserState* const   parser,
                       struct Statement* const     stmt,
@@ -2170,43 +2171,63 @@ translate_leaf_exp (struct ParserState* const parser,
 
       enum W_OPCODE op_code = W_NA;
       uint32_t      value   = 0;
+      uint_t        i;
 
-      struct DeclaredVar* var = stmt_find_declaration (stmt,
-                                                       exp->val.u_id.name,
-                                                       exp->val.u_id.length,
-                                                       TRUE,
-                                                       TRUE );
-      if (var == NULL)
+      for (i = 0; i < wh_array_count (&stmt->spec.proc.iteratorsStack); ++i)
         {
-          char temp[128];
+          struct LoopIterator* const it =
+              wh_array_get (&stmt->spec.proc.iteratorsStack, i);
 
-          wh_copy_first (temp,
-                         exp->val.u_id.name,
-                         sizeof temp,
-                         exp->val.u_id.length);
-
-          log_message (parser, parser->bufferPos, MSG_VAR_NFOUND, temp);
-
-          parser->abortError = TRUE;
-          return unk;
-        }
-
-      value = RETRIVE_ID (var->varId);
-      if (IS_GLOBAL( var->varId))
-        {
-          if (stmt->parent != NULL)
+          if ((exp->val.u_id.length == it->nameLen)
+              && (strncmp (exp->val.u_id.name, it->name, it->nameLen) == 0))
             {
-              assert (stmt->type == STMT_PROC);
-              stmt = stmt->parent;
+              value = it->localIndex;
+              result.extra = NULL;
+              result.type = it->type;
+              MARK_L_VALUE (result.type);
+              break;
             }
-          assert (stmt->type == STMT_GLOBAL);
         }
-      else
-        value -= 1; /* Don't count the return value! */
 
-      result.extra = var->extra;
-      result.type  = var->type;
-      MARK_L_VALUE (result.type);
+      if (value == 0)
+        {
+          struct DeclaredVar* var = stmt_find_declaration (stmt,
+                                                           exp->val.u_id.name,
+                                                           exp->val.u_id.length,
+                                                           TRUE,
+                                                           TRUE );
+          if (var == NULL)
+            {
+              char temp[128];
+
+              wh_copy_first (temp,
+                             exp->val.u_id.name,
+                             sizeof temp,
+                             exp->val.u_id.length);
+
+              log_message (parser, parser->bufferPos, MSG_VAR_NFOUND, temp);
+
+              parser->abortError = TRUE;
+              return unk;
+            }
+
+          value = RETRIVE_ID (var->varId);
+          if (IS_GLOBAL( var->varId))
+            {
+              if (stmt->parent != NULL)
+                {
+                  assert (stmt->type == STMT_PROC);
+                  stmt = stmt->parent;
+                }
+              assert (stmt->type == STMT_GLOBAL);
+            }
+          else
+            value -= 1; /* Don't count the return value! */
+
+          result.extra = var->extra;
+          result.type  = var->type;
+          MARK_L_VALUE (result.type);
+        }
 
       if (value <= value_8)
         {
@@ -2418,6 +2439,87 @@ translate_leaf_exp (struct ParserState* const parser,
   free_sem_value (exp);
   return result;
 }
+
+static struct ExpResultType
+translate_itoffset_exp (struct ParserState* const parser,
+                        struct Statement*         stmt,
+                        struct SemValue* const    exp)
+{
+  struct WOutputStream* const instrs = stmt_query_instrs (stmt);
+  const struct ExpResultType result  = { NULL, T_UINT64 };
+
+  const uint16_t value_16     = ~0;
+  const uint8_t  value_8      = ~0;
+  uint32_t       itLocalIndex = 0;
+  uint_t   i;
+
+  assert(exp->val_type == VAL_ID);
+
+  for (i = 0; i < wh_array_count (&stmt->spec.proc.iteratorsStack); ++i)
+    {
+      struct LoopIterator* const it =
+          wh_array_get (&stmt->spec.proc.iteratorsStack, i);
+
+      if ((exp->val.u_id.length == it->nameLen)
+          && (strncmp (exp->val.u_id.name, it->name, it->nameLen) == 0))
+        {
+          itLocalIndex = it->localIndex;
+          break;
+        }
+    }
+
+  if (itLocalIndex == 0)
+    {
+      char tname[128];
+
+      wh_copy_first (tname,
+                     exp->val.u_id.name,
+                     sizeof tname,
+                     exp->val.u_id.length);
+      log_message (parser, parser->bufferPos, MSG_IT_NOTFOUND, tname);
+      return sgResultUnk;
+    }
+  else if (itLocalIndex <= value_8)
+    {
+      if ((encode_opcode (instrs, W_LDLO8) == NULL)
+          || (wh_ostream_wint8 (instrs, itLocalIndex & 0xFF) == NULL))
+        {
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+          return sgResultUnk;
+        }
+    }
+  else if (itLocalIndex <= value_16)
+    {
+      if ((encode_opcode (instrs, W_LDLO16) == NULL)
+          || (wh_ostream_wint16 (instrs, itLocalIndex & 0xFFFF) == NULL))
+        {
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+          return sgResultUnk;
+        }
+    }
+  else
+    {
+      if ((encode_opcode (instrs, W_LDLO32) == NULL)
+          || (wh_ostream_wint32 (instrs, itLocalIndex) == NULL))
+        {
+          log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+          return sgResultUnk;
+        }
+    }
+
+  if (encode_opcode (instrs, W_ITOFF) == NULL)
+    {
+      log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+
+  free_sem_value(exp);
+
+  return result;
+}
+
 
 
 static struct ExpResultType
@@ -2860,6 +2962,7 @@ translate_tree_exp (struct ParserState* const   parser,
   struct ExpResultType opType1;
   struct ExpResultType opType2;
 
+  assert (parser->pCurrentStmt == stmt);
   assert (parser->pCurrentStmt->type == STMT_PROC);
 
   if (is_leaf_exp( tree))
@@ -2873,6 +2976,9 @@ translate_tree_exp (struct ParserState* const   parser,
 
   else if (tree->opcode == OP_FIELD)
     return translate_field_exp (parser, stmt, tree);
+
+  else if (tree->opcode == OP_OFFSET)
+    return translate_itoffset_exp (parser, stmt, tree->firstTree);
 
   assert (tree->firstTree->val_type == VAL_EXP_LINK);
 
@@ -3130,6 +3236,43 @@ translate_bool_exp (struct ParserState* const parser, YYSTYPE exp)
   free_sem_value (exp);
 
   return TRUE;
+}
+
+uint16_t
+translate_iterable_exp (struct ParserState* const parser, YYSTYPE exp)
+{
+  struct ExpResultType expType;
+
+  assert (exp->val_type == VAL_EXP_LINK);
+
+  expType = translate_tree_exp (parser,
+                                parser->pCurrentStmt,
+                                &(exp->val.u_exp));
+  if (expType.type == T_UNKNOWN)
+    {
+      /* Some error was encounter evaluating expression.
+       * The error should be already logged */
+      assert (parser->abortError == TRUE);
+      return FALSE;
+    }
+
+  free_sem_value (exp);
+
+  if (IS_FIELD (expType.type))
+    return GET_FIELD_TYPE (expType.type);
+
+  else if (IS_ARRAY (expType.type))
+    return GET_BASIC_TYPE (expType.type);
+
+  else if (GET_TYPE (expType.type) == T_TEXT)
+    return T_CHAR;
+
+  log_message (parser,
+               parser->bufferPos,
+               MSG_EXP_NOT_ITERABLE,
+               type_to_text (GET_TYPE (expType.type)));
+
+  return T_UNKNOWN;
 }
 
 

@@ -122,12 +122,16 @@ struct MsgCodeEntry
 #define MSG_PROC_RET_NA_EXT     (MSG_PROC_ARG_NA + 1)
 #define MSG_PROC_RET_NA         (MSG_PROC_RET_NA_EXT + 1)
 #define MSG_EXP_NOT_BOOL        (MSG_PROC_RET_NA + 1)
-#define MSG_BREAK_NOLOOP        (MSG_EXP_NOT_BOOL + 1)
+#define MSG_EXP_NOT_ITERABLE    (MSG_EXP_NOT_BOOL + 1)
+#define MSG_BREAK_NOLOOP        (MSG_EXP_NOT_ITERABLE + 1)
 #define MSG_CONTINUE_NOLOOP     (MSG_BREAK_NOLOOP + 1)
 #define MSG_SYNC_NA             (MSG_CONTINUE_NOLOOP + 1)
 #define MSG_SYNC_MANY           (MSG_SYNC_NA + 1)
 #define MSG_PROC_NO_RET         (MSG_SYNC_MANY + 1)
 #define MSG_DEAD_STMT           (MSG_PROC_NO_RET + 1)
+#define MSG_IT_VARIABLE         (MSG_DEAD_STMT + 1)
+#define MSG_IT_ALREADY          (MSG_IT_VARIABLE + 1)
+#define MSG_IT_NOTFOUND         (MSG_IT_ALREADY + 1)
 
 void
 log_message (struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);

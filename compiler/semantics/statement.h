@@ -64,11 +64,12 @@ struct _ProcStatementSpec
                                       0 - special case for return type
                                       1 - first parameter,
                                       2 - second parameter. etc */
-  struct WOutputStream code;         /* Procedure's execution instructions.*/
-  struct WArray        branchStack;  /* Keeps track of conditional branches.*/
-  struct WArray        loopStack;    /* Keeps track of looping statements */
-  uint32_t             procId;       /* Procedure's ID in the import table. */
-  uint16_t             syncTracker;  /* Keeps track of sync statements. */
+  struct WOutputStream code;           /* Procedure's execution instructions.*/
+  struct WArray        branchStack;    /* Keeps track of conditional branches.*/
+  struct WArray        loopStack;      /* Keeps track of looping statements */
+  struct WArray        iteratorsStack; /* Keeps track of loop iterators */
+  uint32_t             procId;         /* Procedure's ID in the import table. */
+  uint16_t             syncTracker;    /* Keeps track of sync statements. */
   uint_t               declarationPos;
   uint_t               definitionPos;
   bool_t               checkParams;
@@ -159,6 +160,15 @@ stmt_query_loop_stack (struct Statement* const stmt)
   assert (stmt->type == STMT_PROC);
   return &stmt->spec.proc.loopStack;
 }
+
+
+static INLINE struct WArray*
+stmt_query_loop_iterators_stack (struct Statement* const stmt)
+{
+  assert (stmt->type == STMT_PROC);
+  return &stmt->spec.proc.iteratorsStack;
+}
+
 
 
 uint_t

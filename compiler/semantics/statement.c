@@ -91,8 +91,10 @@ init_proc_stmt (struct Statement* parent,
 
   wh_array_init (&outStmt->spec.proc.paramsList, sizeof (struct DeclaredVar));
   wh_array_init (&outStmt->decls, sizeof (struct DeclaredVar));
-  wh_array_init (stmt_query_branch_stack( outStmt), sizeof (struct Branch));
-  wh_array_init (stmt_query_loop_stack( outStmt), sizeof (struct Loop));
+  wh_array_init (stmt_query_branch_stack (outStmt), sizeof (struct Branch));
+  wh_array_init (stmt_query_loop_stack (outStmt), sizeof (struct Loop));
+  wh_array_init (stmt_query_loop_iterators_stack (outStmt),
+                 sizeof (struct LoopIterator));
 
   wh_ostream_init (0, stmt_query_instrs (outStmt));
 
@@ -117,6 +119,7 @@ clear_proc_stmt (struct Statement* stmt)
   wh_array_clean (&(stmt->decls));
   wh_array_clean (stmt_query_branch_stack( stmt));
   wh_array_clean (stmt_query_loop_stack( stmt));
+  wh_array_clean (stmt_query_loop_iterators_stack (stmt));
 
   wh_ostream_clean (stmt_query_instrs( stmt));
 

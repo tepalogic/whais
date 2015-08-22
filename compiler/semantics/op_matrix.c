@@ -392,6 +392,12 @@ decode_opcode (const uint8_t* instrs)
   return *instrs;
 }
 
+uint_t
+opcode_bytes (const enum W_OPCODE opcode)
+{
+  return (opcode >= SECOND_BYTE_MARK) ? 2 : 1;
+}
+
 
 uint_t
 wh_compiler_decode_op (const uint8_t* instrs, enum W_OPCODE* const outOpcode)

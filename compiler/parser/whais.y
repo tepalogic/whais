@@ -82,7 +82,8 @@ void yyerror(struct ParserState *state,  const char *msg);
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right NOT '~'
+%right NOT '!' '~'
+%right '@'
 // %right INC DEC
 
 %left  '[' ']' '.'
@@ -340,6 +341,16 @@ exp : const_exp
     | IDENTIFIER %prec '='
         {
             $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
+            CHK_SEM_ERROR;
+        }
+     | '@' IDENTIFIER
+        {
+            $$ = create_exp_link(state, $2, NULL, NULL, OP_OFFSET);
+            CHK_SEM_ERROR;
+        }
+     | '!' exp
+        {
+            $$ = create_exp_link(state, $2, NULL, NULL, OP_NOT);
             CHK_SEM_ERROR;
         }
      | NOT exp
@@ -672,8 +683,42 @@ until_stmt: DO
               }
 ;
 
-for_stmt: FOR '(' IDENTIFIER ':' exp ')' one_statement
-        | FOR '(' IDENTIFIER ':' exp ')' DO local_block_statement END
+for_stmt: FOR '(' IDENTIFIER ':' exp ')'
+           {
+             begin_foreach_stmt (state, $3, $5, FALSE);
+           }
+          one_statement
+           {
+             finalize_for_stmt (state);
+             CHK_SEM_ERROR;
+           }
+        | FOR '(' IDENTIFIER ':' exp ')'
+           {
+             begin_foreach_stmt (state, $3, $5, FALSE);
+           } 
+           DO local_block_statement END
+           {
+             finalize_for_stmt(state);
+             CHK_SEM_ERROR;
+           }
+        | FOR '(' '!'  IDENTIFIER ':' exp ')'
+           {
+             begin_foreach_stmt (state, $4, $6, TRUE);
+           }
+          one_statement
+           {
+             finalize_for_stmt (state);
+             CHK_SEM_ERROR;
+           }
+        | FOR '(' '!' IDENTIFIER ':' exp ')'
+           {
+             begin_foreach_stmt (state, $4, $6, TRUE);
+           } 
+           DO local_block_statement END
+           {
+             finalize_for_stmt(state);
+             CHK_SEM_ERROR;
+           }
         | FOR '(' exp ';' exp ';' exp ')' 
           {
             check_for_dead_statement (state);

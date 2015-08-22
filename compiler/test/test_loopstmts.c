@@ -145,12 +145,64 @@ char proc_decl_buffer[] =
     "       VAR c,d BOOL;"
     " "
     "       FOR (a = 0; c; b = b + 2)"
-    "       DO"
     "               IF (d) DO"
     "                       CONTINUE;"
     "               ELSE DO "
     "                       BREAK;"
     "               END"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " "
+    " "
+    "PROCEDURE proc4 () RETURN TABLE "
+    "DO "
+    "       VAR an_array BOOL ARRAY; "
+    " "
+    "       FOR (it : an_array)"
+    "               IF (it)"
+    "                       CONTINUE;"
+    "               ELSE "
+    "                       BREAK;"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " "
+    "PROCEDURE proc4_b () RETURN TABLE "
+    "DO "
+    "       VAR an_array BOOL ARRAY; "
+    " "
+    "       FOR (it : an_array)"
+    "       DO"
+    "               IF (it)"
+    "                       CONTINUE;"
+    "               ELSE "
+    "                       BREAK;"
+    "       END"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " "
+    " "
+    "PROCEDURE proc5 () RETURN TABLE "
+    "DO "
+    "       VAR an_array BOOL ARRAY; "
+    " "
+    "       FOR (!it : an_array)"
+    "               IF (it)"
+    "                       CONTINUE;"
+    "               ELSE "
+    "                       BREAK;"
+    "       RETURN NULL; "
+    "ENDPROC"
+    " "
+    "PROCEDURE proc5_b () RETURN TABLE "
+    "DO "
+    "       VAR an_array BOOL ARRAY; "
+    " "
+    "       FOR ( !it : an_array)"
+    "       DO"
+    "               IF (it)"
+    "                       CONTINUE;"
+    "               ELSE "
+    "                       BREAK;"
     "       END"
     "       RETURN NULL; "
     "ENDPROC"
@@ -297,54 +349,171 @@ check_procedure_3 (struct ParserState *state, char * proc_name)
   struct Statement *stmt =
     find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
   uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
-  int shift = 0;
-  int cond_exp_pos = 6;
-  int step_exp_pos = 18;
-  int for_end_pos  = 0;
+  int step_exp_pos = 11;
+  int cond_exp_pos = 20;
+  int for_end_pos  = 54;
+  int current_pos = 0;
 
-  if (decode_opcode( code + cond_exp_pos - 1) != W_CTS)
-    return FALSE;
-  else if (decode_opcode( code + cond_exp_pos + 2) != W_JFC)
-    return FALSE;
-  else
+  current_pos = step_exp_pos - 5 - 1;
+
+  if ((decode_opcode (code + current_pos) != W_CTS)
+      || (decode_opcode (code + current_pos + 1) != W_JMP))
     {
-      for_end_pos = get_int32 (code + cond_exp_pos + 3)
-                    + cond_exp_pos + 2;
-      if (decode_opcode( code + for_end_pos - 5) != W_JMP)
-        return FALSE;
-      else
-        {
-          const int jmp_back = get_int32 (code + for_end_pos - 4)
-                               + for_end_pos - 5;
-          if (jmp_back != step_exp_pos)
-            return FALSE;
-        }
+      return FALSE;
     }
 
-  if (decode_opcode( code + cond_exp_pos + 2 + 5) != W_JMP)
+  current_pos += 1;
+  if (get_int32 (code + current_pos + 1) + current_pos != cond_exp_pos)
     return FALSE;
-  else
+
+  current_pos = cond_exp_pos + 2;
+  if ((decode_opcode (code + current_pos) != W_JFC)
+      || (get_int32 (code + current_pos + 1) + current_pos != for_end_pos))
     {
-      /* Check if the jump is exactly after the step expression */
-      if (get_int32 (code + cond_exp_pos + 2 + 5 + 1) != 19)
-        return FALSE;
+      return FALSE;
     }
 
-  /* check the break statement */
-  shift = 49;
-  if (decode_opcode( code + shift) != W_JMP)
-    return FALSE;
-  shift += get_int32 (code + shift + 1);
-  if (shift != for_end_pos)
+  current_pos = 34;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = 44;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != for_end_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = 49;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  if (decode_opcode (code + for_end_pos) != W_LDNULL)
     return FALSE;
 
-  /* check the continue statement */
-  shift = 39;
-  if (decode_opcode( code + shift) != W_JMP)
-    return FALSE;
-  shift += get_int32 (code + shift + 1);
-  if (shift != step_exp_pos)
-    return FALSE;
+  return TRUE;
+}
+
+
+static bool_t
+check_procedure_4 (struct ParserState *state, char * proc_name)
+{
+  struct Statement *stmt =
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
+  int step_exp_pos = 9;
+  int for_end_pos  = 43;
+  int current_pos;
+
+  if ((decode_opcode (code + 2) != W_ITF)
+      || (decode_opcode (code + 2 + 2) != W_JMP)
+      || (get_int32 (code + 2 + 2 + 1) != 5 + opcode_bytes (W_ITN))
+      || (decode_opcode (code + step_exp_pos) != W_ITN)
+      || (decode_opcode (code + step_exp_pos + 2) != W_JFC)
+      || (get_int32 (code + step_exp_pos + 2 + 1) !=
+          for_end_pos - (step_exp_pos + 2)))
+    {
+      return FALSE;
+    }
+
+  current_pos = 16;
+  if ((decode_opcode (code + current_pos) != W_LDLO8)
+      || (code[++current_pos] != 2))
+    {
+      return FALSE;
+    }
+
+  current_pos = 23;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = 33;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != for_end_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = for_end_pos - 5;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  if ((decode_opcode (code + for_end_pos) != W_CTS)
+      || (decode_opcode (code + for_end_pos + 1) != W_LDNULL))
+    {
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+
+static bool_t
+check_procedure_5 (struct ParserState *state, char * proc_name)
+{
+  struct Statement *stmt =
+    find_proc_decl (state, proc_name, strlen (proc_name), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
+  int step_exp_pos = 9;
+  int for_end_pos  = 43;
+  int current_pos;
+
+  if ((decode_opcode (code + 2) != W_ITL)
+      || (decode_opcode (code + 2 + 2) != W_JMP)
+      || (get_int32 (code + 2 + 2 + 1) != 5 + opcode_bytes (W_ITP))
+      || (decode_opcode (code + step_exp_pos) != W_ITP)
+      || (decode_opcode (code + step_exp_pos + 2) != W_JFC)
+      || (get_int32 (code + step_exp_pos + 2 + 1) !=
+          for_end_pos - (step_exp_pos + 2)))
+    {
+      return FALSE;
+    }
+
+  current_pos = 16;
+  if ((decode_opcode (code + current_pos) != W_LDLO8)
+      || (code[++current_pos] != 2))
+    {
+      return FALSE;
+    }
+
+  current_pos = 23;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = 33;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != for_end_pos))
+    {
+      return FALSE;
+    }
+
+  current_pos = for_end_pos - 5;
+  if ((decode_opcode (code + current_pos) != W_JMP)
+      || (current_pos + get_int32 (code + current_pos + 1) != step_exp_pos))
+    {
+      return FALSE;
+    }
+
+  if ((decode_opcode (code + for_end_pos) != W_CTS)
+      || (decode_opcode (code + for_end_pos + 1) != W_LDNULL))
+    {
+      return FALSE;
+    }
 
   return TRUE;
 }
@@ -358,7 +527,11 @@ check_all_procs (struct ParserState *state)
          && check_procedure_2 (state, "proc2")
          && check_procedure_2 (state, "proc2_b")
          && check_procedure_3 (state, "proc3")
-         && check_procedure_3 (state, "proc3_b");
+         && check_procedure_3 (state, "proc3_b")
+         && check_procedure_4 (state, "proc4")
+         && check_procedure_4 (state, "proc4_b")
+         && check_procedure_5 (state, "proc5")
+         && check_procedure_5 (state, "proc5_b");
 }
 
 int

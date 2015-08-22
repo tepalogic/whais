@@ -1156,6 +1156,55 @@ char test_prog_10[] = ""
   " IF (some_var != NULL) RETURN TRUE; ELSE RETURN FALSE;\n some_var=NULL; \n" "ENDPROC \n";
 
 
+char test_prog_11[] = ""
+  "PROCEDURE Proc (p BOOL) RETURN BOOL \n"
+  "DO \n"
+  "  VAR an_array BOOL ARRAY; \n"
+  "  FOR (p : an_array) "
+  "    IF (p) BREAK;\n"
+  "  RETURN an_array[0];\n"
+  "ENDPROC\n";
+
+char test_prog_12[] = ""
+  "PROCEDURE Proc (b BOOL) RETURN BOOL \n"
+  "DO \n"
+  "  VAR an_array BOOL ARRAY; \n"
+  "  FOR (p : an_array) \n"
+  "    FOR (p : an_array) \n"
+  "      IF (p) BREAK;\n"
+  "  RETURN an_array[0];\n"
+  "ENDPROC\n";
+
+
+char test_prog_13[] = ""
+  "PROCEDURE Proc (b BOOL) RETURN UINT64 \n"
+  "DO \n"
+  "  VAR an_array BOOL ARRAY; \n"
+  "  FOR (c : an_array) "
+  "    IF (c) RETURN @p;\n"
+  "  RETURN 0;\n"
+  "ENDPROC\n";
+
+
+char test_prog_14[] = ""
+  "PROCEDURE Proc (b BOOL) RETURN UINT64 \n"
+  "DO \n"
+  "  VAR a_value BOOL; \n"
+  "  FOR (c : a_value) "
+  "    IF (c) RETURN @p;\n"
+  "  RETURN 0;\n"
+  "ENDPROC\n";
+
+char test_prog_15[] = ""
+  "PROCEDURE Proc (b BOOL) RETURN UINT64 \n"
+  "DO \n"
+  "  VAR a_table TABLE (f2 BOOL); \n"
+  "  FOR (c : a_table) "
+  "    IF (c) RETURN @p;\n"
+  "  RETURN 0;\n"
+  "ENDPROC\n";
+
+
 bool_t
 test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
@@ -1256,6 +1305,32 @@ main ()
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_10,
                                                      MSG_DEAD_STMT,
                                                      MSG_WARNING_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error (test_prog_11,
+                                                       MSG_IT_VARIABLE,
+                                                       MSG_WARNING_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error (test_prog_12,
+                                                       MSG_IT_ALREADY,
+                                                       MSG_ERROR_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error (test_prog_13,
+                                                       MSG_IT_NOTFOUND,
+                                                       MSG_ERROR_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error (test_prog_14,
+                                                       MSG_EXP_NOT_ITERABLE,
+                                                       MSG_ERROR_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error (test_prog_15,
+                                                       MSG_EXP_NOT_ITERABLE,
+                                                       MSG_ERROR_EVENT);
+
   if (test_result == FALSE)
     {
       printf ("TEST RESULT: FAIL\n");
