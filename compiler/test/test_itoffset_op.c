@@ -69,7 +69,7 @@ check_procedure (struct ParserState *state)
   uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
 
   if ((decode_opcode (code + 18) != W_LDLO8)
-      || (code[19] != 3)
+      || (code[19] != 2)
       || (decode_opcode (code + 20) != W_ITOFF))
     {
       return FALSE;

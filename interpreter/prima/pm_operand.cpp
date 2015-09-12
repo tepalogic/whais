@@ -375,6 +375,27 @@ BaseOperand::GetValueAt (const uint64_t index)
 }
 
 
+bool
+BaseOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+bool
+BaseOperand::Iterate (const bool reverse)
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+uint64_t
+BaseOperand::IteratorOffset ()
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
 TableOperand
 BaseOperand::GetTableOp ()
 {
@@ -2554,6 +2575,19 @@ TextOperand::Duplicate () const
 
 
 bool
+TextOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  if (IsNull ())
+    return false;
+
+  assert (mValue.Count () > 0);
+
+  outStartItem = GetValueAt (reverse ? mValue.Count () - 1 : 0);
+  return true;
+}
+
+
+bool
 TextOperand::PrepareToCopy (void* const dest)
 {
   _placement_new (dest, TextOperand (mValue));
@@ -2613,6 +2647,32 @@ CharTextElOperand::Duplicate () const
   return StackValue (CharOperand (ch));
 }
 
+
+bool
+CharTextElOperand::Iterate (const bool reverse)
+{
+  if (reverse)
+    {
+      if (mIndex == 0)
+        return false;
+
+      _CC (uint64_t&, mIndex)--;
+      return true;
+    }
+
+  if (mIndex >= mText.Count () - 1)
+    return false;
+
+  _CC (uint64_t&, mIndex)++;
+  return true;
+}
+
+
+uint64_t
+CharTextElOperand::IteratorOffset ()
+{
+  return mIndex;
+}
 
 bool
 CharTextElOperand::PrepareToCopy (void* const dest)
@@ -2971,6 +3031,12 @@ GlobalOperand::Duplicate () const
   return mValue.Duplicate ();
 }
 
+
+bool
+GlobalOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  return mValue.StartIterate (reverse, outStartItem);
+}
 
 void
 GlobalOperand::NativeObject (INativeObject* const value)
@@ -3404,6 +3470,26 @@ StackValue
 LocalOperand::Duplicate () const
 {
   return mStack[mIndex].Operand ().Duplicate ();
+}
+
+
+bool
+LocalOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  return mStack[mIndex].Operand ().StartIterate (reverse, outStartItem);
+}
+
+
+bool
+LocalOperand::Iterate (const bool reverse)
+{
+  return mStack[mIndex].Operand ().Iterate (reverse);
+}
+
+uint64_t
+LocalOperand::IteratorOffset ()
+{
+  return mStack[mIndex].Operand ().IteratorOffset ();
 }
 
 

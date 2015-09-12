@@ -198,10 +198,12 @@ public:
   virtual ITable& GetTable ();
 
   virtual StackValue GetTableValue ();
-
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
-
   virtual StackValue GetValueAt (const uint64_t index);
+
+  virtual bool StartIterate (const bool  reverse, StackValue& outStartItem);
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
 
   virtual TableOperand GetTableOp ();
 
@@ -899,8 +901,9 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool reverse, StackValue& outStartItem);
 
   virtual bool PrepareToCopy (void* const dest);
 
@@ -939,6 +942,9 @@ public:
 
   virtual StackValue Duplicate () const;
 
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
+
   virtual bool PrepareToCopy (void* const dest);
 
 private:
@@ -966,8 +972,9 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool reverse, StackValue& outStartItem);
 
   virtual bool PrepareToCopy (void* const);
 
@@ -1016,6 +1023,8 @@ protected:
   }
 
   virtual bool IsNull () const;
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
 
 private:
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
@@ -1680,8 +1689,10 @@ public:
   virtual ITable& GetTable ();
 
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool reverse, StackValue& outStartItem);
+
   virtual bool PrepareToCopy (void* const dest);
 
   virtual FieldOperand GetFieldOp ();
@@ -1744,6 +1755,9 @@ protected:
 
     table.Set (mRow, mField, value);
   }
+
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
 
   virtual bool PrepareToCopy (void* const dest);
 
@@ -2370,8 +2384,9 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool reverse, StackValue& outStartItem);
 };
 
 
@@ -2393,8 +2408,9 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool reverse, StackValue& outStartItem);
 };
 
 
@@ -2420,6 +2436,9 @@ public:
   virtual uint_t GetType ();
 
   virtual StackValue Duplicate () const;
+
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
 
 private:
   const uint64_t    mIndex;
@@ -2490,6 +2509,10 @@ protected:
   }
 
   virtual bool IsNull () const;
+
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
+
   virtual bool PrepareToCopy (void* const dest);
 
 private:
@@ -3244,6 +3267,13 @@ public:
     return Operand ().Duplicate ();
   }
 
+  bool StartIterate (const bool  reverse, StackValue& outStartItem)
+  {
+    LockRAII<Lock> dummy (mSync);
+
+    return Operand ().StartIterate (reverse, outStartItem);
+  }
+
   bool PrepareToCopy (void* const dest)
   {
     LockRAII<Lock> dummy (mSync);
@@ -3386,10 +3416,10 @@ public:
   virtual ITable& GetTable ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
-
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool  reverse, StackValue& outStartItem);
 
   virtual bool PrepareToCopy (void* const);
 
@@ -3479,10 +3509,12 @@ public:
   virtual ITable& GetTable ();
 
   virtual StackValue GetFieldAt (const FIELD_INDEX field);
-
   virtual StackValue GetValueAt (const uint64_t index);
-
   virtual StackValue Duplicate () const;
+
+  virtual bool StartIterate (const bool  reverse, StackValue& outStartItem);
+  virtual bool Iterate (const bool reverse);
+  virtual uint64_t IteratorOffset ();
 
   virtual TableOperand GetTableOp ();
 

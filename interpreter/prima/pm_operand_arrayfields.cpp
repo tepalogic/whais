@@ -117,6 +117,42 @@ CharTextFieldElOperand::Duplicate () const
 }
 
 
+bool
+CharTextFieldElOperand::Iterate (const bool reverse)
+{
+  ITable& table = mTableRef->GetTable ();
+
+  assert (mRow < table.AllocatedRows ());
+
+  DText temp;
+  table.Get (mRow, mField, temp);
+
+  const uint64_t maxCount = temp.Count () - 1;
+  if (maxCount == 0)
+    return false;
+
+  if (reverse)
+    {
+      if (mIndex == 0)
+        return false;
+
+      _CC (uint64_t&, mIndex) = min (mIndex - 1, maxCount);
+    }
+
+  if (mIndex >= maxCount)
+    return false;
+
+  _CC (uint64_t&, mIndex)++;
+  return true;
+}
+
+
+uint64_t
+CharTextFieldElOperand::IteratorOffset ()
+{
+  return mIndex;
+}
+
 
 BaseArrayFieldElOperand::~BaseArrayFieldElOperand ()
 {
@@ -137,6 +173,45 @@ BaseArrayFieldElOperand::IsNull () const
 
   return (array.Count () <= mIndex) ? true : false;
 }
+
+
+bool
+BaseArrayFieldElOperand::Iterate (const bool reverse)
+{
+  ITable& table = mTableRef->GetTable ();
+
+  assert (mRow < table.AllocatedRows());
+
+  DArray array;
+  table.Get (mRow, mField, array);
+
+  const uint64_t maxCount = array.Count () - 1;
+  if (maxCount == 0)
+    return false;
+
+  if (reverse)
+    {
+      if (mIndex == 0)
+        return false;
+
+      _CC (uint64_t&, mIndex) = min (mIndex - 1, maxCount);
+      return true;
+    }
+
+  if (mIndex >= maxCount)
+    return false;
+
+  _CC (uint64_t&, mIndex)++;
+  return true;
+}
+
+
+uint64_t
+BaseArrayFieldElOperand::IteratorOffset ()
+{
+  return mIndex;
+}
+
 
 bool
 BaseArrayFieldElOperand::PrepareToCopy (void* const)

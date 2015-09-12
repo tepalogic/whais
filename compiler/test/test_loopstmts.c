@@ -424,7 +424,7 @@ check_procedure_4 (struct ParserState *state, char * proc_name)
 
   current_pos = 16;
   if ((decode_opcode (code + current_pos) != W_LDLO8)
-      || (code[++current_pos] != 2))
+      || (code[++current_pos] != 1))
     {
       return FALSE;
     }
@@ -483,7 +483,7 @@ check_procedure_5 (struct ParserState *state, char * proc_name)
 
   current_pos = 16;
   if ((decode_opcode (code + current_pos) != W_LDLO8)
-      || (code[++current_pos] != 2))
+      || (code[++current_pos] != 1))
     {
       return FALSE;
     }

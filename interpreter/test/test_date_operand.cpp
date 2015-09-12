@@ -369,8 +369,56 @@ test_array_read_value (DArray array, const DBS_T testVal)
   bool  result = true;
   ArrayOperand arrayOp (array);
   NullOperand nullOp;
-  StackValue sv (nullOp);
+  StackValue sv (nullOp), iterator (nullOp);
   IOperand* pOp = NULL;
+
+  if ( ! arrayOp.StartIterate (false, iterator))
+    return false;
+
+  for (uint_t index = 0; index < array.Count (); ++index)
+    {
+      DBS_T first, second;
+      iterator.Operand ().GetValue (first);
+      array.Get (index, second);
+
+      if (first != second)
+        return false;
+
+      if (index == array.Count () - 1)
+        {
+          if (iterator.Operand ().Iterate (false) != false)
+            return false;
+        }
+      else if ( ! iterator.Operand ().Iterate (false))
+        return true;
+    }
+
+  if (iterator.Operand ().Iterate (false))
+    return false;
+
+  if ( ! arrayOp.StartIterate (true, iterator))
+    return false;
+
+  for (int index = array.Count () - 1; index >= 0; --index)
+    {
+      DBS_T first, second;
+      iterator.Operand ().GetValue (first);
+      array.Get (index, second);
+
+      if (first != second)
+        return false;
+
+      if (index == 0)
+        {
+          if (iterator.Operand ().Iterate (true) != false)
+            return false;
+        }
+      else if ( ! iterator.Operand ().Iterate (true))
+        return true;
+    }
+
+  if (iterator.Operand ().Iterate (true))
+    return false;
 
   for (uint_t index = 0;
        (index < array.Count ()) && result;
@@ -378,6 +426,7 @@ test_array_read_value (DArray array, const DBS_T testVal)
     {
       sv = arrayOp.GetValueAt (index);
       pOp = &sv.Operand ();
+
 
       DBS_T first, second;
       pOp->GetValue (first);
@@ -404,18 +453,17 @@ test_array_read_value (DArray array, const DBS_T testVal)
 }
 
 template <typename DBS_T> bool
-test_table_value (ITable& table, DArray& array, const DBS_T testVal)
+test_table_value (TableOperand&  tableOp,
+                  DArray&        array,
+                  const DBS_T    testVal)
 {
+  ITable& table = tableOp.GetTable ();
   bool result = true;
   DArray fieldArray;
   DBS_T    simpleVal;
 
-  table.Get (0,
-                  table.RetrieveField ("simple_type"),
-                  simpleVal);
-  table.Get (0,
-                  table.RetrieveField ("array_type"),
-                  fieldArray);
+  table.Get (0, table.RetrieveField ("simple_type"), simpleVal);
+  table.Get (0, table.RetrieveField ("array_type"), fieldArray);
 
   if (testVal != simpleVal)
     return false;
@@ -432,15 +480,124 @@ test_table_value (ITable& table, DArray& array, const DBS_T testVal)
 
       if (firstVal != secondVal)
         result = false;
+
+      table.Set (el, table.RetrieveField ("simple_type"), firstVal);
     }
+  table.Set (array.Count (), table.RetrieveField ("simple_type"), DBS_T ());
+
+  FieldOperand fieldSimpleOp (tableOp, table.RetrieveField ("simple_type"));
+  FieldOperand fieldArrayOp (tableOp, table.RetrieveField ("array_type"));
+
+  StackValue arrayField = fieldArrayOp.GetValueAt (0);
+
+  NullOperand nullOp;
+  DBS_T ref, val;
+
+  StackValue temp(nullOp), tempA (nullOp);
+  if (! fieldSimpleOp.StartIterate (false, temp))
+    return false;
+
+  if ( ! arrayField.Operand ().StartIterate (false, tempA))
+    return false;
+
+  for (uint_t i = 0; i < array.Count (); ++i)
+    {
+      array.Get (i, ref);
+
+      temp.Operand ().GetValue (val);
+      if (ref != val)
+        return false;
+
+      tempA.Operand ().GetValue (val);
+      if (ref != val)
+        return false;
+
+      if (i == (array.Count () - 1))
+        {
+          if (tempA.Operand ().Iterate (false))
+            return false;
+        }
+      else
+        {
+          if ( ! temp.Operand ().Iterate (false))
+            return false;
+
+          if ( ! tempA.Operand ().Iterate (false))
+            return false;
+        }
+    }
+
+  if ( ! temp.Operand ().Iterate (false))
+    return false;
+
+  temp.Operand ().GetValue (val);
+  if ( ! val.IsNull ())
+    return false;
+
+  if (temp.Operand ().Iterate (false))
+    return false;
+
+  if (tempA.Operand ().Iterate (false))
+    return false;
+
+  if (! fieldSimpleOp.StartIterate (true, temp))
+    return false;
+
+  temp.Operand ().GetValue (val);
+  if ( ! val.IsNull ())
+    return false;
+
+  if ( ! temp.Operand ().Iterate (true))
+    return false;
+
+  if ( ! arrayField.Operand ().StartIterate (true, tempA))
+    return false;
+
+  for (int i = array.Count () - 1; i >= 0; --i)
+    {
+      DBS_T ref, val;
+      array.Get (i, ref);
+
+      temp.Operand ().GetValue (val);
+      if (ref != val)
+        return false;
+
+      tempA.Operand ().GetValue (val);
+      if (ref != val)
+        return false;
+
+      if (i == 0)
+        {
+          if (temp.Operand ().Iterate (true))
+            return false;
+
+          if (tempA.Operand ().Iterate (true))
+            return false;
+        }
+      else
+        {
+          if ( ! temp.Operand ().Iterate (true))
+            return false;
+
+          if ( ! tempA.Operand ().Iterate (true))
+            return false;
+        }
+    }
+
+  if (temp.Operand ().Iterate (true))
+    return false;
+
+  if (tempA.Operand ().Iterate (true))
+    return false;
+
 
   return result;
 }
 
 template <typename DBS_T> bool
 test_array_tableread_value (IDBSHandler& dbsHnd,
-                            DArray      array,
-                            const DBS_T   testVal)
+                            DArray array,
+                            const DBS_T testVal)
 {
   bool  result = true;
   const NullOperand nullOp;
@@ -450,21 +607,20 @@ test_array_tableread_value (IDBSHandler& dbsHnd,
 
   DBSFieldDescriptor fd[2];
 
-  fd[0].isArray      = true;
-  fd[0].type  = testVal.DBSType ();
+  fd[0].isArray = true;
+  fd[0].type = testVal.DBSType ();
   fd[0].name = "array_type";
 
-  fd[1].isArray      = false;
+  fd[1].isArray = false;
   fd[1].type  = testVal.DBSType ();
   fd[1].name = "simple_type";
 
   ITable& testTable = dbsHnd.CreateTempTable (2, fd);
+  TableOperand tableOp (dbsHnd, testTable, true);
   const ROW_INDEX row = testTable.GetReusableRow (true);
   {
-    TableOperand tableOp (dbsHnd, testTable, true);
     FieldOperand fieldArrayOp (tableOp, testTable.RetrieveField ("array_type"));
-    FieldOperand fieldSimpleOp (tableOp,
-                                testTable.RetrieveField ("simple_type"));
+    FieldOperand fieldSimpleOp (tableOp, testTable.RetrieveField ("simple_type"));
 
     svArray = fieldArrayOp.GetValueAt (row);
     svSimple = fieldSimpleOp.GetValueAt (row);
@@ -480,7 +636,7 @@ test_array_tableread_value (IDBSHandler& dbsHnd,
   svArray.Operand ().SetValue (array);
   svSimple.Operand ().SetValue (firstArrayVal);
 
-  result &= test_table_value (testTable, array, firstArrayVal);
+  result &= test_table_value (tableOp, array, firstArrayVal);
 
   array.Set (0, testVal);
   svArrayEl = svArray.Operand ().GetValueAt (0);
@@ -490,11 +646,11 @@ test_array_tableread_value (IDBSHandler& dbsHnd,
   svArrayEl.Operand ().SetValue (testVal);
   svSimple.Operand ().SetValue (testVal);
 
-  result &= test_table_value (testTable, array, testVal);
+  result &= test_table_value (tableOp, array, testVal);
 
   result &= test_null_write (svSimple.Operand (), DBS_T ());
 
-  result &= test_table_value (testTable, array, DBS_T ());
+  result &= test_table_value (tableOp, array, DBS_T ());
 
   return result;
 }

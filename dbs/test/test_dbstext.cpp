@@ -13,6 +13,7 @@
 #include "utils/wrandom.h"
 #include "utils/auto_array.h"
 #include "utils/wunicode.h"
+#include "utils/wutf.h"
 
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_exception.h"
@@ -809,10 +810,158 @@ test_text_substrings_2 ()
   result = result && test_text_substrings_replace (512, 1024);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
-
   return result;
 }
 
+
+static bool
+test_text_char_offsets ()
+{
+  std::cout << "Preparing for text character offsets ... ";
+  std::cout.flush ();
+
+  bool result = true;
+
+  const int charsCount = 30000;
+
+  DArray  arrayChars, arrayOffsets;
+  DText   text1, text2;
+  for (int i = 0; i < charsCount; ++i)
+    {
+      uint32_t ch = wh_rnd () % (UTF_LAST_CODEPOINT - 1) + 1;
+      switch (wh_rnd () % 4)
+      {
+        case 0:
+          ch &= 0xFF;
+          break;
+
+        case 1:
+          ch &= 0xFFF;
+          break;
+
+        case 2:
+          ch &= 0xFFFF;
+          break;
+      }
+
+      if (((UTF16_EXTRA_BYTE_MIN <= ch) && (ch <= UTF16_EXTRA_BYTE_MAX))
+          || (ch == 0))
+        {
+          --i;
+          continue;
+        }
+      arrayOffsets.Add (DUInt32 (text1.RawSize ()));
+      arrayChars.Add (DChar (ch));
+
+      text1.Append (DChar (ch));
+      text2.Append (DChar (ch));
+    }
+
+  DChar   tch;
+  DUInt32 toff;
+
+  arrayChars.Get (text1.Count () - 1, tch);
+  arrayOffsets.Get (text1.Count () - 1, toff);
+  if ((text1.CharAt (text1.Count () - 1) != tch)
+      || (text1.OffsetOfChar (text1.Count () - 1) !=  toff.mValue)
+      || (text1.OffsetOfChar (text1.Count () - 1) !=  text2.OffsetOfChar (text2.Count () - 1))
+      || (text2.CharAt (text2.Count () - 1) != tch))
+    {
+      result &= false;
+    }
+
+  arrayChars.Get (0, tch);
+  arrayOffsets.Get (0, toff);
+  if ((text1.CharAt (0) != tch)
+      || (text1.OffsetOfChar (0) !=  toff.mValue)
+      || (text1.OffsetOfChar (0) !=  text1.OffsetOfChar (0))
+      || (text2.CharAt (0) != tch))
+    {
+      result &= false;
+    }
+
+  arrayChars.Get (text1.Count () - 1, tch);
+  arrayOffsets.Get (text1.Count () - 1, toff);
+  if ((text1.CharAt (text1.Count () - 1) != tch)
+      || (text1.OffsetOfChar (text1.Count () - 1) !=  toff.mValue)
+      || (text1.OffsetOfChar (text1.Count () - 1) !=  text2.OffsetOfChar (text2.Count () - 1))
+      || (text2.CharAt (text2.Count () - 1) != tch))
+    {
+      result &= false;
+    }
+
+  arrayChars.Get (0, tch);
+  arrayOffsets.Get (0, toff);
+  if ((text1.CharAt (0) != tch)
+      || (text1.OffsetOfChar (0) !=  toff.mValue)
+      || (text1.OffsetOfChar (0) !=  text1.OffsetOfChar (0))
+      || (text2.CharAt (0) != tch))
+    {
+      result &= false;
+    }
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  if (!result)
+    return result;
+
+  std::cout << "\tIn order access testing ...  ";
+  std::cout.flush ();
+  for (int i = 0 ; (i < charsCount) && result; ++i)
+    {
+      arrayChars.Get (i, tch);
+      arrayOffsets.Get (i, toff);
+      if ((text1.CharAt (i) != tch)
+          || (text1.OffsetOfChar (i) !=  toff.mValue)
+          || (text1.OffsetOfChar (i) !=  text2.OffsetOfChar (i))
+          || (text2.CharAt (i) != tch))
+        {
+          result &= false;
+        }
+    }
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  if (!result)
+    return result;
+
+  std::cout << "\tReverse order access testing ...  ";
+  std::cout.flush ();
+  for (int i = charsCount - 1 ; (0 <= i) && result; --i)
+    {
+      arrayChars.Get (i, tch);
+      arrayOffsets.Get (i, toff);
+      if ((text1.CharAt (i) != tch)
+          || (text1.OffsetOfChar (i) !=  toff.mValue)
+          || (text1.OffsetOfChar (i) !=  text2.OffsetOfChar (i))
+          || (text2.CharAt (i) != tch))
+        {
+          result &= false;
+        }
+    }
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  if (!result)
+    return result;
+
+  std::cout << "\tRandom order access testing ...  ";
+  std::cout.flush ();
+  for (int i = 0 ; (i < 3 * charsCount) && result; ++i)
+    {
+      uint32_t offset = wh_rnd() % arrayChars.Count ();
+
+      arrayChars.Get (offset, tch);
+      arrayOffsets.Get (offset, toff);
+      if ((text1.CharAt (offset) != tch)
+          || (text1.OffsetOfChar (offset) !=  toff.mValue)
+          || (text1.OffsetOfChar (offset) !=  text2.OffsetOfChar (offset))
+          || (text2.CharAt (offset) != tch))
+        {
+          result &= false;
+        }
+    }
+
+  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  return result;
+}
 
 int
 main ()
@@ -827,6 +976,7 @@ main ()
   success = success && test_text_mirroring ();
   success = success && test_text_substrings ();
   success = success && test_text_substrings_2 ();
+  success = success && test_text_char_offsets ();
 
   DBSShoutdown ();
 

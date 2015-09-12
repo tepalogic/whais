@@ -482,13 +482,13 @@ wod_dump_procs (WIFunctionalUnit& obj, ostream& output, bool_t showCode)
       for (uint_t local = 0; local < localsCount; ++local)
         {
           if (local == 0)
-            output << "return (id. 0)\t\t";
+            output << "return (id: -)\t\t";
 
           else if (local <= obj.ProcParametersCount (proc))
-            output << "param (id. " << local << " )\t\t";
+            output << "param (id: " << local - 1 << " )\t\t";
 
           else
-            output << "local (id. " << local << " )\t\t";
+            output << "local (id:  " << local - 1 << " )\t\t";
 
           wod_dump_type_info (obj.RetriveTypeArea () +
                                 obj.GetProcLocalTypeOff (proc, local),

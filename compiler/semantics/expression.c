@@ -2181,7 +2181,7 @@ translate_leaf_exp (struct ParserState* const parser,
           if ((exp->val.u_id.length == it->nameLen)
               && (strncmp (exp->val.u_id.name, it->name, it->nameLen) == 0))
             {
-              value = it->localIndex;
+              value = it->localIndex - 1;
               result.extra = NULL;
               result.type = it->type;
               MARK_L_VALUE (result.type);
@@ -2463,7 +2463,7 @@ translate_itoffset_exp (struct ParserState* const parser,
       if ((exp->val.u_id.length == it->nameLen)
           && (strncmp (exp->val.u_id.name, it->name, it->nameLen) == 0))
         {
-          itLocalIndex = it->localIndex;
+          itLocalIndex = it->localIndex - 1;
           break;
         }
     }

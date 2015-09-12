@@ -83,7 +83,38 @@ const uint8_t callTestProgram[] = ""
         "tabf[0] = 10;\n"
       "ENDSYNC\n"
       "RETURN temp;\n"
+    "ENDPROC\n"
+    "\n"
+    "PROCEDURE array_parse (ai INT8 ARRAY, count INT8) RETURN INT8\n"
+    "DO\n"
+    " VAR result INT8;\n"
+    "\n"
+    " FOR (i : ai)\n"
+    " DO\n"
+    "   IF (count < 0)\n"
+    "     BREAK;\n"
+    "   result = i;\n"
+    "   count -= 1;\n"
+    " END\n"
+    "\n"
+    " RETURN result;\n"
+    "ENDPROC\n"
+    "\n"
+    "PROCEDURE array_parse_reverse (ai INT8 ARRAY, count INT8) RETURN INT8\n"
+    "DO\n"
+    " VAR result INT8;\n"
+    "\n"
+    " FOR ( ! i : ai)\n"
+    " DO\n"
+    "   IF (count < 0)\n"
+    "     BREAK;\n"
+    "   result = i;\n"
+    "   count -= 1;\n"
+    " END\n"
+    "\n"
+    " RETURN result;\n"
     "ENDPROC\n";
+
 
 
 static const char *MSG_PREFIX[] = {
@@ -693,6 +724,69 @@ test_op_jmp (Session& session)
   return true;
 }
 
+static bool
+test_op_array_parse (Session& session, const bool reverse)
+{
+  if (reverse)
+    std::cout << "Testing opcode for array parse (reverse)...\n";
+  else
+    std::cout << "Testing opcode for array parse...\n";
+
+  SessionStack stack;
+  DInt8 value;
+  DArray array;
+
+  stack.Push (array);
+  stack.Push (value);
+
+  if (reverse)
+    session.ExecuteProcedure ("array_parse_reverse", stack);
+  else
+    session.ExecuteProcedure ("array_parse", stack);
+
+  if (stack.Size () != 1)
+    return false;
+
+  DInt8 result;
+  stack[0].Operand ().GetValue (result);
+
+  if (! result.IsNull())
+    return false;
+
+  stack.Pop (1);
+
+  if (stack.Size () != 0)
+    return false;
+
+  array.Add (DInt8 (10));
+  array.Add (DInt8 (-25));
+
+  stack.Push (array);
+  stack.Push (DInt8 (0));
+
+  if (reverse)
+    session.ExecuteProcedure ("array_parse_reverse", stack);
+  else
+    session.ExecuteProcedure ("array_parse", stack);
+
+  if (stack.Size () != 1)
+    return false;
+
+  stack[0].Operand ().GetValue (result);
+  if (reverse)
+    {
+      if (result != DInt8 (-25))
+        return false;
+    }
+  else
+    {
+      if (result != DInt8 (10))
+        return false;
+     }
+
+  return true;
+}
+
 
 int
 main ()
@@ -729,6 +823,8 @@ main ()
     success = success && test_op_jf (_SC (Session&, commonSession));
     success = success && test_op_jt (_SC (Session&, commonSession));
     success = success && test_op_jmp (_SC (Session&, commonSession));
+    success = success && test_op_array_parse (_SC (Session&, commonSession), false);
+    success = success && test_op_array_parse (_SC (Session&, commonSession), true);
 
     ReleaseInstance (commonSession);
   }

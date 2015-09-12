@@ -161,30 +161,65 @@ ITextStrategy::OffsetOfCharU (const uint64_t index)
   else if (index > mCachedCharsCount)
     throw DBSException (_EXTRA (DBSException::STRING_INDEX_TOO_BIG));
 
-  else if (mCachedCharIndex > index)
+  else if (index < mCachedCharIndex / 2)
     mCachedCharIndex = mCachedCharIndexOffset = 0;
 
-  const uint64_t maxOffset = Utf8CountU ();
-  uint64_t buffOffset = 0, buffValid = 0;
-  uint8_t tempBuffer[256];
-  while (mCachedCharIndex < index)
+  else if (index > (mCachedCharsCount + mCachedCharIndex) / 2)
     {
-      if (buffOffset >= buffValid)
-        {
-          buffOffset = 0;
-          buffValid  = MIN (sizeof tempBuffer,
-                            maxOffset - mCachedCharIndexOffset);
-          ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
-        }
-
-      const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
-
-      mCachedCharIndexOffset += cuCount;
-      buffOffset             += cuCount;
-      ++mCachedCharIndex;
+      mCachedCharIndex       = mCachedCharsCount;
+      mCachedCharIndexOffset = Utf8CountU ();
     }
+  else if (mCachedCharIndex == index)
+    return mCachedCharIndexOffset;
 
-  assert (mCachedCharIndexOffset <= Utf8CountU ());
+  if (mCachedCharIndex < index)
+    {
+      const uint64_t maxOffset = Utf8CountU ();
+      uint64_t buffOffset = 0, buffValid = 0;
+      uint8_t tempBuffer[256];
+      while (mCachedCharIndex < index)
+        {
+          if (buffOffset >= buffValid)
+            {
+              buffOffset = 0;
+              buffValid  = MIN (sizeof tempBuffer,
+                                maxOffset - mCachedCharIndexOffset);
+              ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
+            }
+
+          const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
+
+          mCachedCharIndexOffset += cuCount;
+          buffOffset             += cuCount;
+          ++mCachedCharIndex;
+        }
+    }
+  else
+    {
+      uint64_t lastOffset  = mCachedCharIndexOffset;
+      uint64_t startOffset = 0;
+      uint_t   tempValid   = 0;
+      uint8_t  tempBuffer[128];
+      while (mCachedCharIndex > index)
+        {
+          startOffset = max<int64_t> (lastOffset - sizeof tempBuffer, 0);
+          tempValid = lastOffset - startOffset;
+          ReadUtf8U (startOffset, tempValid, tempBuffer);
+          do
+            {
+              const uint64_t i = --lastOffset - startOffset;
+              if ((tempBuffer[i] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG)
+                {
+                  mCachedCharIndexOffset = lastOffset;
+                  --mCachedCharIndex;
+
+                  if (index == mCachedCharIndex)
+                    break;
+                }
+            }
+          while (startOffset < lastOffset);
+        }
+    }
 
   return mCachedCharIndexOffset;
 }
@@ -213,46 +248,104 @@ ITextStrategy::CharAtU (const uint64_t index)
   if (index == mCachedCharsCount)
     return DChar ();
 
-  if (mCachedCharIndex > index)
+  else if (index < mCachedCharIndex / 2)
     mCachedCharIndex = mCachedCharIndexOffset = 0;
 
-  const uint64_t maxOffset = Utf8CountU ();
-  uint64_t buffOffset = 0, buffValid = 0;
-  uint8_t tempBuffer[256];
-  while (true)
+  else if (index > (mCachedCharsCount + mCachedCharIndex) / 2)
     {
-      if (buffOffset >= buffValid)
+      mCachedCharIndex       = mCachedCharsCount;
+      mCachedCharIndexOffset = Utf8CountU ();
+    }
+
+  if (mCachedCharIndex <= index)
+    {
+      const uint64_t maxOffset = Utf8CountU ();
+      uint64_t buffOffset = 0, buffValid = 0;
+      uint8_t tempBuffer[256];
+      while (true)
         {
-          buffOffset = 0;
-          buffValid  = MIN (sizeof tempBuffer,
-                            maxOffset - mCachedCharIndexOffset);
-          ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
-        }
-
-      const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
-
-      if (mCachedCharIndex == index)
-        {
-          uint32_t cp = 0;
-
-          if (cuCount + buffOffset >= buffValid)
+          if (buffOffset >= buffValid)
             {
               buffOffset = 0;
-              ReadUtf8U (mCachedCharIndexOffset, cuCount, tempBuffer);
+              buffValid  = MIN (sizeof tempBuffer,
+                                maxOffset - mCachedCharIndexOffset);
+              ReadUtf8U (mCachedCharIndexOffset, buffValid, tempBuffer);
             }
 
-          wh_load_utf8_cp (tempBuffer + buffOffset, &cp);
+          const uint_t cuCount = wh_utf8_cu_count (tempBuffer[buffOffset]);
 
-          assert (cp > 0);
-          assert (mCachedCharIndexOffset < maxOffset);
-          assert (mCachedCharIndex < mCachedCharsCount);
+          if (mCachedCharIndex == index)
+            {
+              uint32_t cp = 0;
 
-          return DChar (cp);
+              if (cuCount + buffOffset >= buffValid)
+                {
+                  buffOffset = 0;
+                  ReadUtf8U (mCachedCharIndexOffset, cuCount, tempBuffer);
+                }
+
+              wh_load_utf8_cp (tempBuffer + buffOffset, &cp);
+
+              assert (cp > 0);
+              assert (mCachedCharIndexOffset < maxOffset);
+              assert (mCachedCharIndex < mCachedCharsCount);
+
+              return DChar (cp);
+            }
+
+          mCachedCharIndexOffset += cuCount;
+          buffOffset             += cuCount;
+          ++mCachedCharIndex;
         }
+    }
+  else
+    {
+      uint64_t lastOffset  = mCachedCharIndexOffset;
+      uint64_t startOffset = 0;
+      uint_t   tempValid   = 0;
+      uint8_t  tempBuffer[128];
+      while (true)
+        {
+          if (mCachedCharIndex == index)
+            {
+              assert (lastOffset == mCachedCharIndexOffset);
+              assert (lastOffset - startOffset < tempValid);
 
-      mCachedCharIndexOffset += cuCount;
-      buffOffset             += cuCount;
-      ++mCachedCharIndex;
+              uint64_t i           = lastOffset - startOffset;
+              const uint_t cuCount = wh_utf8_cu_count (tempBuffer[i]);
+              if (cuCount + i > tempValid)
+                {
+                  i = 0;
+                  ReadUtf8U (lastOffset, cuCount, tempBuffer);
+                }
+
+              uint32_t cp = 0;
+              wh_load_utf8_cp (tempBuffer + i, &cp);
+
+              assert (cp > 0);
+              assert (mCachedCharIndex < mCachedCharsCount);
+              assert (mCachedCharIndex == index);
+
+              return DChar (cp);
+            }
+
+          startOffset = max<int64_t> (lastOffset - sizeof tempBuffer, 0);
+          tempValid = lastOffset - startOffset;
+          ReadUtf8U (startOffset, tempValid, tempBuffer);
+          do
+            {
+              const uint64_t i = --lastOffset - startOffset;
+              if ((tempBuffer[i] & UTF8_EXTRA_BYTE_MASK) != UTF8_EXTRA_BYTE_SIG)
+                {
+                  mCachedCharIndexOffset = lastOffset;
+                  --mCachedCharIndex;
+
+                  if (index == mCachedCharIndex)
+                    break;
+                }
+            }
+          while (startOffset < lastOffset);
+        }
     }
 
   assert (false);

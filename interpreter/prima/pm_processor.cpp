@@ -245,8 +245,6 @@ op_func_ldlo8 (ProcedureCall& call, int64_t& offset)
                                 offset;
   const uint8_t localIndex = *data;
 
-  assert (localIndex < call.LocalsCount ());
-
   LocalOperand localOp (call.GetStack (),
                         call.StackBegin () + localIndex);
 
@@ -1464,6 +1462,65 @@ op_func_sor (ProcedureCall& call, int64_t& offset)
 }
 
 
+template<bool reverse> static void
+op_start_iterate (ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack     = call.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+          stackSize);
+
+  IOperand& container = stack[stackSize - 1].Operand ();
+  if (container.IsNull ())
+    {
+      stack.Push (StackValue (BoolOperand (DBool (false))));
+      return ;
+    }
+
+  NullOperand nullOp;
+  StackValue iterator (nullOp);
+
+  const bool started = container.StartIterate (reverse, iterator);
+
+  stack.Pop (1);
+  stack.Push (iterator);
+  stack.Push (StackValue (BoolOperand (DBool (started))));
+}
+
+
+template<bool reverse> static void
+op_iterate (ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack     = call.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+          stackSize);
+
+  IOperand& iteratorOp = stack[stackSize - 1].Operand ();
+
+  const bool started = iteratorOp.Iterate (reverse);
+  stack.Push (StackValue (BoolOperand (DBool (started))));
+}
+
+static void
+op_iterator_offset (ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack     = call.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+          stackSize);
+
+  IOperand& iteratorOp = stack[stackSize - 1].Operand ();
+
+  const uint64_t itOffset = iteratorOp.IteratorOffset ();
+
+  stack.Pop (1);
+  stack.Push (StackValue (UInt64Operand (DUInt64 (itOffset))));
+}
+
 
 typedef void (*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
 
@@ -1630,8 +1687,15 @@ static OP_FUNC operations[] = {
                                 op_func_sxor<DBool>,
 
                                 op_func_sor<DInt64>,
-                                op_func_sor<DBool>
-                              };
+                                op_func_sor<DBool>,
+
+                                op_start_iterate<false>,
+                                op_start_iterate<true>,
+                                op_iterate<false>,
+                                op_iterate<true>,
+
+                                op_iterator_offset
+};
 
 
 

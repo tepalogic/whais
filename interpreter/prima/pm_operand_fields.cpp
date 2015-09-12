@@ -315,6 +315,21 @@ FieldOperand::Duplicate () const
 
 
 bool
+FieldOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  if (IsNull ())
+    return false;
+
+  assert (mTableRef->GetTable ().AllocatedRows() > 0);
+
+  outStartItem = GetValueAt (reverse
+                             ? mTableRef->GetTable ().AllocatedRows() - 1
+                             : 0);
+  return true;
+}
+
+
+bool
 FieldOperand::PrepareToCopy (void *const )
 {
   if (mTableRef)
@@ -351,6 +366,35 @@ FieldOperand::GetTableReference ()
 BaseFieldElOperand::~BaseFieldElOperand ()
 {
   mTableRef->DecrementRefCount ();
+}
+
+
+bool
+BaseFieldElOperand::Iterate (const bool reverse)
+{
+  ITable& table = mTableRef->GetTable ();
+
+  if (reverse)
+    {
+      if (mRow == 0)
+        return false;
+
+      _CC (ROW_INDEX&, mRow)--;
+      return true;
+    }
+
+  if (mRow >= table.AllocatedRows () - 1)
+    return false;
+
+  _CC (ROW_INDEX&, mRow)++;
+  return true;
+}
+
+
+uint64_t
+BaseFieldElOperand::IteratorOffset ()
+{
+  return mRow;
 }
 
 
@@ -3179,6 +3223,22 @@ TextFieldElOperand::Duplicate () const
 }
 
 
+bool
+TextFieldElOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  if (IsNull ())
+    return false;
+
+  DText temp;
+  GetValue (temp);
+  if (temp.IsNull ())
+    return false;
+
+  outStartItem = GetValueAt (reverse ? temp.Count () - 1 : 0);
+  return true;
+}
+
+
 
 bool
 ArrayFieldElOperand::IsNull () const
@@ -3221,7 +3281,7 @@ ArrayFieldElOperand::GetValueAt (const uint64_t index)
 {
   ITable& table = mTableRef->GetTable ();
 
-  DBSFieldDescriptor fd    = table.DescribeField (mField);
+  DBSFieldDescriptor fd = table.DescribeField (mField);
 
   assert (fd.isArray);
 
@@ -3334,6 +3394,23 @@ ArrayFieldElOperand::Duplicate () const
   return StackValue (ArrayOperand (value));
 }
 
+
+bool
+ArrayFieldElOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  if (IsNull ())
+    return false;
+
+  DArray temp;
+  GetValue (temp);
+  if (temp.IsNull ())
+    return false;
+
+  assert (temp.Count () > 0);
+
+  outStartItem = GetValueAt (reverse ? temp.Count () - 1 : 0);
+  return true;
+}
 
 } //namespace prima
 } //namespace whais

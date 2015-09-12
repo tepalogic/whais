@@ -135,6 +135,19 @@ ArrayOperand::Duplicate () const
 
 
 bool
+ArrayOperand::StartIterate (const bool reverse, StackValue& outStartItem)
+{
+  if (IsNull ())
+    return false;
+
+  assert (mValue.Count () > 0);
+
+  outStartItem = GetValueAt (reverse ? (mValue.Count () - 1) : 0);
+  return true;
+}
+
+
+bool
 ArrayOperand::PrepareToCopy (void* const dest)
 {
   _placement_new (dest, *this);
@@ -149,6 +162,32 @@ BaseArrayElOperand::IsNull () const
   return (mArray.Count () <= mIndex) ? true : false;
 }
 
+
+bool
+BaseArrayElOperand::Iterate (const bool reverse)
+{
+  if (reverse)
+    {
+      if (mIndex == 0)
+        return false;
+
+      _CC (uint64_t&, mIndex)--;
+      return true;
+    }
+
+  if (mIndex >= mArray.Count () - 1)
+    return false;
+
+  _CC (uint64_t&, mIndex)++;
+  return true;
+}
+
+
+uint64_t
+BaseArrayElOperand::IteratorOffset ()
+{
+  return mIndex;
+}
 
 
 
