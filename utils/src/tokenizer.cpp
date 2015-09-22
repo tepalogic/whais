@@ -55,7 +55,7 @@ NextToken (const std::string&     text,
 
       while ((text[++lastPos] != '"') || ignoreEnd)
         {
-          ignoreEnd = (text[lastPos] == '\\') ? ~ignoreEnd : false;
+          ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)
             {
               //Most likely an error, but not our jub to handle it!
@@ -75,7 +75,7 @@ NextToken (const std::string&     text,
       bool ignoreEnd = false;
       while ((text[++lastPos] != '\'') || ignoreEnd)
         {
-          ignoreEnd = (text[lastPos] == '\\') ? ~ignoreEnd : false;
+          ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)
             {
               //Most likely an error, but not our jub to handle it!

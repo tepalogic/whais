@@ -8,7 +8,7 @@ ARCH_SHL_EXT:=.dll
 ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
 
-_vc_native:=x86
+_vc_native:=amd64
 _windows_cmd_line=cmd /c '$(WHAIS_VC_PATH)\vcvarsall.bat' $(_vc_native) \&\& $(1) 
 
 CC:=$(call _windows_cmd_line, cl.exe)
@@ -23,7 +23,7 @@ SHLS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 LIBS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 HDRS_OUT_DIR?=$(WHAIS_OUT_DIR)/include/
 
-CC_FLAGS:=/LD /W3 /TC /c  /Y- /arch:SSE2 /nologo /wd4242 /wd4244  /wd4267 /wd4290 /wd4355 /wd4800
+CC_FLAGS:=/LD /W3 /TC /c  /Y- /nologo /wd4242 /wd4244  /wd4267 /wd4290 /wd4355 /wd4800
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG=1
@@ -51,7 +51,7 @@ DEFINES+=INLINE=__inline
 DEFINES+=_CRT_SECURE_NO_WARNINGS _USING_V110_SDK71_
 DEFINES+=QWORDS_PER_OP=4
 DEFINES+=WOS=Windows
-DEFINES+=WARCH=x86_32
+DEFINES+=WARCH=x86_64
 
 #Uncommment to build with VS 12.0
 #DEFINES+=snprintf=_snprintf

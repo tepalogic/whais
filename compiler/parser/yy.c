@@ -1008,7 +1008,7 @@ yyerror (struct ParserState* parser, const char* msg)
 {
   char temp[128] = {0, };
 
-  int i, lastTokenOffset = parser->bufferPos;
+  uint_t i, lastTokenOffset = parser->bufferPos;
   while ((lastTokenOffset > 0) && ! isspace (parser->buffer[lastTokenOffset]))
     --lastTokenOffset;
 

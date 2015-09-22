@@ -308,8 +308,8 @@ cmd_push_stack (ClientConnection& conn, uint_t* const inoutDataOff)
           fields_[field].type    = _SC (DBS_FIELD_TYPE,
                                         GET_BASIC_TYPE (fieldType));
 
-          if ((fields_[field].type < WHC_TYPE_BOOL)
-              || (fields_[field].type > WHC_TYPE_TEXT))
+          if ((_SC (uint_t, fields_[field].type) < WHC_TYPE_BOOL)
+              || (_SC (uint_t, fields_[field].type) > WHC_TYPE_TEXT))
             {
               goto push_frame_error;
             }

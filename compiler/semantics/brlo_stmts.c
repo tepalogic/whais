@@ -40,7 +40,7 @@ check_for_dead_statement (struct ParserState* const parser)
   struct WArray* const branchStack = stmt_query_branch_stack (stmt);
   const uint_t stackSize           = wh_array_count (branchStack);
 
-  assert (parser->pCurrentStmt->type = STMT_PROC);
+  assert (parser->pCurrentStmt->type == STMT_PROC);
 
   if (stackSize > 0)
     {
@@ -477,8 +477,6 @@ finalize_for_stmt (struct ParserState* const parser)
   offset = loopIt->continueMark - endForLoopPos;
   store_le_int32 (offset, code + endForLoopPos + 1);
 
-  wh_array_resize (loopsStack, loopId);
-
   if (loopIt->type == LE_FOREACH_BEGIN)
     {
       if (encode_opcode (stream, W_CTS) == NULL)
@@ -490,6 +488,8 @@ finalize_for_stmt (struct ParserState* const parser)
       struct WArray* const iterators = stmt_query_loop_iterators_stack (stmt);
       wh_array_resize (iterators, wh_array_count (iterators) -1 );
     }
+
+  wh_array_resize (loopsStack, loopId);
 }
 
 void

@@ -3066,7 +3066,7 @@ translate_exp (struct ParserState* const parser, YYSTYPE exp)
   struct Statement* const     stmt   = parser->pCurrentStmt;
   struct WOutputStream* const instrs = stmt_query_instrs (stmt);
 
-  assert (exp->val_type = VAL_EXP_LINK);
+  assert (exp->val_type == VAL_EXP_LINK);
   assert (stmt->type == STMT_PROC);
 
   translate_tree_exp (parser, stmt, &(exp->val.u_exp));
@@ -3092,7 +3092,7 @@ translate_return_exp (struct ParserState* const parser, YYSTYPE exp)
   struct ExpResultType retType = sgResultUnk;
   struct ExpResultType expType = sgResultUnk;
 
-  assert (exp->val_type = VAL_EXP_LINK);
+  assert (exp->val_type == VAL_EXP_LINK);
   assert (stmt->type == STMT_PROC);
 
   if (branchStackSize == 0)

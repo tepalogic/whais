@@ -89,24 +89,24 @@ check_table_fields "test_table" 'text_field *: TEXT$' \
 				'uint64_field *: UINT64$' \
 				'real_field *: REAL$' \
 				'rr_field *: RICHREAL$' \
-				'a_char_field *: ARRAY OF CHAR$' \
-				'a_date_field *: ARRAY OF DATE$' \
-				'a_dt_field *: ARRAY OF DATETIME$' \
-				'a_ht_field *: ARRAY OF HIRESTIME$' \
-				'a_int8_field *: ARRAY OF INT8$' \
-				'a_int16_field *: ARRAY OF INT16$' \
-				'a_int32_field *: ARRAY OF INT32$' \
-				'a_int64_field *: ARRAY OF INT64$' \
-				'a_uint8_field *: ARRAY OF UINT8$' \
-				'a_uint16_field *: ARRAY OF UINT16$' \
-				'a_uint32_field *: ARRAY OF UINT32$' \
-				'a_uint64_field *: ARRAY OF UINT64$' \
-				'a_real_field *: ARRAY OF REAL$' \
-				'a_rr_field *: ARRAY OF RICHREAL$'
+				'a_char_field *: CHAR ARRAY$' \
+				'a_date_field *: DATE ARRAY$' \
+				'a_dt_field *: DATETIME ARRAY$' \
+				'a_ht_field *: HIRESTIME ARRAY$' \
+				'a_int8_field *: INT8 ARRAY$' \
+				'a_int16_field *: INT16 ARRAY$' \
+				'a_int32_field *: INT32 ARRAY$' \
+				'a_int64_field *: INT64 ARRAY$' \
+				'a_uint8_field *: UINT8 ARRAY$' \
+				'a_uint16_field *: UINT16 ARRAY$' \
+				'a_uint32_field *: UINT32 ARRAY$' \
+				'a_uint64_field *: UINT64 ARRAY$' \
+				'a_real_field *: REAL ARRAY$' \
+				'a_rr_field *: RICHREAL ARRAY$'
 
-check_table_fields "test_table_2" '^one_field *: ARRAY OF REAL$'
+check_table_fields "test_table_2" '^one_field *: REAL ARRAY$'
 check_table_fields "test_table_3" '^text_field *: TEXT$'
-check_table_fields "test_table_4" '^text_field *: TEXT$' '^an_array *: ARRAY OF CHAR$'
+check_table_fields "test_table_4" '^text_field *: TEXT$' '^an_array *: CHAR ARRAY$'
 check_table_fields "test_table_5" '^the_char *: CHAR$'
 
 execute_wcmd_command "alter test_table_3 rename text_field r_text_field, add new_field_char CHAR new_field_uint32 UINT32 new_field_a_rr ARRAY RICHREAL"
@@ -116,10 +116,10 @@ execute_wcmd_command "alter test_table_5 remove the_char, add the_char ARRAY CHA
 check_table_fields "test_table_3" '^r_text_field *: TEXT$' \
 			          '^new_field_char *: CHAR$'\
 				  '^new_field_uint32 *: UINT32$'\
- 				  '^new_field_a_rr *: ARRAY OF RICHREAL$'
+ 				  '^new_field_a_rr *: RICHREAL ARRAY$'
 check_missing_table_fields "test_table_3" '\<text_field\>'
-check_table_fields "test_table_4" '^text_field *: TEXT$' '^an_array *: ARRAY OF BOOL$'
-check_table_fields "test_table_5" '^the_char *: ARRAY OF CHAR$'
+check_table_fields "test_table_4" '^text_field *: TEXT$' '^an_array *: BOOL ARRAY$'
+check_table_fields "test_table_5" '^the_char *: CHAR ARRAY$'
 execute_wcmd_command "alter test_table_3 remove r_text_field new_field_a_rr, add text_field INT64"
 check_missing_table_fields "test_table_3" '\<r_text_field\>' '\<new_field_a_rr\>'
 check_table_fields "test_table_3" '^new_field_char *: CHAR$'\
@@ -162,7 +162,7 @@ check_table_fields "test_table" 'text_field_n *: TEXT$' \
 				'ht_field *: HIRESTIME$' \
 				'int8_field *: INT8$' \
 				'new_int8 *: INT8$' \
-				'new_a_int8 *: ARRAY OF INT8$' \
+				'new_a_int8 *: INT8 ARRAY$' \
 				'int16_field *: INT16$' \
 				'int32_field *: INT32$' \
 				'int64_field *: INT64$' \
@@ -171,20 +171,20 @@ check_table_fields "test_table" 'text_field_n *: TEXT$' \
 				'uint64_field *: UINT64$' \
 				'real_field *: REAL$' \
 				'rr_field *: RICHREAL$' \
-				'a_char_field *: ARRAY OF CHAR$' \
-				'a_date_field *: ARRAY OF DATE$' \
-				'a_dt_field *: ARRAY OF DATETIME$' \
-				'a_ht_field *: ARRAY OF HIRESTIME$' \
-				'a_int8_field *: ARRAY OF INT8$' \
-				'a_int16_field *: ARRAY OF INT32$' \
-				'a_int32_field *: ARRAY OF INT32$' \
-				'a_uint8_field *: ARRAY OF UINT8$' \
-				'a_uint16_field *: ARRAY OF UINT16$' \
-				'a_uint32_field *: ARRAY OF UINT32$' \
-				'a_uint64_field *: ARRAY OF UINT64$' \
-				'a_real_field *: ARRAY OF REAL$' \
-				'a_rr_field *: ARRAY OF RICHREAL$' \
-				'a_rr_field *: ARRAY OF RICHREAL$'
+				'a_char_field *: CHAR ARRAY$' \
+				'a_date_field *: DATE ARRAY$' \
+				'a_dt_field *: DATETIME ARRAY$' \
+				'a_ht_field *: HIRESTIME ARRAY$' \
+				'a_int8_field *: INT8 ARRAY$' \
+				'a_int16_field *: INT32 ARRAY$' \
+				'a_int32_field *: INT32 ARRAY$' \
+				'a_uint8_field *: UINT8 ARRAY$' \
+				'a_uint16_field *: UINT16 ARRAY$' \
+				'a_uint32_field *: UINT32 ARRAY$' \
+				'a_uint64_field *: UINT64 ARRAY$' \
+				'a_real_field *: REAL ARRAY$' \
+				'a_rr_field *: RICHREAL ARRAY$' \
+				'a_rr_field *: RICHREAL ARRAY$'
 check_missing_table_fields "test_table" '\<text_field\>' '\<a_int64_field\>' '\<uint32_field\>'
 
 TEXT_FIELD_ROWS_2=`wcmd -u $DB_NAME -d $DB_DIR <<< "rows test_table list text_field_n" | cut -s -d \| -f 3`

@@ -40,6 +40,10 @@ ifeq ($(ARCH),windows_vc_x86)
 SRC_FOLDER:=windows
 endif
 
+ifeq ($(ARCH),windows_vc_x86_64)
+SRC_FOLDER:=windows
+endif
+
 wslcustom_SRC+=$(SRC_FOLDER)/fileio.c
 wslcustom_SRC+=$(SRC_FOLDER)/thread.c  
 wslcustom_SRC+=$(SRC_FOLDER)/time.c  

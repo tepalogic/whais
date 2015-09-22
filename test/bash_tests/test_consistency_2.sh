@@ -23,7 +23,8 @@ TEXT_VAL_5="<<To be or not to be?>> ... That should the question!"
 EXEC_DIR=$(dirname $0)/../
 
 get_whais_pid () {
-	WHAIS_PID=$(pgrep -d ' ' whais | cut -f 1 -d ' ')
+#   WHAIS_PID=$(pgrep -d ' ' whais | cut -f 1 -d ' ')
+    WHAIS_PID=$(pidof whais)
 }
 
 fail_test () {
