@@ -88,7 +88,7 @@ Socket::Socket (const char* const     localAdress,
   if (e != WOP_OK)
     {
       throw SocketException (_EXTRA (e),
-                             "Could not start listen at '%s:%s'.",
+                             "Could not start listen at '%s@%s'.",
                              localAdress,
                              service);
     }

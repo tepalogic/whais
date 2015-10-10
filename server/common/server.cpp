@@ -444,7 +444,6 @@ listener_routine (void* args)
 
                 sMainLog->Log (LT_ERROR, logEntry.str ());
               }
-
             break ;
         }
         acceptUserConnections = sAcceptUsersConnections;
@@ -465,14 +464,11 @@ listener_routine (void* args)
       logEntry <<"Extra: " << e.Code () << " (";
       logEntry << e.File () << ':' << e.Line () << ").\n";
 
-      sMainLog->Log (LT_CRITICAL, logEntry.str ());
-
-      StopServer ();
+      sMainLog->Log (LT_ERROR, logEntry.str ());
   }
   catch (std::bad_alloc&)
   {
       sMainLog->Log (LT_CRITICAL, "OUT OF MEMORY!!!");
-
       StopServer ();
   }
   catch (std::exception& e)
@@ -480,7 +476,6 @@ listener_routine (void* args)
       ostringstream logEntry;
 
       logEntry << "General system failure: " << e.what () << endl;
-
       sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
