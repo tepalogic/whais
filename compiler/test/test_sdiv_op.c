@@ -192,8 +192,8 @@ main ()
     }
 
   free_state (&state);
-  printf ("Memory peak: %u bytes \n", test_get_mem_peak ());
-  printf ("Current memory usage: %u bytes...", test_get_mem_used ());
+  printf ("Memory peak: %u bytes \n", (uint_t)test_get_mem_peak ());
+  printf ("Current memory usage: %u bytes...",  (uint_t)test_get_mem_used ());
   if (test_get_mem_used () != 0)
     {
       test_result = FALSE;

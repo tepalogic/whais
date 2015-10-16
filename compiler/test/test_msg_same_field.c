@@ -98,7 +98,7 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
   if (test_get_mem_used () != 0)
     {
       printf ("Current memory usage: %u bytes! It should be 0.",
-              test_get_mem_used ());
+              (uint_t)test_get_mem_used ());
       test_result = FALSE;
     }
   return test_result;
