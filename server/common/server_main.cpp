@@ -253,7 +253,7 @@ main (int argc, char** argv)
 
     if (databases.size () == 0)
       {
-        glbLog->Log (LT_CRITICAL, "No session were configured.");
+        glbLog->Log (LT_CRITICAL, "No database context configured.");
         return -1;
       }
     else if (databases[0].mDbsName != GlobalContextDatabase ())
