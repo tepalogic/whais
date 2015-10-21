@@ -213,8 +213,8 @@ wh_atomic_fetch_dec64 (volatile int64_t* const value)
 
 
 #if defined (ARCH_PPC)
-/* These functions are quired for by GCC as for PPC (32 bit targets) as those
- * do not support 64 bit atomic operations. */
+/* These functions are required by GCC compiler for PPC target processor as
+ * for these it does not support 8 bit atomic operations. */
 int64_t
 __sync_fetch_and_add_8 (volatile int64_t* const value, int64_t v)
 {
