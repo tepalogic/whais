@@ -38,7 +38,7 @@ namespace pastra {
 static const uint_t DEFAULT_TEMP_MEM_RESERVED = 4096; //4KB
 
 void
-append_int_to_str (std::string& dest, uint64_t number);
+append_int_to_str (uint64_t number, std::string& dest);
 
 
 class DataContainerException : public Exception

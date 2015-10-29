@@ -1275,6 +1275,41 @@ check_text_buffer (const uint8_t* const utf8buffer, const uint_t bufferSize)
 }
 
 
+static void
+remove_extra_container_files (FIX_ERROR_CALLBACK  fixCallback,
+                              const string        baseFile,
+                              const uint64_t      containerSize,
+                              const uint64_t      maxFileSize)
+{
+  uint_t seriesStart = containerSize / maxFileSize + 1;
+
+  if ((containerSize == 0) || (containerSize % maxFileSize == 0))
+    --seriesStart ;
+
+  while (true)
+    {
+      string fileName = baseFile;
+
+      if (seriesStart != 0)
+        append_int_to_str (seriesStart, fileName);
+
+      if ( ! whf_file_exists (fileName.c_str ()))
+        return ;
+
+      fixCallback (INFORMATION, "Removing extra file '%s.", fileName.c_str ());
+      if ( ! whf_remove (fileName.c_str ()))
+        {
+          throw WFileContainerException(
+                   _EXTRA (WFileContainerException::FILE_OS_IO_ERROR),
+                   "Failed to remove file '%s'.",
+                   fileName.c_str ()
+                                        );
+        }
+      ++seriesStart;
+    }
+}
+
+
 bool
 PersistentTable::RepairTable (DbsHandler&                 dbs,
                               const std::string&          name,
@@ -1375,8 +1410,8 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                            false);
   FileContainer rowsData ((fileNamePrefix + PS_TABLE_FIXFIELDS_EXT).c_str (),
                           settings.mMaxFileSize,
-                          ((rowSize * rowsCount) + settings.mMaxFileSize - 1) /
-                          settings.mMaxFileSize,
+                          ((rowSize * rowsCount) + settings.mMaxFileSize - 1)
+                            / settings.mMaxFileSize,
                           false);
 
   RepairTableNodeManager tableNodeMgr (dbs, tableData);
@@ -1406,7 +1441,6 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                    name.c_str (),
                    rowsCount);
     }
-
 
   auto_ptr<VariableSizeStore> vsData (new VariableSizeStore);
   if (vsDataSize > 0)
@@ -1848,7 +1882,18 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
     {
       vsData->ConcludeStorageCheck ();
       vsDataSize = vsData->Size ();
+
     }
+
+  remove_extra_container_files (fixCallback,
+                                (fileNamePrefix + PS_TABLE_VARFIELDS_EXT),
+                                vsData->Size (),
+                                settings.mMaxFileSize);
+
+  remove_extra_container_files (fixCallback,
+                                (fileNamePrefix + PS_TABLE_FIXFIELDS_EXT),
+                                rowsData.Size (),
+                                settings.mMaxFileSize);
 
   store_le_int64 (rowsCount, tableHeader.get () + PS_TABLE_ROWS_COUNT_OFF);
   store_le_int64 (vsDataSize,

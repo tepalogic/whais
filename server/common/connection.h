@@ -46,7 +46,6 @@ struct UserHandler
 {
   UserHandler ()
     : mDesc (NULL),
-      mClientSocket (NULL),
       mLastReqTick (0),
       mThread (),
       mSocket (INVALID_SOCKET),
@@ -57,7 +56,6 @@ struct UserHandler
   }
 
   const DBSDescriptors* mDesc;
-  Socket*               mClientSocket;
   uint64_t              mLastReqTick;
   Thread                mThread;
   Socket                mSocket;

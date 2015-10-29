@@ -818,12 +818,12 @@ main (const int argc, char *argv[])
 
           if (result < 0)
             {
-              cerr << "The selected database is not in a valid state."
+              cerr << "\nThe selected database is not in a valid state."
                       " Aborting!\n";
             }
           else
             {
-              cout << "The database validation went well. Please restart the "
+              cout << "\nThe database validation went well. Please restart the "
                       "program with out '-t' or '--validate'.\n";
             }
             result = EAGAIN;
