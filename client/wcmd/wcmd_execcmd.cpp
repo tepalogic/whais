@@ -1268,7 +1268,7 @@ fetch_execution_result (WH_CONNECTION hnd)
 
           fields.push_back (fieldName);
 
-          fd.name = fields.back ().c_str ();
+          fd.name = NULL;
           fd.type = fieldType;
 
           fieldsDescriptors.push_back (fd);
@@ -1276,10 +1276,13 @@ fetch_execution_result (WH_CONNECTION hnd)
           if (i > 0)
             cout << ", ";
 
-          cout << fd.name << " ";
-          cout << wcmd_decode_typeinfo (fd.type);
+          cout << fieldName << ' ' << wcmd_decode_typeinfo (fieldType);
         }
       cout << ")\n";
+
+      assert (fields.size () == fieldsDescriptors.size ());
+      for (uint_t i = 0; i < fieldsDescriptors.size (); ++i)
+        fieldsDescriptors[i].name = fields[i].c_str ();
 
       assert (fieldsCount == fields.size ());
       assert (fieldsCount == fieldsDescriptors.size ());

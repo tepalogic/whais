@@ -1705,7 +1705,9 @@ ProcedureCall::ProcedureCall (Session&                  session,
   : mProcedure (procedure),
     mSession (session),
     mStack (stack),
-    mCode (procedure.mProcMgr->Code (procedure, NULL)),
+    mCode (mProcedure.mNativeCode
+           ? NULL
+           : procedure.mProcMgr->Code (procedure, NULL)),
     mStackBegin (stack.Size () - procedure.mArgsCount),
     mCodePos (0),
     mAquiredSync (NO_INDEX)

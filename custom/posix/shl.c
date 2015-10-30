@@ -23,14 +23,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 #include <dlfcn.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "whais.h"
 
 WH_SHLIB
 wh_shl_load (const char* const library)
 {
-  const WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  int i = 0;
+  char name[512];
 
+  WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  if (result != INVALID_SHL)
+    return result;
+
+  i = strlen (library) + 1;
+
+  if (sizeof name < (i + 3 + 3)) /* "lib" + * + ".so" */
+    return INVALID_SHL;
+
+  strcpy (name, library);
+  while (--i >= 0)
+    {
+      if (name[i] == '/')
+        break;
+    }
+
+  ++i;
+  sprintf (name + i, "lib%s.so", library + i);
+
+  result = dlopen (name, RTLD_NOW | RTLD_GLOBAL);
   return result;
 }
 

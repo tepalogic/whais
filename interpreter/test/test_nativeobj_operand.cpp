@@ -32,7 +32,8 @@ public:
     if ((mRegistered != 0)
         || (mChunkMemory != NULL))
       {
-        throw "Objected is deleted though it was not properly 'released'.";
+        assert (FALSE);
+        mRegistered /= (mRegistered * 0);
       }
   }
 

@@ -69,6 +69,8 @@ CmdLineParser::CmdLineParser (int argc, char** argv)
     mInclusionPaths (),
     mReplacementTags ()
 {
+  AddInclusionPaths (whf_current_dir ());
+
   Parse ();
 }
 
@@ -289,7 +291,6 @@ CmdLineParser::CheckArguments ()
     mOutputFile = tempBuffer;
   }
 
-  AddInclusionPaths (whf_current_dir ());
   const char* const defaultIncDirs = getenv ("WHAIS_INC");
   if (defaultIncDirs != NULL)
     AddInclusionPaths (defaultIncDirs);

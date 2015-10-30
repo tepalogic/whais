@@ -90,7 +90,7 @@ InterException::Description () const
     return "Failed to define a symbol as it was already defined.";
 
   case EXTERNAL_FIRST:
-    return "Failed to bind an external symbol because its definition was not fund.";
+    return "Failed to bind an external symbol because its definition was not found.";
 
   case EXTERNAL_MISMATCH:
     return "Failed to bind an external symbol because its definition has a different type.";
