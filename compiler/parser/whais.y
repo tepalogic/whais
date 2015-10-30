@@ -109,6 +109,8 @@ global_block_statement: /* empty */
 
 var_decl_stmt: VAR id_list type_spec ';'
                   { $$ = add_list_declaration (state, $2, $3); CHK_SEM_ERROR; }
+             | VAR id_list RETURN ';'
+                  { $$ = add_list_declaration (state, $2, NULL); CHK_SEM_ERROR; }
 
 id_list: IDENTIFIER  
             { $$ = add_id_to_list(NULL, $1); }

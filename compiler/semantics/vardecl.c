@@ -140,11 +140,24 @@ add_declaration (struct ParserState* const parser,
   struct Statement* const stmt   = parser->pCurrentStmt;
 
   assert (var->val_type == VAL_ID);
-  assert (type->val_type == VAL_TYPE_SPEC);
+  assert ((type == NULL) || (type->val_type == VAL_TYPE_SPEC));
 
   if (unique)
     {
-      assert (IS_TABLE_FIELD( type->val.u_tspec.type) == FALSE);
+      assert ((type == NULL) ||
+              (IS_TABLE_FIELD( type->val.u_tspec.type) == FALSE));
+
+      if ((type == NULL)
+          && (parser->pCurrentStmt->type == STMT_GLOBAL))
+        {
+          char text[128];
+
+          wh_copy_first (text, id->name, sizeof text, id->length);
+          log_message (parser, parser->bufferPos, MSG_VAR_GLB_RETURN, text);
+
+          parser->abortError = TRUE;
+          return NULL;
+        }
 
       decl = stmt_find_declaration (stmt, id->name, id->length, FALSE, FALSE);
       if ((decl != NULL)
@@ -208,6 +221,8 @@ add_declaration (struct ParserState* const parser,
       wh_copy_first (text, decl->label, sizeof text, decl->labelLength);
       log_message (parser, parser->bufferPos, MSG_VAR_DEFINED, text);
       log_message (parser, decl->declarationPos, MSG_DECL_PREV);
+
+      parser->abortError = TRUE;
     }
   else
     {
@@ -215,10 +230,18 @@ add_declaration (struct ParserState* const parser,
 
       var.label          = id->name;
       var.labelLength    = id->length;
-      var.type           = type->val.u_tspec.type;
       var.declarationPos = (id->name - parser->buffer);
+      var.type           = (type != NULL) ? type->val.u_tspec.type : 0;
 
-      if (IS_TABLE( var.type)
+      if (var.type == 0)
+        {
+          if ((result = stmt_add_declaration (stmt, &var, FALSE)) == NULL)
+            {
+              log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+              parser->abortError = TRUE;
+            }
+        }
+      else if (IS_TABLE( var.type)
           && ! process_table_decls (parser, &var, type->val.u_tspec.extra))
         {
           result = NULL;   /* Something went wrong along the way */
@@ -288,7 +311,7 @@ add_list_declaration (struct ParserState* parser,
   struct SemIdList* it     = &varsList->val.u_idlist;
 
   assert (varsList->val_type == VAL_ID_LIST);
-  assert (type->val_type == VAL_TYPE_SPEC);
+  assert ((type == NULL) || (type->val_type == VAL_TYPE_SPEC));
 
   free_sem_value (varsList);
 
@@ -315,7 +338,8 @@ add_list_declaration (struct ParserState* parser,
     }
 
   /* mark this as free for reuse */
-  free_sem_value (type);
+  if (type != NULL)
+    free_sem_value (type);
 
   return result;
 }

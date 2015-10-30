@@ -85,7 +85,8 @@ get_iterator_local_index (struct ParserState* const parser,
           (struct DeclaredVar*)wh_array_get (&glb->decls, v);
 
       if ((var->labelLength == itNameLength)
-          && (strncmp (var->label, itName, itNameLength) == 0))
+          && (strncmp (var->label, itName, itNameLength) == 0)
+          && ! IS_TABLE_FIELD (var->type))
         {
           char tname[128];
 
@@ -102,7 +103,8 @@ get_iterator_local_index (struct ParserState* const parser,
           (struct DeclaredVar*)wh_array_get (&stmt->spec.proc.paramsList, v);
 
       if ((var->labelLength == itNameLength)
-          && (strncmp (var->label, itName, itNameLength) == 0))
+          && (strncmp (var->label, itName, itNameLength) == 0)
+          && ! IS_TABLE_FIELD (var->type))
         {
           char tname[128];
 
@@ -119,7 +121,8 @@ get_iterator_local_index (struct ParserState* const parser,
           (struct DeclaredVar*)wh_array_get (&stmt->decls, v);
 
       if ((var->labelLength == itNameLength)
-          && (strncmp (var->label, itName, itNameLength) == 0))
+          && (strncmp (var->label, itName, itNameLength) == 0)
+          && ! IS_TABLE_FIELD (var->type))
         {
           char tname[128];
 

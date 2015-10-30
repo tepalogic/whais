@@ -218,6 +218,19 @@ stmt_add_declaration (struct Statement* const   stmt,
 {
   struct WOutputStream *typeStream = NULL;
 
+  if (var->type == 0)
+    {
+      const struct DeclaredVar* const ret = stmt_get_param (stmt, 0);
+      var->typeSpecOff = ret->typeSpecOff;
+      var->type        = ret->type;
+      var->extra       = ret->extra;
+
+      var->varId = stmt->localsUsed++;
+      MARK_AS_NOT_REFERENCED (var->varId);
+
+      return wh_array_add (&stmt->decls, var);
+    }
+
   if (IS_TABLE_FIELD( var->type))
       var->varId = ~0; /* Set the id to a generic value! */
 

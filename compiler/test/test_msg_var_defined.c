@@ -111,6 +111,24 @@ char test_prog_8[] = ""
   "v3 = v1 + v2;\n "
   "VAR v3 INT8;\n " "RETURN v1 + v2; \n" "ENDPROC \n" " \n";
 
+char test_prog_9[] = ""
+  "VAR v1 UINT32; \n"
+  "VAR v2 RETURN; \n"
+  "VAR v3 DATE; \n";
+
+
+char test_prog_10[] = ""
+  "VAR v1 DATE;"
+  "EXTERN VAR v2 RETURN; \n"
+  "VAR v3 REAL; \n";
+
+char test_prog_11[] = ""
+  "PROCEDURE ProcId1 (v1 INT8, v2 RETURN) RETURN INT32 \n"
+  "DO \n"
+  "RETURN NULL;\n"
+  "ENDPROC \n" " \n";
+
+
 
 bool_t
 test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
@@ -172,24 +190,32 @@ main ()
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
                                                      MSG_VAR_DEFINED,
                                                      MSG_ERROR_EVENT);
-
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_5,
                                                      MSG_VAR_DEFINED,
                                                      MSG_ERROR_EVENT);
-
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_6,
                                                      MSG_VAR_EXT_LATE,
                                                      MSG_WARNING_EVENT);
-
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_7,
                                                      MSG_VAR_DECL_NA,
                                                      MSG_ERROR_EVENT);
-
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_8,
+                                                     MSG_COMPILER_ERR,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_9,
+                                                     MSG_VAR_GLB_RETURN,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_10,
+                                                     MSG_VAR_GLB_RETURN,
+                                                     MSG_ERROR_EVENT);
+  test_result =
+    (test_result == FALSE) ? FALSE : test_for_error (test_prog_11,
                                                      MSG_COMPILER_ERR,
                                                      MSG_ERROR_EVENT);
   if (test_result == FALSE)
