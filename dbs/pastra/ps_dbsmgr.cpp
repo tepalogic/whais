@@ -772,8 +772,8 @@ DBSRepairDatabase (const char* const            name,
     {
       --tablesCount, ++actualCount;
 
-      fixCallback (INFORMATION,
-                   "Checking database table '%s' ...",
+      fixCallback (STEP_INFO,
+                   " * Checking database table '%s' ...\n",
                    tableName);
       try
       {

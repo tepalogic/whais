@@ -85,6 +85,13 @@ repair_callback (const FIX_ERROR_CALLBACK_TYPE type,
 
   switch (type)
     {
+  case STEP_INFO:
+    cout << std::endl;
+    if (format == NULL)
+      return true;
+
+    break;
+
   case INFORMATION:
     cout << "CHK INF: ";
     break;

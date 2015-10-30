@@ -323,7 +323,6 @@ FileContainer::Read (uint64_t from, uint64_t size, uint8_t* buffer)
 void
 FileContainer::Colapse (uint64_t from, uint64_t to)
 {
-  const uint_t   bufferSize    = 4096;        //4KB
   const uint64_t intervalSize  = to - from;
   const uint64_t containerSize = Size ();
 
@@ -340,17 +339,16 @@ FileContainer::Colapse (uint64_t from, uint64_t to)
   else if (intervalSize == 0)
     return;
 
-  auto_ptr<uint8_t> buffer (new uint8_t[bufferSize]);
-
   while (to < containerSize)
     {
-      uint64_t stepSize = bufferSize;
+      uint8_t buffer[1024];
+      uint64_t stepSize = sizeof buffer;
 
       if (stepSize + to > containerSize)
         stepSize = containerSize - to;
 
-      Read (to, stepSize, buffer.get ());
-      Write (from, stepSize, buffer.get ());
+      Read (to, stepSize, buffer);
+      Write (from, stepSize, buffer);
 
       to += stepSize, from += stepSize;
     }

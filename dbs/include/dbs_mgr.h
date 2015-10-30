@@ -101,7 +101,8 @@ struct DBSSettings
 
 
 enum FIX_ERROR_CALLBACK_TYPE {
-  INFORMATION                   = 1,
+  STEP_INFO  = 1,
+  INFORMATION,
   FIX_INFO,
   FIX_QUESTION,
   CONFIRMATION_QUESTION,

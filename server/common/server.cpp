@@ -67,21 +67,15 @@ public:
 
     for (uint_t index = 0; index < mUsersPool.Size (); ++index)
       {
-        while (mUsersPool[index].mClientSocket != NULL)
-          wh_yield ();
+        if ( ! mUsersPool[index].mEndConnection)
+          continue;
 
-        mUsersPool[index].mClientSocket = &socket;
+        mUsersPool[index].mSocket        = socket;
+        mUsersPool[index].mEndConnection = false;
+        mUsersPool[index].mLastReqTick   = 0;
         if (mUsersPool[index].mThread.Run (task, &mUsersPool[index]))
-          {
-            while (mUsersPool[index].mClientSocket != NULL)
-              wh_yield ();
-
-            return true;
-          }
-
-        mUsersPool[index].mClientSocket = NULL;
+          return true;
       }
-
     return false;
   }
 
@@ -108,6 +102,8 @@ public:
 
   void ReqTmoCloseTick ()
   {
+    const WTICKS msecTicks = wh_msec_ticks ();
+
     for (uint_t c = 0; c < mUsersPool.Size (); ++c)
       {
         if ((mUsersPool[c].mEndConnection) || (mUsersPool[c].mLastReqTick == 0))
@@ -115,7 +111,7 @@ public:
 
         if (mUsersPool[c].mDesc == NULL)
           {
-            if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
+            if ((msecTicks - mUsersPool[c].mLastReqTick) <
                 _SC (uint_t, GetAdminSettings ().mAuthTMO))
               {
                 continue ;
@@ -123,10 +119,10 @@ public:
 
             mUsersPool[c].mSocket.Close ();
             sMainLog->Log (LT_WARNING,
-                           "Terminated authentication as it took too long...");
+                           "Authentication terminated as it took too long...");
             continue ;
           }
-        else if ((wh_msec_ticks () - mUsersPool[c].mLastReqTick) <
+        else if ((msecTicks - mUsersPool[c].mLastReqTick) <
                  _SC (uint_t, mUsersPool[c].mDesc->mWaitReqTmo))
           {
             continue;
@@ -135,8 +131,8 @@ public:
         mUsersPool[c].mSocket.Close ();
         mUsersPool[c].mDesc->mLogger->Log (
                     LT_WARNING,
-                    "Terminated connection due to a long wait for a request..."
-                                           );
+                    "Connection dropped due to a long wait for a request..."
+                                          );
       }
   }
 
@@ -162,8 +158,6 @@ client_handler_routine (void* args)
   UserHandler* const client = _RC (UserHandler*, args);
 
   client->mLastReqTick   = 0;
-  client->mSocket        = *client->mClientSocket;
-  client->mClientSocket  = NULL;
   client->mEndConnection = false;
 
   assert (sDbsDescriptors != NULL);
@@ -304,7 +298,6 @@ client_handler_routine (void* args)
   }
 
   client->mSocket.Close ();
-
   client->mLastReqTick  = 0;
   client->mEndConnection = true;
 }
@@ -319,7 +312,7 @@ ticks_routine ()
   do
     {
       if ((sServerStopped) || (sListenersMaxFails <= 0))
-        return ;
+        break ;
 
       wh_sleep (SLEEP_TICK_RESOLUTION);
       syncElapsedTicks    += SLEEP_TICK_RESOLUTION;
@@ -335,7 +328,7 @@ ticks_routine ()
            ++i)
         {
           if (sServerStopped)
-            return ;
+            break ;
 
           const uint64_t dbsLstFlush = (*sDbsDescriptors)[i].mLastFlushTick;
           const int      dbsSyncTmo  = (*sDbsDescriptors)[i].mSyncInterval;
@@ -348,7 +341,7 @@ ticks_routine ()
           for (TABLE_INDEX t = 0; t < tablesCount; ++t)
             {
               if (sServerStopped)
-                return ;
+                break ;
 
               hnd.SyncTableContent (t);
             }
@@ -361,16 +354,16 @@ ticks_routine ()
           (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks ();
         }
 
+        if ((sServerStopped) || (sListenersMaxFails <= 0))
+          break ;
+
         if (syncElapsedTicks >= syncWakeup)
           syncElapsedTicks = 0;
 
-        if ((sServerStopped) || (sListenersMaxFails <= 0))
-          return ;
-
         for (uint_t i = 0;
-            (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
-                && (i < sListeners->Size ());
-            ++i)
+             (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
+                 && (i < sListeners->Size ());
+             ++i)
           {
             (*sListeners)[i].ReqTmoCloseTick ();
           }
@@ -379,6 +372,12 @@ ticks_routine ()
           reqCheckElapsedTics = 0;
     }
   while (true);
+
+  if (sListeners != NULL)
+    {
+      for (uint_t i = 0; i < sListeners->Size (); ++i)
+        (*sListeners)[i].Close ();
+    }
 }
 
 void
@@ -530,11 +529,12 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   ticks_routine ();
   log.Log (LT_DEBUG, "Ticks routine has stopped.");
 
-  for (uint_t index = 0; index < listeners.Size (); ++index)
-    listeners[index].mListenThread.WaitToEnd (false);
-
   LockRAII<Lock> holder (sClosingLock);
   sListeners = NULL;
+  holder.Release ();
+
+  for (uint_t index = 0; index < listeners.Size (); ++index)
+    listeners[index].mListenThread.WaitToEnd (false);
 
   log.Log (LT_DEBUG, "Server stopped!");
 }
@@ -545,21 +545,20 @@ StopServer ()
 {
   LockRAII<Lock> holder (sClosingLock);
 
-  if ((sListeners == NULL)  || (sMainLog == NULL))
-    return; //Ignore! The server probably did not even start.
+  if ((sListeners == NULL)
+      || sServerStopped)
+    {
+      return ;
+    }
 
-  sMainLog->Log (LT_INFO, "Server asked to shutdown.");
+  sMainLog->Log (LT_INFO,
+                 "Server asked to shutdown. Waiting for the next tick...");
+
   sAcceptUsersConnections = false;
   sServerStopped          = true;
 
   for (size_t i = 0; i < sDbsDescriptors->size (); i++)
     (*sDbsDescriptors)[i].mSession->NotifyEvent (ISession::SERVER_STOPED, NULL);
-
-  for (uint_t i = 0; i < sListeners->Size (); ++i)
-    (*sListeners)[i].Close ();
-
-  sClosingLock.Release ();
-  sClosingLock.Acquire (); //For Windows! Wait until is closed!
 }
 
 #ifdef ENABLE_MEMORY_TRACE
