@@ -99,7 +99,7 @@ print_err_no_include (vector<SourceCodeMark>&   codeMarks,
   if (inclusionPaths.size () > 1)
     {
       //Ignore the first entry as is always the current directory;
-      cerr << "\tI looked for it in:\n";
+      cerr << "\tI looked for it in current directory and:\n";
 
       for (uint_t i = 1; i < inclusionPaths.size (); ++i)
         cerr << "\t\t"  << inclusionPaths[i].c_str () << endl;
