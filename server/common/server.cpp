@@ -228,7 +228,7 @@ client_handler_routine (void* args)
         logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
-      logEntry << e.File () << ':' << e.Line () << ").\n";
+      logEntry << e.File () << ':' << e.Line () << ").";
 
       sMainLog->Log (LT_ERROR, logEntry.str ());
   }
@@ -253,7 +253,7 @@ client_handler_routine (void* args)
         logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
-      logEntry << e.File () << ':' << e.Line () << ").\n";
+      logEntry << e.File () << ':' << e.Line () << ").";
 
       sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
@@ -271,7 +271,7 @@ client_handler_routine (void* args)
         logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
-      logEntry << e.File () << ':' << e.Line () << ").\n";
+      logEntry << e.File () << ':' << e.Line () << ").";
 
       client->mDesc->mLogger->Log (LT_ERROR, logEntry.str ());
   }
@@ -285,7 +285,7 @@ client_handler_routine (void* args)
   {
       ostringstream logEntry;
 
-      logEntry << "General system failure: " << e.what () << endl;
+      logEntry << "General system failure: " << e.what ();
 
       sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
@@ -373,6 +373,8 @@ ticks_routine ()
     }
   while (true);
 
+  LockRAII<Lock> holder (sClosingLock);
+
   if (sListeners != NULL)
     {
       for (uint_t i = 0; i < sListeners->Size (); ++i)
@@ -398,7 +400,7 @@ listener_routine (void* args)
         logEntry << ((listener->mInterface == NULL) ?
                        "*" :
                        listener->mInterface);
-        logEntry << '@' << listener->mPort << ".\n";
+        logEntry << '@' << listener->mPort << ".";
 
         sMainLog->Log (LT_INFO, logEntry.str ());
       }
@@ -439,7 +441,7 @@ listener_routine (void* args)
                   logEntry << "Message:\n" << e.Message () << endl;
 
                 logEntry <<"Extra: " << e.Code () << " (";
-                logEntry << e.File () << ':' << e.Line () << ").\n";
+                logEntry << e.File () << ':' << e.Line () << ").";
 
                 sMainLog->Log (LT_ERROR, logEntry.str ());
               }
@@ -461,7 +463,7 @@ listener_routine (void* args)
         logEntry << "Message:\n" << e.Message () << endl;
 
       logEntry <<"Extra: " << e.Code () << " (";
-      logEntry << e.File () << ':' << e.Line () << ").\n";
+      logEntry << e.File () << ':' << e.Line () << ").";
 
       sMainLog->Log (LT_ERROR, logEntry.str ());
   }
@@ -474,7 +476,7 @@ listener_routine (void* args)
   {
       ostringstream logEntry;
 
-      logEntry << "General system failure: " << e.what () << endl;
+      logEntry << "General system failure: " << e.what ();
       sMainLog->Log (LT_CRITICAL, logEntry.str ());
 
       StopServer ();
@@ -526,6 +528,7 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
         }
     }
 
+  log.Log (LT_INFO, "Server has started!");
   ticks_routine ();
   log.Log (LT_DEBUG, "Ticks routine has stopped.");
 
@@ -536,20 +539,22 @@ StartServer (FileLogger& log, vector<DBSDescriptors>& databases)
   for (uint_t index = 0; index < listeners.Size (); ++index)
     listeners[index].mListenThread.WaitToEnd (false);
 
-  log.Log (LT_DEBUG, "Server stopped!");
+  listeners.Reset (0);
+
+  log.Log (LT_INFO, "Server stopped!");
 }
 
 
 void
 StopServer ()
 {
-  LockRAII<Lock> holder (sClosingLock);
-
   if ((sListeners == NULL)
       || sServerStopped)
     {
       return ;
     }
+
+  LockRAII<Lock> holder (sClosingLock);
 
   sMainLog->Log (LT_INFO,
                  "Server asked to shutdown. Waiting for the next tick...");

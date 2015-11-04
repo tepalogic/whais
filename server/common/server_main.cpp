@@ -49,8 +49,7 @@ clean_frameworks (FileLogger& log)
             }
 
           ostringstream logEntry;
-          logEntry << "Closing session '";
-          logEntry << dbsIterator->mDbsName << "'.\n";
+          logEntry << "Closing session '" << dbsIterator->mDbsName << "'.";
           log.Log (LT_INFO, logEntry.str ());
         }
     }
@@ -79,7 +78,7 @@ clean_frameworks (FileLogger& log)
 
           ostringstream logEntry;
           logEntry << "Cleaned resources of database '";
-          logEntry << dbsIterator->mDbsName << "'.\n";
+          logEntry << dbsIterator->mDbsName << "'.";
           log.Log (LT_INFO, logEntry.str ());
         }
     }
