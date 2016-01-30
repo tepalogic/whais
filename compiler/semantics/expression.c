@@ -2745,10 +2745,16 @@ translate_call_exp (struct ParserState* const   parser,
                    stmt_get_param_count (proc),
                    argCount);
 
-      return sgResultUnk;
+      for (; argCount < stmt_get_param_count (proc); ++argCount)
+        {
+          if (encode_opcode( instrs, W_LDNULL) == NULL)
+            {
+              log_message (parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+              return sgResultUnk;
+            }
+        }
     }
-  else
-    free_sem_value (exp->firstTree);
+  free_sem_value (exp->firstTree);
 
   if ((encode_opcode( instrs, W_CALL) == NULL)
       || (wh_ostream_wint32 (instrs, stmt_get_import_id (proc)) == NULL))

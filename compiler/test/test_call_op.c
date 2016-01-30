@@ -66,7 +66,7 @@ char proc_decl_buffer[] =
   "          v8 INT32, "
   "          v9 INT64, "
   "          v10 REAL, "
-  "          v11 RICHREAL,         "
+  "          v11 RICHREAL, "
   "          v12 TEXT, "
   "          v13 UINT8, "
   "          v14 UINT16, "
@@ -132,7 +132,45 @@ char proc_decl_buffer[] =
   "DO "
   "VAR v1 TABLE (v1 DATE, v2 INT8, v3 INT8 ARRAY); "
   "VAR v2 TABLE (v1 HIRESTIME, v2 TEXT, v3 BOOL ARRAY); "
-  "RETURN ProcId3(v1, v2); " "ENDPROC " "\n" "";
+  "RETURN ProcId3(v1, v2); " "ENDPROC " "\n"
+  "\n"
+  "\n"
+  "PROCEDURE ProcLessTst0 ()"
+  "RETURN BOOL "
+  "DO "
+  "RETURN ProcId1 (); "
+  "ENDPROC "
+  "\n"
+  "\n"
+  "PROCEDURE ProcLessTst1 ()"
+  "RETURN BOOL "
+  "DO "
+  "VAR v1 BOOL; "
+  "RETURN ProcId1 (v1); "
+  "ENDPROC "
+  "\n"
+  "\n"
+  "PROCEDURE ProcLessTst15 ()"
+  "RETURN BOOL "
+  "DO "
+  "VAR v1 BOOL; "
+  "VAR v2 CHAR; "
+  "VAR v3 DATE; "
+  "VAR v4 DATETIME; "
+  "VAR v5 HIRESTIME; "
+  "VAR v6 INT8; "
+  "VAR v7 INT8; "
+  "VAR v8 INT8; "
+  "VAR v9 INT8; "
+  "VAR v10 REAL; "
+  "VAR v11 RICHREAL; "
+  "VAR v12 TEXT; "
+  "VAR v13 UINT64; "
+  "VAR v14 UINT64; "
+  "VAR v15 UINT64; "
+  "RETURN ProcId1 (v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15); "
+  "ENDPROC ";
+
 
 static bool_t
 check_procedure (struct ParserState *state,
@@ -183,6 +221,51 @@ check_procedure (struct ParserState *state,
   return TRUE;
 }
 
+
+static bool_t
+check_procedure_less_params (struct ParserState *state,
+                             char * proc_name,
+                             uint_t args_provided)
+{
+  struct Statement *stmt = find_proc_decl (state, proc_name,
+                                           strlen (proc_name), FALSE);
+  struct Statement *called_stmt = find_proc_decl (state, "ProcId1",
+                                                  strlen ("ProcId1"), FALSE);
+  uint8_t *code = wh_ostream_data (stmt_query_instrs( stmt));
+  uint32_t linkid = stmt_get_import_id (called_stmt);
+  uint_t count;
+  uint_t offset = 0;
+
+  for (count = 0; count < 16; ++count)
+    {
+      if (count < args_provided)
+        {
+          if ((decode_opcode( code + offset) != W_LDLO8)
+              || (code[offset + 1] != count))
+            {
+              return FALSE;
+            }
+          offset += 2;
+        }
+      else
+        {
+          if (decode_opcode( code + offset) != W_LDNULL)
+            return FALSE;
+
+          offset += 1;
+        }
+    }
+
+  if (code[offset++] != W_CALL)
+    return FALSE;
+
+  if (load_le_int32 (code + offset) != linkid)
+    return FALSE;
+
+  return TRUE;
+}
+
+
 static bool_t
 check_procedure_calls (struct ParserState *state)
 {
@@ -193,10 +276,13 @@ check_procedure_calls (struct ParserState *state)
   result &= check_procedure (state, "ProcIdTst2", "ProcId2", 2);
   result &= check_procedure (state, "ProcIdTst3", "ProcId3", 2);
 
+  result &= check_procedure_less_params (state, "ProcLessTst0", 0);
+  result &= check_procedure_less_params (state, "ProcLessTst1", 1);
+  result &= check_procedure_less_params (state, "ProcLessTst15", 15);
 
   return result;
-
 }
+
 
 int
 main ()

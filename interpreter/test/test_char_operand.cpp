@@ -747,7 +747,7 @@ test_text_char ()
     {
       DChar c;
 
-      if (iterator.Operand ().IteratorOffset () != i)
+      if (iterator.Operand ().IteratorOffset () != _SC (uint_t, i))
         return false;
 
       iterator.Operand ().GetValue (c);

@@ -164,7 +164,7 @@ static const struct MsgCodeEntry messages[] = {
   {MSG_NO_PROC, MSG_ERROR_EVENT, "The procedure '%s' is not declared."},
   {MSG_PROC_MORE_ARGS, MSG_ERROR_EVENT,
    "The procedure '%s' must not take more than %d parameters."},
-  {MSG_PROC_LESS_ARGS, MSG_ERROR_EVENT,
+  {MSG_PROC_LESS_ARGS, MSG_WARNING_EVENT,
    "The procedure '%s' requires %d parameters. Only %d have been provided."},
   {MSG_CONTAINER_NA, MSG_ERROR_EVENT,
    "A table could not be initialized from a row/record nor vice versa."},

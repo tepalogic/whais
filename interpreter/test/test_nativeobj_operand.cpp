@@ -33,7 +33,7 @@ public:
         || (mChunkMemory != NULL))
       {
         assert (FALSE);
-        mRegistered /= (mRegistered * 0);
+        *(volatile char*)0 = 0; //Hopefully will trigger a crash!
       }
   }
 
@@ -63,7 +63,6 @@ public:
 private:
   int     mRegistered;
   int*    mChunkMemory;
-
 };
 
 

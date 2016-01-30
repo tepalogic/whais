@@ -614,18 +614,33 @@ test_for_error (const char *test_buffer, uint_t err_expected, uint_t err_type)
                             strlen (test_buffer),
                             &my_postman, (WH_MESSENGER_CTXT) test_buffer);
 
-  if (handler != NULL)
+  if (err_type == MSG_WARNING_EVENT)
     {
-      test_result = FALSE;
-      wh_compiler_discard (handler);
-    }
-  else
-    {
-      if ((last_msg_code != err_expected) || (last_msg_type != err_type))
+      if (handler == NULL)
         {
           test_result = FALSE;
+          printf ("The expected error code is actually a warning message. "
+                  "The buffer should have been compiled anyway, but it "
+                  "failed\n");
+          return test_result;
         }
+      else
+        wh_compiler_discard (handler);
+
+      return test_result ;
     }
+  else if (handler != NULL)
+    {
+      printf ("Looks like the buffer was compiled succefully, though an error "
+              "was expected.\n");
+      test_result = FALSE;
+      wh_compiler_discard (handler);
+
+      return test_result ;
+    }
+
+  if ((last_msg_code != err_expected) || (last_msg_type != err_type))
+    test_result = FALSE;
 
   if (test_get_mem_used () != 0)
     {
@@ -652,7 +667,7 @@ main ()
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_3,
                                                      MSG_PROC_LESS_ARGS,
-                                                     MSG_ERROR_EVENT);
+                                                     MSG_WARNING_EVENT);
   test_result =
     (test_result == FALSE) ? FALSE : test_for_error (test_prog_4,
                                                      MSG_PROC_ARG_NA,
