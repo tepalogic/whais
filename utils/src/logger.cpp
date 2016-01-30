@@ -146,7 +146,7 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
   mOutStream.fill (fill);
   mOutStream.width (width);
 
-  return 1 + 2 + 1 + 2 + 1 + 2 + 1 + 6 + 2;
+  return 3 + 2 + 1 + 2 + 1 + 2 + 1 + 6 + 2;
 }
 
 

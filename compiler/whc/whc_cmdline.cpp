@@ -347,7 +347,7 @@ CmdLineParser::DisplayUsage () const
   cout <<
     "Usage: whc [options] input_file\n"
     "Options:\n"
-    "-D 'tag=text'   Define a replace tag (e.g -D 'user_name=The Coder).\n"
+    "-D 'tag=text'   Define a replace tag (e.g -D 'user_name=The Coder' ).\n"
     "-h, --help      Display this help.\n"
     "-I 'dir1;di2'   Add a list of directories paths to the list of\n"
     "                directories used to search for included files.\n"

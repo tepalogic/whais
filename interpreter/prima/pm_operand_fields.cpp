@@ -320,7 +320,8 @@ FieldOperand::StartIterate (const bool reverse, StackValue& outStartItem)
   if (IsNull ())
     return false;
 
-  assert (mTableRef->GetTable ().AllocatedRows() > 0);
+  if (mTableRef->GetTable ().AllocatedRows() <= 0)
+    return false;
 
   outStartItem = GetValueAt (reverse
                              ? mTableRef->GetTable ().AllocatedRows() - 1

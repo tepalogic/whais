@@ -125,7 +125,7 @@ whs_create_server (const char* const       localAddress,
 
   hints.ai_family   = AF_UNSPEC;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags    = AI_ADDRCONFIG | AI_NUMERICHOST | AI_PASSIVE;
+  hints.ai_flags    = AI_NUMERICHOST | AI_PASSIVE;
 
   status = getaddrinfo (localAddress, localPort, &hints, &pResults);
   if (status != 0)
