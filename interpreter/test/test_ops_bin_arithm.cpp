@@ -123,12 +123,11 @@ test_op_addXX (Session& session,
   DBS_T result;
   stack[0].Operand ().GetValue (result);
 
-  if (first.IsNull ())
-    return result == second;
-  else if (second.IsNull ())
-    return result == first;
+  if (first.IsNull () ||  second.IsNull ())
+    return result.IsNull ();
 
   return result == DBS_T (first.mValue + second.mValue);
+
 }
 
 static bool
@@ -209,10 +208,8 @@ test_op_subXX (Session& session,
   DBS_T result;
   stack[0].Operand ().GetValue (result);
 
-  if (first.IsNull ())
-    return result == second;
-  else if (second.IsNull ())
-    return result == first;
+  if (first.IsNull () ||  second.IsNull ())
+    return result.IsNull ();
 
   return result == DBS_T (first.mValue - second.mValue);
 }
@@ -253,10 +250,8 @@ test_op_mulXX (Session& session,
   DBS_T result;
   stack[0].Operand ().GetValue (result);
 
-  if (first.IsNull ())
-    return result == second;
-  else if (second.IsNull ())
-    return result == first;
+  if (first.IsNull () ||  second.IsNull ())
+    return result.IsNull ();
 
   return result == DBS_T (first.mValue * second.mValue);
 }
@@ -296,10 +291,8 @@ test_op_divXX (Session& session,
   DBS_T result;
   stack[0].Operand ().GetValue (result);
 
-  if (first.IsNull ())
-    return result == second;
-  else if (second.IsNull ())
-    return result == first;
+  if (first.IsNull () ||  second.IsNull ())
+    return result.IsNull ();
 
   return result == DBS_T (first.mValue / second.mValue);
 }
@@ -339,10 +332,8 @@ test_op_mod (Session& session,
   DUInt64 result;
   stack[0].Operand ().GetValue (result);
 
-  if (first.IsNull ())
-    return result == second;
-  else if (second.IsNull ())
-    return result == first;
+  if (first.IsNull () ||  second.IsNull ())
+    return result.IsNull ();
 
   return result == DUInt64 (first.mValue % second.mValue);
 }

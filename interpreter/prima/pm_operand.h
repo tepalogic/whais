@@ -126,7 +126,6 @@ number_convert (const T_SRC& from, T_DEST& to)
 }
 
 
-
 class TableOperand;
 class FieldOperand;
 class NativeObjectOperand;
@@ -177,12 +176,15 @@ public:
   virtual void SelfSub (const DRichReal& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
   virtual void SelfMul (const DRichReal& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
   virtual void SelfAnd (const DBool& value);
@@ -429,10 +431,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -480,10 +485,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
   virtual void SelfXor (const DInt64& value);
@@ -529,10 +537,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -580,10 +591,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -631,10 +645,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -682,10 +699,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -733,10 +753,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -784,10 +807,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1180,10 +1206,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1227,10 +1256,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1274,10 +1306,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1321,10 +1356,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1368,10 +1406,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1414,10 +1455,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1461,10 +1505,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1508,10 +1555,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1930,10 +1980,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -1979,10 +2032,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2028,10 +2084,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2077,10 +2136,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2126,10 +2188,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2175,10 +2240,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2224,10 +2292,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2274,10 +2345,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2675,10 +2749,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2723,10 +2800,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
   virtual void SelfXor (const DInt64& value);
@@ -2769,10 +2849,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2817,10 +2900,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2864,10 +2950,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2912,10 +3001,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -2960,10 +3052,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -3008,10 +3103,13 @@ public:
   virtual void SelfSub (const DInt64& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
 
@@ -3183,7 +3281,7 @@ public:
   {
     LockRAII<Lock> dummy (mSync);
 
-    Operand ().SelfAdd (value);
+    Operand ().SelfMul (value);
   }
 
   template <class DBS_T>
@@ -3191,7 +3289,7 @@ public:
   {
     LockRAII<Lock> dummy (mSync);
 
-    Operand ().SelfAdd (value);
+    Operand ().SelfDiv (value);
   }
 
   template <class DBS_T>
@@ -3199,7 +3297,7 @@ public:
   {
     LockRAII<Lock> dummy (mSync);
 
-    Operand ().SelfAdd (value);
+    Operand ().SelfMod (value);
   }
 
   template <class DBS_T>
@@ -3393,12 +3491,15 @@ public:
   virtual void SelfSub (const DRichReal& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
   virtual void SelfMul (const DRichReal& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
   virtual void SelfAnd (const DBool& value);
@@ -3486,12 +3587,15 @@ public:
   virtual void SelfSub (const DRichReal& value);
 
   virtual void SelfMul (const DInt64& value);
+  virtual void SelfMul (const DUInt64& value);
   virtual void SelfMul (const DRichReal& value);
 
   virtual void SelfDiv (const DInt64& value);
+  virtual void SelfDiv (const DUInt64& value);
   virtual void SelfDiv (const DRichReal& value);
 
   virtual void SelfMod (const DInt64& value);
+  virtual void SelfMod (const DUInt64& value);
 
   virtual void SelfAnd (const DInt64& value);
   virtual void SelfAnd (const DBool& value);

@@ -622,24 +622,27 @@ op_func_addXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue + secondOp.mValue);
+  const DBS_T result (firstOp.mValue + secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -652,8 +655,7 @@ op_func_addt (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DText firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
@@ -685,24 +687,27 @@ op_func_andXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue & secondOp.mValue);
+  DBS_T result (firstOp.mValue & secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -715,27 +720,30 @@ op_func_divXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   if (secondOp == DBS_T (0))
     throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue / secondOp.mValue);
+  DBS_T result (firstOp.mValue / secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -748,8 +756,7 @@ op_func_eqXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
@@ -770,14 +777,25 @@ op_func_geXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBool result ((firstOp < secondOp) == false);
 
@@ -792,14 +810,26 @@ op_func_gtXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
+
 
   DBool result (((firstOp < secondOp) || (firstOp == secondOp)) == false);
 
@@ -814,14 +844,25 @@ op_func_leXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBool result ((firstOp < secondOp) || (firstOp == secondOp));
 
@@ -836,14 +877,25 @@ op_func_ltXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBool());
+      return ;
+    }
 
   DBool result (firstOp < secondOp);
 
@@ -858,31 +910,72 @@ op_func_mod (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DInt64 firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DInt64());
+      return ;
+    }
 
   DInt64 secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DInt64());
+      return ;
+    }
 
   if (secondOp == DInt64 (0))
     throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
 
-  DInt64 result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DInt64 (firstOp.mValue % secondOp.mValue);
+  DInt64 result(firstOp.mValue % secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
 }
+
+
+static void
+op_func_modu (ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack     = call.GetStack ();
+  const size_t  stackSize = stack.Size ();
+
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+          stackSize);
+
+  DUInt64 firstOp;
+  stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DUInt64());
+      return ;
+    }
+
+  DUInt64 secondOp;
+  stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DUInt64());
+      return ;
+    };
+
+  if (secondOp == DUInt64 (0))
+    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
+
+  DUInt64 result(firstOp.mValue % secondOp.mValue);
+
+  stack.Pop (2);
+  stack.Push (result);
+}
+
 
 
 template <class DBS_T> static void
@@ -896,19 +989,23 @@ op_func_mulXX (ProcedureCall& call, int64_t& offset)
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue * secondOp.mValue);
+  DBS_T result(firstOp.mValue * secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -985,24 +1082,27 @@ op_func_orXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue | secondOp.mValue);
+  DBS_T result (firstOp.mValue | secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -1015,24 +1115,27 @@ op_func_subXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue - secondOp.mValue);
+  const DBS_T result (firstOp.mValue - secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -1045,24 +1148,27 @@ op_func_xorXX (ProcedureCall& call, int64_t& offset)
   SessionStack& stack     = call.GetStack ();
   const size_t  stackSize = stack.Size ();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
-          stackSize);
+  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
   stack[stackSize - 2].Operand ().GetValue (firstOp);
+  if (firstOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
   DBS_T secondOp;
   stack[stackSize - 1].Operand ().GetValue (secondOp);
+  if (secondOp.IsNull ())
+    {
+      stack.Pop (2);
+      stack.Push (DBS_T());
+      return ;
+    }
 
-  DBS_T result;
-  if (firstOp.IsNull ())
-    result = secondOp;
-
-  else if (secondOp.IsNull ())
-    result = firstOp;
-
-  else
-    result = DBS_T (firstOp.mValue ^ secondOp.mValue);
+  DBS_T result (firstOp.mValue ^ secondOp.mValue);
 
   stack.Pop (2);
   stack.Push (result);
@@ -1584,6 +1690,7 @@ static OP_FUNC operations[] = {
                                 op_func_andXX<DBool>,
 
                                 op_func_divXX<DInt64>,
+                                op_func_divXX<DUInt64>,
                                 op_func_divXX<DRichReal>,
 
                                 op_func_eqXX<DInt64>,
@@ -1596,6 +1703,7 @@ static OP_FUNC operations[] = {
                                 op_func_eqXX<DText>,
 
                                 op_func_geXX<DInt64>,
+                                op_func_geXX<DUInt64>,
                                 op_func_geXX<DChar>,
                                 op_func_geXX<DDate>,
                                 op_func_geXX<DDateTime>,
@@ -1603,6 +1711,7 @@ static OP_FUNC operations[] = {
                                 op_func_geXX<DRichReal>,
 
                                 op_func_gtXX<DInt64>,
+                                op_func_gtXX<DUInt64>,
                                 op_func_gtXX<DChar>,
                                 op_func_gtXX<DDate>,
                                 op_func_gtXX<DDateTime>,
@@ -1610,6 +1719,7 @@ static OP_FUNC operations[] = {
                                 op_func_gtXX<DRichReal>,
 
                                 op_func_leXX<DInt64>,
+                                op_func_leXX<DUInt64>,
                                 op_func_leXX<DChar>,
                                 op_func_leXX<DDate>,
                                 op_func_leXX<DDateTime>,
@@ -1617,6 +1727,7 @@ static OP_FUNC operations[] = {
                                 op_func_leXX<DRichReal>,
 
                                 op_func_ltXX<DInt64>,
+                                op_func_ltXX<DUInt64>,
                                 op_func_ltXX<DChar>,
                                 op_func_ltXX<DDate>,
                                 op_func_ltXX<DDateTime>,
@@ -1624,8 +1735,10 @@ static OP_FUNC operations[] = {
                                 op_func_ltXX<DRichReal>,
 
                                 op_func_mod,
+                                op_func_modu,
 
                                 op_func_mulXX<DInt64>,
+                                op_func_mulXX<DUInt64>,
                                 op_func_mulXX<DRichReal>,
 
                                 op_func_neXX<DInt64>,
@@ -1673,12 +1786,15 @@ static OP_FUNC operations[] = {
                                 op_func_ssub<DRichReal>,
 
                                 op_func_smul<DInt64>,
+                                op_func_smul<DUInt64>,
                                 op_func_smul<DRichReal>,
 
                                 op_func_sdiv<DInt64>,
+                                op_func_sdiv<DUInt64>,
                                 op_func_sdiv<DRichReal>,
 
                                 op_func_smod<DInt64>,
+                                op_func_smod<DUInt64>,
 
                                 op_func_sand<DInt64>,
                                 op_func_sand<DBool>,

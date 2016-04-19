@@ -271,6 +271,12 @@ BaseOperand::SelfMul (const DInt64& value)
 
 
 void
+BaseOperand::SelfMul (const DUInt64& value)
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
+
+void
 BaseOperand::SelfMul (const DRichReal& value)
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
@@ -279,6 +285,13 @@ BaseOperand::SelfMul (const DRichReal& value)
 
 void
 BaseOperand::SelfDiv (const DInt64& value)
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
+
+
+void
+BaseOperand::SelfDiv (const DUInt64& value)
 {
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
@@ -297,6 +310,11 @@ BaseOperand::SelfMod (const DInt64& value)
   throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
 }
 
+void
+BaseOperand::SelfMod (const DUInt64& value)
+{
+  throw InterException (_EXTRA (InterException::INVALID_OP_REQ));
+}
 
 void
 BaseOperand::SelfAnd (const DInt64& value)
@@ -1051,6 +1069,11 @@ UInt8Operand::SelfMul (const DInt64& value)
   mValue = internal_mul (mValue, value);
 }
 
+void
+UInt8Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
 
 void
 UInt8Operand::SelfDiv (const DInt64& value)
@@ -1058,6 +1081,11 @@ UInt8Operand::SelfDiv (const DInt64& value)
   mValue = internal_div (mValue, value);
 }
 
+void
+UInt8Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
 
 void
 UInt8Operand::SelfMod (const DInt64& value)
@@ -1065,13 +1093,17 @@ UInt8Operand::SelfMod (const DInt64& value)
   mValue = internal_mod (mValue, value);
 }
 
+void
+UInt8Operand::SelfMod (const DUInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
 
 void
 UInt8Operand::SelfAnd (const DInt64& value)
 {
   mValue = internal_and (mValue, value);
 }
-
 
 void
 UInt8Operand::SelfXor (const DInt64& value)
@@ -1223,6 +1255,11 @@ UInt16Operand::SelfMul (const DInt64& value)
   mValue = internal_mul (mValue, value);
 }
 
+void
+UInt16Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
 
 void
 UInt16Operand::SelfDiv (const DInt64& value)
@@ -1230,6 +1267,11 @@ UInt16Operand::SelfDiv (const DInt64& value)
   mValue = internal_div (mValue, value);
 }
 
+void
+UInt16Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
 
 void
 UInt16Operand::SelfMod (const DInt64& value)
@@ -1237,6 +1279,11 @@ UInt16Operand::SelfMod (const DInt64& value)
   mValue = internal_mod (mValue, value);
 }
 
+void
+UInt16Operand::SelfMod (const DUInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
 
 void
 UInt16Operand::SelfAnd (const DInt64& value)
@@ -1397,6 +1444,11 @@ UInt32Operand::SelfMul (const DInt64& value)
   mValue = internal_mul (mValue, value);
 }
 
+void
+UInt32Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
 
 void
 UInt32Operand::SelfDiv (const DInt64& value)
@@ -1404,6 +1456,11 @@ UInt32Operand::SelfDiv (const DInt64& value)
   mValue = internal_div (mValue, value);
 }
 
+void
+UInt32Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
 
 void
 UInt32Operand::SelfMod (const DInt64& value)
@@ -1411,6 +1468,11 @@ UInt32Operand::SelfMod (const DInt64& value)
   mValue = internal_mod (mValue, value);
 }
 
+void
+UInt32Operand::SelfMod (const DUInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
 
 void
 UInt32Operand::SelfAnd (const DInt64& value)
@@ -1560,13 +1622,17 @@ UInt64Operand::SelfSub (const DInt64& value)
   mValue = internal_sub (mValue, value);
 }
 
-
 void
 UInt64Operand::SelfMul (const DInt64& value)
 {
   mValue = internal_mul (mValue, value);
 }
 
+void
+UInt64Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
 
 void
 UInt64Operand::SelfDiv (const DInt64& value)
@@ -1574,9 +1640,20 @@ UInt64Operand::SelfDiv (const DInt64& value)
   mValue = internal_div (mValue, value);
 }
 
+void
+UInt64Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
 
 void
 UInt64Operand::SelfMod (const DInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
+
+void
+UInt64Operand::SelfMod (const DUInt64& value)
 {
   mValue = internal_mod (mValue, value);
 }
@@ -1587,7 +1664,6 @@ UInt64Operand::SelfAnd (const DInt64& value)
 {
   mValue = internal_and (mValue, value);
 }
-
 
 void
 UInt64Operand::SelfXor (const DInt64& value)
@@ -1737,6 +1813,12 @@ Int8Operand::SelfMul (const DInt64& value)
   mValue = internal_mul (mValue, value);
 }
 
+void
+Int8Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
+
 
 void
 Int8Operand::SelfDiv (const DInt64& value)
@@ -1744,6 +1826,11 @@ Int8Operand::SelfDiv (const DInt64& value)
   mValue = internal_div (mValue, value);
 }
 
+void
+Int8Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
 
 void
 Int8Operand::SelfMod (const DInt64& value)
@@ -1751,6 +1838,12 @@ Int8Operand::SelfMod (const DInt64& value)
   mValue = internal_mod (mValue, value);
 }
 
+
+void
+Int8Operand::SelfMod (const DUInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
 
 void
 Int8Operand::SelfAnd (const DInt64& value)
@@ -1909,7 +2002,21 @@ Int16Operand::SelfMul (const DInt64& value)
 
 
 void
+Int16Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
+
+
+
+void
 Int16Operand::SelfDiv (const DInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
+
+void
+Int16Operand::SelfDiv (const DUInt64& value)
 {
   mValue = internal_div (mValue, value);
 }
@@ -1917,6 +2024,13 @@ Int16Operand::SelfDiv (const DInt64& value)
 
 void
 Int16Operand::SelfMod (const DInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
+
+
+void
+Int16Operand::SelfMod (const DUInt64& value)
 {
   mValue = internal_mod (mValue, value);
 }
@@ -2080,6 +2194,13 @@ Int32Operand::SelfMul (const DInt64& value)
 
 
 void
+Int32Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
+
+
+void
 Int32Operand::SelfDiv (const DInt64& value)
 {
   mValue = internal_div (mValue, value);
@@ -2087,7 +2208,19 @@ Int32Operand::SelfDiv (const DInt64& value)
 
 
 void
+Int32Operand::SelfDiv (const DUInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
+
+void
 Int32Operand::SelfMod (const DInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
+
+void
+Int32Operand::SelfMod (const DUInt64& value)
 {
   mValue = internal_mod (mValue, value);
 }
@@ -2249,9 +2382,20 @@ Int64Operand::SelfMul (const DInt64& value)
   mValue = internal_mul (mValue, value);
 }
 
+void
+Int64Operand::SelfMul (const DUInt64& value)
+{
+  mValue = internal_mul (mValue, value);
+}
 
 void
 Int64Operand::SelfDiv (const DInt64& value)
+{
+  mValue = internal_div (mValue, value);
+}
+
+void
+Int64Operand::SelfDiv (const DUInt64& value)
 {
   mValue = internal_div (mValue, value);
 }
@@ -2263,6 +2407,11 @@ Int64Operand::SelfMod (const DInt64& value)
   mValue = internal_mod (mValue, value);
 }
 
+void
+Int64Operand::SelfMod (const DUInt64& value)
+{
+  mValue = internal_mod (mValue, value);
+}
 
 void
 Int64Operand::SelfAnd (const DInt64& value)
@@ -2921,6 +3070,12 @@ GlobalOperand::SelfMul (const DInt64& value)
 
 
 void
+GlobalOperand::SelfMul (const DUInt64& value)
+{
+  mValue.SelfMul (value);
+}
+
+void
 GlobalOperand::SelfMul (const DRichReal& value)
 {
   mValue.SelfMul (value);
@@ -2929,6 +3084,13 @@ GlobalOperand::SelfMul (const DRichReal& value)
 
 void
 GlobalOperand::SelfDiv (const DInt64& value)
+{
+  mValue.SelfDiv (value);
+}
+
+
+void
+GlobalOperand::SelfDiv (const DUInt64& value)
 {
   mValue.SelfDiv (value);
 }
@@ -2947,6 +3109,12 @@ GlobalOperand::SelfMod (const DInt64& value)
   mValue.SelfMod (value);
 }
 
+
+void
+GlobalOperand::SelfMod (const DUInt64& value)
+{
+  mValue.SelfMod (value);
+}
 
 void
 GlobalOperand::SelfAnd (const DInt64& value)
@@ -3339,6 +3507,11 @@ LocalOperand::SelfMul (const DInt64& value)
   mStack[mIndex].Operand ().SelfMul (value);
 }
 
+void
+LocalOperand::SelfMul (const DUInt64& value)
+{
+  mStack[mIndex].Operand ().SelfMul (value);
+}
 
 void
 LocalOperand::SelfMul (const DRichReal& value)
@@ -3353,6 +3526,11 @@ LocalOperand::SelfDiv (const DInt64& value)
   mStack[mIndex].Operand ().SelfDiv (value);
 }
 
+void
+LocalOperand::SelfDiv (const DUInt64& value)
+{
+  mStack[mIndex].Operand ().SelfDiv (value);
+}
 
 void
 LocalOperand::SelfDiv (const DRichReal& value)
@@ -3360,13 +3538,17 @@ LocalOperand::SelfDiv (const DRichReal& value)
   mStack[mIndex].Operand ().SelfDiv (value);
 }
 
-
 void
 LocalOperand::SelfMod (const DInt64& value)
 {
   mStack[mIndex].Operand ().SelfMod (value);
 }
 
+void
+LocalOperand::SelfMod (const DUInt64& value)
+{
+  mStack[mIndex].Operand ().SelfMod (value);
+}
 
 void
 LocalOperand::SelfAnd (const DInt64& value)

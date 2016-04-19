@@ -64,7 +64,7 @@ char proc_decl_buffer[] =
   "RETURN v1 /= v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId3 (v1 INT64, v2 UINT64) RETURN INT64 "
+  "PROCEDURE ProcId3 (v1 UINT64, v2 UINT64) RETURN INT64 "
   "DO "
   "RETURN v1 /= v2; "
   "ENDPROC\n\n"
@@ -73,7 +73,7 @@ char proc_decl_buffer[] =
   "DO "
   "RETURN v1 /= v2; "
   "ENDPROC\n\n"
-  "PROCEDURE ProcId5 (v1 RICHREAL, v2 UINT8) RETURN RICHREAL "
+  "PROCEDURE ProcId5 (v1 RICHREAL, v2 INT8) RETURN RICHREAL "
   "DO "
   "RETURN v1 /= v2; "
   "ENDPROC\n\n"
@@ -96,11 +96,11 @@ char proc_decl_buffer[] =
   "";
 
 const enum W_OPCODE _opcodes_expected [] = {
+                                              W_SDIVU,
                                               W_SDIV,
                                               W_SDIV,
-                                              W_SDIV,
-                                              W_SDIV,
-                                              W_SDIV,
+                                              W_SDIVU,
+                                              W_SDIVU,
                                               W_SDIV,
                                               W_SDIVRR,
                                               W_SDIVRR,

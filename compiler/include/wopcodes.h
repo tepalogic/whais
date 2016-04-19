@@ -91,6 +91,7 @@ enum W_OPCODE
   W_ANDB,
 
   W_DIV,
+  W_DIVU,
   W_DIVRR,
 
   W_EQ,
@@ -103,6 +104,7 @@ enum W_OPCODE
   W_EQT,
 
   W_GE,
+  W_GEU,
   W_GEC,
   W_GED,
   W_GEDT,
@@ -110,6 +112,7 @@ enum W_OPCODE
   W_GERR,
 
   W_GT,
+  W_GTU,
   W_GTC,
   W_GTD,
   W_GTDT,
@@ -117,6 +120,7 @@ enum W_OPCODE
   W_GTRR,
 
   W_LE,
+  W_LEU,
   W_LEC,
   W_LED,
   W_LEDT,
@@ -124,6 +128,7 @@ enum W_OPCODE
   W_LERR,
 
   W_LT,
+  W_LTU,
   W_LTC,
   W_LTD,
   W_LTDT,
@@ -131,8 +136,10 @@ enum W_OPCODE
   W_LTRR,
 
   W_MOD,
+  W_MODU,
 
   W_MUL,
+  W_MULU,
   W_MULRR,
 
   W_NE,
@@ -180,12 +187,15 @@ enum W_OPCODE
   W_SSUBRR,
 
   W_SMUL,
+  W_SMULU,
   W_SMULRR,
 
   W_SDIV,
+  W_SDIVU,
   W_SDIVRR,
 
   W_SMOD,
+  W_SMODU,
 
   W_SAND,
   W_SANDB,

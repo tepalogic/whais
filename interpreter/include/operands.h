@@ -100,12 +100,15 @@ public:
   virtual void SelfSub (const DRichReal& value) = 0;
 
   virtual void SelfMul (const DInt64& value) = 0;
+  virtual void SelfMul (const DUInt64& value) = 0;
   virtual void SelfMul (const DRichReal& value) = 0;
 
   virtual void SelfDiv (const DInt64& value) = 0;
+  virtual void SelfDiv (const DUInt64& value) = 0;
   virtual void SelfDiv (const DRichReal& value) = 0;
 
   virtual void SelfMod (const DInt64& value) = 0;
+  virtual void SelfMod (const DUInt64& value) = 0;
 
   virtual void SelfAnd (const DInt64& value) = 0;
   virtual void SelfAnd (const DBool& value) = 0;

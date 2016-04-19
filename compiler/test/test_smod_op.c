@@ -64,11 +64,19 @@ char proc_decl_buffer[] =
   "RETURN v1 %= v2; "
   "ENDPROC\n\n"
   ""
-  "PROCEDURE ProcId3 (v1 INT64, v2 UINT64) RETURN INT64 "
+  "PROCEDURE ProcId3 (v1 UINT16, v2 UINT32) RETURN INT64 "
   "DO "
   "RETURN v1 %= v2; "
   "ENDPROC\n\n"
   "";
+
+
+const enum W_OPCODE _opcodes_expected [] = {
+                                              W_SMODU,
+                                              W_SMOD,
+                                              W_SMOD,
+                                              W_SMODU
+                                            };
 
 static bool_t
 check_procedure (struct ParserState* state,
@@ -100,7 +108,7 @@ check_all_procs (struct ParserState *state)
   for (count = 0; count < 4; ++count)
     {
       sprintf (proc_name, "ProcId%d", count);
-      if (check_procedure( state, proc_name, W_SMOD) == FALSE)
+      if (check_procedure( state, proc_name, _opcodes_expected[count]) == FALSE)
         {
           return FALSE;
         }

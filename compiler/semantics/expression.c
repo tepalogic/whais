@@ -482,7 +482,6 @@ translate_not_exp (struct ParserState* const         parser,
                    parser->bufferPos,
                    MSG_NOT_NA,
                    type_to_text (opType->type));
-
       return sgResultUnk;
     }
 
@@ -559,13 +558,10 @@ translate_add_exp (struct ParserState* const         parser,
   switch (opcode)
     {
     case W_ADD:
-      if (is_unsigned (GET_TYPE (opType1->type)) !=
-          is_unsigned (GET_TYPE( opType2->type)))
-        {
-          log_message (parser, parser->bufferPos, MSG_ADD_SIGN);
-          result.type = T_UINT64;
-        }
-      else if (is_unsigned( GET_TYPE (opType1->type)))
+      if (is_unsigned (ftype) != is_unsigned (stype))
+        result.type = T_INT64;
+
+      else if (is_unsigned(ftype))
         result.type = T_UINT64;
 
       else
@@ -635,10 +631,8 @@ translate_sub_exp (struct ParserState* const         parser,
     {
     case W_SUB:
       if (is_unsigned( ftype) != is_unsigned (stype))
-        {
-          log_message (parser, parser->bufferPos, MSG_SUB_SIGN);
-          result.type = T_UINT64;
-        }
+        result.type = T_INT64;
+
       else if (is_unsigned( ftype))
         result.type = T_UINT64;
 
@@ -703,17 +697,11 @@ translate_mul_exp (struct ParserState* const         parser,
   switch (opcode)
     {
     case W_MUL:
-      if (is_unsigned( ftype) != is_unsigned (stype))
-        {
-          log_message (parser, parser->bufferPos, MSG_MUL_SIGN);
-          result.type = T_UINT64;
-        }
-      else if (is_unsigned( ftype))
-        result.type = T_UINT64;
-
-      else
         result.type = T_INT64;
+      break;
 
+    case W_MULU:
+        result.type = T_UINT64;
       break;
 
     case W_MULRR:
@@ -772,15 +760,11 @@ translate_div_exp (struct ParserState* const         parser,
   switch (opcode)
     {
     case W_DIV:
-      if (is_unsigned( ftype) != is_unsigned (stype))
-        {
-          log_message (parser, parser->bufferPos, MSG_DIV_SIGN);
-          result.type = T_UINT64;
-        }
-      else if (is_unsigned( ftype))
-        result.type = T_UINT64;
-      else
-        result.type = T_INT64;
+      result.type = T_INT64;
+      break;
+
+    case W_DIVU:
+      result.type = T_UINT64;
       break;
 
     case W_DIVRR:
@@ -835,9 +819,9 @@ translate_mod_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert (opcode == W_MOD);
+  assert ((opcode == W_MOD) || (opcode == W_MODU));
 
-  result.type  = T_UINT64;
+  result.type  = (opcode == W_MOD) ? T_INT64 : T_UINT64;
   result.extra = NULL;
 
   return result;
@@ -883,8 +867,19 @@ translate_less_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LT) || (opcode == W_LTRR) || (opcode == W_LTC)
-          || (opcode == W_LTD) || (opcode == W_LTDT) || (opcode == W_LTHT));
+  assert ((opcode == W_LT) || (opcode == W_LTU) || (opcode == W_LTRR)
+          || (opcode == W_LTC) || (opcode == W_LTD) || (opcode == W_LTDT)
+          || (opcode == W_LTHT));
+
+  if (is_unsigned(ftype) != is_unsigned(stype))
+    {
+      log_message (parser,
+                   parser->bufferPos,
+                   MSG_COMPARE_SIGN,
+                   "<",
+                   type_to_text (opType1->type),
+                   type_to_text (opType2->type));
+    }
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -931,8 +926,19 @@ translate_exp_less_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_LE) || (opcode == W_LEC) || (opcode == W_LED)
-          || (opcode == W_LEDT) || (opcode == W_LEHT) || (opcode == W_LERR));
+  assert ((opcode == W_LE) || (opcode == W_LEU) || (opcode == W_LEC)
+          || (opcode == W_LED) || (opcode == W_LEDT) || (opcode == W_LEHT)
+          || (opcode == W_LERR));
+
+  if (is_unsigned(ftype) != is_unsigned(stype))
+    {
+      log_message (parser,
+                   parser->bufferPos,
+                   MSG_COMPARE_SIGN,
+                   "<=",
+                   type_to_text (opType1->type),
+                   type_to_text (opType2->type));
+    }
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -979,8 +985,19 @@ translate_greater_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GT) || (opcode == W_GTC) || (opcode == W_GTD)
-          || (opcode == W_GTDT) || (opcode == W_GTHT) || (opcode == W_GTRR));
+  assert ((opcode == W_GT) || (opcode == W_GTU) || (opcode == W_GTC)
+          || (opcode == W_GTD) || (opcode == W_GTDT) || (opcode == W_GTHT)
+          || (opcode == W_GTRR));
+
+  if (is_unsigned(ftype) != is_unsigned(stype))
+    {
+      log_message (parser,
+                   parser->bufferPos,
+                   MSG_COMPARE_SIGN,
+                   ">",
+                   type_to_text (opType1->type),
+                   type_to_text (opType2->type));
+    }
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1028,8 +1045,19 @@ translate_exp_greater_equal (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  assert ((opcode == W_GE) || (opcode == W_GEC) || (opcode == W_GED)
-          || (opcode == W_GEDT) || (opcode == W_GEHT) || (opcode == W_GERR));
+  assert ((opcode == W_GE) || (opcode == W_GEU) || (opcode == W_GEC)
+          || (opcode == W_GED) || (opcode == W_GEDT) || (opcode == W_GEHT)
+          || (opcode == W_GERR));
+
+  if (is_unsigned(ftype) != is_unsigned(stype))
+    {
+      log_message (parser,
+                   parser->bufferPos,
+                   MSG_COMPARE_SIGN,
+                   ">=",
+                   type_to_text (opType1->type),
+                   type_to_text (opType2->type));
+    }
 
   result.type  = T_BOOL;
   result.extra = NULL;
@@ -1471,8 +1499,7 @@ translate_store_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
+  result = *opType1;
 
   return result;
 }
@@ -1503,12 +1530,13 @@ translate_sadd_exp (struct ParserState* const         parser,
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer( stype))
-        opcode = W_SADD;
+      if (is_integer (stype))
+          opcode = W_SADD;
 
       else if ((stype == T_REAL) || (stype == T_RICHREAL))
         opcode = W_SADDRR;
     }
+
   else if (ftype == T_TEXT)
     {
       if (stype == T_CHAR)
@@ -1535,10 +1563,7 @@ translate_sadd_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1569,8 +1594,8 @@ translate_ssub_exp (struct ParserState* const         parser,
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer( stype))
-        opcode = W_SSUB;
+      if (is_integer (stype))
+          opcode = W_SSUB;
 
       else if ((stype == T_REAL) || (stype == T_RICHREAL))
         opcode = W_SSUBRR;
@@ -1594,10 +1619,7 @@ translate_ssub_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1622,13 +1644,19 @@ translate_smul_exp (struct ParserState* const         parser,
 
   if (is_integer( ftype))
     {
-      if (is_integer( stype))
+      if (is_signed (stype))
         opcode = W_SMUL;
+
+      else if (is_unsigned (stype))
+        opcode = W_SMULU;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer( stype))
-        opcode = W_SMUL;
+      if (is_signed (stype))
+          opcode = W_SMUL;
+
+      else if (is_unsigned (stype))
+          opcode = W_SMULU;
 
       else if ((stype == T_REAL) || (stype == T_RICHREAL))
         opcode = W_SMULRR;
@@ -1651,10 +1679,7 @@ translate_smul_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1680,13 +1705,19 @@ translate_sdiv_exp (struct ParserState* const         parser,
 
   if (is_integer( ftype))
     {
-      if (is_integer( stype))
+      if (is_signed (stype))
         opcode = W_SDIV;
+
+      else if (is_unsigned (stype))
+        opcode = W_SDIVU;
     }
   else if ((ftype == T_REAL) || (ftype == T_RICHREAL))
     {
-      if (is_integer( stype))
-        opcode = W_SDIV;
+      if (is_signed (stype))
+          opcode = W_SDIV;
+
+      else if (is_unsigned (stype))
+          opcode = W_SDIVU;
 
       else if ((stype == T_REAL) || (stype == T_RICHREAL))
         opcode = W_SDIVRR;
@@ -1709,10 +1740,7 @@ translate_sdiv_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1736,8 +1764,14 @@ translate_smod_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  if (is_integer( ftype) && is_integer (stype))
-    opcode = W_SMOD;
+  if (is_integer( ftype))
+    {
+      if (is_signed (stype))
+        opcode = W_SMOD;
+
+      else if (is_unsigned (stype))
+        opcode = W_SMODU;
+    }
 
   if (opcode == W_NA)
     {
@@ -1757,10 +1791,7 @@ translate_smod_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1808,10 +1839,7 @@ translate_sand_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1858,10 +1886,7 @@ translate_sxor_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }
@@ -1909,10 +1934,7 @@ translate_sor_exp (struct ParserState* const         parser,
       return sgResultUnk;
     }
 
-  result.type  = GET_TYPE (opType1->type);
-  result.extra = opType1->extra;
-
-  MARK_L_VALUE (result.type);
+  result = *opType1;
 
   return result;
 }

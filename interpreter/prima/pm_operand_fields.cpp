@@ -983,6 +983,16 @@ UInt8FieldElOperand::SelfMul (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt8FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DUInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt8FieldElOperand::SelfDiv (const DInt64& value)
@@ -995,6 +1005,16 @@ UInt8FieldElOperand::SelfDiv (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt8FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DUInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt8FieldElOperand::SelfMod (const DInt64& value)
@@ -1007,6 +1027,16 @@ UInt8FieldElOperand::SelfMod (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt8FieldElOperand::SelfMod (const DUInt64& value)
+{
+  DUInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt8FieldElOperand::SelfAnd (const DInt64& value)
@@ -1238,6 +1268,18 @@ UInt16FieldElOperand::SelfMul (const DInt64& value)
 
 
 void
+UInt16FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DUInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
 UInt16FieldElOperand::SelfDiv (const DInt64& value)
 {
   DUInt16 currValue;
@@ -1248,9 +1290,30 @@ UInt16FieldElOperand::SelfDiv (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt16FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DUInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt16FieldElOperand::SelfMod (const DInt64& value)
+{
+  DUInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
+
+void
+UInt16FieldElOperand::SelfMod (const DUInt64& value)
 {
   DUInt16 currValue;
   Get (currValue);
@@ -1489,6 +1552,16 @@ UInt32FieldElOperand::SelfMul (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt32FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DUInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt32FieldElOperand::SelfDiv (const DInt64& value)
@@ -1503,6 +1576,17 @@ UInt32FieldElOperand::SelfDiv (const DInt64& value)
 
 
 void
+UInt32FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DUInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
+
+void
 UInt32FieldElOperand::SelfMod (const DInt64& value)
 {
   DUInt32 currValue;
@@ -1513,6 +1597,16 @@ UInt32FieldElOperand::SelfMod (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt32FieldElOperand::SelfMod (const DUInt64& value)
+{
+  DUInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt32FieldElOperand::SelfAnd (const DInt64& value)
@@ -1734,6 +1828,16 @@ UInt64FieldElOperand::SelfMul (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt64FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DUInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt64FieldElOperand::SelfDiv (const DInt64& value)
@@ -1746,9 +1850,30 @@ UInt64FieldElOperand::SelfDiv (const DInt64& value)
   Set (currValue);
 }
 
+void
+UInt64FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DUInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
 
 void
 UInt64FieldElOperand::SelfMod (const DInt64& value)
+{
+  DUInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
+
+void
+UInt64FieldElOperand::SelfMod (const DUInt64& value)
 {
   DUInt64 currValue;
   Get (currValue);
@@ -1989,7 +2114,30 @@ Int8FieldElOperand::SelfMul (const DInt64& value)
 
 
 void
+Int8FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
 Int8FieldElOperand::SelfDiv (const DInt64& value)
+{
+  DInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
+
+void
+Int8FieldElOperand::SelfDiv (const DUInt64& value)
 {
   DInt8 currValue;
   Get (currValue);
@@ -2002,6 +2150,18 @@ Int8FieldElOperand::SelfDiv (const DInt64& value)
 
 void
 Int8FieldElOperand::SelfMod (const DInt64& value)
+{
+  DInt8 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
+Int8FieldElOperand::SelfMod (const DUInt64& value)
 {
   DInt8 currValue;
   Get (currValue);
@@ -2243,6 +2403,18 @@ Int16FieldElOperand::SelfMul (const DInt64& value)
 
 
 void
+Int16FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
 Int16FieldElOperand::SelfDiv (const DInt64& value)
 {
   DInt16 currValue;
@@ -2253,9 +2425,30 @@ Int16FieldElOperand::SelfDiv (const DInt64& value)
   Set (currValue);
 }
 
+void
+Int16FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
 
 void
 Int16FieldElOperand::SelfMod (const DInt64& value)
+{
+  DInt16 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
+
+void
+Int16FieldElOperand::SelfMod (const DUInt64& value)
 {
   DInt16 currValue;
   Get (currValue);
@@ -2496,9 +2689,32 @@ Int32FieldElOperand::SelfMul (const DInt64& value)
   Set (currValue);
 }
 
+void
+Int32FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
+
 
 void
 Int32FieldElOperand::SelfDiv (const DInt64& value)
+{
+  DInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
+Int32FieldElOperand::SelfDiv (const DUInt64& value)
 {
   DInt32 currValue;
   Get (currValue);
@@ -2520,6 +2736,16 @@ Int32FieldElOperand::SelfMod (const DInt64& value)
   Set (currValue);
 }
 
+void
+Int32FieldElOperand::SelfMod (const DUInt64& value)
+{
+  DInt32 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
 
 void
 Int32FieldElOperand::SelfAnd (const DInt64& value)
@@ -2750,6 +2976,18 @@ Int64FieldElOperand::SelfMul (const DInt64& value)
 
 
 void
+Int64FieldElOperand::SelfMul (const DUInt64& value)
+{
+  DInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_mul (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
 Int64FieldElOperand::SelfDiv (const DInt64& value)
 {
   DInt64 currValue;
@@ -2762,7 +3000,31 @@ Int64FieldElOperand::SelfDiv (const DInt64& value)
 
 
 void
+Int64FieldElOperand::SelfDiv (const DUInt64& value)
+{
+  DInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_div (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
 Int64FieldElOperand::SelfMod (const DInt64& value)
+{
+  DInt64 currValue;
+  Get (currValue);
+
+  currValue = internal_mod (currValue, value);
+
+  Set (currValue);
+}
+
+
+void
+Int64FieldElOperand::SelfMod (const DUInt64& value)
 {
   DInt64 currValue;
   Get (currValue);
