@@ -139,6 +139,13 @@ next_token (const char*     buffer,
 
           result = TK_REAL;
         }
+
+      if ((result == TK_NUMERIC)
+          && (*buffer == 's' || *buffer == 'S'
+              || *buffer == 'u' || *buffer == 'U'))
+        {
+          ++buffer;
+        }
     }
   else if (is_idlegal( *buffer))
     {
@@ -381,13 +388,12 @@ parse_integer (const char*      buffer,
   assert (bufferLen != 0);
   assert (outValue != NULL);
 
-  *outValue    = 0;
-  *outSigned   = TRUE;
+  *outValue = 0;
   if ((buffer[0] == '-')
       && (bufferLen > 1)
       && is_numeric (buffer[1], FALSE))
     {
-      negative = TRUE;
+      negative = *outSigned = TRUE;
       ++buffer, --bufferLen;
     }
 
@@ -433,6 +439,12 @@ parse_integer (const char*      buffer,
 
   if (checkForUnsigned && ((*buffer == 'u') || (*buffer == 'U')))
     --bufferLen, *outSigned = FALSE;
+
+  else if (checkForUnsigned && ((*buffer == 's') || (*buffer == 'S')))
+    --bufferLen, *outSigned = TRUE;
+
+  else
+    *outSigned = negative;
 
   return (oldLen - bufferLen);
 }
@@ -1001,7 +1013,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
   return result;
 }
 
-/* this is internally used by yyparse ()
+/* This is internally used by yyparse (),
  * it's declaration is found on wisper.y */
 int
 yyerror (struct ParserState* parser, const char* msg)

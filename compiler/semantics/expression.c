@@ -873,12 +873,16 @@ translate_less_exp (struct ParserState* const         parser,
 
   if (is_unsigned(ftype) != is_unsigned(stype))
     {
-      log_message (parser,
-                   parser->bufferPos,
-                   MSG_COMPARE_SIGN,
-                   "<",
-                   type_to_text (opType1->type),
-                   type_to_text (opType2->type));
+      if ((ftype == T_UINT64) || (stype == T_UINT64))
+        {
+          log_message (parser,
+                       parser->bufferPos,
+                       MSG_COMPARE_SIGN,
+                       "<",
+                       type_to_text (opType1->type),
+                       type_to_text (opType2->type));
+        }
+      /* else: the conversion of unsigned to signed T_INT64 should be safe! */
     }
 
   result.type  = T_BOOL;
@@ -932,12 +936,16 @@ translate_exp_less_equal (struct ParserState* const         parser,
 
   if (is_unsigned(ftype) != is_unsigned(stype))
     {
-      log_message (parser,
-                   parser->bufferPos,
-                   MSG_COMPARE_SIGN,
-                   "<=",
-                   type_to_text (opType1->type),
-                   type_to_text (opType2->type));
+      if ((ftype == T_UINT64) || (stype == T_UINT64))
+        {
+          log_message (parser,
+                       parser->bufferPos,
+                       MSG_COMPARE_SIGN,
+                       "<=",
+                       type_to_text (opType1->type),
+                       type_to_text (opType2->type));
+        }
+      /* else: the conversion of unsigned to signed T_INT64 should be safe! */
     }
 
   result.type  = T_BOOL;
@@ -991,12 +999,16 @@ translate_greater_exp (struct ParserState* const         parser,
 
   if (is_unsigned(ftype) != is_unsigned(stype))
     {
-      log_message (parser,
-                   parser->bufferPos,
-                   MSG_COMPARE_SIGN,
-                   ">",
-                   type_to_text (opType1->type),
-                   type_to_text (opType2->type));
+      if ((ftype == T_UINT64) || (stype == T_UINT64))
+        {
+          log_message (parser,
+                       parser->bufferPos,
+                       MSG_COMPARE_SIGN,
+                       ">",
+                       type_to_text (opType1->type),
+                       type_to_text (opType2->type));
+        }
+      /* else: the conversion of unsigned to signed T_INT64 should be safe! */
     }
 
   result.type  = T_BOOL;
@@ -1051,12 +1063,16 @@ translate_exp_greater_equal (struct ParserState* const         parser,
 
   if (is_unsigned(ftype) != is_unsigned(stype))
     {
-      log_message (parser,
-                   parser->bufferPos,
-                   MSG_COMPARE_SIGN,
-                   ">=",
-                   type_to_text (opType1->type),
-                   type_to_text (opType2->type));
+      if ((ftype == T_UINT64) || (stype == T_UINT64))
+        {
+          log_message (parser,
+                       parser->bufferPos,
+                       MSG_COMPARE_SIGN,
+                       ">=",
+                       type_to_text (opType1->type),
+                       type_to_text (opType2->type));
+        }
+      /* else: the conversion of unsigned to signed T_INT64 should be safe! */
     }
 
   result.type  = T_BOOL;

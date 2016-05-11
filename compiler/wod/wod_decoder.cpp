@@ -825,6 +825,7 @@ const char *wod_str_table[] = {
   "modu",
 
   "mul",
+  "mulu",
   "mulrr",
 
   "ne",
