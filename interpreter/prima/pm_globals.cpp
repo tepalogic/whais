@@ -39,12 +39,14 @@ namespace prima {
 
 GlobalsManager::~GlobalsManager ()
 {
+#if 0
   for (vector<GlobalValue>::iterator it = mStorage.begin ();
        it != mStorage.end ();
        ++it)
     {
       it->Operand ().~BaseOperand ();
     }
+#endif
 }
 
 

@@ -455,7 +455,7 @@ main ()
     ReleaseInstance (commonSession);
   }
 
-  CleanInterpreter ();
+ CleanInterpreter ();
   DBSRemoveDatabase (admin);
   DBSShoutdown ();
 

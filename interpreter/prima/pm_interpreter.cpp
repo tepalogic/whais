@@ -43,14 +43,11 @@ using namespace std;
 namespace whais {
 
 
+using NameSpacePair = std::pair<string, prima::NameSpaceHolder>;
+static std::map<string, prima::NameSpaceHolder> gmNameSpaces;
 
-typedef pair<string, prima::NameSpaceHolder> NameSpacePair;
-
-static const char            gDBSName[] = "administrator";
-static Lock                  gSync;
-
-static map<string, prima::NameSpaceHolder> gmNameSpaces;
-
+static const char              gDBSName[] = "administrator";
+static Lock                    gSync;
 
 
 INTERP_SHL void
@@ -58,12 +55,12 @@ InitInterpreter (const char* adminDbsDir)
 {
   LockRAII<Lock> syncHolder (gSync);
 
-  if (gmNameSpaces.size () != 0)
+  if (gmNameSpaces.size() != 0)
     throw InterException (_EXTRA (InterException::ALREADY_INITED));
 
   static IDBSHandler& glbDbsHnd = DBSRetrieveDatabase (gDBSName, adminDbsDir);
 
-  prima::NameSpaceHolder handler (new prima::NameSpace (glbDbsHnd));
+  prima::NameSpaceHolder handler = std::make_shared<prima::NameSpace>(glbDbsHnd);
 
   gmNameSpaces.insert (NameSpacePair (gDBSName, handler));
 }
@@ -134,22 +131,18 @@ CleanInterpreter (const bool forced)
   if (gmNameSpaces.size () == 0)
     throw InterException (_EXTRA (InterException::NOT_INITED));
 
-  //TODO: Remember to clean the sessions to when the mechanism will
-  //      be employed
-  map<string, prima::NameSpaceHolder>::iterator it = gmNameSpaces.begin ();
-  while (it != gmNameSpaces.end ())
+  //TODO: Remember to clean the sessions in case of a forced shutdown!
+  for (auto& e : gmNameSpaces)
     {
-      prima::NameSpaceHolder& space = it->second;
-
-      if (forced)
-        space.ForceRelease ();
-
-      else if (space.RefsCount () != 0)
+      if (! forced && e.second.use_count() > 1)
         throw InterException (_EXTRA (InterException::SESSION_IN_USE));
 
-      ++it;
+      IDBSHandler& dbs = e.second->GetDBSHandler();
+      e.second.reset();
+      DBSReleaseDatabase(dbs);
     }
-  gmNameSpaces.clear ();
+
+  gmNameSpaces.clear();
 }
 
 
@@ -188,8 +181,6 @@ ISession::~ISession ()
 namespace prima {
 
 
-
-
 NameSpace::NameSpace (IDBSHandler& dbsHandler)
   : mDbsHandler (dbsHandler),
     mTypeManager (*this),
@@ -198,9 +189,6 @@ NameSpace::NameSpace (IDBSHandler& dbsHandler)
     mUnitsManager ()
 {
 }
-
-
-
 
 Session::Session (Logger&           log,
                   NameSpaceHolder&  globalNames,
@@ -211,18 +199,12 @@ Session::Session (Logger&           log,
     mMaxStackCount (~0),
     mServerStopped (false)
 {
-  mGlobalNames.IncRefsCount ();
-  mPrivateNames.IncRefsCount ();
-
   DefineTablesGlobalValues ();
 }
 
 
 Session::~Session ()
 {
-  mGlobalNames.DecRefsCount ();
-  mPrivateNames.DecRefsCount ();
-
   for (vector<WH_SHLIB>::iterator it = mNativeLibs.begin ();
        it != mNativeLibs.end ();
        ++it)
@@ -241,14 +223,14 @@ Session::~Session ()
 void
 Session::LoadCompiledUnit (WIFunctionalUnit& unit)
 {
-  UnitsManager&  unitMgr   = mPrivateNames.Get ().GetUnitsManager ();
+  UnitsManager&  unitMgr   = mPrivateNames->GetUnitsManager ();
   const uint32_t unitIndex = unitMgr.AddUnit (unit.GlobalsCount (),
                                               unit.ProceduresCount (),
                                               unit.RetrieveConstArea (),
                                               unit.ConstsAreaSize ());
   try
   {
-    TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+    TypeManager& typeMgr = mPrivateNames->GetTypeManager ();
     for (uint_t glbIt = 0; glbIt < unit.GlobalsCount (); ++glbIt)
       {
         const uint_t         typeOff  = unit.GlobalTypeOff (glbIt);
@@ -384,7 +366,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
 
     }
 
-  TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+  TypeManager& typeMgr = mPrivateNames->GetTypeManager ();
   for (uint_t procIt = 0; procIt < lib->procsCount; ++procIt)
     {
       if (lib->procsDescriptions[procIt] == NULL)
@@ -467,14 +449,14 @@ Session::ExecuteProcedure (const char* const   procedure,
 uint_t
 Session::GlobalValuesCount () const
 {
-  return mPrivateNames.Get ().GetGlobalsManager ().Count ();
+  return mPrivateNames->GetGlobalsManager ().Count ();
 }
 
 
 uint_t
 Session::ProceduresCount () const
 {
-  return mPrivateNames.Get ().GetProcedureManager ().Count ();
+  return mPrivateNames->GetProcedureManager ().Count ();
 }
 
 
@@ -482,7 +464,7 @@ const char*
 Session::GlobalValueName (const uint_t index) const
 {
   return _RC (const char*,
-              mPrivateNames.Get ().GetGlobalsManager ().Name (index));
+              mPrivateNames->GetGlobalsManager ().Name (index));
 }
 
 
@@ -490,14 +472,14 @@ const char*
 Session::ProcedureName (const uint_t index) const
 {
   return _RC (const char*,
-              mPrivateNames.Get ().GetProcedureManager ().Name (index));
+              mPrivateNames->GetProcedureManager ().Name (index));
 }
 
 
 uint_t
 Session::GlobalValueRawType (const uint32_t glbId)
 {
-  GlobalsManager& glbMgr = mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager& glbMgr = mPrivateNames->GetGlobalsManager ();
   GlobalValue&    value  = glbMgr.Value (glbId);
 
   IOperand& glbOp = value.Operand ();
@@ -509,7 +491,7 @@ Session::GlobalValueRawType (const uint32_t glbId)
 uint_t
 Session::GlobalValueRawType (const char* const name)
 {
-  GlobalsManager* glbMgr = &mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager* glbMgr = &mPrivateNames->GetGlobalsManager ();
   const uint32_t  glbId  = glbMgr->FindGlobal (_RC (const uint8_t*, name),
                                                strlen (name));
   return GlobalValueRawType (glbId);
@@ -519,7 +501,7 @@ Session::GlobalValueRawType (const char* const name)
 uint_t
 Session::GlobalValueFieldsCount (const uint32_t glbId)
 {
-  GlobalsManager& glbMgr = mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager& glbMgr = mPrivateNames->GetGlobalsManager ();
   GlobalValue&    value  = glbMgr.Value (glbId);
 
   IOperand& glbOp = value.Operand ();
@@ -534,7 +516,7 @@ Session::GlobalValueFieldsCount (const uint32_t glbId)
 uint_t
 Session::GlobalValueFieldsCount (const char* const name)
 {
-  GlobalsManager* glbMgr = &mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager* glbMgr = &mPrivateNames->GetGlobalsManager ();
   uint32_t        glbId  = glbMgr->FindGlobal (_RC (const uint8_t*, name),
                                               strlen (name));
   return GlobalValueFieldsCount (glbId);
@@ -544,7 +526,7 @@ Session::GlobalValueFieldsCount (const char* const name)
 const char*
 Session::GlobalValueFieldName (const uint32_t glbId, const uint32_t field)
 {
-  GlobalsManager& glbMgr = mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager& glbMgr = mPrivateNames->GetGlobalsManager ();
   GlobalValue&    value  = glbMgr.Value (glbId);
 
   IOperand& glbOp = value.Operand ();
@@ -558,7 +540,7 @@ Session::GlobalValueFieldName (const uint32_t glbId, const uint32_t field)
 const char*
 Session::GlobalValueFieldName (const char* const name, const uint32_t field)
 {
-  GlobalsManager* glbMgr = &mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager* glbMgr = &mPrivateNames->GetGlobalsManager ();
   uint32_t        glbId  = glbMgr->FindGlobal (_RC (const uint8_t*, name),
                                                strlen (name));
 
@@ -569,7 +551,7 @@ Session::GlobalValueFieldName (const char* const name, const uint32_t field)
 uint_t
 Session::GlobalValueFieldType (const uint32_t glbId, const uint32_t field)
 {
-  GlobalsManager& glbMgr = mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager& glbMgr = mPrivateNames->GetGlobalsManager ();
   GlobalValue&    value  = glbMgr.Value (glbId);
 
   IOperand& glbOp = value.Operand ();
@@ -587,7 +569,7 @@ Session::GlobalValueFieldType (const uint32_t glbId, const uint32_t field)
 uint_t
 Session::GlobalValueFieldType (const char* const name, const uint32_t field)
 {
-  GlobalsManager* glbMgr = &mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager* glbMgr = &mPrivateNames->GetGlobalsManager ();
   uint32_t        glbId  = glbMgr->FindGlobal (_RC (const uint8_t*, name),
                                                strlen (name));
 
@@ -598,14 +580,14 @@ Session::GlobalValueFieldType (const char* const name, const uint32_t field)
 uint_t
 Session::ProcedureParametersCount (const uint_t id) const
 {
-  return mPrivateNames.Get ().GetProcedureManager ().ArgsCount (id) + 1;
+  return mPrivateNames->GetProcedureManager ().ArgsCount (id) + 1;
 }
 
 
 uint_t
 Session::ProcedureParametersCount (const char* const name) const
 {
-  ProcedureManager& procMgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr = mPrivateNames->GetProcedureManager ();
   const uint_t      procId  = procMgr.GetProcedure (_RC (const uint8_t*, name),
                                                     strlen (name));
   return ProcedureParametersCount (procId);
@@ -618,7 +600,7 @@ Session::ProcedurePameterRawType (const uint_t id, const uint_t param)
   if (param >= ProcedureParametersCount (id))
     throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& mgr = mPrivateNames->GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
 
   return val.Operand ().GetType ();
@@ -628,7 +610,7 @@ Session::ProcedurePameterRawType (const uint_t id, const uint_t param)
 uint_t
 Session::ProcedurePameterRawType (const char* const name, const uint_t param)
 {
-  ProcedureManager& procMgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr = mPrivateNames->GetProcedureManager ();
   const uint_t      procId  = procMgr.GetProcedure (_RC (const uint8_t*, name),
                                                     strlen (name));
   return ProcedurePameterRawType (procId, param);
@@ -641,7 +623,7 @@ Session::ProcedurePameterFieldsCount (const uint_t id, const uint_t param)
   if (param >= ProcedureParametersCount (id))
     throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  ProcedureManager& mgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& mgr = mPrivateNames->GetProcedureManager ();
   StackValue&       val = _CC (StackValue&, mgr.LocalValue (id, param));
 
   if (IS_TABLE (val.Operand ().GetType ()))
@@ -655,7 +637,7 @@ uint_t
 Session::ProcedurePameterFieldsCount (const char* const name,
                                       const uint_t      param)
 {
-  ProcedureManager& procMgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr = mPrivateNames->GetProcedureManager ();
   const uint_t      procId  = procMgr.GetProcedure (_RC (const uint8_t*, name),
                                                     strlen (name));
   return ProcedurePameterFieldsCount (procId, param);
@@ -670,7 +652,7 @@ Session::ProcedurePameterFieldName (const uint_t id,
   if (param >= ProcedureParametersCount (id))
     throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& mgr   = mPrivateNames->GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
   ITable&           table = val.Operand ().GetTable ();
 
@@ -683,7 +665,7 @@ Session::ProcedurePameterFieldName (const char* const name,
                                     const uint_t        param,
                                     const uint_t        field)
 {
-  ProcedureManager& procMgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr = mPrivateNames->GetProcedureManager ();
   const uint_t      procId  = procMgr.GetProcedure (_RC (const uint8_t*, name),
                                                     strlen (name));
   return ProcedurePameterFieldName (procId, param, field);
@@ -698,7 +680,7 @@ Session::ProcedurePameterFieldType (const uint_t id,
   if (param >= ProcedureParametersCount (id))
     throw InterException (_EXTRA (InterException::INVALID_LOCAL_REQ));
 
-  ProcedureManager& mgr   = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& mgr   = mPrivateNames->GetProcedureManager ();
   StackValue&       val   = _CC (StackValue&, mgr.LocalValue (id, param));
   ITable&           table = val.Operand ().GetTable ();
 
@@ -717,7 +699,7 @@ Session::ProcedurePameterFieldType (const char* const name,
                                     const uint_t        param,
                                     const uint_t        field)
 {
-  ProcedureManager& procMgr = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr = mPrivateNames->GetProcedureManager ();
   const uint_t      procId  = procMgr.GetProcedure (_RC (const uint8_t*, name),
                                                     strlen (name));
   return ProcedurePameterFieldType (procId, param, field);
@@ -759,14 +741,14 @@ Session::NotifyEvent (const uint_t     event,
 uint32_t
 Session::FindGlobal (const uint8_t* pName, const uint_t nameLength)
 {
-  GlobalsManager* glbMgr  = &mPrivateNames.Get ().GetGlobalsManager ();
+  GlobalsManager* glbMgr  = &mPrivateNames->GetGlobalsManager ();
   uint32_t        result  = glbMgr->FindGlobal (pName, nameLength);
 
   assert (GlobalsManager::IsGlobalEntry (result) == false);
 
   if (GlobalsManager::IsValid (result) == false)
     {
-      glbMgr = &mGlobalNames.Get ().GetGlobalsManager ();
+      glbMgr = &mGlobalNames->GetGlobalsManager ();
       result = glbMgr->FindGlobal (pName, nameLength);
 
       assert (GlobalsManager::IsGlobalEntry (result) == false);
@@ -781,8 +763,8 @@ StackValue
 Session::GetGlobalValue (const uint32_t glbId)
 {
   GlobalsManager& glbMgr = GlobalsManager::IsGlobalEntry (glbId) ?
-                             mGlobalNames.Get ().GetGlobalsManager () :
-                             mPrivateNames.Get ().GetGlobalsManager ();
+                             mGlobalNames->GetGlobalsManager () :
+                             mPrivateNames->GetGlobalsManager ();
 
   GlobalOperand glbOp (glbMgr.Value (glbId));
 
@@ -794,8 +776,8 @@ const uint8_t*
 Session::FindGlobalTI (const uint32_t glbId)
 {
   GlobalsManager& glbMgr = GlobalsManager::IsGlobalEntry (glbId) ?
-                             mGlobalNames.Get ().GetGlobalsManager () :
-                             mPrivateNames.Get ().GetGlobalsManager ();
+                             mGlobalNames->GetGlobalsManager () :
+                             mPrivateNames->GetGlobalsManager ();
 
   return glbMgr.TypeDescription (glbId);
 }
@@ -804,14 +786,14 @@ Session::FindGlobalTI (const uint32_t glbId)
 uint32_t
 Session::FindProcedure (const uint8_t* name, const uint_t nameLength)
 {
-  ProcedureManager* procMgr = &mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager* procMgr = &mPrivateNames->GetProcedureManager ();
   uint32_t          result  = procMgr->GetProcedure (name, nameLength);
 
   assert (ProcedureManager::IsGlobalEntry (result) == false);
 
   if ( ! ProcedureManager::IsValid (result))
     {
-      procMgr = &mGlobalNames.Get ().GetProcedureManager ();
+      procMgr = &mGlobalNames->GetProcedureManager ();
       result  = procMgr->GetProcedure (name, nameLength);
 
       assert (ProcedureManager::IsGlobalEntry (result) == false);
@@ -827,8 +809,8 @@ uint32_t
 Session::ArgsCount (const uint32_t procId)
 {
   ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
+                                mGlobalNames->GetProcedureManager () :
+                                mPrivateNames->GetProcedureManager ();
   return procMgr.ArgsCount (procId);
 }
 
@@ -837,8 +819,8 @@ const uint8_t*
 Session::FindLocalTI (const uint32_t procId, const uint32_t local)
 {
   ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
+                                mGlobalNames->GetProcedureManager () :
+                                mPrivateNames->GetProcedureManager ();
 
   return procMgr.LocalTypeDescription (procId, local);
 }
@@ -846,7 +828,7 @@ Session::FindLocalTI (const uint32_t procId, const uint32_t local)
 IDBSHandler&
 Session::DBSHandler ()
 {
-  return mPrivateNames.Get ().GetDBSHandler ();
+  return mPrivateNames->GetDBSHandler ();
 }
 
 
@@ -854,8 +836,8 @@ const Procedure&
 Session::GetProcedure (const uint32_t procId)
 {
   ProcedureManager& procMgr = ProcedureManager::IsGlobalEntry (procId) ?
-                                mGlobalNames.Get ().GetProcedureManager () :
-                                mPrivateNames.Get ().GetProcedureManager ();
+                                mGlobalNames->GetProcedureManager () :
+                                mPrivateNames->GetProcedureManager ();
 
   const Procedure& procedure = procMgr.GetProcedure (procId);
 
@@ -868,7 +850,7 @@ Session::GetProcedure (const uint32_t procId)
 void
 Session::DefineTablesGlobalValues ()
 {
-  IDBSHandler& dbs = mPrivateNames.Get ().GetDBSHandler ();
+  IDBSHandler& dbs = mPrivateNames->GetDBSHandler ();
 
   const uint_t tablesCount = dbs.PersistentTablesCount ();
 
@@ -923,7 +905,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
   unique_ptr<uint8_t> tdBuff (new uint8_t[TypeManager::GetTypeLength (typeDesc)]);
   memcpy (tdBuff.get (), typeDesc, TypeManager::GetTypeLength (typeDesc));
 
-  TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+  TypeManager& typeMgr = mPrivateNames->GetTypeManager ();
   GlobalValue  value   = typeMgr.CreateGlobalValue (tdBuff.get (),
                                                     persistentTable);
   const uint32_t glbEntry = FindGlobal (name, nameLength);
@@ -944,7 +926,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
         }
 
       const uint32_t  typeOff = typeMgr.AddType (tdBuff.get ());
-      GlobalsManager& glbMgr  = mPrivateNames.Get ().GetGlobalsManager ();
+      GlobalsManager& glbMgr  = mPrivateNames->GetGlobalsManager ();
 
       return glbMgr.AddGlobal (name, nameLength, value, typeOff);
     }
@@ -998,7 +980,7 @@ Session::DefineProcedure (const uint8_t* const   name,
   assert (argsCount < localsCount);
   assert (localsCount > 0);
 
-  TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();
+  TypeManager& typeMgr = mPrivateNames->GetTypeManager ();
 
   for (uint_t localIt = 0; localIt < localsCount; ++ localIt)
     {
@@ -1021,7 +1003,7 @@ Session::DefineProcedure (const uint8_t* const   name,
         }
     }
 
-  ProcedureManager& procMgr   = mPrivateNames.Get ().GetProcedureManager ();
+  ProcedureManager& procMgr   = mPrivateNames->GetProcedureManager ();
   const uint32_t    procIndex = FindProcedure (name, nameLength);
 
   if (external)

@@ -79,6 +79,10 @@ private:
 
 
 
+using NameSpaceHolder=std::shared_ptr<NameSpace>;
+
+
+#if 0
 class NameSpaceHolder
 {
 public:
@@ -145,6 +149,7 @@ private:
   NameSpace* mSpace;
   uint64_t   mRefsCount;
 };
+#endif
 
 
 
@@ -264,11 +269,11 @@ private:
                             const bool               external,
                             Unit* const              unit);
 
-  NameSpaceHolder&            mGlobalNames;
-  NameSpaceHolder&            mPrivateNames;
-  std::vector<WH_SHLIB>       mNativeLibs;
-  volatile uint_t             mMaxStackCount;
-  volatile bool               mServerStopped;
+  NameSpaceHolder            mGlobalNames;
+  NameSpaceHolder            mPrivateNames;
+  std::vector<WH_SHLIB>      mNativeLibs;
+  volatile uint_t            mMaxStackCount;
+  volatile bool              mServerStopped;
 };
 
 
