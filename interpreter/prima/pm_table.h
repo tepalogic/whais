@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -41,56 +41,56 @@ namespace prima {
 class TableReference
 {
 public:
-  TableReference (IDBSHandler& dbs, ITable& table)
-    : mDbsHnd (dbs),
-      mTable (table),
-      mRefCount (0)
+  TableReference(IDBSHandler& dbs, ITable& table)
+    : mDbsHnd(dbs),
+      mTable(table),
+      mRefCount(0)
   {
   }
 
-  TableReference* const Spawn ()
+  TableReference* const Spawn()
   {
-    return new TableReference (mDbsHnd, mTable.Spawn ());
+    return new TableReference(mDbsHnd, mTable.Spawn());
   }
 
-  void IncrementRefCount ()
+  void IncrementRefCount()
   {
-    LockRAII<Lock> _lock (mLock);
+    LockRAII<Lock> _lock(mLock);
     ++mRefCount;
   }
 
-  void DecrementRefCount ()
+  void DecrementRefCount()
   {
-    LockRAII<Lock> _lock (mLock);
+    LockRAII<Lock> _lock(mLock);
 
-    assert (mRefCount > 0);
+    assert(mRefCount > 0);
 
     if (--mRefCount == 0)
       {
-        _lock.Release ();
+        _lock.Release();
         delete this;
       }
   }
 
-  ITable& GetTable ()
+  ITable& GetTable()
   {
-    assert (mRefCount > 0);
+    assert(mRefCount > 0);
 
     return mTable;
   }
 
-  IDBSHandler& GetDBSHandler ()
+  IDBSHandler& GetDBSHandler()
   {
-    assert (mRefCount > 0);
+    assert(mRefCount > 0);
 
     return mDbsHnd;
   }
 
 private:
-  ~TableReference ()
+  ~TableReference()
   {
-    if (&mTable != &GeneralTable::Instance ())
-      mDbsHnd.ReleaseTable (mTable);
+    if (&mTable != &GeneralTable::Instance())
+      mDbsHnd.ReleaseTable(mTable);
   }
 
   IDBSHandler&     mDbsHnd;

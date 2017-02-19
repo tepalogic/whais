@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -40,14 +40,14 @@ class IBlocksManager
 {
 public:
 
-  virtual ~IBlocksManager ();
+  virtual ~IBlocksManager();
 
 
-  virtual void StoreItems (uint64_t           firstItem,
+  virtual void StoreItems(uint64_t           firstItem,
                            uint_t             itemsCount,
                            const uint8_t*     from) = 0;
 
-  virtual void RetrieveItems (uint64_t    firstItem,
+  virtual void RetrieveItems(uint64_t    firstItem,
                               uint_t      itemsCount,
                               uint8_t*    to) = 0;
 };
@@ -56,47 +56,47 @@ public:
 class BlockEntry
 {
 public:
-  explicit BlockEntry (uint8_t* const data)
-    : mData (data),
-      mReferenceCount (0),
-      mFlags (0)
+  explicit BlockEntry(uint8_t* const data)
+    : mData(data),
+      mReferenceCount(0),
+      mFlags(0)
   {
-    assert (data != NULL);
+    assert(data != NULL);
   }
 
-  bool IsDirty () const
+  bool IsDirty() const
   {
-    return (mFlags & BLOCK_ENTRY_DIRTY) != 0;
+    return(mFlags & BLOCK_ENTRY_DIRTY) != 0;
   }
 
-  bool IsInUse () const
+  bool IsInUse() const
   {
     return mReferenceCount > 0;
   }
 
-  void MarkDirty ()
+  void MarkDirty()
   {
     mFlags |= BLOCK_ENTRY_DIRTY;
   }
 
-  void MarkClean ()
+  void MarkClean()
   {
     mFlags &= ~BLOCK_ENTRY_DIRTY;
   }
 
-  void RegisterUser ()
+  void RegisterUser()
   {
-    wh_atomic_fetch_inc32 (_RC (int32_t*, &mReferenceCount));
+    wh_atomic_fetch_inc32(_RC(int32_t*, &mReferenceCount));
   }
 
-  void ReleaseUser ()
+  void ReleaseUser()
   {
-    assert ( mReferenceCount > 0);
+    assert( mReferenceCount > 0);
 
-    wh_atomic_fetch_dec32 (_RC (int32_t*, &mReferenceCount));
+    wh_atomic_fetch_dec32(_RC(int32_t*, &mReferenceCount));
   }
 
-  uint8_t* Data ()
+  uint8_t* Data()
   {
     return mData;
   }
@@ -114,23 +114,23 @@ private:
 class StoredItem
 {
 public:
-  StoredItem (BlockEntry& blockEntry, const uint_t itemOffset)
-    : mBlockEntry (&blockEntry),
-      mItemOffset (itemOffset)
+  StoredItem(BlockEntry& blockEntry, const uint_t itemOffset)
+    : mBlockEntry(&blockEntry),
+      mItemOffset(itemOffset)
   {
-    mBlockEntry->RegisterUser ();
+    mBlockEntry->RegisterUser();
   }
 
-  StoredItem (const StoredItem& src) :
-    mBlockEntry (src.mBlockEntry),
-    mItemOffset (src.mItemOffset)
+  StoredItem(const StoredItem& src) :
+    mBlockEntry(src.mBlockEntry),
+    mItemOffset(src.mItemOffset)
   {
-    mBlockEntry->RegisterUser ();
+    mBlockEntry->RegisterUser();
   }
 
-  ~StoredItem ()
+  ~StoredItem()
   {
-    mBlockEntry->ReleaseUser ();
+    mBlockEntry->ReleaseUser();
   }
 
   StoredItem& operator= (const StoredItem& src)
@@ -138,24 +138,24 @@ public:
     if (this == &src)
       return *this;
 
-    src.mBlockEntry->RegisterUser ();
-    mBlockEntry->ReleaseUser ();
+    src.mBlockEntry->RegisterUser();
+    mBlockEntry->ReleaseUser();
 
-    _CC (BlockEntry*&, mBlockEntry) = src.mBlockEntry;
-    _CC (uint_t&,      mItemOffset) = src.mItemOffset;
+    _CC(BlockEntry*&, mBlockEntry) = src.mBlockEntry;
+    _CC(uint_t&,      mItemOffset) = src.mItemOffset;
 
     return *this;
   }
 
-  uint8_t* GetDataForUpdate () const
+  uint8_t* GetDataForUpdate() const
   {
-    mBlockEntry->MarkDirty ();
-    return mBlockEntry->Data () + mItemOffset;
+    mBlockEntry->MarkDirty();
+    return mBlockEntry->Data() + mItemOffset;
   }
 
-  const uint8_t* GetDataForRead () const
+  const uint8_t* GetDataForRead() const
   {
-    return mBlockEntry->Data () + mItemOffset;
+    return mBlockEntry->Data() + mItemOffset;
   }
 
 protected:
@@ -168,22 +168,22 @@ protected:
 class BlockCache
 {
 public:
-  BlockCache ();
-  ~BlockCache ();
+  BlockCache();
+  ~BlockCache();
 
-  void Init (IBlocksManager&      blocksMgr,
+  void Init(IBlocksManager&      blocksMgr,
              const uint_t         itemSize,
              const uint_t         blockSize,
              const uint_t         maxCachedBlocks,
              const bool           nonPersitentData);
 
-  void Flush ();
+  void Flush();
 
-  void FlushItem (const uint64_t item);
+  void FlushItem(const uint64_t item);
 
-  void RefreshItem (const uint64_t item);
+  void RefreshItem(const uint64_t item);
 
-  StoredItem RetriveItem (const uint64_t item);
+  StoredItem RetriveItem(const uint64_t item);
 
 private:
   IBlocksManager*  mManager;

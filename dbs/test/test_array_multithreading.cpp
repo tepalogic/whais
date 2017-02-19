@@ -38,27 +38,27 @@ static bool       testResult;
 static bool       resetStart;
 
 static void
-test_array_sort (void *)
+test_array_sort(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
     uint_t i;
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].Sort ();
+        testValues[j].Sort();
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -70,28 +70,28 @@ test_array_sort (void *)
 
 
 static void
-test_array_remove (void* )
+test_array_remove(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
     uint_t i;
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].Remove (0);
+        testValues[j].Remove(0);
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -102,29 +102,29 @@ test_array_remove (void* )
 }
 
 static void
-test_array_set (void* )
+test_array_set(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
     uint_t i;
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].Set (0, (wh_rnd () & 1) ? DInt64 () : DInt64 (wh_rnd ()));
+        testValues[j].Set(0, (wh_rnd() & 1) ? DInt64() : DInt64(wh_rnd()));
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
 
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -135,28 +135,28 @@ test_array_set (void* )
 }
 
 static void
-test_array_add (void* )
+test_array_add(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
     uint_t i;
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].Add (DInt64 (wh_rnd ()));
+        testValues[j].Add(DInt64(wh_rnd()));
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -168,10 +168,10 @@ test_array_add (void* )
 
 
 static void
-test_array_get (void* )
+test_array_get(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
@@ -179,18 +179,18 @@ test_array_get (void* )
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
         DInt64 v;
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].Get (0, v);
+        testValues[j].Get(0, v);
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -202,29 +202,29 @@ test_array_get (void* )
 
 
 static void
-test_mirror (void* )
+test_mirror(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
-  wh_sleep (100);
+  wh_sleep(100);
 
   try
   {
     uint_t i;
     for (i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const uint_t j = wh_rnd () % TEST_VALUES_COUNT;
-        const uint_t z = wh_rnd () % TEST_VALUES_COUNT;
+        const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
+        const uint_t z = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].MakeMirror (testValues[z]);
+        testValues[j].MakeMirror(testValues[z]);
 
-        while (resetStart)
-          wh_sleep (1);
+        while(resetStart)
+          wh_sleep(1);
 
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
-  } catch (...)
+  } catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -235,34 +235,34 @@ test_mirror (void* )
 }
 
 static void
-reset_array_variables (void *)
+reset_array_variables(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
   try
   {
-      while ( ! testEnd)
+      while( ! testEnd)
         {
           resetStart = true;
           uint_t i;
           for (i = 0; i < TEST_VALUES_COUNT; ++i)
-            refTable->Get (i, 0, testValues[i]);
+            refTable->Get(i, 0, testValues[i]);
           resetStart = false;
-          wh_sleep (10);
+          wh_sleep(10);
         }
 
   }
-  catch (Exception& e)
+  catch(Exception& e)
   {
       testResult = false;
       testEnd = true;
       cout << "Got an exception in " << __FUNCTION__ << ":\n\t"
-           << e.Description () << '(' << e.Code () << '/' << e.Type () << ")\n"
-           << e.Message () << endl;
+           << e.Description() << '(' << e.Code() << '/' << e.Type() << ")\n"
+           << e.Message() << endl;
 
       throw;
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -274,65 +274,65 @@ reset_array_variables (void *)
 }
 
 int
-main (int argc, char** argv)
+main(int argc, char** argv)
 {
   if (argc > 1)
-    _iterationsCount = atol (argv[1]);
+    _iterationsCount = atol(argv[1]);
 
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
-    IDBSHandler& handler = DBSRetrieveDatabase (db_name);
+    DBSInit(DBSSettings());
+    DBSCreateDatabase(db_name);
+    IDBSHandler& handler = DBSRetrieveDatabase(db_name);
 
-    refTable = &handler.CreateTempTable (1, fieldsDescs);
+    refTable = &handler.CreateTempTable(1, fieldsDescs);
 
     DArray t;
 
-    t.Add (DInt64 (3));
-    refTable->Set (0, 0, t);
+    t.Add(DInt64(3));
+    refTable->Set(0, 0, t);
 
-    t = DArray ();
-    t.Add (DInt64 (-10));
-    t.Add (DInt64 (-12));
-    t.Add (DInt64 (0));
-    refTable->Set (1, 0, t);
+    t = DArray();
+    t.Add(DInt64(-10));
+    t.Add(DInt64(-12));
+    t.Add(DInt64(0));
+    refTable->Set(1, 0, t);
 
-    t = DArray ();
-    t.Add (DInt64 (19));
-    t.Add (DInt64 (10));
-    refTable->Set (2, 0, t);
+    t = DArray();
+    t.Add(DInt64(19));
+    t.Add(DInt64(10));
+    refTable->Set(2, 0, t);
 
-    t = DArray ();
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    t.Add (DInt64 (-89));
-    t.Add (DInt64 (-111));
-    t.Add (DInt64 (0x98112));
-    refTable->Set (3, 0, t);
+    t = DArray();
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    t.Add(DInt64(-89));
+    t.Add(DInt64(-111));
+    t.Add(DInt64(0x98112));
+    refTable->Set(3, 0, t);
 
-    t = DArray ();
-    refTable->Set (4, 0, t);
+    t = DArray();
+    refTable->Set(4, 0, t);
     DArray values[TEST_VALUES_COUNT];
 
     testValues  = values;
@@ -341,32 +341,32 @@ main (int argc, char** argv)
 
     Thread th[7];
 
-    th[0].Run (reset_array_variables, NULL);
-    th[1].Run (test_array_remove, NULL);
-    th[2].Run (test_array_set, NULL);
-    th[3].Run (test_array_add, NULL);
-    th[4].Run (test_array_get, NULL);
-    th[5].Run (test_array_sort, NULL);
-    th[6].Run (test_mirror, NULL);
+    th[0].Run(reset_array_variables, NULL);
+    th[1].Run(test_array_remove, NULL);
+    th[2].Run(test_array_set, NULL);
+    th[3].Run(test_array_add, NULL);
+    th[4].Run(test_array_get, NULL);
+    th[5].Run(test_array_sort, NULL);
+    th[6].Run(test_mirror, NULL);
 
-    th[1].WaitToEnd (true);
-    th[2].WaitToEnd (true);
-    th[3].WaitToEnd (true);
-    th[4].WaitToEnd (true);
-    th[5].WaitToEnd (true);
-    th[6].WaitToEnd (true);
+    th[1].WaitToEnd(true);
+    th[2].WaitToEnd(true);
+    th[3].WaitToEnd(true);
+    th[4].WaitToEnd(true);
+    th[5].WaitToEnd(true);
+    th[6].WaitToEnd(true);
 
 
     testEnd = true;
 
-    th[0].WaitToEnd (true);
+    th[0].WaitToEnd(true);
 
-    handler.ReleaseTable (*refTable);
-    DBSReleaseDatabase (handler);
+    handler.ReleaseTable(*refTable);
+    DBSReleaseDatabase(handler);
   }
 
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSRemoveDatabase(db_name);
+  DBSShoutdown();
 
   if (!testResult)
     {

@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -48,7 +48,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static BOOL_R
-is_leap_year (const int year)
+is_leap_year(const int year)
 {
   if ((year % 4) == 0)
     {

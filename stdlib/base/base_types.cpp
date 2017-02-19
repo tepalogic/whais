@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -90,35 +90,35 @@ uint8_t gARichRealType[sizeof( TypeSpec)];
 WLIB_STATUS
 base_types_init()
 {
-  if ((wh_define_basic_type( T_BOOL, _RC (TypeSpec*, gBoolType)) <= 0)
-      || (wh_define_basic_type( T_CHAR, _RC (TypeSpec*, gCharType)) <= 0)
-      || (wh_define_basic_type( T_DATE, _RC (TypeSpec*, gDateType)) <= 0)
+  if ((wh_define_basic_type( T_BOOL, _RC(TypeSpec*, gBoolType)) <= 0)
+      || (wh_define_basic_type( T_CHAR, _RC(TypeSpec*, gCharType)) <= 0)
+      || (wh_define_basic_type( T_DATE, _RC(TypeSpec*, gDateType)) <= 0)
       || (wh_define_basic_type( T_DATETIME,
-                                _RC (TypeSpec*, gDateTimeType)) <= 0)
+                                _RC(TypeSpec*, gDateTimeType)) <= 0)
       || (wh_define_basic_type( T_HIRESTIME,
-                                _RC (TypeSpec*, gHiresTimeType)) <= 0)
-      || (wh_define_basic_type( T_INT8, _RC (TypeSpec*, gInt8Type)) <= 0)
-      || (wh_define_basic_type( T_INT16, _RC (TypeSpec*, gInt16Type)) <= 0)
-      || (wh_define_basic_type( T_INT32, _RC (TypeSpec*, gInt32Type)) <= 0)
-      || (wh_define_basic_type( T_INT64, _RC (TypeSpec*, gInt64Type)) <= 0)
+                                _RC(TypeSpec*, gHiresTimeType)) <= 0)
+      || (wh_define_basic_type( T_INT8, _RC(TypeSpec*, gInt8Type)) <= 0)
+      || (wh_define_basic_type( T_INT16, _RC(TypeSpec*, gInt16Type)) <= 0)
+      || (wh_define_basic_type( T_INT32, _RC(TypeSpec*, gInt32Type)) <= 0)
+      || (wh_define_basic_type( T_INT64, _RC(TypeSpec*, gInt64Type)) <= 0)
 
-      || (wh_define_basic_type( T_UINT8, _RC (TypeSpec*, gUInt8Type)) <= 0)
-      || (wh_define_basic_type( T_UINT16, _RC (TypeSpec*, gUInt16Type)) <= 0)
-      || (wh_define_basic_type( T_UINT32, _RC (TypeSpec*, gUInt32Type)) <= 0)
-      || (wh_define_basic_type( T_UINT64, _RC (TypeSpec*, gUInt64Type)) <= 0)
+      || (wh_define_basic_type( T_UINT8, _RC(TypeSpec*, gUInt8Type)) <= 0)
+      || (wh_define_basic_type( T_UINT16, _RC(TypeSpec*, gUInt16Type)) <= 0)
+      || (wh_define_basic_type( T_UINT32, _RC(TypeSpec*, gUInt32Type)) <= 0)
+      || (wh_define_basic_type( T_UINT64, _RC(TypeSpec*, gUInt64Type)) <= 0)
 
-      || (wh_define_basic_type( T_REAL, _RC (TypeSpec*, gRealType)) <= 0)
+      || (wh_define_basic_type( T_REAL, _RC(TypeSpec*, gRealType)) <= 0)
       || (wh_define_basic_type( T_RICHREAL,
-                                _RC (TypeSpec*, gRichRealType)) <= 0)
-      || (wh_define_basic_type( T_TEXT, _RC (TypeSpec*, gTextType)) <= 0)
+                                _RC(TypeSpec*, gRichRealType)) <= 0)
+      || (wh_define_basic_type( T_TEXT, _RC(TypeSpec*, gTextType)) <= 0)
       || (wh_define_basic_type( T_UNDETERMINED,
-                                _RC (TypeSpec*, gUndefinedType)) <= 0)
+                                _RC(TypeSpec*, gUndefinedType)) <= 0)
       || (wh_define_basic_type( T_UNDETERMINED,
-                                _RC (TypeSpec*, gGenericArrayType)) <= 0)
+                                _RC(TypeSpec*, gGenericArrayType)) <= 0)
       || (wh_define_basic_type( T_UNDETERMINED,
-                                _RC (TypeSpec*, gGenericFieldType)) <= 0)
+                                _RC(TypeSpec*, gGenericFieldType)) <= 0)
       || (wh_define_basic_type( T_UNKNOWN,
-                                _RC (TypeSpec*, gGenericTableType)) <= 0))
+                                _RC(TypeSpec*, gGenericTableType)) <= 0))
     {
       return WOP_UNKNOW;
     }
@@ -139,33 +139,33 @@ base_types_init()
   memcpy( gARealType, gRealType, sizeof gRealType);
   memcpy( gARichRealType, gRichRealType, sizeof gRichRealType);
 
-  if ((wh_apply_array_modifier( _RC (TypeSpec*, gABoolType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gACharType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gADateType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gADateTimeType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAHiresTimeType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAInt8Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAInt16Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAInt32Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAInt64Type)) <= 0)
+  if ((wh_apply_array_modifier( _RC(TypeSpec*, gABoolType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gACharType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gADateType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gADateTimeType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAHiresTimeType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAInt8Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAInt16Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAInt32Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAInt64Type)) <= 0)
 
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAUInt8Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAUInt16Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAUInt32Type)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gAUInt64Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAUInt8Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAUInt16Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAUInt32Type)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gAUInt64Type)) <= 0)
 
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gARealType)) <= 0)
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gARichRealType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gARealType)) <= 0)
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gARichRealType)) <= 0)
 
-      || (wh_apply_array_modifier( _RC (TypeSpec*, gGenericArrayType)) <= 0))
+      || (wh_apply_array_modifier( _RC(TypeSpec*, gGenericArrayType)) <= 0))
     {
       return WOP_UNKNOW;
     }
 
-  if (wh_apply_field_modifier( _RC (TypeSpec*, gGenericFieldType)) <= 0)
+  if (wh_apply_field_modifier( _RC(TypeSpec*, gGenericFieldType)) <= 0)
     return WOP_UNKNOW;
 
-  if (wh_apply_table_modifier( _RC (TypeSpec*, gGenericTableType)) <= 0)
+  if (wh_apply_table_modifier( _RC(TypeSpec*, gGenericTableType)) <= 0)
     return WOP_UNKNOW;
 
 

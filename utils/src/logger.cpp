@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -34,25 +34,25 @@ NullLogger NULL_LOGGER;
 
 
 
-Logger::~Logger ()
+Logger::~Logger()
 {
 }
 
 
-FileLogger::FileLogger (const char* const file, const bool printStart)
-  : Logger (),
-    mStartTick (wh_msec_ticks ()),
-    mSync (),
-    mOutStream (),
-    mLogFile (file),
-    mTodayTime (wh_get_currtime ())
+FileLogger::FileLogger(const char* const file, const bool printStart)
+  : Logger(),
+    mStartTick(wh_msec_ticks()),
+    mSync(),
+    mOutStream(),
+    mLogFile(file),
+    mTodayTime(wh_get_currtime())
 {
-  mLogFile.append (".wlog");
-  SwitchFile ();
+  mLogFile.append(".wlog");
+  SwitchFile();
 
   if (printStart)
     {
-      const WTime dayStart = wh_get_currtime ();
+      const WTime dayStart = wh_get_currtime();
 
       mOutStream << "\n* Server start on: " << (int)dayStart.year;
       mOutStream << '-' << (int)dayStart.month;
@@ -62,24 +62,24 @@ FileLogger::FileLogger (const char* const file, const bool printStart)
       mOutStream << ':' << (int)dayStart.sec << "\n\n";
     }
 
-  if (! mOutStream.good ())
+  if (! mOutStream.good())
     {
-      throw ios_base::failure ("The file associated with the output stream "
+      throw ios_base::failure("The file associated with the output stream "
                                "could not be opened.");
     }
 }
 
 void
-FileLogger::Log (const LOG_TYPE type, const char* str)
+FileLogger::Log(const LOG_TYPE type, const char* str)
 {
-  LockRAII<Lock> holder (mSync);
+  LockRAII<Lock> holder(mSync);
 
-  const int markSize = PrintTimeMark (type);
+  const int markSize = PrintTimeMark(type);
 
   /* Print white spaces where the time mark should have been for
      for string messages that have more than one line, to keep
      a mice indentation. */
-  while (*str != 0)
+  while(*str != 0)
     {
       if ((*str == '\n') && (*(str + 1) != '\n'))
         {
@@ -93,32 +93,32 @@ FileLogger::Log (const LOG_TYPE type, const char* str)
       ++str;
     }
   mOutStream << endl;
-  mOutStream.flush ();
+  mOutStream.flush();
 }
 
 
 void
-FileLogger::Log (const LOG_TYPE type, const string& str)
+FileLogger::Log(const LOG_TYPE type, const string& str)
 {
-  Log (type, str.c_str ());
+  Log(type, str.c_str());
 }
 
 
 uint_t
-FileLogger::PrintTimeMark (LOG_TYPE type)
+FileLogger::PrintTimeMark(LOG_TYPE type)
 {
   static char logIds[] = { '!', 'C', 'E', 'W', 'I', 'D' };
 
   if (type > LT_DEBUG)
     type = LT_UNKNOW;
 
-  const WTime ctime = wh_get_currtime ();
+  const WTime ctime = wh_get_currtime();
 
   if ((ctime.day != mTodayTime.day)
       || (ctime.month != mTodayTime.month)
       || (ctime.year != mTodayTime.year))
     {
-      SwitchFile ();
+      SwitchFile();
       mTodayTime = ctime;
 
       mOutStream << "\n* Hello on: " << (int)mTodayTime.year;
@@ -129,59 +129,59 @@ FileLogger::PrintTimeMark (LOG_TYPE type)
       mOutStream << ':' << (int)mTodayTime.sec << "\n\n";
     }
 
-  const char       fill  = mOutStream.fill ();
-  const streamsize width = mOutStream.width ();
+  const char       fill  = mOutStream.fill();
+  const streamsize width = mOutStream.width();
 
   mOutStream << '(' << logIds [type] << ')';
-  mOutStream.fill ('0');
-  mOutStream.width (2);
+  mOutStream.fill('0');
+  mOutStream.width(2);
   mOutStream << (uint_t) ctime.hour << ':';
-  mOutStream.width (2);
+  mOutStream.width(2);
   mOutStream << (uint_t) ctime.min << ':';
-  mOutStream.width (2);
+  mOutStream.width(2);
   mOutStream << (uint_t) ctime.sec << '.';
-  mOutStream.width (6);
+  mOutStream.width(6);
   mOutStream << (uint_t) ctime.usec << ": ";
 
-  mOutStream.fill (fill);
-  mOutStream.width (width);
+  mOutStream.fill(fill);
+  mOutStream.width(width);
 
   return 3 + 2 + 1 + 2 + 1 + 2 + 1 + 6 + 2;
 }
 
 
 void
-FileLogger::SwitchFile ()
+FileLogger::SwitchFile()
 {
-  if (mOutStream.is_open ())
+  if (mOutStream.is_open())
     {
-      mOutStream.close ();
+      mOutStream.close();
       string oldFile;
 
-      oldFile.resize (mLogFile.length () + 16);
+      oldFile.resize(mLogFile.length() + 16);
 
-      sprintf (_CC (char*, oldFile.c_str ()),
+      sprintf(_CC(char*, oldFile.c_str()),
                "%s.%04u%02u%02u",
-               mLogFile.c_str (),
+               mLogFile.c_str(),
                mTodayTime.year,
                mTodayTime.month,
                mTodayTime.day);
 
-      whf_move_file (mLogFile.c_str (), oldFile.c_str ());
+      whf_move_file(mLogFile.c_str(), oldFile.c_str());
     }
 
-  mOutStream.open (mLogFile.c_str (), ios::app | ios::out);
+  mOutStream.open(mLogFile.c_str(), ios::app | ios::out);
 }
 
 
 void
-NullLogger::Log (const LOG_TYPE, const char*)
+NullLogger::Log(const LOG_TYPE, const char*)
 {
 }
 
 
 void
-NullLogger::Log (const LOG_TYPE, const string&)
+NullLogger::Log(const LOG_TYPE, const string&)
 {
 }
 

@@ -9,36 +9,36 @@
 
 #include "custom/include/test/test_fmw.h"
 
-extern int yyparse (struct ParserState *);
+extern int yyparse(struct ParserState *);
 
 static void
-init_state_for_test (struct ParserState *state, const char * buffer)
+init_state_for_test(struct ParserState *state, const char * buffer)
 {
   state->buffer = buffer;
-  state->strings = create_string_store ();
-  state->bufferSize = strlen (buffer);
-  wh_array_init (&state->values, sizeof (struct SemValue));
+  state->strings = create_string_store();
+  state->bufferSize = strlen(buffer);
+  wh_array_init(&state->values, sizeof(struct SemValue));
 
-  init_glbl_stmt (&state->globalStmt);
+  init_glbl_stmt(&state->globalStmt);
   state->pCurrentStmt = &state->globalStmt;
 }
 
 static void
-free_state (struct ParserState *state)
+free_state(struct ParserState *state)
 {
-  release_string_store (state->strings);
-  clear_glbl_stmt (&(state->globalStmt));
-  wh_array_clean (&state->values);
+  release_string_store(state->strings);
+  clear_glbl_stmt(&(state->globalStmt));
+  wh_array_clean(&state->values);
 
 }
 
 static bool_t
-check_used_vals (struct ParserState *state)
+check_used_vals(struct ParserState *state)
 {
-  int vals_count = wh_array_count (&state->values);
-  while (--vals_count >= 0)
+  int vals_count = wh_array_count(&state->values);
+  while(--vals_count >= 0)
     {
-      struct SemValue *val = wh_array_get (&state->values, vals_count);
+      struct SemValue *val = wh_array_get(&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
         {
           return TRUE;                /* found value still in use */
@@ -67,7 +67,7 @@ char buffer[] =
   "VAR _var_15 UINT32;\n" "VAR _var_16 UINT64;\n";
 
 static bool_t
-check_declared_var (struct Statement *stm,
+check_declared_var(struct Statement *stm,
                     struct DeclaredVar *var, uint_t type)
 {
   struct WOutputStream *os = &stm->spec.glb.typesDescs;
@@ -78,7 +78,7 @@ check_declared_var (struct Statement *stm,
       return FALSE;
     }
 
-  if ((var->typeSpecOff >= wh_ostream_size (os)))
+  if ((var->typeSpecOff >= wh_ostream_size(os)))
     {
       return FALSE;
     }
@@ -87,8 +87,8 @@ check_declared_var (struct Statement *stm,
       struct TypeSpec *ts = (struct TypeSpec *)
         &(wh_ostream_data( os)[var->typeSpecOff]);
 
-      if ((load_le_int16 (ts->type) != type)
-          || (load_le_int16 (ts->dataSize) != 2)
+      if ((load_le_int16(ts->type) != type)
+          || (load_le_int16(ts->dataSize) != 2)
           || (ts->data[0] != TYPE_SPEC_END_MARK)
           || (ts->data[1] != 0))
         {
@@ -100,7 +100,7 @@ check_declared_var (struct Statement *stm,
 }
 
 static bool_t
-check_vars_decl (struct ParserState *state)
+check_vars_decl(struct ParserState *state)
 {
   struct DeclaredVar *decl_var = NULL;
   uint_t count;
@@ -111,141 +111,141 @@ check_vars_decl (struct ParserState *state)
       return FALSE;
     }
 
-  count = wh_array_count (&(state->globalStmt.decls));
+  count = wh_array_count(&(state->globalStmt.decls));
   if (count != 21)
     {
       /* error: more declarations! */
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_01", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_01", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_BOOL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_02", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_02", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_CHAR))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_03", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_03", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_DATE))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_04", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_04", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_DATETIME))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_05", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_05", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_HIRESTIME))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_06", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_06", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_INT8))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_07", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_07", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_INT16))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_08", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_08", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_INT32))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_09", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_09", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_INT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_10", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_10", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_11", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_11", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_RICHREAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_12", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_12", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_TEXT))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_13", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_13", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_UINT8))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_14", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_14", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_UINT16))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_15", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_15", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_UINT32))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_16", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_16", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_UINT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_var_16", 7, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_var_16", 7, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_UINT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt,
+  decl_var = stmt_find_declaration(&state->globalStmt,
                                     "second_var", 10, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_INT64))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_1", 2, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_1", 2, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "a2", 2, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "a2", 2, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "_a3", 3, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "_a3", 3, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_REAL))
     {
       return FALSE;
     }
 
-  decl_var = stmt_find_declaration (&state->globalStmt, "b4c", 3, FALSE, FALSE);
+  decl_var = stmt_find_declaration(&state->globalStmt, "b4c", 3, FALSE, FALSE);
   if (!check_declared_var( &state->globalStmt, decl_var, T_RICHREAL))
     {
       return FALSE;
@@ -255,69 +255,69 @@ check_vars_decl (struct ParserState *state)
 }
 
 int
-main ()
+main()
 {
   bool_t test_result = TRUE;
   struct ParserState state = { 0, };
 
-  init_state_for_test (&state, buffer);
+  init_state_for_test(&state, buffer);
 
-  printf ("Testing parse..");
+  printf("Testing parse..");
   if (yyparse( &state) != 0)
     {
-      printf ("FAILED\n");
+      printf("FAILED\n");
       test_result = FALSE;
     }
   else
     {
-      printf ("PASSED\n");
+      printf("PASSED\n");
     }
 
   if (test_result)
     {
-      printf ("Testing garbage vals...");
+      printf("Testing garbage vals...");
       if (check_used_vals( &state))
         {
           /* those should no be here */
-          printf ("FAILED\n");
+          printf("FAILED\n");
           test_result = FALSE;
         }
       else
         {
-          printf ("PASSED\n");
+          printf("PASSED\n");
         }
     }
 
-  printf ("Testing declarations...");
+  printf("Testing declarations...");
   if (check_vars_decl( &state) == FALSE)
     {
-      printf ("FAILED\n");
+      printf("FAILED\n");
       test_result = FALSE;
     }
   else
     {
-      printf ("PASSED\n");
+      printf("PASSED\n");
     }
 
-  free_state (&state);
-  printf ("Memory peak: %u bytes \n", (uint_t)test_get_mem_peak ());
-  printf ("Current memory usage: %u bytes...", (uint_t) test_get_mem_used ());
-  if (test_get_mem_used () != 0)
+  free_state(&state);
+  printf("Memory peak: %u bytes \n", (uint_t)test_get_mem_peak());
+  printf("Current memory usage: %u bytes...", (uint_t) test_get_mem_used());
+  if (test_get_mem_used() != 0)
     {
       test_result = FALSE;
-      printf ("FAILED\n");
+      printf("FAILED\n");
     }
   else
     {
-      printf ("PASSED\n");
+      printf("PASSED\n");
     }
 
   if (test_result == FALSE)
     {
-      printf ("TEST RESULT: FAIL\n");
+      printf("TEST RESULT: FAIL\n");
       return -1;
     }
 
-  printf ("TEST RESULT: PASS\n");
+  printf("TEST RESULT: PASS\n");
   return 0;
 }

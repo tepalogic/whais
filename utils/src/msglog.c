@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -31,7 +31,7 @@ static WLOG_FUNC_CONTEXT sgLoggerContext = NULL;
 static WLOG_FUNC         sgLogger        = NULL;
 
 void
-wh_register_logger (WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
+wh_register_logger(WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
 {
   sgLoggerContext = bag;
   sgLogger = man;
@@ -39,47 +39,47 @@ wh_register_logger (WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
 
 
 WLOG_FUNC
-wh_logger (void)
+wh_logger(void)
 {
   return sgLogger;
 }
 
 WLOG_FUNC_CONTEXT
-wh_logger_context (void)
+wh_logger_context(void)
 {
   return sgLoggerContext;
 }
 
 
 void
-wh_log_msg (uint_t        position,
+wh_log_msg(uint_t        position,
             uint_t        code,
             uint_t        type,
             char*         formatedMsg,
             va_list       args)
 {
-  sgLogger (sgLoggerContext, position, code, type, formatedMsg, args);
+  sgLogger(sgLoggerContext, position, code, type, formatedMsg, args);
 }
 
 
 char*
-wh_copy_first (char*         dest,
+wh_copy_first(char*         dest,
                const char*   src,
                uint_t        destMax,
                uint_t        srcLength)
 {
-  assert (destMax > 4);  /* Make sure we can hold the '...' string. */
+  assert(destMax > 4);  /* Make sure we can hold the '...' string. */
 
   if (srcLength > destMax)
     {
       srcLength = destMax - 4;
-      strncpy (dest, src, srcLength);
+      strncpy(dest, src, srcLength);
       dest[srcLength] = 0;
-      strcat (dest, "...");
+      strcat(dest, "...");
     }
   else
     {
-      strncpy (dest, src, srcLength);
+      strncpy(dest, src, srcLength);
       dest[srcLength] = 0;
     }
 

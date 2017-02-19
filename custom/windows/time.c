@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -27,16 +27,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 
 WTime
-wh_get_currtime ()
+wh_get_currtime()
 {
   WTime      result;
   FILETIME   fileTime, localTime;
   SYSTEMTIME utcTime;
   uint64_t   usec;
 
-  GetSystemTimeAsFileTime (&fileTime);
-  FileTimeToLocalFileTime (&fileTime, &localTime);
-  FileTimeToSystemTime (&localTime, &utcTime);
+  GetSystemTimeAsFileTime(&fileTime);
+  FileTimeToLocalFileTime(&fileTime, &localTime);
+  FileTimeToSystemTime(&localTime, &utcTime);
 
   /* Convert the FILETIME to a real 64 bit integer. */
   usec = fileTime.dwHighDateTime;
@@ -49,7 +49,7 @@ wh_get_currtime ()
   /* Keep only the microseconds. */
   usec %= 1000000;
 
-  assert (usec / 1000 == utcTime.wMilliseconds);
+  assert(usec / 1000 == utcTime.wMilliseconds);
 
   result.year  = utcTime.wYear;
   result.month = utcTime.wMonth;
@@ -64,9 +64,9 @@ wh_get_currtime ()
 
 
 WTICKS
-wh_msec_ticks ()
+wh_msec_ticks()
 {
-  return GetTickCount64 ();
+  return GetTickCount64();
 }
 
 

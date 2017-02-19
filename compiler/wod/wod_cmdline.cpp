@@ -1,6 +1,6 @@
 /******************************************************************************
 WOD - Whais Object Dumper.
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -39,25 +39,25 @@ namespace wod {
 
 
 static inline bool
-isStrEqual (const char* str1, const char* str2)
+isStrEqual(const char* str1, const char* str2)
 {
-  return::strcmp (str1, str2) == 0;
+  return::strcmp(str1, str2) == 0;
 }
 
-CmdLineParser::CmdLineParser (int argc, char ** argv)
-  : mArgCount (argc),
-    mArgs (argv),
-    mSourceFile (NULL),
-    mOutStream (&cout),
-    mShowHelp (false),
-    mShowLogo (false),
-    mShowLicense (false)
+CmdLineParser::CmdLineParser(int argc, char ** argv)
+  : mArgCount(argc),
+    mArgs(argv),
+    mSourceFile(NULL),
+    mOutStream(&cout),
+    mShowHelp(false),
+    mShowLogo(false),
+    mShowLicense(false)
 {
-  Parse ();
+  Parse();
 }
 
 
-CmdLineParser::~CmdLineParser ()
+CmdLineParser::~CmdLineParser()
 {
   if (mOutStream != &cout)
     delete mOutStream;
@@ -65,104 +65,104 @@ CmdLineParser::~CmdLineParser ()
 
 
 void
-CmdLineParser::Parse ()
+CmdLineParser::Parse()
 {
   int index = 1;
   if (index >= mArgCount)
     {
-      throw CmdLineException (
-                  _EXTRA (0),
+      throw CmdLineException(
+                  _EXTRA(0),
                   "No arguments provided. Use '--help' for information."
                              );
     }
 
-  while (index < mArgCount)
+  while(index < mArgCount)
     {
-      if (isStrEqual (mArgs[index], "-h") ||
-          isStrEqual (mArgs[index], "--help"))
+      if (isStrEqual(mArgs[index], "-h") ||
+          isStrEqual(mArgs[index], "--help"))
         {
           mShowHelp = true;
           ++index;
         }
-      else if (isStrEqual (mArgs[index], "-v")
-               || isStrEqual (mArgs[index], "--version"))
+      else if (isStrEqual(mArgs[index], "-v")
+               || isStrEqual(mArgs[index], "--version"))
         {
           mShowLogo = true;
           ++index;
         }
-      else if (isStrEqual (mArgs[index], "-l")
-               || isStrEqual (mArgs[index], "--license"))
+      else if (isStrEqual(mArgs[index], "-l")
+               || isStrEqual(mArgs[index], "--license"))
         {
           mShowLicense = true;
           ++index;
         }
-      else if (isStrEqual (mArgs[index], "-o"))
+      else if (isStrEqual(mArgs[index], "-o"))
         {
           if (mOutStream != &cout)
             {
-              throw CmdLineException (
-                  _EXTRA (0),
+              throw CmdLineException(
+                  _EXTRA(0),
                   "The output file '-o' is specified multiple times."
                                      );
             }
 
           if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
             {
-              throw CmdLineException (_EXTRA (0),
+              throw CmdLineException(_EXTRA(0),
                                       "Missing parameter for argument '-o'.");
             }
           else
-            mOutStream = new ofstream (mArgs[index++]);
+            mOutStream = new ofstream(mArgs[index++]);
         }
       else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
         {
           if ((void *) mSourceFile != NULL)
             {
-              throw CmdLineException (_EXTRA (0),
+              throw CmdLineException(_EXTRA(0),
                                       "The input file was already specified.");
             }
           mSourceFile = mArgs[index++];
         }
       else
         {
-          throw CmdLineException (_EXTRA (0),
+          throw CmdLineException(_EXTRA(0),
                                   "Cannot handle argument '%s' Try '--help'!",
                                   mArgs[index]);
         }
     }
-  CheckArguments ();
+  CheckArguments();
 }
 
 
 void
-CmdLineParser::CheckArguments ()
+CmdLineParser::CheckArguments()
 {
   if (mShowHelp)
     {
-      DisplayUsage ();
-      exit (0);
+      DisplayUsage();
+      exit(0);
     }
   else if (mShowLogo)
     {
-      displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
-      exit (0);
+      displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
+      exit(0);
     }
   else if (mShowLicense)
     {
-      displayLicenseInformation (cout, sProgramName, NULL);
-      exit (0);
+      displayLicenseInformation(cout, sProgramName, NULL);
+      exit(0);
     }
   else if (mSourceFile == NULL)
-    throw CmdLineException (_EXTRA (0), "The input file was not specified.");
+    throw CmdLineException(_EXTRA(0), "The input file was not specified.");
 }
 
 
 void
-CmdLineParser::DisplayUsage () const
+CmdLineParser::DisplayUsage() const
 {
   using namespace std;
 
-  displayBanner (cout, sProgramName,  WVER_MAJ, WVER_MIN);
+  displayBanner(cout, sProgramName,  WVER_MAJ, WVER_MIN);
   cout <<
     "Usage: wod [options] input_file\n"
     "Options:\n"
@@ -173,41 +173,41 @@ CmdLineParser::DisplayUsage () const
 }
 
 
-CmdLineException::CmdLineException (const uint32_t  code,
+CmdLineException::CmdLineException(const uint32_t  code,
                                     const char*     file,
                                     uint32_t        line,
                                     const char*     fmtMsg,
                                     ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
 Exception*
-CmdLineException::Clone () const
+CmdLineException::Clone() const
 {
-  return new CmdLineException (*this);
+  return new CmdLineException(*this);
 }
 
 
 
 EXCEPTION_TYPE
-CmdLineException::Type () const
+CmdLineException::Type() const
 {
   return DUMP_CMD_LINE_EXCEPTION;
 }
 
 
 const char*
-CmdLineException::Description () const
+CmdLineException::Description() const
 {
   return "Invalid command line.";
 }

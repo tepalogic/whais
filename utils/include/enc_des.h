@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -33,45 +33,45 @@ extern "C" {
 
 
 void
-wh_buff_des_encode (const uint8_t* const     key,
+wh_buff_des_encode(const uint8_t* const     key,
                     uint8_t* const           buffer,
                     const uint_t             bufferSize);
 void
-wh_buff_des_decode (const uint8_t* const     key,
+wh_buff_des_decode(const uint8_t* const     key,
                     uint8_t* const           buffer,
                     const uint_t             bufferSize);
 
 void
-wh_buff_3des_encode (const uint8_t* const     key,
+wh_buff_3des_encode(const uint8_t* const     key,
                      uint8_t* const           buffer,
                      const uint_t             bufferSize);
 
 void
-wh_buff_3des_decode (const uint8_t* const     key,
+wh_buff_3des_decode(const uint8_t* const     key,
                      uint8_t* const           buffer,
                      const uint_t             bufferSize);
 
 void
-wh_prepare_des_keys (const uint8_t*           userKey,
+wh_prepare_des_keys(const uint8_t*           userKey,
                      const uint_t             keyLenght,
                      const bool_t             _3des,
                      uint64_t* const          outPreparedKeys);
 void
-wh_buff_des_encode_ex (const uint64_t* const    preparedKeys,
+wh_buff_des_encode_ex(const uint64_t* const    preparedKeys,
                        uint8_t* const           buffer,
                        const uint_t             bufferSize);
 void
-wh_buff_des_decode_ex (const uint64_t* const    preparedKeys,
+wh_buff_des_decode_ex(const uint64_t* const    preparedKeys,
                        uint8_t* const           buffer,
                        const uint_t             bufferSize);
 
 void
-wh_buff_3des_encode_ex (const uint64_t* const    preparedKeys,
+wh_buff_3des_encode_ex(const uint64_t* const    preparedKeys,
                         uint8_t* const           buffer,
                         const uint_t             bufferSize);
 
 void
-wh_buff_3des_decode_ex (const uint64_t* const    preparedKeys,
+wh_buff_3des_decode_ex(const uint64_t* const    preparedKeys,
                         uint8_t* const           buffer,
                         const uint_t             bufferSize);
 

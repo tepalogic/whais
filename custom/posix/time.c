@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -30,14 +30,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 WTime
-wh_get_currtime ()
+wh_get_currtime()
 {
   WTime          result;
   struct tm      timeUtc;
   struct timeval tv;
 
-  gettimeofday (&tv, NULL);
-  localtime_r (&tv.tv_sec, &timeUtc);
+  gettimeofday(&tv, NULL);
+  localtime_r(&tv.tv_sec, &timeUtc);
 
   result.year  = timeUtc.tm_year + 1900;
   result.month = timeUtc.tm_mon  + 1;
@@ -52,12 +52,12 @@ wh_get_currtime ()
 
 
 WTICKS
-wh_msec_ticks ()
+wh_msec_ticks()
 {
   struct timeval tv;
 
-  gettimeofday (&tv, NULL);
+  gettimeofday(&tv, NULL);
 
-  return ((WTICKS)tv.tv_sec * 1000ul) + (WTICKS)(tv.tv_usec / 1000);
+  return((WTICKS)tv.tv_sec * 1000ul) + (WTICKS)(tv.tv_usec / 1000);
 }
 

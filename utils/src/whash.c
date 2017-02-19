@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -33,7 +33,7 @@ static const uint8_t  FNV_ZERO_RPL  = 0x77;
 
 /* Based on FNV-1a hash algorithm. */
 uint64_t
-wh_hash (const uint8_t* key, const uint_t keySize)
+wh_hash(const uint8_t* key, const uint_t keySize)
 {
   uint64_t result = FNV_OFFSET;
   uint_t   i;

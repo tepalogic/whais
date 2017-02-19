@@ -1,6 +1,6 @@
 /******************************************************************************
   WCMD - An utility to manage whais database files.
-  Copyright (C) 2008  Iulian Popa
+  Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
 Pantelimon Ilfov,
@@ -43,19 +43,19 @@ using namespace std;
 
 
 const char*
-wcmd_translate_status (const uint32_t cs)
+wcmd_translate_status(const uint32_t cs)
 {
   if (cs > WCS_OS_ERR_BASE)
     {
       /* This is safe, coz this function is not supposed to be executed
        * in a multithread environment. a*/
       static char statusStr [64];
-      sprintf (statusStr, "OS internal error: %u.", cs - WCS_OS_ERR_BASE);
+      sprintf(statusStr, "OS internal error: %u.", cs - WCS_OS_ERR_BASE);
 
       return statusStr;
     }
 
-  switch (cs)
+  switch(cs)
   {
   case WCS_OK:
     return "No error returned.";
@@ -129,7 +129,7 @@ wcmd_translate_status (const uint32_t cs)
     return "Unexpected internal error.";
   }
 
-  assert (false);
+  assert(false);
 
   return "Unknown error encountered!";
 }
@@ -145,45 +145,45 @@ static const char globalShowDescExt[] =
   "  global [variable_name] ... ";
 
 static bool
-cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   size_t              linePos   = 0;
-  string              token     = CmdLineNextToken (cmdLine, linePos);
+  string              token     = CmdLineNextToken(cmdLine, linePos);
   string              globals;
   WH_CONNECTION       conHdl    = NULL;
   uint_t              glbsCount = 0;
   uint_t              glbsSel   = 0;
-  const VERBOSE_LEVEL level     = GetVerbosityLevel ();
+  const VERBOSE_LEVEL level     = GetVerbosityLevel();
   vector<string>      subStrs;
 
-  assert (token == "global");
+  assert(token == "global");
 
-  uint32_t cs = WConnect (GetRemoteHostName ().c_str (),
-                          GetConnectionPort ().c_str (),
-                          GetWorkingDB ().c_str (),
-                          GetUserPassword ().c_str (),
-                          GetUserId (),
+  uint32_t cs = WConnect(GetRemoteHostName().c_str(),
+                          GetConnectionPort().c_str(),
+                          GetWorkingDB().c_str(),
+                          GetUserPassword().c_str(),
+                          GetUserId(),
                           DEFAULT_FRAME_SIZE,
                           &conHdl);
   if (cs != WCS_OK)
     {
       if (level >= VL_DEBUG)
-        cout << "Failed to connect: " << wcmd_translate_status (cs) << endl;
+        cout << "Failed to connect: " << wcmd_translate_status(cs) << endl;
 
-      cout << wcmd_translate_status (cs) << endl;
+      cout << wcmd_translate_status(cs) << endl;
       return false;
     }
 
-  while (linePos <= cmdLine.length ())
+  while(linePos <= cmdLine.length())
     {
-      token = CmdLineNextToken (cmdLine, linePos);
-      if (token.length () == 0)
+      token = CmdLineNextToken(cmdLine, linePos);
+      if (token.length() == 0)
         break;
 
-      subStrs.push_back (token);
+      subStrs.push_back(token);
     }
 
-  cs = WStartGlobalsList (conHdl, &glbsCount);
+  cs = WStartGlobalsList(conHdl, &glbsCount);
   if (level >= VL_DEBUG)
     {
       if (cs == WCS_OK)
@@ -194,21 +194,21 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
 
   uint_t glbIt = glbsCount;
-  while ((cs == WCS_OK)
+  while((cs == WCS_OK)
           && (glbIt-- > 0))
     {
       const char* glbName = NULL;
-      cs = WFetchGlobal (conHdl, &glbName);
+      cs = WFetchGlobal(conHdl, &glbName);
       if ((cs != WCS_OK) && (level < VL_DEBUG))
         cout << "Fetching global value name has failed.\n";
 
-      assert (glbName != NULL);
+      assert(glbName != NULL);
 
-      if (subStrs.size () > 0)
+      if (subStrs.size() > 0)
         {
           for (size_t i = 0; i < subStrs.size(); ++i)
             {
-              if (strstr (glbName, subStrs[i].c_str ()) != NULL)
+              if (strstr(glbName, subStrs[i].c_str()) != NULL)
                 {
                   globals += ' ';
                   globals += glbName;
@@ -233,11 +233,11 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
   do
     {
       unsigned int rawType = 0;
-      token   = CmdLineNextToken (globals, linePos);
-      if (token.length () == 0)
+      token   = CmdLineNextToken(globals, linePos);
+      if (token.length() == 0)
 	    break;
 
-      cs = WDescribeGlobal (conHdl, token.c_str (), &rawType);
+      cs = WDescribeGlobal(conHdl, token.c_str(), &rawType);
       if (cs != WCS_OK)
         {
           if (level <= VL_DEBUG)
@@ -251,11 +251,11 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
       cout << token << ' ';
       if (rawType & WHC_TYPE_TABLE_MASK)
         {
-          assert ((rawType & WHC_TYPE_FIELD_MASK) == 0);
+          assert((rawType & WHC_TYPE_FIELD_MASK) == 0);
 
           uint_t fieldsCount;
 
-          cs = WValueFieldsCount (conHdl, &fieldsCount);
+          cs = WValueFieldsCount(conHdl, &fieldsCount);
           if (cs != WCS_OK)
             break;
 
@@ -265,19 +265,19 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
               continue;
             }
 
-          cout << "TABLE (";
+          cout << "TABLE(";
           for (uint_t field = 0; field < fieldsCount; field++)
             {
               const char* fieldName;
 
-              cs = WValueFetchField (conHdl, &fieldName, &rawType);
+              cs = WValueFetchField(conHdl, &fieldName, &rawType);
               if (cs != WCS_OK)
                 break;
 
               if (field > 0)
                 cout << ", ";
 
-              cout << fieldName << " " << wcmd_decode_typeinfo (rawType);
+              cout << fieldName << " " << wcmd_decode_typeinfo(rawType);
             }
           cout << ")\n";
         }
@@ -285,12 +285,12 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
         {
           rawType &= ~WHC_TYPE_FIELD_MASK;
 
-          cout << wcmd_decode_typeinfo (rawType) << " FIELD\n";
+          cout << wcmd_decode_typeinfo(rawType) << " FIELD\n";
         }
       else
-        cout << wcmd_decode_typeinfo (rawType) << endl;
+        cout << wcmd_decode_typeinfo(rawType) << endl;
     }
-  while ((linePos < globals.length ())
+  while((linePos < globals.length())
          && (cs == WCS_OK));
 
   if ((cs == WCS_OK)
@@ -301,12 +301,12 @@ cmdGlobalList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
 
 cmdGlobalList_exit:
-  WClose (conHdl);
+  WClose(conHdl);
 
   if (cs != WCS_OK)
-    cout << wcmd_translate_status (cs) << endl;
+    cout << wcmd_translate_status(cs) << endl;
 
-  return (cs == WCS_OK) ? true : false;
+  return(cs == WCS_OK) ? true : false;
 }
 
 
@@ -320,47 +320,47 @@ static const char procShowDescExt[] =
 
 
 static bool
-cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   size_t              linePos     = 0;
-  string              token       = CmdLineNextToken (cmdLine, linePos);
+  string              token       = CmdLineNextToken(cmdLine, linePos);
   string              procedures;
   WH_CONNECTION       conHdl      = NULL;
   uint_t              procsCount  = 0;
   uint_t              procsSelect = 0;
-  const VERBOSE_LEVEL level       = GetVerbosityLevel ();
+  const VERBOSE_LEVEL level       = GetVerbosityLevel();
   vector<string>      subStrs;
 
-  uint32_t cs = WConnect (GetRemoteHostName ().c_str (),
-                          GetConnectionPort ().c_str (),
-                          GetWorkingDB ().c_str (),
-                          GetUserPassword ().c_str (),
-                          GetUserId (),
+  uint32_t cs = WConnect(GetRemoteHostName().c_str(),
+                          GetConnectionPort().c_str(),
+                          GetWorkingDB().c_str(),
+                          GetUserPassword().c_str(),
+                          GetUserId(),
                           DEFAULT_FRAME_SIZE,
                           &conHdl);
 
-  assert (token == "procedure");
+  assert(token == "procedure");
 
   if (cs != WCS_OK)
     {
       if (level >= VL_DEBUG)
         cout << "Failed to connect: ";
 
-      cout << wcmd_translate_status (cs) << endl;
+      cout << wcmd_translate_status(cs) << endl;
 
       return false;
     }
 
-  while (linePos <= cmdLine.length ())
+  while(linePos <= cmdLine.length())
     {
-      token = CmdLineNextToken (cmdLine, linePos);
-      if (token.length () == 0)
+      token = CmdLineNextToken(cmdLine, linePos);
+      if (token.length() == 0)
         break;
 
-      subStrs.push_back (token);
+      subStrs.push_back(token);
     }
 
-  cs = WStartProceduresList (conHdl, &procsCount);
+  cs = WStartProceduresList(conHdl, &procsCount);
   if (level >= VL_DEBUG)
     {
       if (cs == WCS_OK)
@@ -371,21 +371,21 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
 
   uint_t procIt = procsCount;
-  while ((cs == WCS_OK)
+  while((cs == WCS_OK)
           && (procIt-- > 0))
     {
       const char* procName = NULL;
-      cs = WFetchProcedure (conHdl, &procName);
+      cs = WFetchProcedure(conHdl, &procName);
       if ((cs != WCS_OK) && (level < VL_DEBUG))
         cout << "Fetching procedure name has failed.\n";
 
-      assert (procName != NULL);
+      assert(procName != NULL);
 
-      if (subStrs.size () > 0)
+      if (subStrs.size() > 0)
         {
           for (size_t i = 0; i < subStrs.size(); ++i)
             {
-              if (strstr (procName, subStrs[i].c_str ()) != NULL)
+              if (strstr(procName, subStrs[i].c_str()) != NULL)
                 {
                   procedures += ' ';
                   procedures += procName;
@@ -411,11 +411,11 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     {
       uint_t procsParametersCount;
 
-      token   = CmdLineNextToken (procedures, linePos);
-      if (token.empty ())
+      token   = CmdLineNextToken(procedures, linePos);
+      if (token.empty())
         break;
 
-      cs = WProcParamsCount (conHdl, token.c_str (), &procsParametersCount);
+      cs = WProcParamsCount(conHdl, token.c_str(), &procsParametersCount);
 
       if (cs != WCS_OK)
         {
@@ -440,7 +440,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
           unsigned int paramType;
 
-          cs = WProcParamType (conHdl, token.c_str (), param, &paramType);
+          cs = WProcParamType(conHdl, token.c_str(), param, &paramType);
           if (cs != WCS_OK)
             {
               if (level <= VL_DEBUG)
@@ -456,12 +456,12 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
           if (paramType & WHC_TYPE_TABLE_MASK)
             {
-              assert ((paramType & WHC_TYPE_FIELD_MASK) == 0);
+              assert((paramType & WHC_TYPE_FIELD_MASK) == 0);
 
               uint_t fieldsCount;
 
-              cs = WProcParamFieldCount (conHdl,
-                                         token.c_str (),
+              cs = WProcParamFieldCount(conHdl,
+                                         token.c_str(),
                                          param,
                                          &fieldsCount);
               if (cs != WCS_OK)
@@ -473,13 +473,13 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   continue;
                 }
 
-              cout << "TABLE (";
+              cout << "TABLE(";
               for (uint_t field = 0; field < fieldsCount; field++)
                 {
                   const char* fieldName;
 
-                  cs = WProcParamField (conHdl,
-                                        token.c_str (),
+                  cs = WProcParamField(conHdl,
+                                        token.c_str(),
                                         param,
                                         field,
                                         &fieldName,
@@ -490,7 +490,7 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                   if (field > 0)
                     cout << ", ";
 
-                  cout << fieldName << " " << wcmd_decode_typeinfo (paramType);
+                  cout << fieldName << " " << wcmd_decode_typeinfo(paramType);
                 }
               cout << ')';
             }
@@ -502,16 +502,16 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 cout << "FIELD";
 
               else
-                cout << wcmd_decode_typeinfo (paramType) << " FIELD";
+                cout << wcmd_decode_typeinfo(paramType) << " FIELD";
             }
           else
-            cout << wcmd_decode_typeinfo (paramType);
+            cout << wcmd_decode_typeinfo(paramType);
         }
-      while (param++ > 0);
+      while(param++ > 0);
 
       cout << endl;
     }
-  while ((linePos < procedures.length ())
+  while((linePos < procedures.length())
          && (cs == WCS_OK));
 
   if ((cs == WCS_OK)
@@ -522,12 +522,12 @@ cmdProcList (const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
 
 cmdProcList_exit:
-  WClose (conHdl);
+  WClose(conHdl);
 
   if (cs != WCS_OK)
-    cout << wcmd_translate_status (cs) << endl;
+    cout << wcmd_translate_status(cs) << endl;
 
-  return (cs == WCS_OK) ? true : false;
+  return(cs == WCS_OK) ? true : false;
 }
 
 
@@ -540,36 +540,36 @@ static const char pingShowDescExt[] =
 
 
 static bool
-cmdPing (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+cmdPing(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   WH_CONNECTION conHdl = NULL;
-  WTICKS        ticks  = wh_msec_ticks ();
-  uint32_t      cs     = WConnect (GetRemoteHostName ().c_str (),
-                                   GetConnectionPort ().c_str (),
-                                   GetWorkingDB ().c_str (),
-                                   GetUserPassword ().c_str (),
-                                   GetUserId (),
+  WTICKS        ticks  = wh_msec_ticks();
+  uint32_t      cs     = WConnect(GetRemoteHostName().c_str(),
+                                   GetConnectionPort().c_str(),
+                                   GetWorkingDB().c_str(),
+                                   GetUserPassword().c_str(),
+                                   GetUserId(),
                                    DEFAULT_FRAME_SIZE,
                                    &conHdl);
   if (cs != WCS_OK)
     goto cmd_ping_exit;
 
-  cs = WPingServer (conHdl);
+  cs = WPingServer(conHdl);
 
 cmd_ping_exit:
 
-  WClose (conHdl);
+  WClose(conHdl);
 
-  ticks = wh_msec_ticks () - ticks;
+  ticks = wh_msec_ticks() - ticks;
   if (cs != WCS_OK)
     {
-      cout << wcmd_translate_status (cs) << endl;
+      cout << wcmd_translate_status(cs) << endl;
       return false;
     }
   else
     {
       cout << "Ping time: " << ticks / 1000 << '.';
-      cout.width (3); cout.fill ('0');
+      cout.width(3); cout.fill('0');
       cout << right << ticks % 1000<< "s.\n";
     }
 
@@ -585,41 +585,41 @@ static const char greetShowDescExt[] =
 
 
 static bool
-cmdGreet (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+cmdGreet(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
   const char*   servAns = NULL;
   WH_CONNECTION conHdl  = NULL;
-  uint32_t      cs      = WConnect (GetRemoteHostName ().c_str (),
-                                    GetConnectionPort ().c_str (),
-                                    GetWorkingDB ().c_str (),
-                                    GetUserPassword ().c_str (),
-                                    GetUserId (),
+  uint32_t      cs      = WConnect(GetRemoteHostName().c_str(),
+                                    GetConnectionPort().c_str(),
+                                    GetWorkingDB().c_str(),
+                                    GetUserPassword().c_str(),
+                                    GetUserId(),
                                     DEFAULT_FRAME_SIZE,
                                     &conHdl);
   if (cs != WCS_OK)
     goto cmd_greet_exit;
 
-  cs = WGreetServer (conHdl, &servAns);
+  cs = WGreetServer(conHdl, &servAns);
 
 cmd_greet_exit:
   if (cs != WCS_OK)
     {
-      WClose (conHdl);
-      cout << wcmd_translate_status (cs) << endl;
+      WClose(conHdl);
+      cout << wcmd_translate_status(cs) << endl;
 
       return false;
     }
   else
     {
-      assert (servAns != NULL);
+      assert(servAns != NULL);
 
-      if (strlen (servAns) == 0)
+      if (strlen(servAns) == 0)
         cout << "No answer from server.\n";
 
       else
         cout << "Server says:\n" << servAns << endl;
 
-      WClose (conHdl);
+      WClose(conHdl);
     }
 
   return true;
@@ -664,7 +664,7 @@ static const char execShowDescExt[] =
   "  I8{} -- and a null array holding 8 bit integers.\n"
   "\n"
   "Table values parameter specifiers:\n"
-  "  Table values holds their rows inside of a () pair. Rows holds their\n"
+  "  Table values holds their rows inside of a() pair. Rows holds their\n"
   "  field values inside of []. A field value is specfied using the field's\n"
   "  followed by a dot and then by the value specifier as it is done in the\n"
   "  case of base and arrays values. Example:\n"
@@ -680,7 +680,7 @@ static const char execShowDescExt[] =
   "  exec proc_name i8'231' t'Text \\'example\\'')\n";
 
 void
-AddOnlineTableCommands ()
+AddOnlineTableCommands()
 {
 
   CmdEntry entry;
@@ -691,7 +691,7 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = globalShowDescExt;
   entry.mCmd          = cmdGlobalList;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
   entry.mShowStatus   = true;
   entry.mName         = "procedure";
@@ -699,7 +699,7 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = procShowDescExt;
   entry.mCmd          = cmdProcList;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
   entry.mShowStatus   = true;
   entry.mName         = "ping";
@@ -707,7 +707,7 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = pingShowDescExt;
   entry.mCmd          = cmdPing;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
   entry.mShowStatus   = true;
   entry.mName         = "greet";
@@ -715,7 +715,7 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = greetShowDescExt;
   entry.mCmd          = cmdGreet;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
   entry.mShowStatus   = true;
   entry.mName         = "exec";
@@ -723,6 +723,6 @@ AddOnlineTableCommands ()
   entry.mExtendedDesc = execShowDescExt;
   entry.mCmd          = cmdExec;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 }
 

@@ -50,7 +50,7 @@ uint_t simpleTypes[] =
 //         WHC_TYPE_ARRAY_MASK | WHC_TYPE_TEXT,
     };
 
-const uint_t simpleTypesSize = sizeof (simpleTypes) / sizeof (simpleTypes[0]);
+const uint_t simpleTypesSize = sizeof(simpleTypes) / sizeof(simpleTypes[0]);
 
 WField tableFields[] =
     {
@@ -88,16 +88,16 @@ WField tableFields[] =
         {"array_richreal_field", WHC_TYPE_ARRAY_MASK | WHC_TYPE_RICHREAL}
     };
 
-const uint_t tableFieldsSize = sizeof (tableFields) / sizeof (tableFields[0]);
+const uint_t tableFieldsSize = sizeof(tableFields) / sizeof(tableFields[0]);
 
 static uint_t
-get_field_entry_index (const char*                  field,
+get_field_entry_index(const char*                  field,
                        const WField*       fields,
                        const uint_t                   fieldsSize)
 {
   for (uint_t i = 0; i < fieldsSize; ++i)
     {
-      if (strcmp (fields[i].name, field) == 0)
+      if (strcmp(fields[i].name, field) == 0)
         return i;
     }
 
@@ -105,7 +105,7 @@ get_field_entry_index (const char*                  field,
 }
 
 static bool
-match_table_fields_match (WH_CONNECTION               hnd,
+match_table_fields_match(WH_CONNECTION               hnd,
                          const WField*       fields,
                          const uint_t                   fieldsSize)
 {
@@ -113,9 +113,9 @@ match_table_fields_match (WH_CONNECTION               hnd,
   uint_t fieldsCount;
   uint_t topType;
 
-  if ((WDescribeStackTop (hnd, &topType) != WCS_OK)
+  if ((WDescribeStackTop(hnd, &topType) != WCS_OK)
       || (topType != WHC_TYPE_TABLE_MASK)
-      || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
+      || (WValueFieldsCount(hnd, &fieldsCount) != WCS_OK)
       || (fieldsSize != fieldsCount))
     {
       return false;
@@ -126,10 +126,10 @@ match_table_fields_match (WH_CONNECTION               hnd,
       const char* fieldName;
       uint_t        fieldType;
 
-      if (WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
-      const uint_t index = get_field_entry_index (fieldName,
+      const uint_t index = get_field_entry_index(fieldName,
                                                   fields,
                                                   fieldsSize);
       if (index > fieldsSize)
@@ -138,15 +138,15 @@ match_table_fields_match (WH_CONNECTION               hnd,
       if (fieldType != fields[index].type)
         return false;
 
-      if (GET_BIT (visitedFields, index) != 0)
+      if (GET_BIT(visitedFields, index) != 0)
         return false;
 
-      SET_BIT (visitedFields, index);
+      SET_BIT(visitedFields, index);
     }
 
   for (uint_t i = 0; i < fieldsSize; ++i)
     {
-      if (GET_BIT (visitedFields, i) == 0)
+      if (GET_BIT(visitedFields, i) == 0)
         return false;
     }
 
@@ -155,28 +155,28 @@ match_table_fields_match (WH_CONNECTION               hnd,
 
 
 static bool
-test_stack_bulk_update (WH_CONNECTION hnd)
+test_stack_bulk_update(WH_CONNECTION hnd)
 {
   cout << "Testing stack bulk update ... ";
 
-  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+  if (WPushValue(hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
       goto test_stack_bulk_update_err;
 
   for (uint_t i = 0; i < simpleTypesSize; ++i)
     {
-      if (WPushValue (hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+      if (WPushValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
         goto test_stack_bulk_update_err;
     }
 
-  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+  if (WPushValue(hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
       goto test_stack_bulk_update_err;
 
-  if (WFlush (hnd) != WCS_OK)
+  if (WFlush(hnd) != WCS_OK)
       goto test_stack_bulk_update_err;
 
-  if ((match_table_fields_match (hnd, tableFields, tableFieldsSize) == false)
-      || (WPopValues (hnd, 1) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+  if ((match_table_fields_match(hnd, tableFields, tableFieldsSize) == false)
+      || (WPopValues(hnd, 1) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_stack_bulk_update_err;
     }
@@ -186,20 +186,20 @@ test_stack_bulk_update (WH_CONNECTION hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WDescribeStackTop (hnd, &type) != WCS_OK)
+      if ((WDescribeStackTop(hnd, &type) != WCS_OK)
            || (type != simpleTypes[i])
-           || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
+           || (WValueFieldsCount(hnd, &fieldsCount) != WCS_OK)
            || (fieldsCount != 0)
-           || (WPopValues (hnd, 1) != WCS_OK)
-           || (WFlush (hnd) != WCS_OK))
+           || (WPopValues(hnd, 1) != WCS_OK)
+           || (WFlush(hnd) != WCS_OK))
         {
           goto test_stack_bulk_update_err;
         }
     }
 
-  if ((match_table_fields_match (hnd, tableFields, tableFieldsSize) == false)
-      || (WPopValues (hnd, 1) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+  if ((match_table_fields_match(hnd, tableFields, tableFieldsSize) == false)
+      || (WPopValues(hnd, 1) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_stack_bulk_update_err;
     }
@@ -214,13 +214,13 @@ test_stack_bulk_update_err:
 }
 
 static bool
-test_stack_step_update (WH_CONNECTION hnd)
+test_stack_step_update(WH_CONNECTION hnd)
 {
   cout << "Testing stack update step by step ... ";
 
-  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK)
-      || (match_table_fields_match (hnd, tableFields, tableFieldsSize) == false))
+  if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK)
+      || (match_table_fields_match(hnd, tableFields, tableFieldsSize) == false))
     {
       goto test_stack_step_update_err;
     }
@@ -230,29 +230,29 @@ test_stack_step_update (WH_CONNECTION hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WPushValue (hnd, simpleTypes[i], 0, NULL) != WCS_OK)
-          || (WFlush (hnd) != WCS_OK))
+      if ((WPushValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+          || (WFlush(hnd) != WCS_OK))
         {
           goto test_stack_step_update_err;
         }
-      else if ((WDescribeStackTop (hnd, &type) != WCS_OK)
+      else if ((WDescribeStackTop(hnd, &type) != WCS_OK)
                || (type != simpleTypes[i])
-               || (WValueFieldsCount (hnd, &fieldsCount) != WCS_OK)
+               || (WValueFieldsCount(hnd, &fieldsCount) != WCS_OK)
                || (fieldsCount != 0))
         {
           goto test_stack_step_update_err;
         }
     }
 
-  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK)
-      || (match_table_fields_match (hnd, tableFields, tableFieldsSize) == false))
+  if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, tableFieldsSize, tableFields) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK)
+      || (match_table_fields_match(hnd, tableFields, tableFieldsSize) == false))
     {
       goto test_stack_step_update_err;
     }
 
-  if ((WPopValues (hnd, ~0) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+  if ((WPopValues(hnd, ~0) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_stack_step_update_err;
     }
@@ -266,7 +266,7 @@ test_stack_step_update_err:
 }
 
 static bool
-test_for_errors (WH_CONNECTION hnd)
+test_for_errors(WH_CONNECTION hnd)
 {
   uint_t type;
   WField invalid1 = { "", WHC_TYPE_ARRAY_MASK | WHC_TYPE_BOOL };
@@ -274,18 +274,18 @@ test_for_errors (WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue (NULL, WHC_TYPE_REAL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushValue (hnd, WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushValue (hnd, WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK , 0, tableFields) != WCS_INVALID_ARGS)
-      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK, 1, &invalid1) != WCS_INVALID_ARGS)
-      || (WPushValue (hnd, WHC_TYPE_TABLE_MASK, 1, &invalid2) != WCS_INVALID_ARGS))
+  if ((WPushValue(NULL, WHC_TYPE_REAL, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_TABLE_MASK , 0, tableFields) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_TABLE_MASK, 1, &invalid1) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_TABLE_MASK, 1, &invalid2) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeStackTop (NULL, NULL) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop (NULL, &type) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop (hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WDescribeStackTop(NULL, NULL) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop(NULL, &type) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop(hnd, NULL) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -299,36 +299,36 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName ()
+DefaultDatabaseName()
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId ()
+DefaultUserId()
 {
   return 1;
 }
 
 const char*
-DefaultUserPassword ()
+DefaultUserPassword()
 {
   return "test_password";
 }
 
 int
-main (int argc, const char** argv)
+main(int argc, const char** argv)
 {
   WH_CONNECTION hnd        = NULL;
 
 
-  bool success = tc_settup_connection (argc, argv, &hnd);
+  bool success = tc_settup_connection(argc, argv, &hnd);
 
-  success = success && test_for_errors (hnd);
-  success = success && test_stack_step_update (hnd);
-  success = success && test_stack_bulk_update (hnd);
+  success = success && test_for_errors(hnd);
+  success = success && test_stack_step_update(hnd);
+  success = success && test_stack_bulk_update(hnd);
 
-  WClose (hnd);
+  WClose(hnd);
 
   if (!success)
     {

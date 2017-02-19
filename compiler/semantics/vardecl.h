@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for Whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -68,31 +68,31 @@ struct DeclaredVar
 };
 
 YYSTYPE
-add_id_to_list (YYSTYPE list, YYSTYPE id);
+add_id_to_list(YYSTYPE list, YYSTYPE id);
 
 YYSTYPE
-create_type_spec (struct ParserState* parser, const uint16_t type);
+create_type_spec(struct ParserState* parser, const uint16_t type);
 
 struct DeclaredVar*
-add_declaration (struct ParserState* const parser,
+add_declaration(struct ParserState* const parser,
                  YYSTYPE                   var,
                  YYSTYPE                   type,
                  const bool_t              paramter,
                  const bool_t              unique);
 
 YYSTYPE
-add_list_declaration (struct ParserState* parser,
+add_list_declaration(struct ParserState* parser,
                       YYSTYPE             vars,
                       YYSTYPE             type);
 
 YYSTYPE
-add_field_declaration (struct ParserState*       parser,
+add_field_declaration(struct ParserState*       parser,
                        YYSTYPE                   var,
                        YYSTYPE                   type,
                        struct DeclaredVar* const extra);
 
 bool_t
-compare_extern_table_types (const struct DeclaredVar* const firstTable,
+compare_extern_table_types(const struct DeclaredVar* const firstTable,
                             const struct DeclaredVar* const secondFields);
 
 

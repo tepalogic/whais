@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -232,7 +232,7 @@ get_date_weekday( const int year, const uint_t month, const uint_t day)
   assert( janFirst < 7);
   assert( dateDays > 0);
 
-  return (janFirst + dateDays - 1) % 7;
+  return(janFirst + dateDays - 1) % 7;
 }
 
 
@@ -291,7 +291,7 @@ add_date_days( int32_t          days,
 static WLIB_STATUS
 get_ticks( SessionStack& stack, ISession&)
 {
-  stack.Push( DUInt64 (wh_msec_ticks()));
+  stack.Push( DUInt64(wh_msec_ticks()));
 
   return WOP_OK;
 }
@@ -319,13 +319,13 @@ get_date_year( SessionStack& stack, ISession&)
   DDate date;
 
   stack[stack.Size() - 1].Operand().GetValue( date);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DInt16 ());
+    stack.Push( DInt16());
 
   else
-    stack.Push( DInt16 (date.mYear));
+    stack.Push( DInt16(date.mYear));
 
   return WOP_OK;
 }
@@ -337,13 +337,13 @@ get_date_month( SessionStack& stack, ISession&)
   DDate date;
 
   stack[stack.Size() - 1].Operand().GetValue( date);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (date.mMonth));
+    stack.Push( DUInt8(date.mMonth));
 
   return WOP_OK;
 }
@@ -355,13 +355,13 @@ get_date_day( SessionStack& stack, ISession&)
   DDate date;
 
   stack[stack.Size() - 1].Operand().GetValue( date);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (date.mDay));
+    stack.Push( DUInt8(date.mDay));
 
   return WOP_OK;
 }
@@ -373,13 +373,13 @@ get_date_hours( SessionStack& stack, ISession&)
   DDateTime time;
 
   stack[stack.Size() - 1].Operand().GetValue( time);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (time.mHour));
+    stack.Push( DUInt8(time.mHour));
 
   return WOP_OK;
 }
@@ -391,13 +391,13 @@ get_date_mins( SessionStack& stack, ISession&)
   DDateTime time;
 
   stack[stack.Size() - 1].Operand().GetValue( time);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (time.mMinutes));
+    stack.Push( DUInt8(time.mMinutes));
 
   return WOP_OK;
 }
@@ -409,13 +409,13 @@ get_date_secs( SessionStack& stack, ISession&)
   DDateTime time;
 
   stack[stack.Size() - 1].Operand().GetValue( time);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (time.mSeconds));
+    stack.Push( DUInt8(time.mSeconds));
 
   return WOP_OK;
 }
@@ -427,13 +427,13 @@ get_date_microsecs( SessionStack& stack, ISession&)
   DHiresTime time;
 
   stack[stack.Size() - 1].Operand().GetValue( time);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt32 ());
+    stack.Push( DUInt32());
 
   else
-    stack.Push( DUInt32 (time.mMicrosec));
+    stack.Push( DUInt32(time.mMicrosec));
 
   return WOP_OK;
 }
@@ -446,10 +446,10 @@ diff_date_days( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( firstDate);
   stack[stack.Size() - 1].Operand().GetValue( secondDate);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (firstDate.IsNull() || secondDate.IsNull())
-    stack.Push( DInt32 ());
+    stack.Push( DInt32());
 
   else
     {
@@ -463,7 +463,7 @@ diff_date_days( SessionStack& stack, ISession&)
                              firstDate.mMonth,
                              firstDate.mDay);
 
-      stack.Push( DInt32 (result));
+      stack.Push( DInt32(result));
     }
 
   return WOP_OK;
@@ -478,7 +478,7 @@ add_time_delta_days( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( time);
   stack[stack.Size() - 1].Operand().GetValue( days);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (time.IsNull())
     stack.Push( DHiresTime());
@@ -515,10 +515,10 @@ diff_time_seconds( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( firstTime);
   stack[stack.Size() - 1].Operand().GetValue( secondTime);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (firstTime.IsNull() || secondTime.IsNull())
-    stack.Push( DInt64 ());
+    stack.Push( DInt64());
 
   else
     {
@@ -543,7 +543,7 @@ diff_time_seconds( SessionStack& stack, ISession&)
       result += secondTime.mSeconds;
       result -= firstTime.mSeconds;
 
-      stack.Push( DInt64 (result));
+      stack.Push( DInt64(result));
     }
 
   return WOP_OK;
@@ -557,7 +557,7 @@ add_time_delta_seconds( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( time);
   stack[stack.Size() - 1].Operand().GetValue( seconds);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (time.IsNull())
     stack.Push( DHiresTime());
@@ -627,10 +627,10 @@ diff_time_microsecs( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( firstTime);
   stack[stack.Size() - 1].Operand().GetValue( secondTime);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (firstTime.IsNull() || secondTime.IsNull())
-    stack.Push( DInt64 ());
+    stack.Push( DInt64());
 
   else
     {
@@ -658,7 +658,7 @@ diff_time_microsecs( SessionStack& stack, ISession&)
       result += secondTime.mMicrosec;
       result -= firstTime.mMicrosec;
 
-      stack.Push( DInt64 (result));
+      stack.Push( DInt64(result));
     }
 
   return WOP_OK;
@@ -673,7 +673,7 @@ add_time_delta_microseconds( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( time);
   stack[stack.Size() - 1].Operand().GetValue( useconds);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (time.IsNull())
     stack.Push( DHiresTime());
@@ -742,7 +742,7 @@ native_is_leap_year( SessionStack& stack, ISession& )
   DInt16 year;
 
   stack[stack.Size() - 1].Operand().GetValue( year);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (year.IsNull())
     stack.Push( DBool());
@@ -760,13 +760,13 @@ date_week( SessionStack& stack, ISession&)
   DDate date;
 
   stack[stack.Size() - 1].Operand().GetValue( date);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DUInt8 ());
+    stack.Push( DUInt8());
 
   else
-    stack.Push( DUInt8 (get_date_week( date.mYear, date.mMonth, date.mDay)));
+    stack.Push( DUInt8(get_date_week( date.mYear, date.mMonth, date.mDay)));
 
   return WOP_OK;
 }
@@ -780,7 +780,7 @@ last_date_of_week( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 2].Operand().GetValue( year);
   stack[stack.Size() - 1].Operand().GetValue( week);
-  stack.Pop (2);
+  stack.Pop(2);
 
   if (week.IsNull()
       || year.IsNull()
@@ -820,16 +820,16 @@ get_weekday( SessionStack& stack, ISession&)
   DDate   date;
 
   stack[stack.Size() - 1].Operand().GetValue( date);
-  stack.Pop (1);
+  stack.Pop(1);
 
   if (date.IsNull())
     {
-      stack.Push( DUInt8 ());
+      stack.Push( DUInt8());
 
       return WOP_OK;
     }
 
-  stack.Push( DUInt8 (get_date_weekday( date.mYear,
+  stack.Push( DUInt8(get_date_weekday( date.mYear,
                                         date.mMonth,
                                         date.mDay) + 1));
   return WOP_OK;

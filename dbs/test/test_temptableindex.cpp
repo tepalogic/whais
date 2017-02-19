@@ -33,40 +33,40 @@ static uint_t _removedRows = _rowsCount / 10;
 
 
 bool
-fill_table_with_values (ITable& table,
+fill_table_with_values(ITable& table,
                         const uint32_t rowCount,
                         uint64_t seed,
                         DArray& tableValues)
 {
   bool     result = true;
 
-  table.CreateIndex (0, NULL, NULL);
+  table.CreateIndex(0, NULL, NULL);
   std::cout << "Filling table with values ... " << std::endl;
 
-  wh_rnd_set_seed (seed);
+  wh_rnd_set_seed(seed);
   for (uint_t index = 0; index < rowCount; ++index)
     {
-      DUInt64 value (wh_rnd ());
-      if (table.AddRow () != index)
+      DUInt64 value(wh_rnd());
+      if (table.AddRow() != index)
         {
           result = false;
           break;
         }
 
       std::cout << "\r" << index << "(" << rowCount << ")";
-      table.Set (index, 0, value);
-      tableValues.Add (value);
+      table.Set(index, 0, value);
+      tableValues.Add(value);
 
     }
 
   std::cout << std::endl << "Check table with values ... " << std::endl;
-  DArray values = table.MatchRows (DUInt64 (),
-                                   DUInt64 (~0),
+  DArray values = table.MatchRows(DUInt64(),
+                                   DUInt64(~0),
                                    0,
                                    ~0,
                                    0);
-  if ((values.Count () != tableValues.Count ()) ||
-      (values.Count () != rowCount))
+  if ((values.Count() != tableValues.Count()) ||
+      (values.Count() != rowCount))
     {
       result = false;
     }
@@ -76,14 +76,14 @@ fill_table_with_values (ITable& table,
       DUInt64    rowValue;
       DROW_INDEX rowIndex;
 
-      values.Get (checkIndex, rowIndex);
-      assert (rowIndex.IsNull () == false);
+      values.Get(checkIndex, rowIndex);
+      assert(rowIndex.IsNull() == false);
 
-      table.Get (rowIndex.mValue, 0, rowValue);
+      table.Get(rowIndex.mValue, 0, rowValue);
 
       DUInt64 generated;
-      tableValues.Get (rowIndex.mValue, generated);
-      assert (generated.IsNull () == false);
+      tableValues.Get(rowIndex.mValue, generated);
+      assert(generated.IsNull() == false);
 
       if ((rowValue == generated) == false)
         {
@@ -100,7 +100,7 @@ fill_table_with_values (ITable& table,
 }
 
 bool
-fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
+fill_table_with_first_nulls(ITable& table, const uint32_t rowCount)
 {
   bool result = true;
   std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
@@ -109,12 +109,12 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 
   for (uint64_t index = 0; index < rowCount; ++index)
     {
-      table.Set (index, 0, nullValue);
+      table.Set(index, 0, nullValue);
 
       std::cout << "\r" << index << "(" << rowCount << ")";
     }
 
-  DArray values = table.MatchRows (nullValue,
+  DArray values = table.MatchRows(nullValue,
                                    nullValue,
                                    0,
                                    ~0,
@@ -123,19 +123,19 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
   for (uint64_t index = 0; (index < rowCount) && result; ++index)
     {
       DROW_INDEX element;
-      values.Get (index, element);
+      values.Get(index, element);
 
-      if (element.IsNull () || (element.mValue != index))
+      if (element.IsNull() || (element.mValue != index))
         result = false;
 
       DUInt64 rowValue;
-      table.Get (index, 0, rowValue);
+      table.Get(index, 0, rowValue);
 
-      if (rowValue.IsNull () == false)
+      if (rowValue.IsNull() == false)
         result = false;
     }
 
-  if (values.Count () != rowCount)
+  if (values.Count() != rowCount)
     result = false;
 
   std::cout << std::endl << (result ? "OK" : "FAIL") << std::endl;
@@ -144,38 +144,38 @@ fill_table_with_first_nulls (ITable& table, const uint32_t rowCount)
 }
 
 void
-callback_index_create (CreateIndexCallbackContext* const pData)
+callback_index_create(CreateIndexCallbackContext* const pData)
 {
   std::cout << '\r' << pData->mRowIndex << '(' << pData->mRowsCount << ')';
 }
 
 bool
-test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
+test_index_creation(ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
 {
   CreateIndexCallbackContext data;
   bool result = true;
   std::cout << "Test index creation ... " << std::endl;
 
-  table.RemoveIndex (0);
+  table.RemoveIndex(0);
 
   for (uint64_t index = 0; index < _removedRows; ++index)
     {
       DUInt64 rowValue;
-      tableValues.Get (index, rowValue);
+      tableValues.Get(index, rowValue);
 
-      table.Set (index, 0, rowValue);
+      table.Set(index, 0, rowValue);
     }
 
 
-  table.CreateIndex (0, callback_index_create, &data);
+  table.CreateIndex(0, callback_index_create, &data);
 
-  DArray values  = table.MatchRows (DUInt64 (),
-                                    DUInt64 (~0),
+  DArray values  = table.MatchRows(DUInt64(),
+                                    DUInt64(~0),
                                     0,
                                     ~0,
                                     0);
 
-  if (values.Count () != _rowsCount)
+  if (values.Count() != _rowsCount)
     result = false;
 
   std::cout << (result ? "OK" : "FAIL") << std::endl;
@@ -185,13 +185,13 @@ test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
   for (uint64_t index = 0; (index < _rowsCount) && result; ++index)
     {
       DUInt64 rowValue;
-      table.Get (index, 0, rowValue);
+      table.Get(index, 0, rowValue);
 
-      if (rowValue.IsNull () == true)
+      if (rowValue.IsNull() == true)
         result = false;
 
       DUInt64 generatedValue;
-      tableValues.Get (index, generatedValue);
+      tableValues.Get(index, generatedValue);
       if ((rowValue == generatedValue) == false)
         result = false;
 
@@ -203,37 +203,37 @@ test_index_creation (ITable& table, IDBSHandler& dbsHnd, DArray& tableValues)
 }
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
   if (argc > 1)
     {
-      _rowsCount = atol (argv[1]);
+      _rowsCount = atol(argv[1]);
     }
   _removedRows = _rowsCount / 10;
 
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
+    DBSInit(DBSSettings());
+    DBSCreateDatabase(db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
+  IDBSHandler& handler = DBSRetrieveDatabase(db_name);
 
   {
-    DArray    tableValues (_SC (DUInt64*, NULL));
-    ITable& table = handler.CreateTempTable (sizeof field_desc / sizeof (field_desc[0]),
+    DArray    tableValues(_SC(DUInt64*, NULL));
+    ITable& table = handler.CreateTempTable(sizeof field_desc / sizeof(field_desc[0]),
                                                  field_desc);
 
-    success = success && fill_table_with_values (table, _rowsCount, 0, tableValues);
-    success = success && fill_table_with_first_nulls (table, _removedRows);
-    success = success && test_index_creation (table, handler, tableValues);
+    success = success && fill_table_with_values(table, _rowsCount, 0, tableValues);
+    success = success && fill_table_with_first_nulls(table, _removedRows);
+    success = success && test_index_creation(table, handler, tableValues);
 
-    handler.ReleaseTable (table);
+    handler.ReleaseTable(table);
   }
 
-  DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSReleaseDatabase(handler);
+  DBSRemoveDatabase(db_name);
+  DBSShoutdown();
 
   if (!success)
     {

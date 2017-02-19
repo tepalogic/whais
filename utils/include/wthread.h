@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -34,15 +34,15 @@ namespace whais {
 class EXCEP_SHL Lock
 {
 public:
-  Lock ();
-  ~Lock ();
+  Lock();
+  ~Lock();
 
-  void Acquire ();
-  bool TryAcquire ();
-  void Release ();
+  void Acquire();
+  bool TryAcquire();
+  void Release();
 
 private:
-  Lock (const Lock&);
+  Lock(const Lock&);
   Lock& operator= (const Lock&);
 
   WH_LOCK mLock;
@@ -52,14 +52,14 @@ private:
 class EXCEP_SHL SpinLock
 {
 public:
-  SpinLock ();
+  SpinLock();
 
-  void Acquire ();
-  bool TryAcquire ();
-  void Release ();
+  void Acquire();
+  bool TryAcquire();
+  void Release();
 
 private:
-  SpinLock (const SpinLock&);
+  SpinLock(const SpinLock&);
   SpinLock& operator= (const SpinLock&);
 
   volatile int16_t mLock;
@@ -69,42 +69,42 @@ template<class T>
 class LockRAII
 {
 public:
-  explicit LockRAII ( T &lock, const bool skipAcquire = false)
-    : mLock (lock),
-      mIsAcquireed (false)
+  explicit LockRAII( T &lock, const bool skipAcquire = false)
+    : mLock(lock),
+      mIsAcquireed(false)
   {
     if ( ! skipAcquire)
-      Acquire ();
+      Acquire();
   }
 
-  ~LockRAII ()
+  ~LockRAII()
   {
-    Release ();
+    Release();
   }
 
-  void Acquire ()
+  void Acquire()
   {
-    mLock.Acquire ();
+    mLock.Acquire();
     mIsAcquireed = true;
   }
 
-  bool TryAcquire ()
+  bool TryAcquire()
   {
-    mIsAcquireed = mLock.TryAcquire ();
+    mIsAcquireed = mLock.TryAcquire();
     return mIsAcquireed;
   }
 
-  void Release ()
+  void Release()
   {
     if (mIsAcquireed)
       {
-        mLock.Release ();
+        mLock.Release();
         mIsAcquireed = false;
       }
   }
 
 private:
-  LockRAII (const LockRAII&);
+  LockRAII(const LockRAII&);
   LockRAII& operator= (const LockRAII& );
 
   T&       mLock;
@@ -117,58 +117,58 @@ class DoubleLockRAII
 {
 public:
   DoubleLockRAII(T& lock1, T& lock2, const bool skipAcquire = false)
-    : mLock1 (lock1),
-      mLock2 (lock2),
-      mIsAcquireed1 (false),
-      mIsAcquireed2 (false)
+    : mLock1(lock1),
+      mLock2(lock2),
+      mIsAcquireed1(false),
+      mIsAcquireed2(false)
   {
     if ( ! skipAcquire)
-      AcquireBoth ();
+      AcquireBoth();
   }
 
-  ~DoubleLockRAII ()
+  ~DoubleLockRAII()
   {
-    ReleaseBoth ();
+    ReleaseBoth();
   }
 
-  void AcquireBoth ()
+  void AcquireBoth()
   {
     if (&mLock1 == &mLock2)
       {
-        mLock1.Acquire ();
+        mLock1.Acquire();
         mIsAcquireed1 = true;
         return ;
       }
 
-    while (true)
+    while(true)
       {
-        mLock1.Acquire ();
+        mLock1.Acquire();
         mIsAcquireed1 = true;
 
-        if (mLock2.TryAcquire ())
+        if (mLock2.TryAcquire())
           {
             mIsAcquireed2 = true;
             return ;
           }
 
-        mLock1.Release ();
+        mLock1.Release();
         mIsAcquireed1 = false;
 
-        wh_yield ();
+        wh_yield();
       }
   }
 
-  void ReleaseBoth ()
+  void ReleaseBoth()
   {
     if (mIsAcquireed1)
-      mLock1.Release ();
+      mLock1.Release();
 
     if (mIsAcquireed2)
-      mLock2.Release ();
+      mLock2.Release();
   }
 
 private:
-  DoubleLockRAII (const DoubleLockRAII&);
+  DoubleLockRAII(const DoubleLockRAII&);
   DoubleLockRAII& operator= (const DoubleLockRAII& );
 
   T&       mLock1;
@@ -182,62 +182,62 @@ template<typename T>
 class TripleLockRAII
 {
 public:
-  TripleLockRAII (T& lock1, T& lock2, T& lock3, const bool skipAcquire = false)
-    : mLock1 (lock1),
-      mLock2 (lock2),
-      mLock3 (lock3),
-      mIsAcquireed1 (false),
-      mIsAcquireed2 (false),
-      mIsAcquireed3 (false)
+  TripleLockRAII(T& lock1, T& lock2, T& lock3, const bool skipAcquire = false)
+    : mLock1(lock1),
+      mLock2(lock2),
+      mLock3(lock3),
+      mIsAcquireed1(false),
+      mIsAcquireed2(false),
+      mIsAcquireed3(false)
   {
     if ( ! skipAcquire)
-      AcquireAll ();
+      AcquireAll();
   }
 
-  ~TripleLockRAII ()
+  ~TripleLockRAII()
   {
-    ReleaseAll ();
+    ReleaseAll();
   }
 
-  void AcquireAll ()
+  void AcquireAll()
   {
-    while (true)
+    while(true)
       {
-        mLock1.Acquire ();
+        mLock1.Acquire();
         mIsAcquireed1 = true;
 
         if ((&mLock2 == &mLock1)
-            || ((mIsAcquireed2 = mLock2.TryAcquire ()) == true))
+            || ((mIsAcquireed2 = mLock2.TryAcquire()) == true))
         {
             if ((&mLock3 == &mLock2)
                 || (&mLock3 == &mLock1)
-                || ((mIsAcquireed3 = mLock3.TryAcquire ()) == true))
+                || ((mIsAcquireed3 = mLock3.TryAcquire()) == true))
               {
                 return;
               }
         }
 
-        ReleaseAll ();
-        wh_yield ();
+        ReleaseAll();
+        wh_yield();
       }
   }
 
-  void ReleaseAll ()
+  void ReleaseAll()
   {
     if (mIsAcquireed1)
-      mLock1.Release ();
+      mLock1.Release();
 
     if (mIsAcquireed2)
-      mLock2.Release ();
+      mLock2.Release();
 
     if (mIsAcquireed3)
-      mLock3.Release ();
+      mLock3.Release();
 
     mIsAcquireed1 = mIsAcquireed2 = mIsAcquireed3 = false;
   }
 
 private:
-  TripleLockRAII (const TripleLockRAII&);
+  TripleLockRAII(const TripleLockRAII&);
   TripleLockRAII& operator= (const TripleLockRAII& );
 
   T&       mLock1;
@@ -253,17 +253,17 @@ private:
 class EXCEP_SHL LockException : public Exception
 {
 public:
-  LockException (const uint32_t    code,
+  LockException(const uint32_t    code,
                  const char*       file,
                  uint32_t          line,
                  const char*       fmtMsg = NULL,
                  ...);
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description () const;
+  virtual const char* Description() const;
 };
 
 
@@ -271,23 +271,23 @@ public:
 class EXCEP_SHL Thread
 {
 public:
-  Thread ();
-  ~Thread ();
+  Thread();
+  ~Thread();
 
-  bool Run (WH_THREAD_ROUTINE routine,
+  bool Run(WH_THREAD_ROUTINE routine,
             void* const       args,
             const bool        waitPrevEnd = false);
 
-  void WaitToEnd (const bool throwPending = true);
+  void WaitToEnd(const bool throwPending = true);
 
-  void ThrowPendingException ();
+  void ThrowPendingException();
 
-  void IgnoreExceptions (bool ignore)
+  void IgnoreExceptions(bool ignore)
   {
     mIgnoreExceptions = ignore;
   }
 
-  void DiscardException ()
+  void DiscardException()
   {
     mUnkExceptSignaled = false;
 
@@ -295,15 +295,15 @@ public:
     mException = NULL;
   }
 
-  bool HasExceptionPending ()
+  bool HasExceptionPending()
   {
-    return (mUnkExceptSignaled || (mException != NULL));
+    return(mUnkExceptSignaled || (mException != NULL));
   }
 
 private:
-  static void ThreadWrapperRoutine (void* const);
+  static void ThreadWrapperRoutine(void* const);
 
-  Thread (const Thread&);
+  Thread(const Thread&);
   Thread& operator= (const Thread&);
 
   WH_THREAD_ROUTINE       mRoutine;
@@ -322,18 +322,18 @@ private:
 class EXCEP_SHL ThreadException : public Exception
 {
 public:
-  ThreadException (const uint32_t    code,
+  ThreadException(const uint32_t    code,
                    const char*       file,
                    uint32_t          line,
                    const char*       fmtMsg = NULL,
                    ...);
 
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description () const;
+  virtual const char* Description() const;
 };
 
 

@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -30,55 +30,55 @@ extern "C"
 {
 #endif
 
-typedef void (*WH_THREAD_ROUTINE) (void*);
+typedef void(*WH_THREAD_ROUTINE) (void*);
 
 uint_t
-wh_lock_init (WH_LOCK* const lock);
+wh_lock_init(WH_LOCK* const lock);
 
 uint_t
-wh_lock_destroy (WH_LOCK* const lock);
+wh_lock_destroy(WH_LOCK* const lock);
 
 uint_t
-wh_lock_acquire (WH_LOCK* const lock);
+wh_lock_acquire(WH_LOCK* const lock);
 
 uint_t
-wh_lock_try_acquire (WH_LOCK* const lock,
+wh_lock_try_acquire(WH_LOCK* const lock,
                      bool_t* const outAcquired);
 
 uint_t
-wh_lock_release (WH_LOCK* const lock);
+wh_lock_release(WH_LOCK* const lock);
 
 uint_t
-wh_thread_create (WH_THREAD*                    outThread,
+wh_thread_create(WH_THREAD*                    outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void*                         args);
 
 uint_t
-wh_thread_free (WH_THREAD thread);
+wh_thread_free(WH_THREAD thread);
 
 void
-wh_yield ();
+wh_yield();
 
 void
-wh_sleep (const uint_t millisecs);
+wh_sleep(const uint_t millisecs);
 
 int16_t
-wh_atomic_fetch_inc16 (volatile int16_t* const value);
+wh_atomic_fetch_inc16(volatile int16_t* const value);
 
 int16_t
-wh_atomic_fetch_dec16 (volatile int16_t* const value);
+wh_atomic_fetch_dec16(volatile int16_t* const value);
 
 int32_t
-wh_atomic_fetch_inc32 (volatile int32_t* const value);
+wh_atomic_fetch_inc32(volatile int32_t* const value);
 
 int32_t
-wh_atomic_fetch_dec32 (volatile int32_t* const value);
+wh_atomic_fetch_dec32(volatile int32_t* const value);
 
 int64_t
-wh_atomic_fetch_inc64 (volatile int64_t* const value);
+wh_atomic_fetch_inc64(volatile int64_t* const value);
 
 int64_t
-wh_atomic_fetch_dec64 (volatile int64_t* const value);
+wh_atomic_fetch_dec64(volatile int64_t* const value);
  
 
 #ifdef __cplusplus

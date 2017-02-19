@@ -1,6 +1,6 @@
 /******************************************************************************
   PASTRA - A light database one file system and more.
-  Copyright (C) 2008  Iulian Popa
+  Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
 Pantelimon Ilfov,
@@ -33,12 +33,12 @@ namespace whais
 class DBS_SHL DBSException : public Exception
 {
 public:
-  DBSException (const uint32_t  code,
+  DBSException(const uint32_t  code,
                 const char*     file,
                 uint32_t        line,
                 const char*     fmtMsg = NULL,
                 ...);
-  virtual ~DBSException ();
+  virtual ~DBSException();
 
   enum ExceptionCodes
   {
@@ -80,11 +80,11 @@ public:
     GENERAL_CONTROL_ERROR
   };
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description () const;
+  virtual const char* Description() const;
 };
 
 } //namespace whais

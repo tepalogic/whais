@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -36,7 +36,7 @@ namespace whais {
 
 #ifndef QWORDS_PER_OP
 #define QWORDS_PER_OP    4
-#warning "QWORDS_PER_OP holds the default value of 4 (e.g. 32 bytes per stack value)."
+#warning "QWORDS_PER_OP holds the default value of 4(e.g. 32 bytes per stack value)."
 #endif
 
 class StackValue;
@@ -47,10 +47,10 @@ class INativeObject;
 class INTERP_SHL INativeObject
 {
 public:
-  virtual ~INativeObject ();
+  virtual ~INativeObject();
 
-  virtual void RegisterUser () = 0;
-  virtual void ReleaseUser () = 0;
+  virtual void RegisterUser() = 0;
+  virtual void ReleaseUser() = 0;
 };
 
 
@@ -59,86 +59,86 @@ class INTERP_SHL IOperand
   friend class StackValue;
 
 public:
-  virtual ~IOperand ();
+  virtual ~IOperand();
 
-  virtual bool IsNull () const = 0;
+  virtual bool IsNull() const = 0;
 
-  virtual void GetValue (DBool& outValue) const = 0;
-  virtual void GetValue (DChar& outValue) const = 0;
-  virtual void GetValue (DDate& outValue) const = 0;
-  virtual void GetValue (DDateTime& outValue) const = 0;
-  virtual void GetValue (DHiresTime& outValue) const = 0;
-  virtual void GetValue (DInt8& outValue) const = 0;
-  virtual void GetValue (DInt16& outValue) const = 0;
-  virtual void GetValue (DInt32& outValue) const = 0;
-  virtual void GetValue (DInt64& outValue) const = 0;
-  virtual void GetValue (DReal& outValue) const = 0;
-  virtual void GetValue (DRichReal& outValue) const = 0;
-  virtual void GetValue (DUInt8& outValue) const = 0;
-  virtual void GetValue (DUInt16& outValue) const = 0;
-  virtual void GetValue (DUInt32& outValue) const = 0;
-  virtual void GetValue (DUInt64& outValue) const = 0;
-  virtual void GetValue (DText& outValue) const = 0;
-  virtual void GetValue (DArray& outValue) const = 0;
+  virtual void GetValue(DBool& outValue) const = 0;
+  virtual void GetValue(DChar& outValue) const = 0;
+  virtual void GetValue(DDate& outValue) const = 0;
+  virtual void GetValue(DDateTime& outValue) const = 0;
+  virtual void GetValue(DHiresTime& outValue) const = 0;
+  virtual void GetValue(DInt8& outValue) const = 0;
+  virtual void GetValue(DInt16& outValue) const = 0;
+  virtual void GetValue(DInt32& outValue) const = 0;
+  virtual void GetValue(DInt64& outValue) const = 0;
+  virtual void GetValue(DReal& outValue) const = 0;
+  virtual void GetValue(DRichReal& outValue) const = 0;
+  virtual void GetValue(DUInt8& outValue) const = 0;
+  virtual void GetValue(DUInt16& outValue) const = 0;
+  virtual void GetValue(DUInt32& outValue) const = 0;
+  virtual void GetValue(DUInt64& outValue) const = 0;
+  virtual void GetValue(DText& outValue) const = 0;
+  virtual void GetValue(DArray& outValue) const = 0;
 
-  virtual void SetValue (const DBool& value) = 0;
-  virtual void SetValue (const DChar& value) = 0;
-  virtual void SetValue (const DHiresTime& value) = 0;
-  virtual void SetValue (const DInt64& value) = 0;
-  virtual void SetValue (const DUInt64& value) = 0;
-  virtual void SetValue (const DRichReal& value) = 0;
-  virtual void SetValue (const DText& value) = 0;
-  virtual void SetValue (const DArray& value) = 0;
+  virtual void SetValue(const DBool& value) = 0;
+  virtual void SetValue(const DChar& value) = 0;
+  virtual void SetValue(const DHiresTime& value) = 0;
+  virtual void SetValue(const DInt64& value) = 0;
+  virtual void SetValue(const DUInt64& value) = 0;
+  virtual void SetValue(const DRichReal& value) = 0;
+  virtual void SetValue(const DText& value) = 0;
+  virtual void SetValue(const DArray& value) = 0;
 
 
-  virtual void SelfAdd (const DInt64& value) = 0;
-  virtual void SelfAdd (const DRichReal& value) = 0;
-  virtual void SelfAdd (const DChar& value) = 0;
-  virtual void SelfAdd (const DText& value) = 0;
+  virtual void SelfAdd(const DInt64& value) = 0;
+  virtual void SelfAdd(const DRichReal& value) = 0;
+  virtual void SelfAdd(const DChar& value) = 0;
+  virtual void SelfAdd(const DText& value) = 0;
 
-  virtual void SelfSub (const DInt64& value) = 0;
-  virtual void SelfSub (const DRichReal& value) = 0;
+  virtual void SelfSub(const DInt64& value) = 0;
+  virtual void SelfSub(const DRichReal& value) = 0;
 
-  virtual void SelfMul (const DInt64& value) = 0;
-  virtual void SelfMul (const DUInt64& value) = 0;
-  virtual void SelfMul (const DRichReal& value) = 0;
+  virtual void SelfMul(const DInt64& value) = 0;
+  virtual void SelfMul(const DUInt64& value) = 0;
+  virtual void SelfMul(const DRichReal& value) = 0;
 
-  virtual void SelfDiv (const DInt64& value) = 0;
-  virtual void SelfDiv (const DUInt64& value) = 0;
-  virtual void SelfDiv (const DRichReal& value) = 0;
+  virtual void SelfDiv(const DInt64& value) = 0;
+  virtual void SelfDiv(const DUInt64& value) = 0;
+  virtual void SelfDiv(const DRichReal& value) = 0;
 
-  virtual void SelfMod (const DInt64& value) = 0;
-  virtual void SelfMod (const DUInt64& value) = 0;
+  virtual void SelfMod(const DInt64& value) = 0;
+  virtual void SelfMod(const DUInt64& value) = 0;
 
-  virtual void SelfAnd (const DInt64& value) = 0;
-  virtual void SelfAnd (const DBool& value) = 0;
+  virtual void SelfAnd(const DInt64& value) = 0;
+  virtual void SelfAnd(const DBool& value) = 0;
 
-  virtual void SelfXor (const DInt64& value) = 0;
-  virtual void SelfXor (const DBool& value) = 0;
+  virtual void SelfXor(const DInt64& value) = 0;
+  virtual void SelfXor(const DBool& value) = 0;
 
-  virtual void SelfOr (const DInt64& value) = 0;
-  virtual void SelfOr (const DBool& value) = 0;
+  virtual void SelfOr(const DInt64& value) = 0;
+  virtual void SelfOr(const DBool& value) = 0;
 
-  virtual uint_t GetType () = 0;
+  virtual uint_t GetType() = 0;
 
-  virtual FIELD_INDEX GetField () = 0;
+  virtual FIELD_INDEX GetField() = 0;
 
-  virtual ITable& GetTable () = 0;
+  virtual ITable& GetTable() = 0;
 
-  virtual StackValue GetTableValue () = 0;
-  virtual StackValue GetFieldAt (const FIELD_INDEX field) = 0;
-  virtual StackValue GetValueAt (const uint64_t index) = 0;
-  virtual StackValue Duplicate () const = 0;
+  virtual StackValue GetTableValue() = 0;
+  virtual StackValue GetFieldAt(const FIELD_INDEX field) = 0;
+  virtual StackValue GetValueAt(const uint64_t index) = 0;
+  virtual StackValue Duplicate() const = 0;
 
-  virtual bool StartIterate (const bool reverse, StackValue& outStartItem) = 0;
-  virtual bool Iterate (const bool reverse) = 0;
-  virtual uint64_t IteratorOffset () = 0;
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) = 0;
+  virtual bool Iterate(const bool reverse) = 0;
+  virtual uint64_t IteratorOffset() = 0;
 
-  virtual void           NativeObject (INativeObject* const value) = 0;
-  virtual INativeObject& NativeObject () = 0;
+  virtual void           NativeObject(INativeObject* const value) = 0;
+  virtual INativeObject& NativeObject() = 0;
 
 protected:
-  virtual bool PrepareToCopy (void* const dest) = 0;
+  virtual bool PrepareToCopy(void* const dest) = 0;
 };
 
 
@@ -146,70 +146,70 @@ class INTERP_SHL StackValue
 {
 public:
   template <class OP_T>
-  explicit StackValue (const OP_T& op)
+  explicit StackValue(const OP_T& op)
   {
     const IOperand& compileTest = op;
     (void)compileTest;  //Just to make sure the right type is used.
 
-    assert (sizeof (OP_T) <= sizeof (mStorage));
+    assert(sizeof(OP_T) <= sizeof(mStorage));
 
-    _placement_new (mStorage, op);
+    _placement_new(mStorage, op);
   }
 
-  StackValue (const StackValue& source)
+  StackValue(const StackValue& source)
   {
-    IOperand& op = _CC (StackValue&, source).Operand ();
+    IOperand& op = _CC(StackValue&, source).Operand();
 
-    if (op.PrepareToCopy (mStorage))
-      memcpy (mStorage, &source.mStorage, sizeof mStorage);
+    if (op.PrepareToCopy(mStorage))
+      memcpy(mStorage, &source.mStorage, sizeof mStorage);
   }
 
-  ~StackValue ()
+  ~StackValue()
   {
-    Clear ();
+    Clear();
   }
 
   StackValue&
   operator= (const StackValue& source)
   {
-    IOperand& op = _CC (StackValue&, source).Operand ();
-    Clear ();
+    IOperand& op = _CC(StackValue&, source).Operand();
+    Clear();
 
-    if (op.PrepareToCopy (mStorage))
-      memcpy (mStorage, &source.mStorage, sizeof mStorage);
+    if (op.PrepareToCopy(mStorage))
+      memcpy(mStorage, &source.mStorage, sizeof mStorage);
 
     return *this;
   }
 
-  IOperand& Operand ()
+  IOperand& Operand()
   {
-    return *_RC (IOperand*, mStorage);
+    return *_RC(IOperand*, mStorage);
   }
 
 
-  static StackValue Create (const DBool& value);
-  static StackValue Create (const DChar& value);
-  static StackValue Create (const DDate& value);
-  static StackValue Create (const DDateTime& value);
-  static StackValue Create (const DHiresTime& value);
-  static StackValue Create (const DInt8& value);
-  static StackValue Create (const DInt16& value);
-  static StackValue Create (const DInt32& value);
-  static StackValue Create (const DInt64& value);
-  static StackValue Create (const DReal& value);
-  static StackValue Create (const DRichReal& value);
-  static StackValue Create (const DUInt8& value);
-  static StackValue Create (const DUInt16& value);
-  static StackValue Create (const DUInt32& value);
-  static StackValue Create (const DUInt64& value);
-  static StackValue Create (const DText& value);
-  static StackValue Create (const DArray& value);
+  static StackValue Create(const DBool& value);
+  static StackValue Create(const DChar& value);
+  static StackValue Create(const DDate& value);
+  static StackValue Create(const DDateTime& value);
+  static StackValue Create(const DHiresTime& value);
+  static StackValue Create(const DInt8& value);
+  static StackValue Create(const DInt16& value);
+  static StackValue Create(const DInt32& value);
+  static StackValue Create(const DInt64& value);
+  static StackValue Create(const DReal& value);
+  static StackValue Create(const DRichReal& value);
+  static StackValue Create(const DUInt8& value);
+  static StackValue Create(const DUInt16& value);
+  static StackValue Create(const DUInt32& value);
+  static StackValue Create(const DUInt64& value);
+  static StackValue Create(const DText& value);
+  static StackValue Create(const DArray& value);
 
 
 private:
-  void Clear ()
+  void Clear()
   {
-    Operand ().~IOperand ();
+    Operand().~IOperand();
   }
 
   uint64_t mStorage[QWORDS_PER_OP];
@@ -220,42 +220,42 @@ private:
 class INTERP_SHL SessionStack
 {
 public:
-  SessionStack ();
-  ~SessionStack ();
+  SessionStack();
+  ~SessionStack();
 
-  void  Push ();
-  void  Push (const DBool& value);
-  void  Push (const DChar& value);
-  void  Push (const DDate& value);
-  void  Push (const DDateTime& value);
-  void  Push (const DHiresTime& value);
-  void  Push (const DInt8& value);
-  void  Push (const DInt16& value);
-  void  Push (const DInt32& value);
-  void  Push (const DInt64& value);
-  void  Push (const DReal& value);
-  void  Push (const DRichReal& value);
-  void  Push (const DUInt8& value);
-  void  Push (const DUInt16& value);
-  void  Push (const DUInt32& value);
-  void  Push (const DUInt64& value);
-  void  Push (const DText& value);
-  void  Push (const DArray& value);
-  void  Push (IDBSHandler& dbs, ITable& table);
-  void  Push (INativeObject& object);
-  void  Push (const StackValue& value);
+  void  Push();
+  void  Push(const DBool& value);
+  void  Push(const DChar& value);
+  void  Push(const DDate& value);
+  void  Push(const DDateTime& value);
+  void  Push(const DHiresTime& value);
+  void  Push(const DInt8& value);
+  void  Push(const DInt16& value);
+  void  Push(const DInt32& value);
+  void  Push(const DInt64& value);
+  void  Push(const DReal& value);
+  void  Push(const DRichReal& value);
+  void  Push(const DUInt8& value);
+  void  Push(const DUInt16& value);
+  void  Push(const DUInt32& value);
+  void  Push(const DUInt64& value);
+  void  Push(const DText& value);
+  void  Push(const DArray& value);
+  void  Push(IDBSHandler& dbs, ITable& table);
+  void  Push(INativeObject& object);
+  void  Push(const StackValue& value);
 
-  void  Pop (const uint_t count);
+  void  Pop(const uint_t count);
 
-  size_t Size () const;
+  size_t Size() const;
 
   StackValue& operator[] (const uint_t index);
 
 private:
 
-#pragma warning (disable: 4251)
+#pragma warning(disable: 4251)
   std::vector<StackValue> mStack;
-#pragma warning (default: 4251)
+#pragma warning(default: 4251)
 
 };
 

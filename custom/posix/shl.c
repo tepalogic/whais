@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -29,46 +29,46 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 
 WH_SHLIB
-wh_shl_load (const char* const library)
+wh_shl_load(const char* const library)
 {
   int i = 0;
   char name[512];
 
-  WH_SHLIB result = dlopen (library, RTLD_NOW | RTLD_GLOBAL);
+  WH_SHLIB result = dlopen(library, RTLD_NOW | RTLD_GLOBAL);
   if (result != INVALID_SHL)
     return result;
 
-  i = strlen (library) + 1;
+  i = strlen(library) + 1;
 
   if (sizeof name < (i + 3 + 3)) /* "lib" + * + ".so" */
     return INVALID_SHL;
 
-  strcpy (name, library);
-  while (--i >= 0)
+  strcpy(name, library);
+  while(--i >= 0)
     {
       if (name[i] == '/')
         break;
     }
 
   ++i;
-  sprintf (name + i, "lib%s.so", library + i);
+  sprintf(name + i, "lib%s.so", library + i);
 
-  result = dlopen (name, RTLD_NOW | RTLD_GLOBAL);
+  result = dlopen(name, RTLD_NOW | RTLD_GLOBAL);
   return result;
 }
 
 
 void
-wh_shl_release (WH_SHLIB shl)
+wh_shl_release(WH_SHLIB shl)
 {
-  dlclose (shl);
+  dlclose(shl);
 }
 
 
 void*
-wh_shl_symbol (WH_SHLIB shl, const char* const symbol)
+wh_shl_symbol(WH_SHLIB shl, const char* const symbol)
 {
-  void* const result = dlsym (shl, symbol);
+  void* const result = dlsym(shl, symbol);
 
   return result;
 }

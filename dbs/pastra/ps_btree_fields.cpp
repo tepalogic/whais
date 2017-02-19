@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -30,285 +30,285 @@ namespace whais {
 namespace pastra {
 
 
-FieldIndexNodeManager::FieldIndexNodeManager (
+FieldIndexNodeManager::FieldIndexNodeManager(
                     unique_ptr<IDataContainer>& container,
                     const uint_t              nodeSize,
                     const uint_t              maxCacheMem,
                     const DBS_FIELD_TYPE      fieldType,
                     const bool                create
                                            )
-  : mNodeSize (nodeSize),
-    mMaxCachedMem (maxCacheMem),
-    mRootNode (NIL_NODE),
-    mFirstFreeNode (NIL_NODE),
-    mContainer (container.release ()),
-    mFieldType (fieldType)
+  : mNodeSize(nodeSize),
+    mMaxCachedMem(maxCacheMem),
+    mRootNode(NIL_NODE),
+    mFirstFreeNode(NIL_NODE),
+    mContainer(container.release()),
+    mFieldType(fieldType)
 {
 
   if (create)
-    InitContainer ();
+    InitContainer();
 
-  InitFromContainer ();
+  InitFromContainer();
 }
 
-FieldIndexNodeManager::~FieldIndexNodeManager ()
+FieldIndexNodeManager::~FieldIndexNodeManager()
 {
-  FlushNodes ();
+  FlushNodes();
 }
 
 uint64_t
-FieldIndexNodeManager::NodeRawSize () const
+FieldIndexNodeManager::NodeRawSize() const
 {
   return mNodeSize;
 }
 
 void
-FieldIndexNodeManager::MarkForRemoval ()
+FieldIndexNodeManager::MarkForRemoval()
 {
-  mContainer->MarkForRemoval ();
+  mContainer->MarkForRemoval();
 }
 
 uint64_t
-FieldIndexNodeManager::IndexRawSize () const
+FieldIndexNodeManager::IndexRawSize() const
 {
-  return mContainer->Size ();
+  return mContainer->Size();
 }
 
 NODE_INDEX
-FieldIndexNodeManager::AllocateNode (const NODE_INDEX parent,
+FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent,
                                     const KEY_INDEX parentKey)
 {
   NODE_INDEX nodeIndex = mFirstFreeNode;
 
   if (nodeIndex != NIL_NODE)
     {
-      BTreeNodeRAII freeNode (RetrieveNode (nodeIndex));
+      BTreeNodeRAII freeNode(RetrieveNode(nodeIndex));
 
-      mFirstFreeNode = freeNode->Next ();
+      mFirstFreeNode = freeNode->Next();
 
-      UpdateContainer ();
+      UpdateContainer();
     }
   else
     {
-      assert (mContainer->Size () % NodeRawSize () == 0);
+      assert(mContainer->Size() % NodeRawSize() == 0);
 
-      nodeIndex = mContainer->Size () / NodeRawSize ();
+      nodeIndex = mContainer->Size() / NodeRawSize();
     }
 
   if (parent != NIL_NODE)
     {
-      BTreeNodeRAII parentNode (RetrieveNode (parent));
+      BTreeNodeRAII parentNode(RetrieveNode(parent));
 
-      parentNode->SetNodeOfKey (parentKey, nodeIndex);
+      parentNode->SetNodeOfKey(parentKey, nodeIndex);
 
-      assert (parentNode->IsLeaf () == false);
+      assert(parentNode->IsLeaf() == false);
     }
 
-  assert (nodeIndex > 0);
-  assert (nodeIndex != mFirstFreeNode);
+  assert(nodeIndex > 0);
+  assert(nodeIndex != mFirstFreeNode);
 
   return nodeIndex;
 }
 
 void
-FieldIndexNodeManager::FreeNode (const NODE_INDEX nodeId)
+FieldIndexNodeManager::FreeNode(const NODE_INDEX nodeId)
 {
-  BTreeNodeRAII node (RetrieveNode (nodeId));
+  BTreeNodeRAII node(RetrieveNode(nodeId));
 
-  node->MarkAsRemoved ();
-  node->Next (mFirstFreeNode);
+  node->MarkAsRemoved();
+  node->Next(mFirstFreeNode);
 
-  mFirstFreeNode = node->NodeId ();
+  mFirstFreeNode = node->NodeId();
 
-  UpdateContainer ();
+  UpdateContainer();
 }
 
 NODE_INDEX
-FieldIndexNodeManager::RootNodeId ()
+FieldIndexNodeManager::RootNodeId()
 {
   if (mRootNode == NIL_NODE)
     {
-      BTreeNodeRAII rootNode (RetrieveNode (AllocateNode (NIL_NODE, 0)));
+      BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
 
-      rootNode->Next (NIL_NODE);
-      rootNode->Prev (NIL_NODE);
-      rootNode->KeysCount (0);
-      rootNode->Leaf (true);
-      rootNode->InsertKey (rootNode->SentinelKey ());
+      rootNode->Next(NIL_NODE);
+      rootNode->Prev(NIL_NODE);
+      rootNode->KeysCount(0);
+      rootNode->Leaf(true);
+      rootNode->InsertKey(rootNode->SentinelKey());
 
-      RootNodeId (rootNode->NodeId ());
+      RootNodeId(rootNode->NodeId());
     }
 
   return mRootNode;
 }
 
 void
-FieldIndexNodeManager::RootNodeId (const NODE_INDEX nodeId)
+FieldIndexNodeManager::RootNodeId(const NODE_INDEX nodeId)
 {
-  assert (nodeId != NIL_NODE);
+  assert(nodeId != NIL_NODE);
 
   mRootNode = nodeId;
-  assert (mFirstFreeNode != mRootNode);
+  assert(mFirstFreeNode != mRootNode);
 
-  UpdateContainer ();
+  UpdateContainer();
 }
 
 uint_t
-FieldIndexNodeManager::MaxCachedNodes ()
+FieldIndexNodeManager::MaxCachedNodes()
 {
   return mMaxCachedMem / mNodeSize;
 }
 
 IBTreeNode*
-FieldIndexNodeManager::LoadNode (const NODE_INDEX nodeId)
+FieldIndexNodeManager::LoadNode(const NODE_INDEX nodeId)
 {
-  assert (nodeId > 0);
+  assert(nodeId > 0);
 
-  unique_ptr<IBTreeNode> node (NodeFactory (nodeId));
+  unique_ptr<IBTreeNode> node(NodeFactory(nodeId));
 
-  assert (mContainer->Size () % NodeRawSize () == 0);
+  assert(mContainer->Size() % NodeRawSize() == 0);
 
-  if (mContainer->Size () > nodeId * NodeRawSize ())
+  if (mContainer->Size() > nodeId * NodeRawSize())
     {
-      mContainer->Read (nodeId * NodeRawSize (), NodeRawSize (),
-          node->RawData ());
+      mContainer->Read(nodeId * NodeRawSize(), NodeRawSize(),
+          node->RawData());
     }
   else
     {
-      assert (mContainer->Size () == nodeId * NodeRawSize ());
+      assert(mContainer->Size() == nodeId * NodeRawSize());
 
       //Reserve the required space
-      mContainer->Write (nodeId * NodeRawSize (), NodeRawSize (),
-          node->RawData ());
+      mContainer->Write(nodeId * NodeRawSize(), NodeRawSize(),
+          node->RawData());
     }
 
-  node->MarkClean ();
-  assert (node->NodeId () == nodeId);
+  node->MarkClean();
+  assert(node->NodeId() == nodeId);
 
-  return node.release ();
+  return node.release();
 }
 
 void
-FieldIndexNodeManager::SaveNode (IBTreeNode* const node)
+FieldIndexNodeManager::SaveNode(IBTreeNode* const node)
 {
-  assert (node->NodeId () > 0);
-  assert (mContainer->Size () > node->NodeId () * NodeRawSize ());
-  assert (mContainer->Size () % NodeRawSize () == 0);
+  assert(node->NodeId() > 0);
+  assert(mContainer->Size() > node->NodeId() * NodeRawSize());
+  assert(mContainer->Size() % NodeRawSize() == 0);
 
-  if (node->IsDirty () == false)
+  if (node->IsDirty() == false)
     return;
 
-  mContainer->Write (node->NodeId () * NodeRawSize (), NodeRawSize (),
-      node->RawData ());
+  mContainer->Write(node->NodeId() * NodeRawSize(), NodeRawSize(),
+      node->RawData());
 
-  node->MarkClean ();
+  node->MarkClean();
 }
 
 void
-FieldIndexNodeManager::InitContainer ()
+FieldIndexNodeManager::InitContainer()
 {
-  unique_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node(NodeFactory(0));
 
-  node->Next (NIL_NODE);
-  node->Prev (NIL_NODE);
+  node->Next(NIL_NODE);
+  node->Prev(NIL_NODE);
 
-  mContainer->Write (0, NodeRawSize (), node->RawData ());
+  mContainer->Write(0, NodeRawSize(), node->RawData());
 }
 
 void
-FieldIndexNodeManager::UpdateContainer ()
+FieldIndexNodeManager::UpdateContainer()
 {
-  unique_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node(NodeFactory(0));
 
-  node->Next (mFirstFreeNode);
-  node->Prev (mRootNode);
+  node->Next(mFirstFreeNode);
+  node->Prev(mRootNode);
 
-  mContainer->Write (0, NodeRawSize (), node->RawData ());
+  mContainer->Write(0, NodeRawSize(), node->RawData());
 }
 
 void
-FieldIndexNodeManager::InitFromContainer ()
+FieldIndexNodeManager::InitFromContainer()
 {
-  unique_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node(NodeFactory(0));
 
-  mContainer->Read (0, NodeRawSize (), node->RawData ());
+  mContainer->Read(0, NodeRawSize(), node->RawData());
 
-  mFirstFreeNode = node->Next ();
-  mRootNode = node->Prev ();
+  mFirstFreeNode = node->Next();
+  mRootNode = node->Prev();
 }
 
 IBTreeNode *
-FieldIndexNodeManager::NodeFactory (const NODE_INDEX nodeId)
+FieldIndexNodeManager::NodeFactory(const NODE_INDEX nodeId)
 {
   IBTreeNode* result = NULL;
 
-  switch (mFieldType)
+  switch(mFieldType)
     {
   case T_BOOL:
-    result = new BoolBTreeNode (*this, nodeId);
+    result = new BoolBTreeNode(*this, nodeId);
     break;
 
   case T_CHAR:
-    result = new CharBTreeNode (*this, nodeId);
+    result = new CharBTreeNode(*this, nodeId);
     break;
 
   case T_DATE:
-    result = new DateBTreeNode (*this, nodeId);
+    result = new DateBTreeNode(*this, nodeId);
     break;
 
   case T_DATETIME:
-    result = new DateTimeBTreeNode (*this, nodeId);
+    result = new DateTimeBTreeNode(*this, nodeId);
     break;
 
   case T_HIRESTIME:
-    result = new HiresTimeBTreeNode (*this, nodeId);
+    result = new HiresTimeBTreeNode(*this, nodeId);
     break;
 
   case T_UINT8:
-    result = new UInt8BTreeNode (*this, nodeId);
+    result = new UInt8BTreeNode(*this, nodeId);
     break;
 
   case T_UINT16:
-    result = new UInt16BTreeNode (*this, nodeId);
+    result = new UInt16BTreeNode(*this, nodeId);
     break;
 
   case T_UINT32:
-    result = new UInt32BTreeNode (*this, nodeId);
+    result = new UInt32BTreeNode(*this, nodeId);
     break;
 
   case T_UINT64:
-    result = new UInt64BTreeNode (*this, nodeId);
+    result = new UInt64BTreeNode(*this, nodeId);
     break;
 
   case T_INT8:
-    result = new Int8BTreeNode (*this, nodeId);
+    result = new Int8BTreeNode(*this, nodeId);
     break;
 
   case T_INT16:
-    result = new Int16BTreeNode (*this, nodeId);
+    result = new Int16BTreeNode(*this, nodeId);
     break;
 
   case T_INT32:
-    result = new Int32BTreeNode (*this, nodeId);
+    result = new Int32BTreeNode(*this, nodeId);
     break;
 
   case T_INT64:
-    result = new Int64BTreeNode (*this, nodeId);
+    result = new Int64BTreeNode(*this, nodeId);
     break;
 
   case T_REAL:
-    result = new RealBTreeNode (*this, nodeId);
+    result = new RealBTreeNode(*this, nodeId);
     break;
 
   case T_RICHREAL:
-    result = new RichRealBTreeNode (*this, nodeId);
+    result = new RichRealBTreeNode(*this, nodeId);
     break;
 
   default:
-    assert (false);
+    assert(false);
     }
 
-  assert (result != NULL);
+  assert(result != NULL);
   return result;
 }
 

@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -46,61 +46,61 @@ struct DbsManager;
 class DbsHandler : public IDBSHandler
 {
 public:
-  DbsHandler (const DBSSettings&    settings,
+  DbsHandler(const DBSSettings&    settings,
               const std::string&    directory,
               const std::string&    name);
 
-  DbsHandler (const DbsHandler&     source);
+  DbsHandler(const DbsHandler&     source);
 
-  virtual ~DbsHandler ();
+  virtual ~DbsHandler();
 
-  virtual TABLE_INDEX PersistentTablesCount ();
+  virtual TABLE_INDEX PersistentTablesCount();
 
-  virtual ITable& RetrievePersistentTable (const TABLE_INDEX index);
+  virtual ITable& RetrievePersistentTable(const TABLE_INDEX index);
 
-  virtual ITable& RetrievePersistentTable (const char* const name);
+  virtual ITable& RetrievePersistentTable(const char* const name);
 
-  virtual void ReleaseTable (ITable&);
+  virtual void ReleaseTable(ITable&);
 
-  virtual void AddTable (const char* const      name,
+  virtual void AddTable(const char* const      name,
                          const FIELD_INDEX      fieldsCount,
                          DBSFieldDescriptor*    inoutFields);
 
-  virtual void DeleteTable (const char* const name);
+  virtual void DeleteTable(const char* const name);
 
-  virtual void SyncAllTablesContent ();
-  virtual void SyncTableContent (const TABLE_INDEX index);
-  virtual void NotifyDatabaseUpdate ();
+  virtual void SyncAllTablesContent();
+  virtual void SyncTableContent(const TABLE_INDEX index);
+  virtual void NotifyDatabaseUpdate();
 
-  virtual ITable& CreateTempTable (const FIELD_INDEX   fieldsCount,
+  virtual ITable& CreateTempTable(const FIELD_INDEX   fieldsCount,
                                    DBSFieldDescriptor* inoutFields);
 
-  virtual const char* TableName (const TABLE_INDEX index);
+  virtual const char* TableName(const TABLE_INDEX index);
 
-  void Discard ();
+  void Discard();
 
-  void RemoveFromStorage ();
+  void RemoveFromStorage();
 
-  const std::string& WorkingDir () const
+  const std::string& WorkingDir() const
   {
     return mDbsLocationDir;
   }
 
-  const std::string& TemporalDir () const
+  const std::string& TemporalDir() const
   {
     return mGlbSettings.mTempDir;
   }
 
-  uint64_t MaxFileSize () const
+  uint64_t MaxFileSize() const
   {
     return mGlbSettings.mMaxFileSize;
   }
 
-  bool HasUnreleasedTables ();
+  bool HasUnreleasedTables();
 
-  void RegisterTableSpawn ();
+  void RegisterTableSpawn();
 
-  const DBSSettings& Settings () const
+  const DBSSettings& Settings() const
   {
     return mGlbSettings;
   }
@@ -109,7 +109,7 @@ private:
 
   typedef std::map<std::string, PersistentTable*> TABLES;
 
-  void SyncToFile ();
+  void SyncToFile();
 
   const DBSSettings&      mGlbSettings;
   Lock                    mSync;
@@ -125,9 +125,9 @@ private:
 
 struct DbsElement
 {
-  DbsElement (const DbsHandler& dbs)
-    : mRefCount (0),
-      mDbs (dbs)
+  DbsElement(const DbsHandler& dbs)
+    : mRefCount(0),
+      mDbs(dbs)
   {
   }
 
@@ -141,26 +141,26 @@ struct DbsManager
 {
   typedef std::map<std::string, DbsElement> DATABASES_MAP;
 
-  DbsManager (const DBSSettings& settings)
-    : mSync (),
-      mDBSSettings (settings),
-      mDatabases ()
+  DbsManager(const DBSSettings& settings)
+    : mSync(),
+      mDBSSettings(settings),
+      mDatabases()
   {
-    if ((mDBSSettings.mWorkDir.length () == 0)
-        || (mDBSSettings.mTempDir.length () == 0)
+    if ((mDBSSettings.mWorkDir.length() == 0)
+        || (mDBSSettings.mTempDir.length() == 0)
         || (mDBSSettings.mTableCacheBlkSize == 0)
         || (mDBSSettings.mTableCacheBlkCount == 0)
         || (mDBSSettings.mVLStoreCacheBlkSize == 0)
         || (mDBSSettings.mVLStoreCacheBlkCount == 0)
         || (mDBSSettings.mVLValueCacheSize == 0))
       {
-        throw DBSException (
-            _EXTRA (DBSException::BAD_PARAMETERS),
+        throw DBSException(
+            _EXTRA(DBSException::BAD_PARAMETERS),
             "Cannot create a database manager with the specified parameters."
                            );
       }
-    NormalizeFilePath (mDBSSettings.mWorkDir, true);
-    NormalizeFilePath (mDBSSettings.mTempDir, true);
+    NormalizeFilePath(mDBSSettings.mWorkDir, true);
+    NormalizeFilePath(mDBSSettings.mTempDir, true);
   }
 
   Lock            mSync;

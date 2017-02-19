@@ -1,6 +1,6 @@
 /******************************************************************************
  PRIMA - A language interpreter for WHAIS source objects
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -28,42 +28,42 @@
 using namespace whais;
 
 
-InterException::InterException (const uint32_t  code,
+InterException::InterException(const uint32_t  code,
                                 const char*     file,
                                 uint32_t        line,
                                 const char*     fmtMsg,
                                 ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
 Exception*
-InterException::Clone () const
+InterException::Clone() const
 {
-  return new InterException (*this);
+  return new InterException(*this);
 }
 
 
 EXCEPTION_TYPE
-InterException::Type () const
+InterException::Type() const
 {
   return INTERPRETER_EXCEPTION;
 }
 
 
 const char*
-InterException::Description () const
+InterException::Description() const
 {
-  switch (Code ())
+  switch(Code())
     {
   case INVALID_OP_REQ:
     return "An operation was requested that was not support by a stack operand.";
@@ -168,7 +168,7 @@ InterException::Description () const
     return "GENERAL FAILURE: Program execution must stop due to a interpreter internal error.";
     }
 
-  assert (false);
+  assert(false);
   return "An unknown interpreter exception was thrown.";
 }
 

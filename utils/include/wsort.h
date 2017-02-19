@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -33,24 +33,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 template<typename TE, typename TC> int64_t
-partition (int64_t      from,
+partition(int64_t      from,
            int64_t      to,
            TC&          inoutContainer,
            bool* const  outAlreadySorted)
 {
-  assert (from < to);
-  assert (to < _SC (int64_t, inoutContainer.Count ()));
+  assert(from < to);
+  assert(to < _SC(int64_t, inoutContainer.Count()));
 
   *outAlreadySorted = true;
 
   int64_t pivotIndex = from++;
-  inoutContainer.Pivot (pivotIndex);
+  inoutContainer.Pivot(pivotIndex);
   do
   {
-    if (inoutContainer.Pivot () < inoutContainer[from])
+    if (inoutContainer.Pivot() < inoutContainer[from])
       {
         pivotIndex = from++;
-        inoutContainer.Pivot (pivotIndex);
+        inoutContainer.Pivot(pivotIndex);
         continue;
       }
     else if (inoutContainer[from] < inoutContainer[from - 1])
@@ -60,7 +60,7 @@ partition (int64_t      from,
       }
     ++from;
   }
-  while (from <= to);
+  while(from <= to);
 
   if (*outAlreadySorted)
     return to;
@@ -69,27 +69,27 @@ partition (int64_t      from,
   from = pivotIndex;
   do
     {
-      if (inoutContainer[from] < inoutContainer.Pivot ())
+      if (inoutContainer[from] < inoutContainer.Pivot())
         {
           ++from;
           continue;
         }
-      if (! (inoutContainer[to] < inoutContainer.Pivot ()))
+      if (! (inoutContainer[to] < inoutContainer.Pivot()))
         {
           to--;
           continue;
         }
 
-      assert (from != to);
-      assert (inoutContainer[to] < inoutContainer[from]);
+      assert(from != to);
+      assert(inoutContainer[to] < inoutContainer[from]);
 
-      inoutContainer.Exchange (from, to);
+      inoutContainer.Exchange(from, to);
     }
-  while (from < to);
+  while(from < to);
 
-  assert (from == to);
+  assert(from == to);
 
-  if (inoutContainer[from] < inoutContainer.Pivot ())
+  if (inoutContainer[from] < inoutContainer.Pivot())
     from++;
 
   return from;
@@ -99,24 +99,24 @@ partition (int64_t      from,
 
 
 template<typename TE, typename TC> int64_t
-partition_reverse (int64_t      from,
+partition_reverse(int64_t      from,
                    int64_t      to,
                    TC&          inoutContainer,
                    bool* const  outAlreadySorted)
 {
-  assert (from < to);
-  assert (to < _SC (int64_t, inoutContainer.Count ()));
+  assert(from < to);
+  assert(to < _SC(int64_t, inoutContainer.Count()));
 
   *outAlreadySorted = true;
 
   int64_t pivotIndex = to--;
-  inoutContainer.Pivot (pivotIndex);
+  inoutContainer.Pivot(pivotIndex);
   do
   {
-    if (inoutContainer.Pivot () < inoutContainer[to] )
+    if (inoutContainer.Pivot() < inoutContainer[to] )
       {
         pivotIndex = to--;
-        inoutContainer.Pivot (pivotIndex);
+        inoutContainer.Pivot(pivotIndex);
         continue;
       }
     else if (inoutContainer[to] < inoutContainer[to + 1])
@@ -126,7 +126,7 @@ partition_reverse (int64_t      from,
       }
     --to;
   }
-  while (from <= to);
+  while(from <= to);
 
   if (*outAlreadySorted)
     return to;
@@ -135,28 +135,28 @@ partition_reverse (int64_t      from,
   to = pivotIndex;
   do
     {
-      if (inoutContainer[to] < inoutContainer.Pivot ())
+      if (inoutContainer[to] < inoutContainer.Pivot())
         {
           --to;
           continue;
         }
 
-      if (! (inoutContainer[from] < inoutContainer.Pivot ()))
+      if (! (inoutContainer[from] < inoutContainer.Pivot()))
         {
           ++from;
           continue;
         }
 
-      assert (from != to);
-      assert (inoutContainer[from] < inoutContainer[to]);
+      assert(from != to);
+      assert(inoutContainer[from] < inoutContainer[to]);
 
-      inoutContainer.Exchange (from, to);
+      inoutContainer.Exchange(from, to);
     }
-  while (from < to);
+  while(from < to);
 
-  assert (from == to);
+  assert(from == to);
 
-  if (! (inoutContainer[to] < inoutContainer.Pivot ()))
+  if (! (inoutContainer[to] < inoutContainer.Pivot()))
     return ++to;
 
   return to;
@@ -165,11 +165,11 @@ partition_reverse (int64_t      from,
 
 struct _partition_t
 {
-  _partition_t (int64_t from, int64_t to)
-    : mFrom (from),
-      mTo (to)
+  _partition_t(int64_t from, int64_t to)
+    : mFrom(from),
+      mTo(to)
   {
-    assert (from < to);
+    assert(from < to);
   }
   int64_t mFrom;
   int64_t mTo;
@@ -177,23 +177,23 @@ struct _partition_t
 
 
 template<typename TE, typename TC> void
-quick_sort (int64_t           from,
+quick_sort(int64_t           from,
             int64_t           to,
             const bool        reverse,
             TC&               inoutContainer)
 {
-  assert (from <= to);
+  assert(from <= to);
 
   if (from == to)
     return ;
 
   std::vector<_partition_t> partStack;
-  partStack.push_back ( _partition_t (from, to));
+  partStack.push_back( _partition_t(from, to));
 
   do
     {
-      _partition_t current = partStack[partStack.size () - 1];
-      partStack.pop_back ();
+      _partition_t current = partStack[partStack.size() - 1];
+      partStack.pop_back();
 
       int64_t pivot;
       bool    alreadySorted;
@@ -216,13 +216,13 @@ quick_sort (int64_t           from,
       if ( ! alreadySorted)
         {
           if (pivot < current.mTo)
-            partStack.push_back (_partition_t (pivot, current.mTo));
+            partStack.push_back(_partition_t(pivot, current.mTo));
 
           if (current.mFrom < pivot - 1)
-            partStack.push_back (_partition_t (current.mFrom, pivot - 1));
+            partStack.push_back(_partition_t(current.mFrom, pivot - 1));
         }
     }
-  while (partStack.size () > 0);
+  while(partStack.size() > 0);
 }
 
 

@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -37,62 +37,62 @@ using namespace whais;
 using namespace whais::wod;
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
   int retCode = 0;
 
   try
   {
-    CmdLineParser cmdLine (argc, argv);
+    CmdLineParser cmdLine(argc, argv);
 
     {
-      File inFileObj (cmdLine.SourceFile (), WH_FILEREAD);
-      wod_dump_header (inFileObj, cmdLine.OutStream ());
+      File inFileObj(cmdLine.SourceFile(), WH_FILEREAD);
+      wod_dump_header(inFileObj, cmdLine.OutStream());
     }
 
-    CompiledFileUnit inUnit (cmdLine.SourceFile ());
+    CompiledFileUnit inUnit(cmdLine.SourceFile());
 
-    wod_dump_const_area (inUnit, cmdLine.OutStream ());
-    wod_dump_globals_tables (inUnit, cmdLine.OutStream ());
-    wod_dump_procs (inUnit, cmdLine.OutStream (), false);
+    wod_dump_const_area(inUnit, cmdLine.OutStream());
+    wod_dump_globals_tables(inUnit, cmdLine.OutStream());
+    wod_dump_procs(inUnit, cmdLine.OutStream(), false);
 
   }
-  catch (FunctionalUnitException& e)
+  catch(FunctionalUnitException& e)
   {
-    cerr << e.Message () << endl;
+    cerr << e.Message() << endl;
     retCode = -1;
   }
-  catch (FileException& e)
+  catch(FileException& e)
   {
-    cerr << "File IO error " << e.Code ();
+    cerr << "File IO error " << e.Code();
 
-    if ( ! e.Message ().empty ())
-      cerr << ": " << e.Message () << endl;
+    if ( ! e.Message().empty())
+      cerr << ": " << e.Message() << endl;
 
     else
       cerr << '.' << endl;
 
     retCode = -1;
   }
-  catch (CmdLineException& e)
+  catch(CmdLineException& e)
   {
-    cerr << e.Message () << endl;
+    cerr << e.Message() << endl;
   }
-  catch (Exception & e)
+  catch(Exception & e)
   {
-    cerr << "error : " << e.Message () << endl;
-    cerr << "file: " << e.File () << " : " << e.Line () << endl;
-    cerr << "Extra: " << e.Code () << endl;
+    cerr << "error : " << e.Message() << endl;
+    cerr << "file: " << e.File() << " : " << e.Line() << endl;
+    cerr << "Extra: " << e.Code() << endl;
 
     retCode = -1;
   }
-  catch (bad_alloc &)
+  catch(bad_alloc &)
   {
     cerr << "Memory allocation failed!" << endl;
 
     retCode = -1;
   }
-  catch (...)
+  catch(...)
   {
     cerr << "Unknown exception thrown!" << endl;
     retCode = -1;

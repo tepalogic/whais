@@ -1,6 +1,6 @@
 /******************************************************************************
   WCMD - An utility to manage whais database files.
-  Copyright (C) 2008  Iulian Popa
+  Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
 Pantelimon Ilfov,
@@ -84,8 +84,8 @@ static const char usageDescription[] =
 "                            k,K : for Kilobytes.\n"
 "                            m,M : for Megabytes.\n"
 "                            g,G : for Gigabytes.\n"
-"                           Default value for this is 2G (e.g. 2 Gigabytes),\n"
-"                           and the minimum is 1M (e.g. one Megabyte).\n"
+"                           Default value for this is 2G(e.g. 2 Gigabytes),\n"
+"                           and the minimum is 1M(e.g. one Megabyte).\n"
 "    -t, --validate         Check the database integrity.\n"
 "    -f, --auto_yes         Auto answer with 'yes' to all questions related\n"
 "                           to database validation.\n"
@@ -125,7 +125,7 @@ static bool sFinishInteraction = false;
 #ifndef ARCH_WINDOWS_VC
 
 static void
-sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
+sigterm_hdl(int sig, siginfo_t *siginfo, void *context)
 {
   if (sig == SIGINT)
     {
@@ -141,18 +141,18 @@ sigterm_hdl (int sig, siginfo_t *siginfo, void *context)
 
 
 static bool
-set_signals ()
+set_signals()
 {
   struct sigaction action;
 
-  memset (&action, 0, sizeof action);
+  memset(&action, 0, sizeof action);
   action.sa_flags     = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
- if (sigaction (SIGINT, &action, NULL) < 0)
+ if (sigaction(SIGINT, &action, NULL) < 0)
    return false;
 
- if (sigaction (SIGTERM, &action, NULL) < 0)
+ if (sigaction(SIGTERM, &action, NULL) < 0)
    return false;
 
  return true;
@@ -161,7 +161,7 @@ set_signals ()
 #else
 
 static BOOL WINAPI
-ServerStopHandler (DWORD)
+ServerStopHandler(DWORD)
 {
   sFinishInteraction = true;
   cout << endl;
@@ -170,26 +170,26 @@ ServerStopHandler (DWORD)
 }
 
 static BOOL
-set_signals ()
+set_signals()
 {
-  return SetConsoleCtrlHandler (ServerStopHandler, TRUE);
+  return SetConsoleCtrlHandler(ServerStopHandler, TRUE);
 }
 
 #endif
 
 
 static void
-PrintHelpUsage ()
+PrintHelpUsage()
 {
-  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
+  displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
   cout << usageDescription;
 }
 
 
 static void
-PrintWrongUsage (const char* const arg)
+PrintWrongUsage(const char* const arg)
 {
-  displayBanner (cout, sProgramName, WVER_MAJ, WVER_MIN);
+  displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
 
   if (arg != NULL)
     cerr << "Cannot handle argument '" << arg << "' correctly. Use --help!\n";
@@ -200,32 +200,32 @@ PrintWrongUsage (const char* const arg)
 
 
 static bool
-ExecuteCommandLine (const string& cmdLine)
+ExecuteCommandLine(const string& cmdLine)
 {
-  assert (cmdLine.length () > 0);
+  assert(cmdLine.length() > 0);
 
   static const string spaces = " \t";
 
   if (sFinishInteraction)
     return false;
 
-  size_t firstPos = cmdLine.find_first_not_of (spaces);
-  size_t lastPos  = cmdLine.find_last_not_of (spaces);
+  size_t firstPos = cmdLine.find_first_not_of(spaces);
+  size_t lastPos  = cmdLine.find_last_not_of(spaces);
 
   if (lastPos == 0)
-    lastPos = cmdLine.length () - 1;
+    lastPos = cmdLine.length() - 1;
 
   if (firstPos == lastPos)
     return true;
 
-  const string normalizeCmd = cmdLine.substr (firstPos,
+  const string normalizeCmd = cmdLine.substr(firstPos,
                                               lastPos - firstPos + 1);
 
-  assert (normalizeCmd != "");
+  assert(normalizeCmd != "");
 
   size_t          pos     = 0;
-  const string    command = CmdLineNextToken (normalizeCmd, pos);
-  const CmdEntry* cmd     = FindCmdEntry (command.c_str ());
+  const string    command = CmdLineNextToken(normalizeCmd, pos);
+  const CmdEntry* cmd     = FindCmdEntry(command.c_str());
 
   if (cmd == NULL)
     {
@@ -233,9 +233,9 @@ ExecuteCommandLine (const string& cmdLine)
       return false;
     }
 
-  const bool cmdResult = cmd->mCmd (normalizeCmd, cmd->mContext);
+  const bool cmdResult = cmd->mCmd(normalizeCmd, cmd->mContext);
 
-  if (cmd->mShowStatus && (GetVerbosityLevel () > VL_STATUS))
+  if (cmd->mShowStatus && (GetVerbosityLevel() > VL_STATUS))
     cout << command << " : " << (cmdResult ? "OK" : "FAIL") << endl;
 
   return cmdResult;
@@ -243,7 +243,7 @@ ExecuteCommandLine (const string& cmdLine)
 
 
 static bool
-ExecuteCommandStmt (const string& cmdStmt)
+ExecuteCommandStmt(const string& cmdStmt)
 {
   size_t lastPos    = 0;
   size_t currentPos = 0;
@@ -251,20 +251,20 @@ ExecuteCommandStmt (const string& cmdStmt)
   bool   result     = true;
   bool   armedSlash = false;
 
-  while (result
-         && (currentPos < cmdStmt.length ()))
+  while(result
+         && (currentPos < cmdStmt.length()))
     {
-      if (cmdStmt.c_str ()[currentPos] != commandSep)
+      if (cmdStmt.c_str()[currentPos] != commandSep)
         {
           if ((commandSep == ';')
-              && (cmdStmt.c_str ()[currentPos] == '\''))
+              && (cmdStmt.c_str()[currentPos] == '\''))
             {
-              commandSep = cmdStmt.c_str ()[currentPos++];
+              commandSep = cmdStmt.c_str()[currentPos++];
             }
           else
             {
               if ((commandSep == '\'')
-                  && (cmdStmt.c_str ()[currentPos] == '\\'))
+                  && (cmdStmt.c_str()[currentPos] == '\\'))
                 {
                   armedSlash = ! armedSlash;
                 }
@@ -278,7 +278,7 @@ ExecuteCommandStmt (const string& cmdStmt)
         }
       else if (commandSep == '\'')
         {
-          assert (currentPos > 0);
+          assert(currentPos > 0);
 
           if ( ! armedSlash)
             commandSep = ';';
@@ -288,11 +288,11 @@ ExecuteCommandStmt (const string& cmdStmt)
           continue ;
         }
 
-      const string command = cmdStmt.substr (lastPos, currentPos - lastPos);
+      const string command = cmdStmt.substr(lastPos, currentPos - lastPos);
       lastPos = ++currentPos;
 
-      if (command.length () > 0)
-        result = ExecuteCommandLine (command);
+      if (command.length() > 0)
+        result = ExecuteCommandLine(command);
     }
 
   if (! result)
@@ -304,19 +304,19 @@ ExecuteCommandStmt (const string& cmdStmt)
       return false;
     }
 
-  const string command = cmdStmt.substr (lastPos);
+  const string command = cmdStmt.substr(lastPos);
 
-  if (command.length () > 0)
-    result = ExecuteCommandLine (command);
+  if (command.length() > 0)
+    result = ExecuteCommandLine(command);
 
   return result;
 }
 
 
 static bool
-cmdExit (const string& cmdLine, ENTRY_CMD_CONTEXT context)
+cmdExit(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  bool* finished = _RC (bool*, context);
+  bool* finished = _RC(bool*, context);
 
   *finished = true;
 
@@ -325,7 +325,7 @@ cmdExit (const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
 
 static int
-ExecuteInteractively (istream& is)
+ExecuteInteractively(istream& is)
 {
   CmdEntry entry;
 
@@ -336,45 +336,45 @@ ExecuteInteractively (istream& is)
   entry.mContext      = &sFinishInteraction;
   entry.mShowStatus   = false;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
   string commandStmt;
-  while (! sFinishInteraction)
+  while(! sFinishInteraction)
     {
-      if ((commandStmt.length () == 0) && (&is == &cin))
+      if ((commandStmt.length() == 0) && (&is == &cin))
         cout << "> ";
 
       string line;
-      if (getline (is, line))
+      if (getline(is, line))
         {
-          if (line.length () <= 0)
+          if (line.length() <= 0)
             continue;
 
-          commandStmt.append (line);
+          commandStmt.append(line);
           if (&is == &cin)
             {
-              if (line[line.length () - 1] == '\\')
-                commandStmt.resize (commandStmt.length () - 1);
+              if (line[line.length() - 1] == '\\')
+                commandStmt.resize(commandStmt.length() - 1);
 
               else
                 {
-                  ExecuteCommandStmt (commandStmt);
-                  commandStmt.resize (0);
+                  ExecuteCommandStmt(commandStmt);
+                  commandStmt.resize(0);
                 }
             }
-          else if (line[line.length () - 1] == ';')
+          else if (line[line.length() - 1] == ';')
             {
-              line.resize (line.length () - 1);
-              if ( ! ExecuteCommandStmt (commandStmt))
+              line.resize(line.length() - 1);
+              if ( ! ExecuteCommandStmt(commandStmt))
                 {
                   sFinishInteraction = true;
                   return EINVAL;
                 }
 
-              commandStmt.resize (0);
+              commandStmt.resize(0);
             }
         }
-      else if ((&is != &cin) && (commandStmt.length () > 0))
+      else if ((&is != &cin) && (commandStmt.length() > 0))
         {
           cerr << "Error! A script statement does not end with ';'.\n";
           return EINVAL;
@@ -388,33 +388,33 @@ ExecuteInteractively (istream& is)
 
 
 static void
-InitDBS ()
+InitDBS()
 {
 
-  if (IsOnlineDatabase ())
+  if (IsOnlineDatabase())
     {
-      if (GetVerbosityLevel () >= VL_INFO)
+      if (GetVerbosityLevel() >= VL_INFO)
         {
           cout << "Connecting to a remote database as ";
-          cout << (GetUserId () == 0 ? "administrator" : "default user")
+          cout << (GetUserId() == 0 ? "administrator" : "default user")
                << ".\n";
         }
 
-      if (GetVerbosityLevel () >= VL_DEBUG)
+      if (GetVerbosityLevel() >= VL_DEBUG)
         {
-          cout << " remote host:     " << GetRemoteHostName () << endl;
-          cout << " port:            " << GetConnectionPort () << endl;
-          cout << " database:        " << GetWorkingDB () << endl;
-          cout << " user id:         " << GetUserId () << endl;
-          cout << " password:        " << GetUserPassword () << endl;
+          cout << " remote host:     " << GetRemoteHostName() << endl;
+          cout << " port:            " << GetConnectionPort() << endl;
+          cout << " database:        " << GetWorkingDB() << endl;
+          cout << " user id:         " << GetUserId() << endl;
+          cout << " password:        " << GetUserPassword() << endl;
         }
     }
   else
     {
-      const string&  workDir     = GetWorkingDirectory ();
-      const uint64_t maxFileSize = GetMaximumFileSize ();
+      const string&  workDir     = GetWorkingDirectory();
+      const uint64_t maxFileSize = GetMaximumFileSize();
 
-      if (GetVerbosityLevel () >= VL_DEBUG)
+      if (GetVerbosityLevel() >= VL_DEBUG)
         {
           cout << "Starting the DBS framework: " << endl;
           cout << " directory: " << workDir << endl;
@@ -423,35 +423,35 @@ InitDBS ()
 
       DBSSettings settings;
       settings.mWorkDir = settings.mTempDir = workDir;
-      DBSInit (settings);
+      DBSInit(settings);
     }
 }
 
 
 static void
-StopDBS ()
+StopDBS()
 {
-  if (IsOnlineDatabase ())
+  if (IsOnlineDatabase())
     return;
 
-  DBSShoutdown ();
+  DBSShoutdown();
 
-  if (GetVerbosityLevel () >= VL_DEBUG)
+  if (GetVerbosityLevel() >= VL_DEBUG)
     cout << "Stopping the DBS framework." << endl;
 }
 
 
 static void
-OpenDB ()
+OpenDB()
 {
-  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
-  const string&       workDB = GetWorkingDB ();
+  const VERBOSE_LEVEL level  = GetVerbosityLevel();
+  const string&       workDB = GetWorkingDB();
 
   if (level >= VL_DEBUG)
     cout << "Opening database: " << workDB << " ... ";
 
-  IDBSHandler& dbsHnd = DBSRetrieveDatabase (workDB.c_str ());
-  SetDbsHandler (dbsHnd);
+  IDBSHandler& dbsHnd = DBSRetrieveDatabase(workDB.c_str());
+  SetDbsHandler(dbsHnd);
 
   if (level >= VL_DEBUG)
     cout << "done." << endl;
@@ -459,15 +459,15 @@ OpenDB ()
 
 
 static void
-RemoveDB ()
+RemoveDB()
 {
-  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
-  const string&       workDB = GetWorkingDB ();
+  const VERBOSE_LEVEL level  = GetVerbosityLevel();
+  const string&       workDB = GetWorkingDB();
 
   if (level >= VL_DEBUG)
     cout << "Removing database: " << workDB << " ... ";
 
-  DBSRemoveDatabase (workDB.c_str ());
+  DBSRemoveDatabase(workDB.c_str());
 
   if (level >= VL_DEBUG)
     cout << "done." << endl;
@@ -475,15 +475,15 @@ RemoveDB ()
 
 
 static void
-CreateDB ()
+CreateDB()
 {
-  const VERBOSE_LEVEL level  = GetVerbosityLevel ();
-  const string&       workDB = GetWorkingDB ();
+  const VERBOSE_LEVEL level  = GetVerbosityLevel();
+  const string&       workDB = GetWorkingDB();
 
   if (level >= VL_INFO)
     cout << "Creating database: " << workDB << " ... ";
 
-  DBSCreateDatabase (workDB.c_str ());
+  DBSCreateDatabase(workDB.c_str());
 
   if (level >= VL_INFO)
     cout << "done." << endl;
@@ -491,7 +491,7 @@ CreateDB ()
 
 
 int
-main (const int argc, char *argv[])
+main(const int argc, char *argv[])
 {
   int           result              = 0;
   int           currentArg          = 1;
@@ -507,7 +507,7 @@ main (const int argc, char *argv[])
   const char*   cmdScript           = NULL;
   string        dbDirectory;
 
-  if (! whs_init ())
+  if (! whs_init())
     {
       cerr << "Couldn't not initialize the network socket framework.\n";
 
@@ -516,132 +516,132 @@ main (const int argc, char *argv[])
 
   if (argc == currentArg)
     {
-      PrintWrongUsage (NULL);
+      PrintWrongUsage(NULL);
       return EINVAL;
     }
 
-  InitCmdManager ();
+  InitCmdManager();
 
-  while (currentArg < argc)
+  while(currentArg < argc)
     {
-      if ((strcmp (argv[currentArg], "--help") == 0) ||
-          (strcmp (argv[currentArg], "-h") == 0))
+      if ((strcmp(argv[currentArg], "--help") == 0) ||
+          (strcmp(argv[currentArg], "-h") == 0))
         {
-          PrintHelpUsage ();
+          PrintHelpUsage();
           return 0;
         }
-      else if ((strcmp (argv[currentArg], "-c") == 0) ||
-               (strcmp (argv[currentArg], "--create" ) == 0))
+      else if ((strcmp(argv[currentArg], "-c") == 0) ||
+               (strcmp(argv[currentArg], "--create" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetWorkingDB (argv[currentArg++]);
+          SetWorkingDB(argv[currentArg++]);
           createDB = true;
         }
-      else if ((strcmp (argv[currentArg], "-r") == 0) ||
-               (strcmp (argv[currentArg], "--remove" ) == 0))
+      else if ((strcmp(argv[currentArg], "-r") == 0) ||
+               (strcmp(argv[currentArg], "--remove" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetWorkingDB (argv[currentArg++]);
+          SetWorkingDB(argv[currentArg++]);
           removeDB = true;
         }
-      else if ((strcmp (argv[currentArg], "-u") == 0) ||
-               (strcmp (argv[currentArg], "--use" ) == 0))
+      else if ((strcmp(argv[currentArg], "-u") == 0) ||
+               (strcmp(argv[currentArg], "--use" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetWorkingDB (argv[currentArg++]);
+          SetWorkingDB(argv[currentArg++]);
           useDB = true;
         }
-      else if ((strcmp (argv[currentArg], "-H") == 0) ||
-               (strcmp (argv[currentArg], "--host" ) == 0))
+      else if ((strcmp(argv[currentArg], "-H") == 0) ||
+               (strcmp(argv[currentArg], "--host" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetRemoteHostName (argv[currentArg++]);
+          SetRemoteHostName(argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-P") == 0) ||
-               (strcmp (argv[currentArg], "--port" ) == 0))
+      else if ((strcmp(argv[currentArg], "-P") == 0) ||
+               (strcmp(argv[currentArg], "--port" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetConnectionPort (argv[currentArg++]);
+          SetConnectionPort(argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-A") == 0) ||
-               (strcmp (argv[currentArg], "--admin" ) == 0))
+      else if ((strcmp(argv[currentArg], "-A") == 0) ||
+               (strcmp(argv[currentArg], "--admin" ) == 0))
         {
           ++currentArg;
-          SetUserId (0);
+          SetUserId(0);
         }
-      else if ((strcmp (argv[currentArg], "-p") == 0) ||
-               (strcmp (argv[currentArg], "--pass" ) == 0))
+      else if ((strcmp(argv[currentArg], "-p") == 0) ||
+               (strcmp(argv[currentArg], "--pass" ) == 0))
         {
           ++currentArg;
           if (currentArg == argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
-          SetUserPassword (argv[currentArg++]);
+          SetUserPassword(argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-d") == 0) ||
-               (strcmp (argv[currentArg], "--dir" ) == 0))
+      else if ((strcmp(argv[currentArg], "-d") == 0) ||
+               (strcmp(argv[currentArg], "--dir" ) == 0))
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
 
-          SetWorkingDirectory (argv[currentArg++]);
+          SetWorkingDirectory(argv[currentArg++]);
         }
-      else if ((strcmp (argv[currentArg], "-G") == 0)
-               || (strcmp (argv[currentArg], "--globals") == 0))
+      else if ((strcmp(argv[currentArg], "-G") == 0)
+               || (strcmp(argv[currentArg], "--globals") == 0))
         {
           genHeader = true;
           showLogo  = false;
           ++currentArg;
         }
-      else if (strcmp (argv[currentArg], "--verbose" ) == 0)
+      else if (strcmp(argv[currentArg], "--verbose" ) == 0)
         {
           ++currentArg;
           if (currentArg >= argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
 
-          const int verbosityLevel = atoi (argv[currentArg++]);
+          const int verbosityLevel = atoi(argv[currentArg++]);
           if (verbosityLevel > 5)
             {
               cerr << "The value of the verbosity level is invalid.\n";
@@ -649,69 +649,69 @@ main (const int argc, char *argv[])
               return EINVAL;
             }
 
-          SetVerbosityLevel (verbosityLevel);
+          SetVerbosityLevel(verbosityLevel);
         }
-      else if ((strcmp (argv[currentArg], "-s") == 0) ||
-               (strcmp (argv[currentArg], "--script" ) == 0))
+      else if ((strcmp(argv[currentArg], "-s") == 0) ||
+               (strcmp(argv[currentArg], "--script" ) == 0))
         {
           ++currentArg;
           if (currentArg == argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
           scriptFile = argv [currentArg++];
           showLogo = false;
         }
-      else if ((strcmp (argv[currentArg], "-S") == 0) ||
-               (strcmp (argv[currentArg], "--cmd" ) == 0))
+      else if ((strcmp(argv[currentArg], "-S") == 0) ||
+               (strcmp(argv[currentArg], "--cmd" ) == 0))
         {
           ++currentArg;
           if (currentArg == argc)
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
 
               return EINVAL;
             }
           cmdScript = argv [currentArg++];
           showLogo = false;
         }
-      else if ((strcmp (argv[currentArg], "-m") == 0) ||
-               (strcmp (argv[currentArg], "--file_size" ) == 0))
+      else if ((strcmp(argv[currentArg], "-m") == 0) ||
+               (strcmp(argv[currentArg], "--file_size" ) == 0))
         {
           ++currentArg;
 
           if ((currentArg == argc) ||
-              ( ! SetMaximumFileSize (argv[currentArg])))
+              ( ! SetMaximumFileSize(argv[currentArg])))
             {
-              PrintWrongUsage (argv[currentArg - 1]);
+              PrintWrongUsage(argv[currentArg - 1]);
               return EINVAL;
             }
           else
             ++currentArg;
         }
-      else if ((strcmp (argv[currentArg], "-f") == 0)
-               || (strcmp (argv[currentArg], "--auto_yes" ) == 0))
+      else if ((strcmp(argv[currentArg], "-f") == 0)
+               || (strcmp(argv[currentArg], "--auto_yes" ) == 0))
         {
           ++currentArg;
 
           autoYes = true;
         }
-      else if ((strcmp (argv[currentArg], "-t") == 0)
-               || (strcmp (argv[currentArg], "--validate") == 0))
+      else if ((strcmp(argv[currentArg], "-t") == 0)
+               || (strcmp(argv[currentArg], "--validate") == 0))
         {
           ++currentArg;
 
           checkDbForErrors = true;
         }
-      else if (strcmp (argv[currentArg], "--nologo") == 0)
+      else if (strcmp(argv[currentArg], "--nologo") == 0)
         {
           ++currentArg,
           showLogo = false;
         }
-      else if ((strcmp (argv[currentArg], "-l") == 0)
-               || (strcmp (argv[currentArg], "--license") == 0))
+      else if ((strcmp(argv[currentArg], "-l") == 0)
+               || (strcmp(argv[currentArg], "--license") == 0))
         {
           ++currentArg,
           showLicense = true;
@@ -725,11 +725,11 @@ main (const int argc, char *argv[])
 
   if (showLicense)
     {
-      displayLicenseInformation (cout, sProgramName, sProgramDesc);
+      displayLicenseInformation(cout, sProgramName, sProgramDesc);
       return 0;
     }
   else if (showLogo)
-    displayBanner (cout, "Whais Commander", WVER_MAJ, WVER_MIN);
+    displayBanner(cout, "Whais Commander", WVER_MAJ, WVER_MIN);
 
   if (! (useDB || createDB || removeDB))
     {
@@ -760,7 +760,7 @@ main (const int argc, char *argv[])
       return EINVAL;
     }
 
-  if (IsOnlineDatabase () || genHeader)
+  if (IsOnlineDatabase() || genHeader)
     {
       if (removeDB || createDB)
         {
@@ -774,12 +774,12 @@ main (const int argc, char *argv[])
           return EINVAL;
         }
 
-      assert (useDB);
+      assert(useDB);
     }
 
   if (checkDbForErrors)
     {
-      if ( ! useDB || IsOnlineDatabase ())
+      if ( ! useDB || IsOnlineDatabase())
         {
           cerr << "Only an existent local database may be validated.\n";
           return EINVAL;
@@ -788,14 +788,14 @@ main (const int argc, char *argv[])
 
   try
   {
-    InitDBS ();
+    InitDBS();
   }
-  catch (const Exception& e)
+  catch(const Exception& e)
   {
-    printException (cerr, e);
-    return e.Code ();
+    printException(cerr, e);
+    return e.Code();
   }
-  catch (...)
+  catch(...)
   {
     cerr << "Fatal error ... An unknown exception was encountered.\n";
 
@@ -809,12 +809,12 @@ main (const int argc, char *argv[])
 
       if (checkDbForErrors)
         {
-          assert (useDB && ! IsOnlineDatabase ());
+          assert(useDB && ! IsOnlineDatabase());
 
           checkDbForErrors = false;
 
           cout << "Checking database ...\n";
-          result = check_database_for_errors (autoYes, true);
+          result = check_database_for_errors(autoYes, true);
 
           if (result < 0)
             {
@@ -832,112 +832,112 @@ main (const int argc, char *argv[])
       if ((result == 0) &&  ! removeDB)
         {
           if (createDB)
-            CreateDB ();
+            CreateDB();
 
-          if (IsOnlineDatabase ())
+          if (IsOnlineDatabase())
             {
-              if (GetUserPassword ().size () == 0)
+              if (GetUserPassword().size() == 0)
                 {
                   string password;
 
                   cout << "Password"
-                      << ((GetUserId () == 0) ? "(administrator): " : ": ");
+                      << ((GetUserId() == 0) ? "(administrator): " : ": ");
 
-                  wh_disable_echo ();
-                  getline (cin, password);
-                  wh_enable_echo ();
+                  wh_disable_echo();
+                  getline(cin, password);
+                  wh_enable_echo();
 
                   cout << endl;
 
-                  SetUserPassword (password.c_str ());
+                  SetUserPassword(password.c_str());
                 }
 
               try
                 {
                   WH_CONNECTION conHdl = NULL;
-                  uint32_t cs = WConnect (GetRemoteHostName ().c_str (),
-                                          GetConnectionPort ().c_str (),
-                                          GetWorkingDB ().c_str (),
-                                          GetUserPassword ().c_str (),
-                                          GetUserId (), DEFAULT_FRAME_SIZE,
+                  uint32_t cs = WConnect(GetRemoteHostName().c_str(),
+                                          GetConnectionPort().c_str(),
+                                          GetWorkingDB().c_str(),
+                                          GetUserPassword().c_str(),
+                                          GetUserId(), DEFAULT_FRAME_SIZE,
                                           &conHdl);
                   if (cs != WCS_OK)
                     throw 0;
 
-                  cs = WPingServer (conHdl);
-                  WClose (conHdl);
+                  cs = WPingServer(conHdl);
+                  WClose(conHdl);
                   if (cs != WCS_OK)
                     throw 0;
                 }
-              catch (...)
+              catch(...)
                 {
                   /*
                    * This message might or might not appear. Though
                    * the program terminates, if it gets on this path then
-                   * error message is displayed from time to time (this issue
+                   * error message is displayed from time to time(this issue
                    * was spotted when using Linux).
                    *
                    * Probably a tool chain/OS/Bash bug!
                    */
 
                   cerr << "ERROR: Failed to connect at database '"
-                       << GetWorkingDB () << "' from '"
-                       << GetRemoteHostName () << '@'
-                       << GetConnectionPort () << "'!\n";
+                       << GetWorkingDB() << "' from '"
+                       << GetRemoteHostName() << '@'
+                       << GetConnectionPort() << "'!\n";
 
                   return EINVAL;
                 }
 
-              AddOnlineTableCommands ();
+              AddOnlineTableCommands();
             }
           else
             {
-              OpenDB ();
-              AddOfflineTableCommands ();
+              OpenDB();
+              AddOfflineTableCommands();
             }
 
-        set_signals ();
+        set_signals();
         if (genHeader)
           {
-            PrintExternalDeclarations (cout);
+            PrintExternalDeclarations(cout);
             result = 0;
           }
         else if (scriptFile != NULL)
           {
-            ifstream script (scriptFile, ios_base::in | ios_base::binary);
-            result = ExecuteInteractively (script);
+            ifstream script(scriptFile, ios_base::in | ios_base::binary);
+            result = ExecuteInteractively(script);
           }
         else if (cmdScript != NULL)
           {
-            istringstream script (cmdScript);
-            result = ExecuteInteractively (script);
+            istringstream script(cmdScript);
+            result = ExecuteInteractively(script);
           }
         else
-          result = ExecuteInteractively (cin);
+          result = ExecuteInteractively(cin);
 
-          if (! IsOnlineDatabase ())
-            DBSReleaseDatabase (GetDBSHandler ());
+          if (! IsOnlineDatabase())
+            DBSReleaseDatabase(GetDBSHandler());
         }
       else if (result == 0)
-        RemoveDB ();
+        RemoveDB();
   }
-  catch (const Exception& e)
+  catch(const Exception& e)
   {
-    if ((e.Type () == DBS_EXCEPTION)
-        && (e.Code () == DBSException::DATABASE_IN_USE))
+    if ((e.Type() == DBS_EXCEPTION)
+        && (e.Code() == DBSException::DATABASE_IN_USE))
       {
         cerr << "The selected database was not closed properly last time it ";
         cerr << "was used.\n";
-        checkDbForErrors = repair_database_erros ();
+        checkDbForErrors = repair_database_erros();
       }
     else
       {
-        printException (cerr, e);
+        printException(cerr, e);
 
-        result = e.Code ();
+        result = e.Code();
       }
   }
-  catch (...)
+  catch(...)
   {
     cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = 1;
@@ -947,7 +947,7 @@ main (const int argc, char *argv[])
   {
       if (checkDbForErrors)
         {
-          if (check_database_for_errors (autoYes, false) < 0)
+          if (check_database_for_errors(autoYes, false) < 0)
             {
               cout << "Failed to validate the database.\n";
               result = EINVAL;
@@ -959,20 +959,20 @@ main (const int argc, char *argv[])
               result = EAGAIN;
             }
         }
-      StopDBS ();
+      StopDBS();
   }
-  catch (const Exception& e)
+  catch(const Exception& e)
   {
-    printException (cerr, e);
-    result = (result != 0) ? result : e.Code ();
+    printException(cerr, e);
+    result = (result != 0) ? result : e.Code();
   }
-  catch (...)
+  catch(...)
   {
     cerr << "Fatal error ... Unknown exception was thrown.\n";
     result = (result != 0)  ? result : 1;
   }
 
-  whs_clean ();
+  whs_clean();
 
   return result;
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -64,7 +64,7 @@ typedef uint8_t       bool_t;
 #define FILE_LOCKED     ((int)-2)
 #define INVALID_SHL     NULL
 
-#define SHL_EXPORT_SYMBOL __attribute__ ((visibility ("default")))
-#define SHL_IMPORT_SYMBOL __attribute__ ((visibility ("default")))
+#define SHL_EXPORT_SYMBOL __attribute__ ((visibility("default")))
+#define SHL_IMPORT_SYMBOL __attribute__ ((visibility("default")))
 
 #endif /* WHAIS_TYPES_H */

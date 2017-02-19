@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -361,7 +361,7 @@ static const uint16_t SECOND_BYTE_MARK = 0x80;
 
 
 struct WOutputStream*
-encode_opcode (struct WOutputStream* stream, const enum W_OPCODE opcode)
+encode_opcode(struct WOutputStream* stream, const enum W_OPCODE opcode)
 {
   uint16_t tempOpcode = opcode;
 
@@ -369,17 +369,17 @@ encode_opcode (struct WOutputStream* stream, const enum W_OPCODE opcode)
     {
       tempOpcode |= (SECOND_BYTE_MARK << 8);
 
-     if (wh_ostream_wint8 (stream, (uint8_t)((tempOpcode >> 8) & 0xFF)) == NULL)
+     if (wh_ostream_wint8(stream, (uint8_t)((tempOpcode >> 8) & 0xFF)) == NULL)
        return NULL;
-     return wh_ostream_wint8 (stream, (uint8_t)(tempOpcode & 0xFF));
+     return wh_ostream_wint8(stream, (uint8_t)(tempOpcode & 0xFF));
     }
 
-  return wh_ostream_wint8 (stream, (uint8_t)tempOpcode);
+  return wh_ostream_wint8(stream, (uint8_t)tempOpcode);
 }
 
 
 enum W_OPCODE
-decode_opcode (const uint8_t* instrs)
+decode_opcode(const uint8_t* instrs)
 {
   if (*instrs & SECOND_BYTE_MARK)
     {
@@ -393,14 +393,14 @@ decode_opcode (const uint8_t* instrs)
 }
 
 uint_t
-opcode_bytes (const enum W_OPCODE opcode)
+opcode_bytes(const enum W_OPCODE opcode)
 {
-  return (opcode >= SECOND_BYTE_MARK) ? 2 : 1;
+  return(opcode >= SECOND_BYTE_MARK) ? 2 : 1;
 }
 
 
 uint_t
-wh_compiler_decode_op (const uint8_t* instrs, enum W_OPCODE* const outOpcode)
+wh_compiler_decode_op(const uint8_t* instrs, enum W_OPCODE* const outOpcode)
 {
   if (*instrs & SECOND_BYTE_MARK)
     {

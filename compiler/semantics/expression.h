@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -80,26 +80,26 @@ enum EXP_OPERATION
 };
 
 YYSTYPE
-create_exp_link (struct ParserState* const parser,
+create_exp_link(struct ParserState* const parser,
                  YYSTYPE                   firstOp,
                  YYSTYPE                   secondOp,
                  YYSTYPE                   thirdOp,
                  const enum EXP_OPERATION  opcode);
 
 YYSTYPE
-translate_exp (struct ParserState* const parser, YYSTYPE exp);
+translate_exp(struct ParserState* const parser, YYSTYPE exp);
 
 YYSTYPE
-translate_return_exp (struct ParserState* const  parser, YYSTYPE exp);
+translate_return_exp(struct ParserState* const  parser, YYSTYPE exp);
 
 bool_t
-translate_bool_exp (struct ParserState* const parser, YYSTYPE exp);
+translate_bool_exp(struct ParserState* const parser, YYSTYPE exp);
 
 uint16_t
-translate_iterable_exp (struct ParserState* const parser, YYSTYPE exp);
+translate_iterable_exp(struct ParserState* const parser, YYSTYPE exp);
 
 YYSTYPE
-create_arg_link (struct ParserState* const parser, YYSTYPE arg, YYSTYPE next);
+create_arg_link(struct ParserState* const parser, YYSTYPE arg, YYSTYPE next);
 
 #endif /* EXPRESSION_H */
 

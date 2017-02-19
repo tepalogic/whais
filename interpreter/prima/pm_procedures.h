@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -68,24 +68,24 @@ struct Procedure
 class ProcedureManager
 {
 public:
-  ProcedureManager (NameSpace& space)
-    : mNameSpace (space),
-      mProcsEntrys (),
-      mIdentifiers (),
-      mLocalsValues (),
-      mLocalsTypes (),
-      mDefinitions (),
-      mSyncStmts (),
-      mSync ()
+  ProcedureManager(NameSpace& space)
+    : mNameSpace(space),
+      mProcsEntrys(),
+      mIdentifiers(),
+      mLocalsValues(),
+      mLocalsTypes(),
+      mDefinitions(),
+      mSyncStmts(),
+      mSync()
   {
   }
 
-  uint_t Count () const
+  uint_t Count() const
   {
-    return mProcsEntrys.size ();
+    return mProcsEntrys.size();
   }
 
-  uint32_t AddProcedure (const uint8_t* const     name,
+  uint32_t AddProcedure(const uint8_t* const     name,
                          const uint_t             nameLength,
                          const uint32_t           localsCount,
                          const uint32_t           argsCount,
@@ -96,46 +96,46 @@ public:
                          const uint32_t           codeSize,
                          Unit* const              unit);
 
-  uint32_t GetProcedure (const uint8_t* const name,
+  uint32_t GetProcedure(const uint8_t* const name,
                          const uint_t         nameLength) const;
 
-  const Procedure& GetProcedure (const uint32_t procId);
+  const Procedure& GetProcedure(const uint32_t procId);
 
-  const uint8_t* Name (const uint_t procId) const;
+  const uint8_t* Name(const uint_t procId) const;
 
-  uint32_t ArgsCount (const uint_t procId) const;
+  uint32_t ArgsCount(const uint_t procId) const;
 
-  const StackValue& LocalValue (const uint_t    procId,
+  const StackValue& LocalValue(const uint_t    procId,
                                 const uint32_t  local) const;
 
-  const uint8_t* LocalTypeDescription (const uint_t     procId,
+  const uint8_t* LocalTypeDescription(const uint_t     procId,
                                        const uint32_t   local) const;
 
-  const uint8_t* Code (const Procedure&    proc,
+  const uint8_t* Code(const Procedure&    proc,
                        uint_t* const            outCodeSize) const;
 
-  void AquireSync (const Procedure& proc, const uint32_t sync);
+  void AquireSync(const Procedure& proc, const uint32_t sync);
 
-  void ReleaseSync (const Procedure& proc, const uint32_t sync);
+  void ReleaseSync(const Procedure& proc, const uint32_t sync);
 
-  static bool IsValid (const uint32_t entry)
+  static bool IsValid(const uint32_t entry)
   {
     return entry != INVALID_ENTRY;
   }
 
-  static bool IsGlobalEntry (const uint32_t entry)
+  static bool IsGlobalEntry(const uint32_t entry)
   {
-    return IsValid (entry) && ((entry & GLOBAL_ID) != 0);
+    return IsValid(entry) && ((entry & GLOBAL_ID) != 0);
   }
 
-  static void MarkAsGlobalEntry (uint32_t& entry)
+  static void MarkAsGlobalEntry(uint32_t& entry)
   {
     entry |= GLOBAL_ID;
   }
 
 
 private:
-  ProcedureManager (const ProcedureManager&);
+  ProcedureManager(const ProcedureManager&);
   ProcedureManager& operator= (const ProcedureManager&);
 
   static const uint32_t GLOBAL_ID     = 0x80000000;

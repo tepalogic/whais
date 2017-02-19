@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -95,7 +95,7 @@ get_PI( SessionStack& stack, ISession&)
 
 
 static WLIB_STATUS
-get_SQRT2 (SessionStack& stack, ISession&)
+get_SQRT2(SessionStack& stack, ISession&)
 {
   stack.Push( DRichReal( RICHREAL_T( 2,
                                      41421356237309ull,
@@ -120,7 +120,7 @@ template<class T>
 WLIB_STATUS
 get_min_value( SessionStack& stack, ISession& )
 {
-  stack.Push( T::Min ());
+  stack.Push( T::Min());
 
   return WOP_OK;
 }
@@ -130,7 +130,7 @@ template<class T>
 WLIB_STATUS
 get_max_value( SessionStack& stack, ISession& )
 {
-  stack.Push( T::Max ());
+  stack.Push( T::Max());
 
   return WOP_OK;
 }

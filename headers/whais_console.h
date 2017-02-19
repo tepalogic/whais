@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -31,10 +31,10 @@ extern "C"
 #endif
 
 bool_t
-wh_disable_echo ();
+wh_disable_echo();
 
 bool_t
-wh_enable_echo ();
+wh_enable_echo();
 
 #ifdef __cplusplus
 }

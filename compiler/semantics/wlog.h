@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -132,7 +132,7 @@ struct MsgCodeEntry
 #define MSG_IT_NOTFOUND         (MSG_IT_ALREADY + 1)
 
 void
-log_message (struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);
+log_message(struct ParserState *parser, uint_t buffPos, uint_t msgCode, ...);
 
 #endif /*WLOG_H_ */
 

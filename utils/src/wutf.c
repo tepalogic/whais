@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -27,7 +27,7 @@
 #include "wutf.h"
 
 uint_t
-wh_utf8_cu_count (const uint8_t codeUnit)
+wh_utf8_cu_count(const uint8_t codeUnit)
 {
   if (codeUnit < 0x80)
     return 1;
@@ -56,7 +56,7 @@ wh_utf8_cu_count (const uint8_t codeUnit)
 
 
 uint_t
-wh_utf16_cu_count (const uint16_t codeUnit)
+wh_utf16_cu_count(const uint16_t codeUnit)
 {
   if ((UTF16_EXTRA_BYTE_MIN <= codeUnit)
       && (codeUnit <= UTF16_EXTRA_BYTE_MAX))
@@ -68,13 +68,13 @@ wh_utf16_cu_count (const uint16_t codeUnit)
 }
 
 uint_t
-wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
+wh_load_utf8_cp(const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 {
-  const uint_t cpCount = wh_utf8_cu_count (utf8Str[0]);
+  const uint_t cpCount = wh_utf8_cu_count(utf8Str[0]);
 
   *outCodePoint = 0;
 
-  switch (cpCount)
+  switch(cpCount)
     {
     case 1:
 
@@ -122,7 +122,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 #endif
 
     default:
-      assert (FALSE);
+      assert(FALSE);
       return 0;
     }
 
@@ -131,7 +131,7 @@ wh_load_utf8_cp (const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 
 
 uint_t
-wh_load_utf16_cp (const uint16_t* const utf16Str, uint32_t* const outCodePoint)
+wh_load_utf16_cp(const uint16_t* const utf16Str, uint32_t* const outCodePoint)
 {
   if ((UTF16_EXTRA_BYTE_MIN <= utf16Str[0])
       && (utf16Str[0] <= UTF16_EXTRA_BYTE_MAX))
@@ -148,7 +148,7 @@ wh_load_utf16_cp (const uint16_t* const utf16Str, uint32_t* const outCodePoint)
           return 2;
         }
 
-      assert (FALSE);
+      assert(FALSE);
       return 0;
     }
 
@@ -159,7 +159,7 @@ wh_load_utf16_cp (const uint16_t* const utf16Str, uint32_t* const outCodePoint)
 
 
 uint_t
-wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
+wh_store_utf8_cp(const uint32_t codePoint, uint8_t* const dest)
 {
   if (codePoint < 0x80)
     {
@@ -216,16 +216,16 @@ wh_store_utf8_cp (const uint32_t codePoint, uint8_t* const dest)
     }
 #endif
 
-  assert (FALSE);
+  assert(FALSE);
 
   return 0;
 }
 
 
 uint_t
-wh_store_utf16_cp (const uint32_t codePoint, uint16_t* const dest)
+wh_store_utf16_cp(const uint32_t codePoint, uint16_t* const dest)
 {
-  switch (wh_utf16_store_size( codePoint))
+  switch(wh_utf16_store_size( codePoint))
     {
     case 1:
       dest[0] = codePoint;
@@ -234,7 +234,7 @@ wh_store_utf16_cp (const uint32_t codePoint, uint16_t* const dest)
     case 2:
       {
         const uint32_t cp = codePoint - UTF16_EXTRA_CODE_UNIT_MARK;
-        assert (codePoint >= UTF16_EXTRA_CODE_UNIT_MARK);
+        assert(codePoint >= UTF16_EXTRA_CODE_UNIT_MARK);
 
         dest[0] = UTF16_EXTRA_BYTE_MIN + (cp >> 10);
         dest[1] = cp & UTF16_EXTRA_10BIT_MASK;
@@ -243,12 +243,12 @@ wh_store_utf16_cp (const uint32_t codePoint, uint16_t* const dest)
       }
     }
 
-  assert (FALSE);
+  assert(FALSE);
   return 0;
 }
 
 uint_t
-wh_utf8_store_size (const uint32_t codePoint)
+wh_utf8_store_size(const uint32_t codePoint)
 {
   if (codePoint < 0x80)
     return 1;
@@ -270,26 +270,26 @@ wh_utf8_store_size (const uint32_t codePoint)
     return 6;
 #endif
 
-  assert (FALSE);
+  assert(FALSE);
 
   return 0;
 }
 
 
 uint_t
-wh_utf16_store_size (const uint32_t codePoint)
+wh_utf16_store_size(const uint32_t codePoint)
 {
   if ((UTF16_EXTRA_BYTE_MIN <= codePoint)
       && (codePoint <= UTF16_EXTRA_BYTE_MAX))
     {
-      assert (FALSE);
+      assert(FALSE);
 
       return 0;
     }
   else if (codePoint > UTF_LAST_CODEPOINT)
     {
       /* Unlike UTF-8, UTF-16 could these code points. */
-      assert (FALSE);
+      assert(FALSE);
 
       return 0;
     }
@@ -299,13 +299,13 @@ wh_utf16_store_size (const uint32_t codePoint)
 
 
 int
-wh_utf8_strlen (const uint8_t* utf8Str)
+wh_utf8_strlen(const uint8_t* utf8Str)
 {
   int result = 0;
 
-  while (*utf8Str != 0)
+  while(*utf8Str != 0)
     {
-      const uint_t chSize = wh_utf8_cu_count (utf8Str[0]);
+      const uint_t chSize = wh_utf8_cu_count(utf8Str[0]);
       if (chSize == 0)
         return -1;
 
@@ -317,13 +317,13 @@ wh_utf8_strlen (const uint8_t* utf8Str)
 
 
 int
-wh_utf16_strlen (const uint16_t* utf16Str)
+wh_utf16_strlen(const uint16_t* utf16Str)
 {
   int result = 0;
 
-  while (*utf16Str != 0)
+  while(*utf16Str != 0)
     {
-      const uint_t chSize = wh_utf16_cu_count (utf16Str[0]);
+      const uint_t chSize = wh_utf16_cu_count(utf16Str[0]);
       if (chSize == 0)
         return -1;
 

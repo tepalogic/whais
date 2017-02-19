@@ -1,6 +1,6 @@
 /******************************************************************************
  WHAISC - A compiler for whais programs
- Copyright (C) 2009  Iulian Popa
+ Copyright(C) 2009  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -64,7 +64,7 @@ enum SEMVALUE_TYPE
 /* Describes semantically an identifier. */
 struct SemId
 {
-  const char*   name;         /* identifier name (not null terminated) */
+  const char*   name;         /* identifier name(not null terminated) */
   uint_t        length;       /* name's length */
 };
 
@@ -85,10 +85,10 @@ struct SemCReal
 };
 
 
-/* Describes semantically a string constant (e.g. a text delimited by "" ) */
+/* Describes semantically a string constant(e.g. a text delimited by "" ) */
 struct SemCText
 {
-  const char* text;     /* The entry (not null terminated. */
+  const char* text;     /* The entry(not null terminated. */
   uint_t      length;   /* The length of the entry */
 };
 
@@ -146,7 +146,7 @@ struct SemProcParamList
 };
 
 
-/* Semantic used to evaluate an expression (node).
+/* Semantic used to evaluate an expression(node).
    Depending on the type of the operator, it holds a pointer operands
    expression tree for evaluation. */
 struct SemExpression
@@ -212,16 +212,16 @@ struct ParserState
 /* Reuse or allocate space to hold a semantic description. Tries not to avoid
    allocation of many small memory buffers. */
 struct SemValue*
-alloc_sem_value (struct ParserState* const parser);
+alloc_sem_value(struct ParserState* const parser);
 
 /* Allocate and initialize a semantic description for a boolean value. */
 struct SemValue*
-alloc_bool_sem_value (struct ParserState* const parser,
+alloc_bool_sem_value(struct ParserState* const parser,
                       const bool_t              value);
 
 /* Marks a previously allocated semantic description, as ready for reuse. */
 INLINE static void
-free_sem_value (struct SemValue* const value)
+free_sem_value(struct SemValue* const value)
 {
   value->val_type = VAL_REUSE;
 }

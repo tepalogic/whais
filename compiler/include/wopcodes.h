@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -223,7 +223,7 @@ extern "C"
 #endif
 
 COMPILER_SHL uint_t
-wh_compiler_decode_op (const uint8_t*        instrs,
+wh_compiler_decode_op(const uint8_t*        instrs,
                        enum W_OPCODE* const  outOpcode);
 #ifdef __cplusplus
 }

@@ -28,28 +28,28 @@ uint64_t _iterationsCount = 5000000;
 
 template <typename TR, const int64_t precision>
 static WE_I128
-from_real (TR value)
+from_real(TR value)
 {
-  WE_I128 result = toInt64 (value);
+  WE_I128 result = toInt64(value);
 
-  value  -= toInt64 (value);
+  value  -= toInt64(value);
   result *= precision;
-  result += toInt64 (value * precision);
+  result += toInt64(value * precision);
 
   return result;
 }
 
 template <typename TR, const int64_t precision>
 static TR
-to_real (WE_I128 value)
+to_real(WE_I128 value)
 {
   bool resneg = false;
 
   if (value < 0)
     resneg = true, value = -value;
 
-  TR result (toInt64 (value / precision),
-             toInt64 (value % precision),
+  TR result(toInt64(value / precision),
+             toInt64(value % precision),
              precision);
 
   if (resneg)
@@ -59,7 +59,7 @@ to_real (WE_I128 value)
 }
 
 template <typename TR, const int64_t precision>
-bool test_addition_real (const char* type)
+bool test_addition_real(const char* type)
 {
   int64_t i, j;
 
@@ -68,11 +68,11 @@ bool test_addition_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = wh_rnd ();
-      j = wh_rnd ();
+      i = wh_rnd();
+      j = wh_rnd();
 
-      const WE_I128 op1 (i);
-      const WE_I128 op2 (j);
+      const WE_I128 op1(i);
+      const WE_I128 op2(j);
 
       const TR first  = to_real<TR, precision> (op1);
       const TR second = to_real<TR, precision> (op2);
@@ -114,7 +114,7 @@ test_addition_real_fail:
 }
 
 template <typename TR, const int64_t precision>
-bool test_subtraction_real (const char* type)
+bool test_subtraction_real(const char* type)
 {
   int64_t i, j;
 
@@ -123,11 +123,11 @@ bool test_subtraction_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = wh_rnd ();
-      j = wh_rnd ();
+      i = wh_rnd();
+      j = wh_rnd();
 
-      const WE_I128 op1 (i);
-      const WE_I128 op2 (j);
+      const WE_I128 op1(i);
+      const WE_I128 op2(j);
 
       const TR first  = to_real<TR, precision> (op1);
       const TR second = to_real<TR, precision> (op2);
@@ -172,7 +172,7 @@ test_subtraction_real_fail:
 }
 
 template <typename TR, const int64_t precision, const int scale>
-bool test_multiplication_real (const char* type)
+bool test_multiplication_real(const char* type)
 {
   int64_t i, j;
 
@@ -181,11 +181,11 @@ bool test_multiplication_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = wh_rnd () / scale;
-      j = wh_rnd () / scale;
+      i = wh_rnd() / scale;
+      j = wh_rnd() / scale;
 
-      const WE_I128 op1 (i);
-      const WE_I128 op2 (j);
+      const WE_I128 op1(i);
+      const WE_I128 op2(j);
 
       const TR first  = to_real<TR, precision> (op1);
       const TR second = to_real<TR, precision> (op2);
@@ -197,9 +197,9 @@ bool test_multiplication_real (const char* type)
         }
 
       if (((first * 0) != (0 * first))
-          || ((first * 0) != TR (0))
+          || ((first * 0) != TR(0))
           || ((second * 0) != (0 * second))
-          || ((second * 0) != TR (0)))
+          || ((second * 0) != TR(0)))
         {
           goto test_multiplication_real_fail;
         }
@@ -229,7 +229,7 @@ test_multiplication_real_fail:
 
 
 template <typename TR, const int64_t precision, const int scale, const int64_t MASK>
-bool test_division_real (const char* type)
+bool test_division_real(const char* type)
 {
   int64_t i, j;
 
@@ -238,11 +238,11 @@ bool test_division_real (const char* type)
 
   for (uint64_t it = 0; it <= _iterationsCount; ++it)
     {
-      i = wh_rnd () & MASK;
-      j = wh_rnd () & MASK;
+      i = wh_rnd() & MASK;
+      j = wh_rnd() & MASK;
 
-      const WE_I128 op1 (i);
-      const WE_I128 op2 (j);
+      const WE_I128 op1(i);
+      const WE_I128 op2(j);
 
       const TR first  = to_real<TR, precision> (op1) * scale;
       const TR second = to_real<TR, precision> (op2) * scale;
@@ -293,10 +293,10 @@ test_division_real_fail:
 
 
 int
-main (int argc, char** argv)
+main(int argc, char** argv)
 {
   if (argc > 1)
-    _iterationsCount = atol (argv[1]);
+    _iterationsCount = atol(argv[1]);
 
   bool success = true;
 

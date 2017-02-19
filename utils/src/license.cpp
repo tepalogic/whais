@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -35,38 +35,38 @@ using namespace std;
 
 
 extern "C" void
-showBanner (const char* const programName,
+showBanner(const char* const programName,
             const uint_t      verMajor,
             const uint_t      verMinor)
 {
-  displayBanner (cout, programName, verMajor, verMinor);
+  displayBanner(cout, programName, verMajor, verMinor);
 }
 
 
 extern "C" void
-showLicenseInformation (const char* const programName,
+showLicenseInformation(const char* const programName,
                         const char* const programDescription)
 {
-  displayLicenseInformation (cout, programName, programDescription);
+  displayLicenseInformation(cout, programName, programDescription);
 }
 
 
 
 void
-displayBanner (std::ostream&      os,
+displayBanner(std::ostream&      os,
                const char* const  programName,
                const uint_t       verMajor,
                const uint_t       verMinor)
 {
   os << programName << " version "
-     << verMajor << '.' << setw (2) << setfill ('0') << verMinor
-     << setw (0) << setfill (' ') << " for "
-     << xstringify (WOS) << ' ' << xstringify (WARCH)
-     << "\nCopyright (C) 2015 by Iulian Popa (popaiulian@gmail.com)\n";
+     << verMajor << '.' << setw(2) << setfill('0') << verMinor
+     << setw(0) << setfill(' ') << " for "
+     << xstringify(WOS) << ' ' << xstringify(WARCH)
+     << "\nCopyright(C) 2015 by Iulian Popa(popaiulian@gmail.com)\n";
 }
 
 void
-displayLicenseInformation (std::ostream&     os,
+displayLicenseInformation(std::ostream&     os,
                            const char* const programName,
                            const char* const programDescription)
 {
@@ -75,7 +75,7 @@ displayLicenseInformation (std::ostream&     os,
     os << " - " << programDescription;
 
   os <<
-    "\nCopyright (C) 2015  Iulian Popa\n"
+    "\nCopyright(C) 2015  Iulian Popa\n"
     "\n"
     "Address: Str. Olimp nr. 6\n"
     "         Pantelimon, Ilfov\n"

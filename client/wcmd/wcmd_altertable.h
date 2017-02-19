@@ -1,6 +1,6 @@
 /******************************************************************************
   WCMD - An utility to manage whais database files.
-  Copyright (C) 2008  Iulian Popa
+  Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
 Pantelimon Ilfov,
@@ -38,29 +38,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 class TableAlterRules
 {
 public:
-  TableAlterRules (whais::IDBSHandler&             dbs,
+  TableAlterRules(whais::IDBSHandler&             dbs,
                    const std::string&              table,
                    const std::vector<std::string>& fields);
-  ~TableAlterRules ();
+  ~TableAlterRules();
 
-  void DropField (const std::string& field);
-  void RetypeField (const std::string&   name,
+  void DropField(const std::string& field);
+  void RetypeField(const std::string&   name,
                     const DBS_FIELD_TYPE type,
                     const bool           isArray);
-  void RenameField (const std::string& oldName, const std::string& newName);
-  void AddField (const std::string&   name,
+  void RenameField(const std::string& oldName, const std::string& newName);
+  void AddField(const std::string&   name,
                  const DBS_FIELD_TYPE type,
                  const bool           isArray);
 
-  void CommitToTable (const std::string&             newTableName,
+  void CommitToTable(const std::string&             newTableName,
                       const whais::Range<ROW_INDEX>& selectedRows);
-  void Commit ();
+  void Commit();
 
 private:
-  TableAlterRules (whais::IDBSHandler&             dbs,
+  TableAlterRules(whais::IDBSHandler&             dbs,
                    whais::ITable&                  table);
 
-  void CommitToTable (whais::ITable&                 table,
+  void CommitToTable(whais::ITable&                 table,
                       const whais::Range<ROW_INDEX>& selectedRows);
 
   struct FieldConnection

@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -32,12 +32,12 @@ namespace whais
 
 
 const std::string
-NextToken (const std::string&       text,
+NextToken(const std::string&       text,
            size_t&                  inoutOff,
            const std::string&       delims);
 
 std::string&
-NormalizeFilePath (std::string& path, const bool isDirectory);
+NormalizeFilePath(std::string& path, const bool isDirectory);
 
 } //namespace whais
 

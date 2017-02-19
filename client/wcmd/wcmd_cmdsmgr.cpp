@@ -1,6 +1,6 @@
 /******************************************************************************
   WCMD - An utility to manage whais database files.
-  Copyright (C) 2008  Iulian Popa
+  Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
 Pantelimon Ilfov,
@@ -45,9 +45,9 @@ static const uint_t MAX_DECODED_STRING = 256;
 
 
 static string
-decode_basic_type (const uint16_t type)
+decode_basic_type(const uint16_t type)
 {
-  switch (GET_BASIC_TYPE (type))
+  switch(GET_BASIC_TYPE(type))
   {
   case T_BOOL:
     return "BOOL";
@@ -101,7 +101,7 @@ decode_basic_type (const uint16_t type)
     return "UNDEFINED";
 
   default:
-    assert (false);
+    assert(false);
   }
 
   return NULL;
@@ -109,15 +109,15 @@ decode_basic_type (const uint16_t type)
 
 
 string
-wcmd_decode_typeinfo (unsigned int type)
+wcmd_decode_typeinfo(unsigned int type)
 {
-  if ( ! IS_ARRAY (type))
-    return decode_basic_type (type);
+  if ( ! IS_ARRAY(type))
+    return decode_basic_type(type);
 
-  if (GET_BASIC_TYPE (type) == WHC_TYPE_NOTSET)
+  if (GET_BASIC_TYPE(type) == WHC_TYPE_NOTSET)
     return "ARRAY";
 
-  return decode_basic_type (GET_BASIC_TYPE (type)) + " ARRAY";
+  return decode_basic_type(GET_BASIC_TYPE(type)) + " ARRAY";
 }
 
 
@@ -132,26 +132,26 @@ static const char descExtHelp[] = "Display the list of available commands "
                                      "  help table";
 
 static bool
-cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
+cmdHelp(const string& cmdLine, ENTRY_CMD_CONTEXT)
 {
   size_t currPosition = 0;
-  string token        = CmdLineNextToken (cmdLine, currPosition);
+  string token        = CmdLineNextToken(cmdLine, currPosition);
 
-  assert (token == "help");
+  assert(token == "help");
 
-  if (currPosition >= (cmdLine.length () - 1))
+  if (currPosition >= (cmdLine.length() - 1))
     {
       //This is the only token. List commands.
-      map<string, CmdEntry>::iterator it = sCommands.begin ();
+      map<string, CmdEntry>::iterator it = sCommands.begin();
 
-      while (it != sCommands.end ())
+      while(it != sCommands.end())
         {
-          const streamsize prevWidth = cout.width (20);
-          const char       prevFill  = cout.fill (' ');
+          const streamsize prevWidth = cout.width(20);
+          const char       prevFill  = cout.fill(' ');
 
           cout << left << it->first;
-          cout.width (prevWidth);
-          cout.fill (prevFill);
+          cout.width(prevWidth);
+          cout.fill(prevFill);
           cout << it->second.mDesc << endl;
 
           ++it;
@@ -159,13 +159,13 @@ cmdHelp (const string& cmdLine, ENTRY_CMD_CONTEXT)
       return true;
     }
 
-  token = CmdLineNextToken (cmdLine, currPosition);
-  if ( ! CmdLineNextToken (cmdLine, currPosition).empty ())
+  token = CmdLineNextToken(cmdLine, currPosition);
+  if ( ! CmdLineNextToken(cmdLine, currPosition).empty())
     {
       cout << "Invalid command parameters.\n";
       return false;
     }
-  const CmdEntry *const entry = FindCmdEntry (token.c_str ());
+  const CmdEntry *const entry = FindCmdEntry(token.c_str());
   if (entry == NULL)
     {
       cout << "Unknown command '" << token << "'.\n";
@@ -188,27 +188,27 @@ static const char descExtEcho[] = "Used mainly with scripts to print a text "
                                      "  echo First stage completed.";
 
 static bool
-cmdEcho (const string& cmdLine, ENTRY_CMD_CONTEXT)
+cmdEcho(const string& cmdLine, ENTRY_CMD_CONTEXT)
 {
   size_t currPosition = 0;
-  string token        = CmdLineNextToken (cmdLine, currPosition);
+  string token        = CmdLineNextToken(cmdLine, currPosition);
 
-  assert (token == "echo");
+  assert(token == "echo");
 
-  while (currPosition < cmdLine.length ()
-         && isspace (cmdLine.at (currPosition)))
+  while(currPosition < cmdLine.length()
+         && isspace(cmdLine.at(currPosition)))
     {
       ++currPosition;
     }
 
-  cout << cmdLine.substr (currPosition) << endl;
+  cout << cmdLine.substr(currPosition) << endl;
 
   return true;
 }
 
 
 void
-InitCmdManager ()
+InitCmdManager()
 {
   CmdEntry entry;
 
@@ -219,7 +219,7 @@ InitCmdManager ()
   entry.mContext      = NULL;
   entry.mShowStatus   = false;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 
 
   entry.mName         = "echo";
@@ -229,31 +229,31 @@ InitCmdManager ()
   entry.mContext      = NULL;
   entry.mShowStatus   = false;
 
-  RegisterCommand (entry);
+  RegisterCommand(entry);
 }
 
 
 void
-RegisterCommand (const CmdEntry& entry)
+RegisterCommand(const CmdEntry& entry)
 {
-  assert (entry.mName != NULL);
-  assert (entry.mDesc != NULL);
-  assert (entry.mExtendedDesc != NULL);
+  assert(entry.mName != NULL);
+  assert(entry.mDesc != NULL);
+  assert(entry.mExtendedDesc != NULL);
 
-  pair<string, CmdEntry> cmdEntry (entry.mName, entry);
+  pair<string, CmdEntry> cmdEntry(entry.mName, entry);
 
-  sCommands.insert (cmdEntry);
+  sCommands.insert(cmdEntry);
 }
 
 
 const CmdEntry*
-FindCmdEntry (const char* const name)
+FindCmdEntry(const char* const name)
 {
   const string command = name;
   CmdEntry*    entry    = NULL;
 
-  map<string, CmdEntry>::iterator it = sCommands.find (command);
-  if (it != sCommands.end ())
+  map<string, CmdEntry>::iterator it = sCommands.find(command);
+  if (it != sCommands.end())
     entry = &it->second;
 
   return entry;
@@ -261,64 +261,64 @@ FindCmdEntry (const char* const name)
 
 
 const string
-CmdLineNextToken (const string& cmdLine, size_t& inoutPosition)
+CmdLineNextToken(const string& cmdLine, size_t& inoutPosition)
 {
   static string delimiters = " \t";
 
-  return NextToken (cmdLine, inoutPosition, delimiters);
+  return NextToken(cmdLine, inoutPosition, delimiters);
 }
 
 
 void
-printException (ostream& outputStream, const Exception& e)
+printException(ostream& outputStream, const Exception& e)
 {
-  const VERBOSE_LEVEL level = GetVerbosityLevel ();
+  const VERBOSE_LEVEL level = GetVerbosityLevel();
 
-  if (e.Type () == DBS_EXCEPTION)
+  if (e.Type() == DBS_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "DBS framework exception.\n";
 
-      if ( e.Message ().empty ())
-        outputStream << e.Description () <<endl;
+      if ( e.Message().empty())
+        outputStream << e.Description() <<endl;
     }
-  else if (e.Type () == INTERPRETER_EXCEPTION)
+  else if (e.Type() == INTERPRETER_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "Interpreter exception.\n";
 
-      assert (! e.Message ().empty ());
+      assert(! e.Message().empty());
 
-      if ( e.Message ().empty ())
-        outputStream << e.Description () <<endl;
+      if ( e.Message().empty())
+        outputStream << e.Description() <<endl;
     }
-  else if (e.Type () == FILE_EXCEPTION)
+  else if (e.Type() == FILE_EXCEPTION)
     {
       if (level >= VL_DEBUG)
         outputStream << "File system IO exception.\n";
 
       char errorDesc[MAX_DECODED_STRING];
 
-      whf_err_to_str (e.Code (), errorDesc, sizeof errorDesc);
+      whf_err_to_str(e.Code(), errorDesc, sizeof errorDesc);
       outputStream << errorDesc << endl;
     }
   else
     {
-      assert (false);
+      assert(false);
 
       outputStream << "Unknown exception throwed.\n";
     }
 
 
-  if ( ! e.Message ().empty ())
-    outputStream << e.Message () << endl;
+  if ( ! e.Message().empty())
+    outputStream << e.Message() << endl;
 
   if (level >= VL_DEBUG)
     {
-      outputStream << "Type: " << e.Type () << endl;
-      outputStream << "Code: " << e.Code () << endl;
-      outputStream << "File: " << e.File () << endl;
-      outputStream << "Line: " << e.Line () << endl;
+      outputStream << "Type: " << e.Type() << endl;
+      outputStream << "Code: " << e.Code() << endl;
+      outputStream << "File: " << e.File() << endl;
+      outputStream << "Line: " << e.Line() << endl;
     }
 }
 

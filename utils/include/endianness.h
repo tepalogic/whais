@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 static INLINE uint16_t
-load_le_int16 (const uint8_t* from)
+load_le_int16(const uint8_t* from)
 {
   uint16_t result;
 
@@ -45,7 +45,7 @@ load_le_int16 (const uint8_t* from)
 
 
 static INLINE uint32_t
-load_le_int32 (const uint8_t* from)
+load_le_int32(const uint8_t* from)
 {
   uint32_t result;
 
@@ -59,7 +59,7 @@ load_le_int32 (const uint8_t* from)
 
 
 static INLINE uint64_t
-load_le_int64 (const uint8_t* from)
+load_le_int64(const uint8_t* from)
 {
   uint64_t result;
 
@@ -78,7 +78,7 @@ load_le_int64 (const uint8_t* from)
 
 
 static INLINE void
-store_le_int16 (const uint16_t value, uint8_t* const to)
+store_le_int16(const uint16_t value, uint8_t* const to)
 {
   to[0] = value        & 0xFF;
   to[1] = (value >> 8) & 0xFF;
@@ -86,7 +86,7 @@ store_le_int16 (const uint16_t value, uint8_t* const to)
 
 
 static INLINE void
-store_le_int32 (const uint32_t value, uint8_t* const to)
+store_le_int32(const uint32_t value, uint8_t* const to)
 {
   to[0] = value         & 0xFF;
   to[1] = (value >>  8) & 0xFF;
@@ -96,7 +96,7 @@ store_le_int32 (const uint32_t value, uint8_t* const to)
 
 
 static INLINE void
-store_le_int64 (const uint64_t value, uint8_t* const to)
+store_le_int64(const uint64_t value, uint8_t* const to)
 {
   to[0] = value         & 0xFF;
   to[1] = (value >>  8) & 0xFF;
@@ -110,7 +110,7 @@ store_le_int64 (const uint64_t value, uint8_t* const to)
 
 
 static INLINE uint16_t
-load_ge_int16 (const uint8_t* from)
+load_ge_int16(const uint8_t* from)
 {
   uint16_t result;
 
@@ -122,7 +122,7 @@ load_ge_int16 (const uint8_t* from)
 
 
 static INLINE uint32_t
-load_ge_int32 (const uint8_t* from)
+load_ge_int32(const uint8_t* from)
 {
   uint32_t result;
 
@@ -136,7 +136,7 @@ load_ge_int32 (const uint8_t* from)
 
 
 static INLINE uint64_t
-load_ge_int64 (const uint8_t* from)
+load_ge_int64(const uint8_t* from)
 {
   uint64_t result;
 
@@ -154,7 +154,7 @@ load_ge_int64 (const uint8_t* from)
 
 
 static INLINE void
-store_ge_int16 (const uint16_t value, uint8_t* const to)
+store_ge_int16(const uint16_t value, uint8_t* const to)
 {
   to[1] = value        & 0xFF;
   to[0] = (value >> 8) & 0xFF;
@@ -162,7 +162,7 @@ store_ge_int16 (const uint16_t value, uint8_t* const to)
 
 
 static INLINE void
-store_ge_int32 (const uint32_t value, uint8_t* const to)
+store_ge_int32(const uint32_t value, uint8_t* const to)
 {
   to[3] = value         & 0xFF;
   to[2] = (value >>  8) & 0xFF;
@@ -172,7 +172,7 @@ store_ge_int32 (const uint32_t value, uint8_t* const to)
 
 
 static INLINE void
-store_ge_int64 (const uint64_t value, uint8_t* const to)
+store_ge_int64(const uint64_t value, uint8_t* const to)
 {
   to[7] = value         & 0xFF;
   to[6] = (value >>  8) & 0xFF;

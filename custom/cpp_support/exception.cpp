@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -37,7 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #if defined __va_copy
       #define va_copy(x,y) __va_copy(x,y)
       #define _va_end_w(x) va_end(x)
-  #elif defined (ARCH_PPC) && defined (_GNU_SOURCE)
+  #elif defined(ARCH_PPC) && defined(_GNU_SOURCE)
       #define va_copy(x,y) (*x = *y)
       #define _va_end_w(x)
   #else
@@ -51,66 +51,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace whais {
 
-Exception::Exception (uint32_t        code,
+Exception::Exception(uint32_t        code,
                       const char*     file,
                       uint32_t        line)
-  : mErrorMessage (),
-    mFile (file),
-    mLine (line),
-    mCode (code)
+  : mErrorMessage(),
+    mFile(file),
+    mLine(line),
+    mCode(code)
 {
 }
 
 
-Exception::Exception (const Exception& source)
-  : mErrorMessage (source.mErrorMessage),
-    mFile (source.mFile),
-    mLine (source.mLine),
-    mCode (source.mCode)
+Exception::Exception(const Exception& source)
+  : mErrorMessage(source.mErrorMessage),
+    mFile(source.mFile),
+    mLine(source.mLine),
+    mCode(source.mCode)
 {
 }
 
 
-Exception::~Exception ()
+Exception::~Exception()
 {
 }
 
 
 uint32_t
-Exception::Code () const
+Exception::Code() const
 {
   return mCode;
 }
 
 
 const std::string&
-Exception::Message () const
+Exception::Message() const
 {
   return mErrorMessage;
 }
 
 
 void
-Exception::Message (const char* fmtMsg, va_list vl)
+Exception::Message(const char* fmtMsg, va_list vl)
 {
   std::string msgHolder;
   va_list     c_vl;
 
   int maxSize = 128;
 
-  while (true)
+  while(true)
     {
-      msgHolder.resize (maxSize);
-      va_copy (c_vl, vl);
+      msgHolder.resize(maxSize);
+      va_copy(c_vl, vl);
 
-      const int actualSize = vsnprintf (_CC (char*, msgHolder.c_str ()),
+      const int actualSize = vsnprintf(_CC(char*, msgHolder.c_str()),
                                         maxSize,
                                         fmtMsg,
                                         c_vl);
-      _va_end_w (c_vl);
+      _va_end_w(c_vl);
       if ((0 <= actualSize) && (actualSize < maxSize))
         {
-          mErrorMessage = std::string (msgHolder.c_str ());
+          mErrorMessage = std::string(msgHolder.c_str());
           break;
         }
       maxSize *= 2;
@@ -119,30 +119,30 @@ Exception::Message (const char* fmtMsg, va_list vl)
 
 
 void
-Exception::Message (const char* fmtMsg, ... )
+Exception::Message(const char* fmtMsg, ... )
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
   else
-    mErrorMessage.clear ();
+    mErrorMessage.clear();
 }
 
 
 const char*
-Exception::File () const
+Exception::File() const
 {
   return mFile;
 }
 
 
 uint32_t
-Exception::Line () const
+Exception::Line() const
 {
   return mLine;
 }
@@ -150,120 +150,120 @@ Exception::Line () const
 
 
 
-FileException::FileException (const uint32_t    code,
+FileException::FileException(const uint32_t    code,
                               const char*       file,
                               uint32_t          line,
                               const char*       fmtMsg,
                               ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
 Exception*
-FileException::Clone () const
+FileException::Clone() const
 {
-  return new FileException (*this);
+  return new FileException(*this);
 }
 
 
 EXCEPTION_TYPE
-FileException::Type () const
+FileException::Type() const
 {
   return FILE_EXCEPTION;
 }
 
 
 const char*
-FileException::Description () const
+FileException::Description() const
 {
   return "File IO error.";
 }
 
 
 
-LockException::LockException (const uint32_t    code,
+LockException::LockException(const uint32_t    code,
                               const char*       file,
                               uint32_t          line,
                               const char*       fmtMsg,
                               ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
 Exception*
-LockException::Clone () const
+LockException::Clone() const
 {
-  return new LockException (*this);
+  return new LockException(*this);
 }
 
 
 EXCEPTION_TYPE
-LockException::Type () const
+LockException::Type() const
 {
   return SYNC_EXCEPTION;
 }
 
 
 const char*
-LockException::Description () const
+LockException::Description() const
 {
   return "Thread synchronization error.";
 }
 
 
 
-ThreadException::ThreadException (const uint32_t    code,
+ThreadException::ThreadException(const uint32_t    code,
                                   const char*       file,
                                   uint32_t          line,
                                   const char*       fmtMsg,
                                   ... )
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
 Exception*
-ThreadException::Clone () const
+ThreadException::Clone() const
 {
-  return new ThreadException (*this);
+  return new ThreadException(*this);
 }
 
 
 EXCEPTION_TYPE
-ThreadException::Type () const
+ThreadException::Type() const
 {
   return THREAD_EXCEPTION;
 }
 
 
 const char*
-ThreadException::Description () const
+ThreadException::Description() const
 {
   return "Thread execution error.";
 }
@@ -271,40 +271,40 @@ ThreadException::Description () const
 
 
 
-SocketException::SocketException (const uint32_t        code,
+SocketException::SocketException(const uint32_t        code,
                                   const char*           file,
                                   uint32_t              line,
                                   const char*           fmtMsg,
                                   ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
     if (fmtMsg != NULL)
       {
         va_list vl;
 
-        va_start (vl, fmtMsg);
-        this->Message (fmtMsg, vl);
-        va_end (vl);
+        va_start(vl, fmtMsg);
+        this->Message(fmtMsg, vl);
+        va_end(vl);
       }
 }
 
 
 Exception*
-SocketException::Clone () const
+SocketException::Clone() const
 {
-  return new SocketException (*this);
+  return new SocketException(*this);
 }
 
 
 EXCEPTION_TYPE
-SocketException::Type () const
+SocketException::Type() const
 {
   return SOCKED_EXCEPTION;
 }
 
 
 const char*
-SocketException::Description () const
+SocketException::Description() const
 {
 
   return "Network IO error.";

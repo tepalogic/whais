@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -29,48 +29,48 @@
 
 using namespace whais;
 
-DBSException::DBSException (const uint32_t  code,
+DBSException::DBSException(const uint32_t  code,
                             const char*     file,
                             uint32_t        line,
                             const char*     fmtMsg,
                             ...)
-  : Exception (code, file, line)
+  : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
     {
       va_list vl;
 
-      va_start (vl, fmtMsg);
-      this->Message (fmtMsg, vl);
-      va_end (vl);
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
     }
 }
 
 
-DBSException::~DBSException ()
+DBSException::~DBSException()
 {
 }
 
 
 Exception*
-DBSException::Clone () const
+DBSException::Clone() const
 {
-  return new DBSException (*this);
+  return new DBSException(*this);
 }
 
 
 EXCEPTION_TYPE
-DBSException::Type () const
+DBSException::Type() const
 {
   return DBS_EXCEPTION;
 }
 
 
 const char*
-DBSException::Description () const
+DBSException::Description() const
 {
 
-  switch (Code ())
+  switch(Code())
   {
   case OPER_NOT_SUPPORTED:
     return "A requested operation is not supported.";
@@ -172,6 +172,6 @@ DBSException::Description () const
     return "GENERAL FAILURE: Program execution must be stopped due to a DBS internal error.";
   }
 
-  assert (false);
+  assert(false);
   return "An unknown DBS framework exception was thrown";
 };

@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "configuration.h"
 
 bool
-LoadDatabase (whais::FileLogger& log, DBSDescriptors& inoutDesc);
+LoadDatabase(whais::FileLogger& log, DBSDescriptors& inoutDesc);
 
 #endif /* LOADER_H_ */
 

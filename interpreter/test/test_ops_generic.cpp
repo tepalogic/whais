@@ -21,34 +21,34 @@ static const char nnull_proc[] = "nnull_test";
 static const char field_proc[] = "field_index";
 
 const uint8_t callTestProgram[] = ""
-    "PROCEDURE cts_test (n INT8) RETURN INT8\n"
+    "PROCEDURE cts_test(n INT8) RETURN INT8\n"
     "DO\n"
       "n = n +1;"
       "RETURN n * 2;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE inull_test (n INT8) RETURN INT8\n"
+    "PROCEDURE inull_test(n INT8) RETURN INT8\n"
     "DO\n"
       "n = n +1;"
       "RETURN n * 2;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE nnull_test (n INT8) RETURN INT8\n"
+    "PROCEDURE nnull_test(n INT8) RETURN INT8\n"
     "DO\n"
       "n = n +1;"
       "RETURN n * 2;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE p1 (n INT8) RETURN INT8\n"
+    "PROCEDURE p1(n INT8) RETURN INT8\n"
     "DO\n"
       "RETURN n * 2;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE p2 (n INT8, n2 INT8) RETURN INT8\n"
+    "PROCEDURE p2(n INT8, n2 INT8) RETURN INT8\n"
     "DO\n"
-      "RETURN p1 (n + n2);\n"
+      "RETURN p1(n + n2);\n"
     "ENDPROC\n"
-    "PROCEDURE text_index (t1 TEXT) RETURN CHAR\n"
+    "PROCEDURE text_index(t1 TEXT) RETURN CHAR\n"
     "DO\n"
       "VAR temp CHAR;\n"
       "\n"
@@ -56,7 +56,7 @@ const uint8_t callTestProgram[] = ""
       "t1[0] = 'B';\n"
       "RETURN temp;\n"
     "ENDPROC\n"
-    "PROCEDURE array_index (a1 INT8 ARRAY) RETURN INT8\n"
+    "PROCEDURE array_index(a1 INT8 ARRAY) RETURN INT8\n"
     "DO\n"
       "VAR temp INT8;\n"
       "\n"
@@ -64,7 +64,7 @@ const uint8_t callTestProgram[] = ""
       "a1[0] = 10;\n"
       "RETURN temp;\n"
     "ENDPROC\n"
-    "PROCEDURE table_index (tab TABLE (value INT8)) RETURN INT8\n"
+    "PROCEDURE table_index(tab TABLE(value INT8)) RETURN INT8\n"
     "DO\n"
       "VAR temp INT8;\n"
       "\n"
@@ -72,7 +72,7 @@ const uint8_t callTestProgram[] = ""
       "tab[0, value] = 10;\n"
       "RETURN temp;\n"
     "ENDPROC\n"
-    "PROCEDURE field_index (tab TABLE (value INT8)) RETURN INT8\n"
+    "PROCEDURE field_index(tab TABLE(value INT8)) RETURN INT8\n"
     "DO\n"
       "VAR temp INT8;\n"
       "VAR tabf INT8 FIELD;"
@@ -85,13 +85,13 @@ const uint8_t callTestProgram[] = ""
       "RETURN temp;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE array_parse (ai INT8 ARRAY, count INT8) RETURN INT8\n"
+    "PROCEDURE array_parse(ai INT8 ARRAY, count INT8) RETURN INT8\n"
     "DO\n"
     " VAR result INT8;\n"
     "\n"
-    " FOR (i : ai)\n"
+    " FOR(i : ai)\n"
     " DO\n"
-    "   IF (count < 0)\n"
+    "   IF(count < 0)\n"
     "     BREAK;\n"
     "   result = i;\n"
     "   count -= 1;\n"
@@ -100,13 +100,13 @@ const uint8_t callTestProgram[] = ""
     " RETURN result;\n"
     "ENDPROC\n"
     "\n"
-    "PROCEDURE array_parse_reverse (ai INT8 ARRAY, count INT8) RETURN INT8\n"
+    "PROCEDURE array_parse_reverse(ai INT8 ARRAY, count INT8) RETURN INT8\n"
     "DO\n"
     " VAR result INT8;\n"
     "\n"
-    " FOR ( ! i : ai)\n"
+    " FOR( ! i : ai)\n"
     " DO\n"
-    "   IF (count < 0)\n"
+    "   IF(count < 0)\n"
     "     BREAK;\n"
     "   result = i;\n"
     "   count -= 1;\n"
@@ -122,7 +122,7 @@ static const char *MSG_PREFIX[] = {
                                     };
 
 static uint_t
-get_line_from_buffer (const char * buffer, uint_t buff_pos)
+get_line_from_buffer(const char * buffer, uint_t buff_pos)
 {
   uint_t count = 0;
   int result = 1;
@@ -130,13 +130,13 @@ get_line_from_buffer (const char * buffer, uint_t buff_pos)
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
 
-  while (count < buff_pos)
+  while(count < buff_pos)
     {
       if (buffer[count] == '\n')
         ++result;
       else if (buffer[count] == 0)
         {
-          assert (0);
+          assert(0);
         }
       ++count;
     }
@@ -144,7 +144,7 @@ get_line_from_buffer (const char * buffer, uint_t buff_pos)
 }
 
 void
-my_postman (WH_MESSENGER_CTXT data,
+my_postman(WH_MESSENGER_CTXT data,
             uint_t            buff_pos,
             uint_t            msg_id,
             uint_t            msgType,
@@ -152,16 +152,16 @@ my_postman (WH_MESSENGER_CTXT data,
             va_list           args)
 {
   const char *buffer = (const char *) data;
-  int buff_line = get_line_from_buffer (buffer, buff_pos);
+  int buff_line = get_line_from_buffer(buffer, buff_pos);
 
-  fprintf (stderr, MSG_PREFIX[msgType]);
-  fprintf (stderr, "%d : line %d: ", msg_id, buff_line);
-  vfprintf (stderr, pMsgFormat, args);
-  fprintf (stderr, "\n");
+  fprintf(stderr, MSG_PREFIX[msgType]);
+  fprintf(stderr, "%d : line %d: ", msg_id, buff_line);
+  vfprintf(stderr, pMsgFormat, args);
+  fprintf(stderr, "\n");
 }
 
 static uint_t
-w_encode_opcode (W_OPCODE opcode, uint8_t* pOutCode)
+w_encode_opcode(W_OPCODE opcode, uint8_t* pOutCode)
 {
   if (opcode > 0x80)
     {
@@ -177,230 +177,230 @@ w_encode_opcode (W_OPCODE opcode, uint8_t* pOutCode)
 }
 
 static bool
-test_op_cts (Session& session)
+test_op_cts(Session& session)
 {
   std::cout << "Testing opcode cts...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, cts_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, cts_proc),
                                                  sizeof cts_proc - 1);
 
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DInt8 op(-10);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_CTS, testCode + opSize);
-  w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_CTS, testCode + opSize);
+  w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op); //A procedure should return a value!
+  stack.Push(op); //A procedure should return a value!
 
-  session.ExecuteProcedure (cts_proc, stack);
+  session.ExecuteProcedure(cts_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   return true;
 }
 
 static bool
-test_op_inull (Session& session)
+test_op_inull(Session& session)
 {
   std::cout << "Testing opcode inull...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, inull_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, inull_proc),
                                                  sizeof inull_proc - 1);
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DDate op;
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_INULL, testCode + opSize);
-  w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_INULL, testCode + opSize);
+  w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (inull_proc, stack);
+  session.ExecuteProcedure(inull_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBool result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DBool (true) )
+  if (result != DBool(true) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_nnull (Session& session)
+test_op_nnull(Session& session)
 {
   std::cout << "Testing opcode nnull...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, nnull_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, nnull_proc),
                                                  sizeof nnull_proc - 1);
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DDate op;
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_NNULL, testCode + opSize);
-  w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_NNULL, testCode + opSize);
+  w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op); //A procedure should return a value!
+  stack.Push(op); //A procedure should return a value!
 
-  session.ExecuteProcedure (nnull_proc, stack);
+  session.ExecuteProcedure(nnull_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DBool result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-  if (result == DBool (true) )
+  if (result == DBool(true) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_call (Session& session)
+test_op_call(Session& session)
 {
   std::cout << "Testing opcode call...\n";
   SessionStack stack;
 
-  stack.Push (DUInt8 (10));
-  stack.Push (DUInt16 (2));
+  stack.Push(DUInt8(10));
+  stack.Push(DUInt16(2));
 
-  session.ExecuteProcedure ("p2", stack);
+  session.ExecuteProcedure("p2", stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DUInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DUInt8 (24) )
+  if (result != DUInt8(24) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_text_index (Session& session)
+test_op_text_index(Session& session)
 {
   std::cout << "Testing opcode for text indexing...\n";
   SessionStack stack;
-  DChar value ('A');
-  LocalOperand localOp (stack, 0);
+  DChar value('A');
+  LocalOperand localOp(stack, 0);
 
-  DText text ("A");
-  stack.Push (text);
-  stack.Push (StackValue (localOp));
+  DText text("A");
+  stack.Push(text);
+  stack.Push(StackValue(localOp));
 
-  session.ExecuteProcedure ("text_index", stack);
+  session.ExecuteProcedure("text_index", stack);
 
-  if (stack.Size () != 2)
+  if (stack.Size() != 2)
     return false;
 
   DChar result;
-  stack[1].Operand ().GetValue (result);
+  stack[1].Operand().GetValue(result);
 
   if (result != value )
     return false;
 
-  stack[0].Operand ().GetValue (text);
-  value = text.CharAt (0);
+  stack[0].Operand().GetValue(text);
+  value = text.CharAt(0);
 
-  if (value != DChar ('B') )
+  if (value != DChar('B') )
     return false;
 
   return true;
 }
 
 static bool
-test_op_array_index (Session& session)
+test_op_array_index(Session& session)
 {
   std::cout << "Testing opcode for array indexing...\n";
   SessionStack stack;
-  DInt8 value (0x23);
-  LocalOperand localOp (stack, 0);
+  DInt8 value(0x23);
+  LocalOperand localOp(stack, 0);
 
   DArray array;
-  array.Add (value);
+  array.Add(value);
 
-  stack.Push (array);
-  stack.Push (StackValue (localOp));
+  stack.Push(array);
+  stack.Push(StackValue(localOp));
 
-  session.ExecuteProcedure ("array_index", stack);
+  session.ExecuteProcedure("array_index", stack);
 
-  if (stack.Size () != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand ().GetValue (result);
+  stack[1].Operand().GetValue(result);
 
   if (result != value )
     return false;
 
-  stack[0].Operand ().GetValue (array);
-  array.Get (0, value);
+  stack[0].Operand().GetValue(array);
+  array.Get(0, value);
 
-  if (value != DInt8 (10) )
+  if (value != DInt8(10) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_table_index (Session& session)
+test_op_table_index(Session& session)
 {
   std::cout << "Testing opcode for table indexing...\n";
   SessionStack stack;
 
   DBSFieldDescriptor fd = { "value", T_INT8, false};
-  DInt8 value (0x23);
-  LocalOperand localOp (stack, 0);
+  DInt8 value(0x23);
+  LocalOperand localOp(stack, 0);
 
-  ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
-  tempTable.GetReusableRow (true);
-  tempTable.Set (0, 0, value);
+  ITable& tempTable = session.DBSHandler().CreateTempTable(1, &fd);
+  tempTable.GetReusableRow(true);
+  tempTable.Set(0, 0, value);
 
-  stack.Push (session.DBSHandler (), tempTable);
-  stack.Push (StackValue (localOp));
+  stack.Push(session.DBSHandler(), tempTable);
+  stack.Push(StackValue(localOp));
 
-  session.ExecuteProcedure ("table_index", stack);
+  session.ExecuteProcedure("table_index", stack);
 
-  if (stack.Size () != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand ().GetValue (result);
+  stack[1].Operand().GetValue(result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand ().GetTable ();
+  ITable& stackTable = stack[0].Operand().GetTable();
 
   if (&stackTable != &tempTable)
     return false;
 
-  stackTable.Get (0, 0, value);
+  stackTable.Get(0, 0, value);
   if (value != DInt8  (10) )
     return false;
 
@@ -408,39 +408,39 @@ test_op_table_index (Session& session)
 }
 
 static bool
-test_op_field_index (Session& session)
+test_op_field_index(Session& session)
 {
   std::cout << "Testing opcode for field indexing...\n";
   SessionStack stack;
 
   DBSFieldDescriptor fd = { "value", T_INT8, false};
-  DInt8 value (0x23);
-  LocalOperand localOp (stack, 0);
+  DInt8 value(0x23);
+  LocalOperand localOp(stack, 0);
 
-  ITable& tempTable = session.DBSHandler ().CreateTempTable (1, &fd);
-  tempTable.GetReusableRow (true);
-  tempTable.Set (0, 0, value);
+  ITable& tempTable = session.DBSHandler().CreateTempTable(1, &fd);
+  tempTable.GetReusableRow(true);
+  tempTable.Set(0, 0, value);
 
-  stack.Push (session.DBSHandler (), tempTable);
-  stack.Push (StackValue (localOp));
+  stack.Push(session.DBSHandler(), tempTable);
+  stack.Push(StackValue(localOp));
 
-  session.ExecuteProcedure ("field_index", stack);
+  session.ExecuteProcedure("field_index", stack);
 
-  if (stack.Size () != 2)
+  if (stack.Size() != 2)
     return false;
 
   DInt8 result;
-  stack[1].Operand ().GetValue (result);
+  stack[1].Operand().GetValue(result);
 
   if (result != value )
     return false;
 
-  ITable& stackTable = stack[0].Operand ().GetTable ();
+  ITable& stackTable = stack[0].Operand().GetTable();
 
   if (&stackTable != &tempTable)
     return false;
 
-  stackTable.Get (0, 0, value);
+  stackTable.Get(0, 0, value);
   if (value != DInt8  (10) )
     return false;
 
@@ -448,118 +448,118 @@ test_op_field_index (Session& session)
 }
 
 static bool
-test_op_jfc (Session& session)
+test_op_jfc(Session& session)
 {
   std::cout << "Testing opcode jfc...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, field_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
 
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DBool op(false);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_JFC, testCode + opSize);
+  opSize += w_encode_opcode(W_JFC, testCode + opSize);
   testCode[opSize++] = 8;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 1;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (0) )
+  if (result != DInt8(0) )
     return false;
 
-  stack.Pop (1);
+  stack.Pop(1);
 
-  op = DBool (true);
-  stack.Push (op);
+  op = DBool(true);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand ().GetValue (result);
+   stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (1) )
+  if (result != DInt8(1) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_jtc (Session& session)
+test_op_jtc(Session& session)
 {
   std::cout << "Testing opcode jtc...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, field_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
 
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DBool op(true);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_JTC, testCode + opSize);
+  opSize += w_encode_opcode(W_JTC, testCode + opSize);
   testCode[opSize++] = 8;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 1;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (0) )
+  if (result != DInt8(0) )
     return false;
 
-  stack.Pop (1);
+  stack.Pop(1);
 
-  op = DBool (false);
-  stack.Push (op);
+  op = DBool(false);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand ().GetValue (result);
+   stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (1) )
+  if (result != DInt8(1) )
     return false;
 
   return true;
@@ -567,116 +567,116 @@ test_op_jtc (Session& session)
 
 
 static bool
-test_op_jf (Session& session)
+test_op_jf(Session& session)
 {
   std::cout << "Testing opcode jf...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, field_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DBool op(false);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_JF, testCode + opSize);
+  opSize += w_encode_opcode(W_JF, testCode + opSize);
   testCode[opSize++] = 8;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 1;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (0) )
+  if (result != DInt8(0) )
     return false;
 
-  stack.Pop (1);
+  stack.Pop(1);
 
-  op = DBool (true);
-  stack.Push (op);
+  op = DBool(true);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand ().GetValue (result);
+   stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (1) )
+  if (result != DInt8(1) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_jt (Session& session)
+test_op_jt(Session& session)
 {
   std::cout << "Testing opcode jt...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, field_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DBool op(true);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_LDLO8, testCode);
+  opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_JT, testCode + opSize);
+  opSize += w_encode_opcode(W_JT, testCode + opSize);
   testCode[opSize++] = 8;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 1;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (0) )
+  if (result != DInt8(0) )
     return false;
 
-  stack.Pop (1);
+  stack.Pop(1);
 
-  op = DBool (false);
-  stack.Push (op);
+  op = DBool(false);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-   stack[0].Operand ().GetValue (result);
+   stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (1) )
+  if (result != DInt8(1) )
     return false;
 
   return true;
@@ -684,51 +684,51 @@ test_op_jt (Session& session)
 
 
 static bool
-test_op_jmp (Session& session)
+test_op_jmp(Session& session)
 {
   std::cout << "Testing opcode jmp...\n";
-  const uint32_t procId = session.FindProcedure (_RC (const uint8_t*, field_proc),
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
-  const Procedure& proc   = session.GetProcedure (procId);
-  uint8_t* testCode = _CC (uint8_t*, proc.mProcMgr->Code (proc, NULL));
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
   SessionStack stack;
 
   DBool op(true);
 
   uint8_t opSize = 0;
-  opSize += w_encode_opcode (W_JMP, testCode + opSize);
+  opSize += w_encode_opcode(W_JMP, testCode + opSize);
   testCode[opSize++] = 8;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 1;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
-  opSize += w_encode_opcode (W_LDI8, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_LDI8, testCode + opSize);
   testCode[opSize++] = 10;
-  opSize += w_encode_opcode (W_RET, testCode + opSize);
+  opSize += w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push (op);
+  stack.Push(op);
 
-  session.ExecuteProcedure (field_proc, stack);
+  session.ExecuteProcedure(field_proc, stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
-  if (result != DInt8 (10) )
+  if (result != DInt8(10) )
     return false;
 
   return true;
 }
 
 static bool
-test_op_array_parse (Session& session, const bool reverse)
+test_op_array_parse(Session& session, const bool reverse)
 {
   if (reverse)
-    std::cout << "Testing opcode for array parse (reverse)...\n";
+    std::cout << "Testing opcode for array parse(reverse)...\n";
   else
     std::cout << "Testing opcode for array parse...\n";
 
@@ -736,51 +736,51 @@ test_op_array_parse (Session& session, const bool reverse)
   DInt8 value;
   DArray array;
 
-  stack.Push (array);
-  stack.Push (value);
+  stack.Push(array);
+  stack.Push(value);
 
   if (reverse)
-    session.ExecuteProcedure ("array_parse_reverse", stack);
+    session.ExecuteProcedure("array_parse_reverse", stack);
   else
-    session.ExecuteProcedure ("array_parse", stack);
+    session.ExecuteProcedure("array_parse", stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
   DInt8 result;
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
 
   if (! result.IsNull())
     return false;
 
-  stack.Pop (1);
+  stack.Pop(1);
 
-  if (stack.Size () != 0)
+  if (stack.Size() != 0)
     return false;
 
-  array.Add (DInt8 (10));
-  array.Add (DInt8 (-25));
+  array.Add(DInt8(10));
+  array.Add(DInt8(-25));
 
-  stack.Push (array);
-  stack.Push (DInt8 (0));
+  stack.Push(array);
+  stack.Push(DInt8(0));
 
   if (reverse)
-    session.ExecuteProcedure ("array_parse_reverse", stack);
+    session.ExecuteProcedure("array_parse_reverse", stack);
   else
-    session.ExecuteProcedure ("array_parse", stack);
+    session.ExecuteProcedure("array_parse", stack);
 
-  if (stack.Size () != 1)
+  if (stack.Size() != 1)
     return false;
 
-  stack[0].Operand ().GetValue (result);
+  stack[0].Operand().GetValue(result);
   if (reverse)
     {
-      if (result != DInt8 (-25))
+      if (result != DInt8(-25))
         return false;
     }
   else
     {
-      if (result != DInt8 (10))
+      if (result != DInt8(10))
         return false;
      }
 
@@ -789,49 +789,49 @@ test_op_array_parse (Session& session, const bool reverse)
 
 
 int
-main ()
+main()
 {
   bool success = true;
 
   {
-    DBSInit (DBSSettings ());
+    DBSInit(DBSSettings());
   }
 
-  DBSCreateDatabase (admin);
-  InitInterpreter ();
+  DBSCreateDatabase(admin);
+  InitInterpreter();
 
   {
-    ISession& commonSession = GetInstance (NULL);
+    ISession& commonSession = GetInstance(NULL);
 
-    CompiledBufferUnit callBuf (callTestProgram,
+    CompiledBufferUnit callBuf(callTestProgram,
                                  sizeof callTestProgram,
                                  my_postman,
                                  callTestProgram);
 
-    commonSession.LoadCompiledUnit (callBuf);
+    commonSession.LoadCompiledUnit(callBuf);
 
-    success = success && test_op_cts (_SC (Session&, commonSession));
-    success = success && test_op_inull (_SC (Session&, commonSession));
-    success = success && test_op_nnull (_SC (Session&, commonSession));
-    success = success && test_op_call (_SC (Session&, commonSession));
-    success = success && test_op_text_index (_SC (Session&, commonSession));
-    success = success && test_op_array_index (_SC (Session&, commonSession));
-    success = success && test_op_table_index (_SC (Session&, commonSession));
-    success = success && test_op_field_index (_SC (Session&, commonSession));
-    success = success && test_op_jfc (_SC (Session&, commonSession));
-    success = success && test_op_jtc (_SC (Session&, commonSession));
-    success = success && test_op_jf (_SC (Session&, commonSession));
-    success = success && test_op_jt (_SC (Session&, commonSession));
-    success = success && test_op_jmp (_SC (Session&, commonSession));
-    success = success && test_op_array_parse (_SC (Session&, commonSession), false);
-    success = success && test_op_array_parse (_SC (Session&, commonSession), true);
+    success = success && test_op_cts(_SC(Session&, commonSession));
+    success = success && test_op_inull(_SC(Session&, commonSession));
+    success = success && test_op_nnull(_SC(Session&, commonSession));
+    success = success && test_op_call(_SC(Session&, commonSession));
+    success = success && test_op_text_index(_SC(Session&, commonSession));
+    success = success && test_op_array_index(_SC(Session&, commonSession));
+    success = success && test_op_table_index(_SC(Session&, commonSession));
+    success = success && test_op_field_index(_SC(Session&, commonSession));
+    success = success && test_op_jfc(_SC(Session&, commonSession));
+    success = success && test_op_jtc(_SC(Session&, commonSession));
+    success = success && test_op_jf(_SC(Session&, commonSession));
+    success = success && test_op_jt(_SC(Session&, commonSession));
+    success = success && test_op_jmp(_SC(Session&, commonSession));
+    success = success && test_op_array_parse(_SC(Session&, commonSession), false);
+    success = success && test_op_array_parse(_SC(Session&, commonSession), true);
 
-    ReleaseInstance (commonSession);
+    ReleaseInstance(commonSession);
   }
 
-  CleanInterpreter ();
-  DBSRemoveDatabase (admin);
-  DBSShoutdown ();
+  CleanInterpreter();
+  DBSRemoveDatabase(admin);
+  DBSShoutdown();
   if (!success)
     {
       std::cout << "TEST RESULT: FAIL" << std::endl;

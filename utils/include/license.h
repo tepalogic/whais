@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -35,10 +35,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __cplusplus
 
 void
-showBanner (const char* programName, uint_t verMajor, uint_t verMinor);
+showBanner(const char* programName, uint_t verMajor, uint_t verMinor);
 
 void
-showLicenseInformation (const char* programName,
+showLicenseInformation(const char* programName,
                         const char* programDescription);
 
 #else
@@ -46,13 +46,13 @@ showLicenseInformation (const char* programName,
 #include <iostream>
 
 void
-displayBanner (std::ostream&      os,
+displayBanner(std::ostream&      os,
                const char* const  programName,
                const uint_t       verMajor,
                const uint_t       verMinor);
 
 void
-displayLicenseInformation (std::ostream&     os,
+displayLicenseInformation(std::ostream&     os,
                            const char* const programName,
                            const char* const programDescription);
 #endif /* __cplusplus */

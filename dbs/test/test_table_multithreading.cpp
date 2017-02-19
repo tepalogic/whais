@@ -41,7 +41,7 @@ static bool       testResult;
 
 
 static void
-test_table_sort (void *)
+test_table_sort(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -49,16 +49,16 @@ test_table_sort (void *)
   {
     for (uint_t i = 0; !testEnd; ++i)
       {
-        const FIELD_INDEX f = refTable->RetrieveField (((wh_rnd () & 1) == 0)
+        const FIELD_INDEX f = refTable->RetrieveField(((wh_rnd() & 1) == 0)
                                                        ? "f_int"
                                                        : "f_text");
 
-        refTable->Sort (f, 0, refTable->AllocatedRows (), (i & 1) == 0);
+        refTable->Sort(f, 0, refTable->AllocatedRows(), (i & 1) == 0);
 
-        wh_sleep (3);
+        wh_sleep(3);
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -70,7 +70,7 @@ test_table_sort (void *)
 
 
 static void
-test_table_index (void *)
+test_table_index(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -78,21 +78,21 @@ test_table_index (void *)
   {
     for (uint_t i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const FIELD_INDEX f = refTable->RetrieveField ("f_int");
+        const FIELD_INDEX f = refTable->RetrieveField("f_int");
 
-        if (refTable->IsIndexed (f))
+        if (refTable->IsIndexed(f))
           {
-            if ((wh_rnd () & 1) == 0)
-              refTable->RemoveIndex (f);
+            if ((wh_rnd() & 1) == 0)
+              refTable->RemoveIndex(f);
           }
-        else if ((wh_rnd () & 1) == 0)
-          refTable->CreateIndex (f, NULL, NULL);
+        else if ((wh_rnd() & 1) == 0)
+          refTable->CreateIndex(f, NULL, NULL);
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -104,7 +104,7 @@ test_table_index (void *)
 
 
 static void
-test_table_test_rows_basic (void *)
+test_table_test_rows_basic(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -112,32 +112,32 @@ test_table_test_rows_basic (void *)
   {
     for (uint_t i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const FIELD_INDEX f = refTable->RetrieveField ("f_int");
+        const FIELD_INDEX f = refTable->RetrieveField("f_int");
 
-        switch (wh_rnd ()  % 3)
+        switch(wh_rnd()  % 3)
         {
           case 0:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f, DInt64 (wh_rnd ()));
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f, DInt64 (wh_rnd ()));
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f, DInt64(wh_rnd()));
+            refTable2->Set(wh_rnd() % refTable2->AllocatedRows(), f, DInt64(wh_rnd()));
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f, DInt64 ());
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f, DInt64 (wh_rnd ()));
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f, DInt64());
+            refTable2->Set(wh_rnd() % refTable2->AllocatedRows(), f, DInt64(wh_rnd()));
             break;
 
           default:
             {
               DInt64 value;
-              ROW_INDEX row = wh_rnd () % refTable->AllocatedRows ();
+              ROW_INDEX row = wh_rnd() % refTable->AllocatedRows();
 
-              refTable->Get (row, f, value);
-              refTable->Set (row, f, value);
+              refTable->Get(row, f, value);
+              refTable->Set(row, f, value);
             }
         }
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -149,7 +149,7 @@ test_table_test_rows_basic (void *)
 
 
 static void
-test_table_test_rows_array (void *)
+test_table_test_rows_array(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -157,52 +157,52 @@ test_table_test_rows_array (void *)
   {
     for (uint_t i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const ROW_INDEX row = wh_rnd () % refTable->AllocatedRows ();
+        const ROW_INDEX row = wh_rnd() % refTable->AllocatedRows();
 
         DArray value;
-        const FIELD_INDEX f1 = refTable->RetrieveField ("f_array");
-        const FIELD_INDEX f2 = refTable->RetrieveField ("f_array_2");
+        const FIELD_INDEX f1 = refTable->RetrieveField("f_array");
+        const FIELD_INDEX f2 = refTable->RetrieveField("f_array_2");
 
-        switch (wh_rnd ()  % 4)
+        switch(wh_rnd()  % 4)
         {
           case 0:
 
-            for (int el = 0, p = wh_rnd () % 100; el < p; ++el)
-              value.Add (DInt64 (wh_rnd ()));
+            for (int el = 0, p = wh_rnd() % 100; el < p; ++el)
+              value.Add(DInt64(wh_rnd()));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f2, value);
 
-            if ((wh_rnd () & 1) == 0)
-              value.Add (DInt64 (wh_rnd ()));
+            if ((wh_rnd() & 1) == 0)
+              value.Add(DInt64(wh_rnd()));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f1, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f1, value);
+            refTable2->Set(wh_rnd() % refTable2->AllocatedRows(), f1, value);
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f1, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f2, value);
 
             break;
 
           case 2:
-            refTable->Get (row, f1, value);
-            refTable->Set (row, f1, value);
+            refTable->Get(row, f1, value);
+            refTable->Set(row, f1, value);
 
-            refTable->Get (row, f2, value);
-            refTable->Set (row, f2, value);
+            refTable->Get(row, f2, value);
+            refTable->Set(row, f2, value);
 
-            refTable2->Set (row, f2, value);
+            refTable2->Set(row, f2, value);
             break;
 
           default:
-            refTable->Get (row, f1, value);
-            refTable->Set (row, f2, value);
-            refTable2->Set (row, f2, value);
+            refTable->Get(row, f1, value);
+            refTable->Set(row, f2, value);
+            refTable2->Set(row, f2, value);
         }
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -214,7 +214,7 @@ test_table_test_rows_array (void *)
 
 
 static void
-test_table_test_rows_text (void *)
+test_table_test_rows_text(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -222,50 +222,50 @@ test_table_test_rows_text (void *)
   {
     for (uint_t i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        const ROW_INDEX row = wh_rnd () % refTable->AllocatedRows ();
+        const ROW_INDEX row = wh_rnd() % refTable->AllocatedRows();
 
         DText value;
-        const FIELD_INDEX f1 = refTable->RetrieveField ("f_text");
-        const FIELD_INDEX f2 = refTable->RetrieveField ("f_text_2");
+        const FIELD_INDEX f1 = refTable->RetrieveField("f_text");
+        const FIELD_INDEX f2 = refTable->RetrieveField("f_text_2");
 
-        switch (wh_rnd ()  % 4)
+        switch(wh_rnd()  % 4)
         {
           case 0:
 
-            for (int el = 0, p = wh_rnd () % 300; el < p; ++el)
-              value.Append (DChar (wh_rnd () % 0xD800));
+            for (int el = 0, p = wh_rnd() % 300; el < p; ++el)
+              value.Append(DChar(wh_rnd() % 0xD800));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f2, value);
 
-            if ((wh_rnd () & 1) == 0)
-              value.Append (DChar (wh_rnd () % 0xD800));
+            if ((wh_rnd() & 1) == 0)
+              value.Append(DChar(wh_rnd() % 0xD800));
 
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
-            refTable2->Set (wh_rnd () % refTable2->AllocatedRows (), f1, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f1, value);
+            refTable2->Set(wh_rnd() % refTable2->AllocatedRows(), f1, value);
             break;
 
           case 1:
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f1, value);
-            refTable->Set (wh_rnd () % refTable->AllocatedRows (), f2, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f1, value);
+            refTable->Set(wh_rnd() % refTable->AllocatedRows(), f2, value);
             break;
 
           case 2:
-            refTable->Get (row, f1, value);
-            refTable->Set (row, f1, value);
+            refTable->Get(row, f1, value);
+            refTable->Set(row, f1, value);
 
-            refTable->Get (row, f2, value);
-            refTable->Set (row, f2, value);
-            refTable2->Set (row, f2, value);
+            refTable->Get(row, f2, value);
+            refTable->Set(row, f2, value);
+            refTable2->Set(row, f2, value);
             break;
 
           default:
-            refTable->Get (row, f1, value);
-            refTable->Set (row, f2, value);
-            refTable2->Set (row, f1, value);
+            refTable->Get(row, f1, value);
+            refTable->Set(row, f2, value);
+            refTable2->Set(row, f1, value);
         }
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -278,7 +278,7 @@ test_table_test_rows_text (void *)
 
 
 static void
-test_table_rows (void *)
+test_table_rows(void *)
 {
   cout << "Started " << __FUNCTION__ << endl;
 
@@ -286,25 +286,25 @@ test_table_rows (void *)
   {
     for (uint_t i = 0; (i < _iterationsCount) && !testEnd; ++i)
       {
-        if (refTable->ReusableRowsCount () < refTable->AllocatedRows () / 3)
+        if (refTable->ReusableRowsCount() < refTable->AllocatedRows() / 3)
           {
-            refTable->AddRow ();
-            refTable2->AddRow ();
+            refTable->AddRow();
+            refTable2->AddRow();
           }
         else
           {
-            refTable->MarkRowForReuse (wh_rnd () % refTable->AllocatedRows ());
-            refTable->GetReusableRow (true);
+            refTable->MarkRowForReuse(wh_rnd() % refTable->AllocatedRows());
+            refTable->GetReusableRow(true);
 
-            refTable2->MarkRowForReuse (wh_rnd () % refTable2->AllocatedRows ());
-            refTable2->GetReusableRow (true);
+            refTable2->MarkRowForReuse(wh_rnd() % refTable2->AllocatedRows());
+            refTable2->GetReusableRow(true);
           }
 
-        if (wh_rnd () & 1)
-          wh_yield ();
+        if (wh_rnd() & 1)
+          wh_yield();
       }
   }
-  catch (...)
+  catch(...)
   {
       testResult = false;
       testEnd = true;
@@ -317,84 +317,84 @@ test_table_rows (void *)
 
 
 int
-main (int argc, char** argv)
+main(int argc, char** argv)
 {
   if (argc > 1)
-    _iterationsCount = atol (argv[1]);
+    _iterationsCount = atol(argv[1]);
 
   cout << "Iteration count set at " << _iterationsCount << endl;
 
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
-    IDBSHandler& handler = DBSRetrieveDatabase (db_name);
+    DBSInit(DBSSettings());
+    DBSCreateDatabase(db_name);
+    IDBSHandler& handler = DBSRetrieveDatabase(db_name);
 
     handler.AddTable("t_test_table", 5, fieldsDescs);
-    refTable  = &handler.RetrievePersistentTable ("t_test_table");
-    refTable2 = &handler.CreateTempTable (5, fieldsDescs);
+    refTable  = &handler.RetrievePersistentTable("t_test_table");
+    refTable2 = &handler.CreateTempTable(5, fieldsDescs);
 
-    refTable->AddRow ();
-    refTable2->AddRow ();
+    refTable->AddRow();
+    refTable2->AddRow();
 
     testEnd     = false;
     testResult  = true;
 
     Thread th[6];
 
-    th[0].Run (test_table_rows, NULL);
-    th[1].Run (test_table_index, NULL);
-    th[2].Run (test_table_test_rows_array, NULL);
-    th[3].Run (test_table_test_rows_text, NULL);
-    th[4].Run (test_table_test_rows_basic, NULL);
-    th[5].Run (test_table_sort, NULL);
+    th[0].Run(test_table_rows, NULL);
+    th[1].Run(test_table_index, NULL);
+    th[2].Run(test_table_test_rows_array, NULL);
+    th[3].Run(test_table_test_rows_text, NULL);
+    th[4].Run(test_table_test_rows_basic, NULL);
+    th[5].Run(test_table_sort, NULL);
 
-    th[0].WaitToEnd (true);
-    th[1].WaitToEnd (true);
-    th[2].WaitToEnd (true);
-    th[3].WaitToEnd (true);
-    th[4].WaitToEnd (true);
+    th[0].WaitToEnd(true);
+    th[1].WaitToEnd(true);
+    th[2].WaitToEnd(true);
+    th[3].WaitToEnd(true);
+    th[4].WaitToEnd(true);
 
-    wh_sleep (100);
+    wh_sleep(100);
     testEnd = true;
 
-    th[5].WaitToEnd (true);
+    th[5].WaitToEnd(true);
 
-    handler.ReleaseTable (*refTable);
+    handler.ReleaseTable(*refTable);
     if (testResult)
       {
         cout << "Starting the second round.\n";
 
-        refTable = &handler.RetrievePersistentTable ("t_test_table");
+        refTable = &handler.RetrievePersistentTable("t_test_table");
         testEnd  = false;
 
-        th[0].Run (test_table_rows, NULL);
-        th[1].Run (test_table_index, NULL);
-        th[2].Run (test_table_test_rows_array, NULL);
-        th[3].Run (test_table_test_rows_text, NULL);
-        th[4].Run (test_table_test_rows_basic, NULL);
-        th[5].Run (test_table_sort, NULL);
+        th[0].Run(test_table_rows, NULL);
+        th[1].Run(test_table_index, NULL);
+        th[2].Run(test_table_test_rows_array, NULL);
+        th[3].Run(test_table_test_rows_text, NULL);
+        th[4].Run(test_table_test_rows_basic, NULL);
+        th[5].Run(test_table_sort, NULL);
 
-        th[0].WaitToEnd (true);
-        th[1].WaitToEnd (true);
-        th[2].WaitToEnd (true);
-        th[3].WaitToEnd (true);
-        th[4].WaitToEnd (true);
+        th[0].WaitToEnd(true);
+        th[1].WaitToEnd(true);
+        th[2].WaitToEnd(true);
+        th[3].WaitToEnd(true);
+        th[4].WaitToEnd(true);
 
-        wh_sleep (100);
+        wh_sleep(100);
         testEnd = true;
 
-        th[5].WaitToEnd (true);
+        th[5].WaitToEnd(true);
 
-        handler.ReleaseTable (*refTable);
+        handler.ReleaseTable(*refTable);
       }
 
-    handler.ReleaseTable (*refTable2);
-    handler.DeleteTable ("t_test_table");
-    DBSReleaseDatabase (handler);
+    handler.ReleaseTable(*refTable2);
+    handler.DeleteTable("t_test_table");
+    DBSReleaseDatabase(handler);
   }
 
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSRemoveDatabase(db_name);
+  DBSShoutdown();
 
   if (!testResult)
     {

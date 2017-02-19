@@ -671,11 +671,11 @@ static const WField _fields[] =
   {"WHC_TYPE_ARRAY_RICHREAL", WHC_TYPE_RICHREAL| WHC_TYPE_ARRAY_MASK}
 };
 
-static const uint_t _valuesCount = sizeof (_values) / sizeof (_values[0]);
-static const uint_t _fieldsCount = sizeof (_fields) / sizeof (_fields[0]);
+static const uint_t _valuesCount = sizeof(_values) / sizeof(_values[0]);
+static const uint_t _fieldsCount = sizeof(_fields) / sizeof(_fields[0]);
 
 static const char*
-get_table_field_name (const uint_t fieldType)
+get_table_field_name(const uint_t fieldType)
 {
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
@@ -688,16 +688,16 @@ get_table_field_name (const uint_t fieldType)
 
 
 static bool
-check_table_description (WH_CONNECTION hnd)
+check_table_description(WH_CONNECTION hnd)
 {
   uint_t type, fcount;
 
   const char* fieldName = NULL;
   uint_t        fieldType = 0;
 
-  if ((WDescribeStackTop (hnd, &type) != WCS_OK)
+  if ((WDescribeStackTop(hnd, &type) != WCS_OK)
       || (type != WHC_TYPE_TABLE_MASK)
-      || (WValueFieldsCount (hnd, &fcount) != WCS_OK)
+      || (WValueFieldsCount(hnd, &fcount) != WCS_OK)
       || (fcount != _fieldsCount))
     {
       return false;
@@ -706,14 +706,14 @@ check_table_description (WH_CONNECTION hnd)
   for (uint_t i = 0; i < _fieldsCount; ++i)
     {
 
-      if (WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+      if (WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
         return false;
 
-      if (strcmp (fieldName, get_table_field_name ( fieldType)) != 0)
+      if (strcmp(fieldName, get_table_field_name( fieldType)) != 0)
         return false;
     }
 
-  if ((WValueFetchField (hnd, &fieldName, &fieldType) != WCS_OK)
+  if ((WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
       || (fieldName != NULL)
       || (fieldType != WHC_TYPE_NOTSET))
     {
@@ -725,11 +725,11 @@ check_table_description (WH_CONNECTION hnd)
 
 
 static bool
-check_table_value (WH_CONNECTION      hnd,
+check_table_value(WH_CONNECTION      hnd,
                    const uint_t         index,
                    const bool           extraCheck)
 {
-  const char* const fieldName = get_table_field_name (_values[index].type);
+  const char* const fieldName = get_table_field_name(_values[index].type);
   const char*       tabVal    = NULL;
   const uint64_t      row       = index / _fieldsCount;
 
@@ -737,7 +737,7 @@ check_table_value (WH_CONNECTION      hnd,
 
   if (extraCheck)
     {
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        "some_field_name",
                        row,
                        WIGNORE_OFF,
@@ -747,7 +747,7 @@ check_table_value (WH_CONNECTION      hnd,
         return false;
       }
 
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        fieldName,
                        98012, //Some big row number
                        WIGNORE_OFF,
@@ -757,7 +757,7 @@ check_table_value (WH_CONNECTION      hnd,
         return false;
       }
 
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        fieldName,
                        row,
                        WIGNORE_OFF,
@@ -767,7 +767,7 @@ check_table_value (WH_CONNECTION      hnd,
           return false;
         }
 
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        fieldName,
                        row,
                        MAX_VALUES_ENTRIES + index,
@@ -777,7 +777,7 @@ check_table_value (WH_CONNECTION      hnd,
           return false;
         }
 
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        fieldName,
                        row,
                        0,
@@ -787,7 +787,7 @@ check_table_value (WH_CONNECTION      hnd,
           return false;
         }
 
-      if (WValueArraySize (hnd,
+      if (WValueArraySize(hnd,
                            "some_field",
                            WIGNORE_ROW,
                            &elCount) != WCS_INVALID_FIELD)
@@ -795,7 +795,7 @@ check_table_value (WH_CONNECTION      hnd,
           return false;
         }
 
-      if (WValueArraySize (hnd,
+      if (WValueArraySize(hnd,
                            fieldName,
                            WIGNORE_ROW,
                            &elCount) != WCS_INVALID_ROW)
@@ -804,7 +804,7 @@ check_table_value (WH_CONNECTION      hnd,
         }
 
 
-      if (WValueTextLength (hnd,
+      if (WValueTextLength(hnd,
                             fieldName,
                             0,
                             0,
@@ -816,7 +816,7 @@ check_table_value (WH_CONNECTION      hnd,
 
 
 
-  if ((WValueArraySize (hnd,
+  if ((WValueArraySize(hnd,
                         fieldName,
                         row,
                         &elCount) != WCS_OK)
@@ -827,7 +827,7 @@ check_table_value (WH_CONNECTION      hnd,
 
   for (uint_t i = 0; i < elCount; ++i)
     {
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        fieldName,
                        row,
                        i,
@@ -837,7 +837,7 @@ check_table_value (WH_CONNECTION      hnd,
           return false;
         }
 
-      if (strcmp (tabVal, _values[index].values[i]) != 0)
+      if (strcmp(tabVal, _values[index].values[i]) != 0)
         return false;
     }
 
@@ -846,22 +846,22 @@ check_table_value (WH_CONNECTION      hnd,
 
 
 static bool
-fill_table_with_values (WH_CONNECTION hnd,
+fill_table_with_values(WH_CONNECTION hnd,
                         const bool      bulk)
 {
-  if (WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+  if (WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
     return false;
 
-  if ( ! bulk && (WFlush (hnd) != WCS_OK))
+  if ( ! bulk && (WFlush(hnd) != WCS_OK))
     return false;
 
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
       for (uint_t j = 0; j < _values[i].elementsCount; ++j)
         {
-          if (WUpdateValue (hnd,
+          if (WUpdateValue(hnd,
                             _values[i].type,
-                            get_table_field_name (_values[i].type),
+                            get_table_field_name(_values[i].type),
                             i / _fieldsCount,
                             j,
                             WIGNORE_OFF,
@@ -870,37 +870,37 @@ fill_table_with_values (WH_CONNECTION hnd,
               goto fill_table_fail;
             }
 
-          if ( ! bulk && (WFlush (hnd) != WCS_OK))
+          if ( ! bulk && (WFlush(hnd) != WCS_OK))
             goto fill_table_fail;
         }
     }
 
-  if (WFlush (hnd) != WCS_OK)
+  if (WFlush(hnd) != WCS_OK)
     return false;
 
-  return check_table_description (hnd);
+  return check_table_description(hnd);
 
 fill_table_fail:
   return false;
 }
 
 static bool
-test_step_table_fill (WH_CONNECTION hnd)
+test_step_table_fill(WH_CONNECTION hnd)
 {
-  cout << "Testing filling a table with basic values (stepping mode)... ";
+  cout << "Testing filling a table with basic values(stepping mode)... ";
 
-  if (! fill_table_with_values (hnd, false))
+  if (! fill_table_with_values(hnd, false))
     goto test_step_table_fill_error;
 
 
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
-      if (! check_table_value (hnd, i, true))
+      if (! check_table_value(hnd, i, true))
         goto test_step_table_fill_error;
     }
 
-  if ((WPopValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WFlush (hnd) !=WCS_OK))
+  if ((WPopValues(hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush(hnd) !=WCS_OK))
     {
       goto test_step_table_fill_error;
     }
@@ -916,21 +916,21 @@ test_step_table_fill_error:
 
 
 static bool
-test_bulk_table_fill (WH_CONNECTION hnd)
+test_bulk_table_fill(WH_CONNECTION hnd)
 {
-  cout << "Testing filling a table with basic values (bulk mode)... ";
+  cout << "Testing filling a table with basic values(bulk mode)... ";
 
-  if (! fill_table_with_values (hnd, true))
+  if (! fill_table_with_values(hnd, true))
     goto test_bulk_table_fill_error;
 
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
-      if (! check_table_value (hnd, i, false))
+      if (! check_table_value(hnd, i, false))
         goto test_bulk_table_fill_error;
     }
 
-  if ((WPopValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WFlush (hnd) !=WCS_OK))
+  if ((WPopValues(hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush(hnd) !=WCS_OK))
     {
       goto test_bulk_table_fill_error;
     }
@@ -947,26 +947,26 @@ test_bulk_table_fill_error:
 
 
 static bool
-test_for_errors (WH_CONNECTION hnd)
+test_for_errors(WH_CONNECTION hnd)
 {
   unsigned long long count;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (hnd, &count) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK) //Just for fun!
+      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, &count) != WCS_OK)
       || (count != 0)
-      || (WValueArraySize (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WValueArraySize (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WPopValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+      || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize(hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength(hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WPopValues(hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -980,35 +980,35 @@ test_for_errors_fail :
 }
 
 const char*
-DefaultDatabaseName ()
+DefaultDatabaseName()
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId ()
+DefaultUserId()
 {
   return 1;
 }
 
 const char*
-DefaultUserPassword ()
+DefaultUserPassword()
 {
   return "test_password";
 }
 
 int
-main (int argc, const char** argv)
+main(int argc, const char** argv)
 {
   WH_CONNECTION hnd        = NULL;
 
-  bool success = tc_settup_connection (argc, argv, &hnd);
+  bool success = tc_settup_connection(argc, argv, &hnd);
 
-  success = success && test_for_errors (hnd);
-  success = success && test_step_table_fill (hnd);
-  success = success && test_bulk_table_fill (hnd);
+  success = success && test_for_errors(hnd);
+  success = success && test_step_table_fill(hnd);
+  success = success && test_bulk_table_fill(hnd);
 
-  WClose (hnd);
+  WClose(hnd);
 
   if (!success)
     {

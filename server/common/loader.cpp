@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -42,84 +42,84 @@ static const char CLEAR_LOG_STREAM[] = "";
 
 
 bool
-LoadDatabase (FileLogger& log, DBSDescriptors& inoutDesc)
+LoadDatabase(FileLogger& log, DBSDescriptors& inoutDesc)
 {
   ostringstream logEntry;
   uint64_t      temp;
 
 
   logEntry << "Loading database: " << inoutDesc.mDbsName;
-  log.Log (LT_INFO, logEntry.str ());
-  logEntry.str (CLEAR_LOG_STREAM);
+  log.Log(LT_INFO, logEntry.str());
+  logEntry.str(CLEAR_LOG_STREAM);
 
-  inoutDesc.mDbs = &DBSRetrieveDatabase (inoutDesc.mDbsName.c_str (),
-                                         inoutDesc.mDbsDirectory.c_str ());
+  inoutDesc.mDbs = &DBSRetrieveDatabase(inoutDesc.mDbsName.c_str(),
+                                         inoutDesc.mDbsDirectory.c_str());
   std::unique_ptr<Logger> dbsLogger(
-                         new FileLogger (inoutDesc.mDbsLogFile.c_str (), true)
+                         new FileLogger(inoutDesc.mDbsLogFile.c_str(), true)
                                   );
   logEntry << "Sync interval is set at " << inoutDesc.mSyncInterval
            << " milliseconds";
-  dbsLogger->Log (LT_INFO, logEntry.str ());
-  log.Log (LT_INFO, logEntry.str ());
-  logEntry.str (CLEAR_LOG_STREAM);
+  dbsLogger->Log(LT_INFO, logEntry.str());
+  log.Log(LT_INFO, logEntry.str());
+  logEntry.str(CLEAR_LOG_STREAM);
 
   logEntry << "Request timeout interval is set at " << inoutDesc.mWaitReqTmo
            << " milliseconds.";
-  dbsLogger->Log (LT_INFO, logEntry.str ());
-  log.Log (LT_INFO, logEntry.str ());
-  logEntry.str (CLEAR_LOG_STREAM);
+  dbsLogger->Log(LT_INFO, logEntry.str());
+  log.Log(LT_INFO, logEntry.str());
+  logEntry.str(CLEAR_LOG_STREAM);
 
-  if (inoutDesc.mDbsName != GlobalContextDatabase ())
+  if (inoutDesc.mDbsName != GlobalContextDatabase())
     {
-      inoutDesc.mSession = &GetInstance (inoutDesc.mDbsName.c_str (),
-                                         dbsLogger.get ());
+      inoutDesc.mSession = &GetInstance(inoutDesc.mDbsName.c_str(),
+                                         dbsLogger.get());
     }
   else
-    inoutDesc.mSession = &GetInstance (NULL, dbsLogger.get ());
+    inoutDesc.mSession = &GetInstance(NULL, dbsLogger.get());
 
   temp = inoutDesc.mStackCount;
-  if ( ! inoutDesc.mSession->NotifyEvent (ISession::MAX_STACK_COUNT, &temp))
+  if ( ! inoutDesc.mSession->NotifyEvent(ISession::MAX_STACK_COUNT, &temp))
     {
       logEntry << "Failed to set the maximum stack count limitation for "
                   "session '" << inoutDesc.mDbsName << "' at "
                << inoutDesc.mStackCount << " elements.";
 
-      log.Log (LT_ERROR, logEntry.str ());
-      logEntry.str (CLEAR_LOG_STREAM);
-      logEntry.str (CLEAR_LOG_STREAM);
+      log.Log(LT_ERROR, logEntry.str());
+      logEntry.str(CLEAR_LOG_STREAM);
+      logEntry.str(CLEAR_LOG_STREAM);
     }
 
-  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin ();
-       it != inoutDesc.mNativeLibs.end ();
+  for (vector<string>::iterator it = inoutDesc.mNativeLibs.begin();
+       it != inoutDesc.mNativeLibs.end();
        ++it)
     {
       logEntry << "... Loading dynamic native library '" << *it << "'.";
-      dbsLogger->Log (LT_INFO, logEntry.str ());
-      log.Log (LT_INFO, logEntry.str ());
-      logEntry.str (CLEAR_LOG_STREAM);
+      dbsLogger->Log(LT_INFO, logEntry.str());
+      log.Log(LT_INFO, logEntry.str());
+      logEntry.str(CLEAR_LOG_STREAM);
 
-      WH_SHLIB shl = wh_shl_load (it->c_str ());
+      WH_SHLIB shl = wh_shl_load(it->c_str());
       if ((shl == INVALID_SHL)
-          || ! inoutDesc.mSession->LoadSharedLib (shl))
+          || ! inoutDesc.mSession->LoadSharedLib(shl))
         {
-          log.Log (LT_ERROR, "Failed to load the dynamic library.");
+          log.Log(LT_ERROR, "Failed to load the dynamic library.");
         }
     }
 
-  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin ();
-       it != inoutDesc.mObjectLibs.end ();
+  for (vector<string>::iterator it = inoutDesc.mObjectLibs.begin();
+       it != inoutDesc.mObjectLibs.end();
        ++it)
     {
       logEntry << "... Loading compiled object unit '" << *it << "'.";
-      dbsLogger->Log (LT_INFO, logEntry.str ());
-      log.Log (LT_INFO, logEntry.str ());
-      logEntry.str (CLEAR_LOG_STREAM);
+      dbsLogger->Log(LT_INFO, logEntry.str());
+      log.Log(LT_INFO, logEntry.str());
+      logEntry.str(CLEAR_LOG_STREAM);
 
-      CompiledFileUnit unit (it->c_str ());
-      inoutDesc.mSession->LoadCompiledUnit (unit);
+      CompiledFileUnit unit(it->c_str());
+      inoutDesc.mSession->LoadCompiledUnit(unit);
     }
 
-  inoutDesc.mLogger = dbsLogger.release ();
+  inoutDesc.mLogger = dbsLogger.release();
 
   return true;
 }

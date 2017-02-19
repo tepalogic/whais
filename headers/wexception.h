@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -54,34 +54,34 @@ enum EXCEPTION_TYPE
 class EXCEP_SHL Exception
 {
 public:
-  Exception (uint32_t      code,
+  Exception(uint32_t      code,
              const char*   file,
              uint32_t      line);
-  Exception (const Exception& source);
+  Exception(const Exception& source);
 
-  virtual ~Exception ();
+  virtual ~Exception();
 
-  uint32_t            Code () const;
+  uint32_t            Code() const;
 
-  const std::string&  Message () const;
-  void                Message (const char* msg, va_list vl);
-  void                Message (const char* msg, ...);
+  const std::string&  Message() const;
+  void                Message(const char* msg, va_list vl);
+  void                Message(const char* msg, ...);
 
-  const char*         File () const;
+  const char*         File() const;
 
-  uint32_t            Line () const;
+  uint32_t            Line() const;
 
-  virtual Exception* Clone () const = 0;
+  virtual Exception* Clone() const = 0;
 
-  virtual EXCEPTION_TYPE Type () const = 0;
+  virtual EXCEPTION_TYPE Type() const = 0;
 
-  virtual const char* Description () const = 0;
+  virtual const char* Description() const = 0;
 
 private:
 
-#pragma warning ( disable : 4251 )
+#pragma warning( disable : 4251 )
   std::string       mErrorMessage;
-#pragma warning ( default : 4251)
+#pragma warning( default : 4251)
 
   const char* const     mFile;
   const uint32_t        mLine;

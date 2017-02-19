@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -169,8 +169,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *   CmdReadStack
  *   {
  *      fieldNameHint:  uint8[]
- *      rowHint      :  uint64 (fieldName[0] != 0)
- *      positionHint :  uint64 (array & texts)
+ *      rowHint      :  uint64(fieldName[0] != 0)
+ *      positionHint :  uint64(array & texts)
  *   }
  *
  *
@@ -240,14 +240,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * {
  *      type      : uint16
  *      fieldName : uint8[] (type == FT_TABLE)
- *      fieldType : uint16 (type == FT_TABLE)
+ *      fieldType : uint16(type == FT_TABLE)
  *      fieldName : uint8[] (type == FT_TABLE)
- *      fieldType : uint16 (type == FT_TABLE)
+ *      fieldType : uint16(type == FT_TABLE)
  *      .
  *      .
  *      .
  *      fieldName : uint8[] (type == FT_TABLE)
- *      fieldType : uint16 (type == FT_TABLE)
+ *      fieldType : uint16(type == FT_TABLE)
  * }
  *
  * CmdSubCmdUpdateTop

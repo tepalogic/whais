@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -68,7 +68,7 @@ proc_field_isindexed( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
+      stack.Pop(1);
       stack.Push( DBool());
 
       return WOP_OK;
@@ -79,7 +79,7 @@ proc_field_isindexed( SessionStack& stack, ISession&)
 
   DBool result( table.IsIndexed( field));
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -93,7 +93,7 @@ proc_field_name( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
+      stack.Pop(1);
       stack.Push( DText());
 
       return WOP_OK;
@@ -105,7 +105,7 @@ proc_field_name( SessionStack& stack, ISession&)
   DBSFieldDescriptor fd = table.DescribeField( field);
   DText result( fd.name);
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -119,16 +119,16 @@ proc_field_index( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DUInt64 ());
+      stack.Pop(1);
+      stack.Push( DUInt64());
 
       return WOP_OK;
     }
 
   const uint64_t field = op.GetField();
 
-  stack.Pop (1);
-  stack.Push( DUInt64 (field));
+  stack.Pop(1);
+  stack.Push( DUInt64(field));
 
   return WOP_OK;
 }
@@ -156,7 +156,7 @@ proc_field_find_range( SessionStack& stack, ISession&)
 
   if (opField.IsNull())
     {
-      stack.Pop (5);
+      stack.Pop(5);
       stack.Push( DArray());
 
       return WOP_OK;
@@ -349,7 +349,7 @@ proc_field_find_range( SessionStack& stack, ISession&)
       throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
     }
 
-  stack.Pop (5);
+  stack.Pop(5);
   stack.Push( result);
 
   return WOP_OK;
@@ -361,13 +361,13 @@ retrieve_minim_value( ITable&           table,
                       const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  T              minim     = T::Max ();
+  T              minim     = T::Max();
   uint64_t       foundRow  = 0;
 
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
     {
       T value;
-      table.Get (row, field, value);
+      table.Get(row, field, value);
 
       if ( ! value.IsNull() && (value <= minim))
         {
@@ -385,13 +385,13 @@ retrieve_maxim_value( ITable&           table,
                       const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  T              maxim     = T::Min ();
+  T              maxim     = T::Min();
   uint64_t       foundRow  = 0;
 
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
     {
       T value;
-      table.Get (row, field, value);
+      table.Get(row, field, value);
 
       if ( ! value.IsNull() && (maxim <= value))
         {
@@ -412,8 +412,8 @@ field_search_minmax( SessionStack& stack, ISession&)
 
   if (opField.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DUInt64 ());
+      stack.Pop(1);
+      stack.Push( DUInt64());
 
       return WOP_OK;
     }
@@ -558,8 +558,8 @@ field_search_minmax( SessionStack& stack, ISession&)
     throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
   }
 
-  stack.Pop (1);
-  stack.Push( DUInt64 (foundRow));
+  stack.Pop(1);
+  stack.Push( DUInt64(foundRow));
 
   return WOP_OK;
 }
@@ -576,7 +576,7 @@ compute_integer_field_average_value( ITable&              table,
   T currentValue;
   for (uint64_t row = 0; row < rowsCount; ++row)
     {
-      table.Get (row, field, currentValue);
+      table.Get(row, field, currentValue);
 
       if ( ! currentValue.IsNull())
         {
@@ -606,7 +606,7 @@ compute_real_field_average_value( ITable&             table,
   T currentValue;
   for (uint64_t row = 0; row < rowsCount; ++row)
     {
-      table.Get (row, field, currentValue);
+      table.Get(row, field, currentValue);
 
       if ( ! currentValue.IsNull())
         {
@@ -625,8 +625,8 @@ compute_real_field_average_value( ITable&             table,
   integerSum    += fractionalSum / DBS_RICHREAL_PREC;
   fractionalSum %= DBS_RICHREAL_PREC;
 
-  RICHREAL_T result = _SC (RICHREAL_T, integerSum) / rowsAdded;
-  result += RICHREAL_T( 0, toInt64 (fractionalSum), DBS_RICHREAL_PREC)
+  RICHREAL_T result = _SC(RICHREAL_T, integerSum) / rowsAdded;
+  result += RICHREAL_T( 0, toInt64(fractionalSum), DBS_RICHREAL_PREC)
             / rowsAdded;
 
   return DRichReal( result);
@@ -640,7 +640,7 @@ compute_field_average( SessionStack& stack, ISession&)
 
   if (opField.IsNull())
     {
-      stack.Pop (1);
+      stack.Pop(1);
       stack.Push( DRichReal());
 
       return WOP_OK;
@@ -707,7 +707,7 @@ compute_field_average( SessionStack& stack, ISession&)
       throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
     }
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -736,7 +736,7 @@ field_sort_table( SessionStack& stack, ISession&)
       result = DBool( true);
     }
 
-  stack.Pop (1);
+  stack.Pop(1);
 
   return WOP_OK;
 }

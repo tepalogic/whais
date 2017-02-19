@@ -32,43 +32,43 @@ const WField  _fields[] =
         {"WHC_TYPE_TEXT_2", WHC_TYPE_TEXT},
     };
 
-static const uint_t _fieldsCount = sizeof _fields / sizeof (_fields[0]);
+static const uint_t _fieldsCount = sizeof _fields / sizeof(_fields[0]);
 
 const char*
-insert_a_string (WH_CONNECTION        hnd,
+insert_a_string(WH_CONNECTION        hnd,
                  const char*          fieldName,
                  const uint64_t         row,
                  const bool             bulk)
 {
-  const uint_t thisStringSize = wh_rnd () % MAX_STRING_SIZE;
+  const uint_t thisStringSize = wh_rnd() % MAX_STRING_SIZE;
 
   char* result = new char[MAX_STRING_SIZE];
 
-  memset (result, 0, MAX_STRING_SIZE);
+  memset(result, 0, MAX_STRING_SIZE);
 
-  while (true)
+  while(true)
     {
-      const char* temp = _refStrings[wh_rnd () % MAX_REFS_STRINGS];
+      const char* temp = _refStrings[wh_rnd() % MAX_REFS_STRINGS];
 
-      if (strlen (result) + strlen (temp) >= thisStringSize)
+      if (strlen(result) + strlen(temp) >= thisStringSize)
         break;
 
-      if ((WUpdateValue (hnd,
+      if ((WUpdateValue(hnd,
                          WHC_TYPE_TEXT,
                          fieldName,
                          row,
                          WIGNORE_OFF,
-                         wh_utf8_strlen (_RC (uint8_t*, result)),
+                         wh_utf8_strlen(_RC(uint8_t*, result)),
                          temp) != WCS_OK)
-          || (bulk && (WFlush (hnd) != WCS_OK)))
+          || (bulk && (WFlush(hnd) != WCS_OK)))
         {
           return NULL;
         }
 
-      strcat (result, temp);
+      strcat(result, temp);
     }
 
-  if (WFlush (hnd) != WCS_OK)
+  if (WFlush(hnd) != WCS_OK)
     return NULL;
 
   return result;
@@ -76,9 +76,9 @@ insert_a_string (WH_CONNECTION        hnd,
 
 
 static bool
-test_simple_text (WH_CONNECTION hnd)
+test_simple_text(WH_CONNECTION hnd)
 {
-  uint_t              aSimpleOffset = wh_rnd () % 7;
+  uint_t              aSimpleOffset = wh_rnd() % 7;
 
   const char*       ref;
   char              aValue[MAX_STRING_SIZE];
@@ -88,78 +88,78 @@ test_simple_text (WH_CONNECTION hnd)
 
   cout << "Testing text simple updates ... ";
 
-  if ((WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+  if ((WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_simple_text_fail;
     }
 
-  ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, false);
-  if ((WValueTextLength (hnd,
+  ref = insert_a_string(hnd, WIGNORE_FIELD, WIGNORE_OFF, false);
+  if ((WValueTextLength(hnd,
                          WIGNORE_FIELD,
                          WIGNORE_ROW,
                          WIGNORE_OFF,
                          &count) != WCS_OK)
-      || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
+      || (_SC(int, count) != wh_utf8_strlen(_RC(const uint8_t*, ref)))
+      || (WDescribeStackTop(hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
     }
 
   aValue[0] = 0;
-  while (strlen (aValue) < strlen (ref + aSimpleOffset))
+  while(strlen(aValue) < strlen(ref + aSimpleOffset))
     {
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        WIGNORE_FIELD,
                        WIGNORE_ROW,
                        WIGNORE_OFF,
-                       wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                       wh_utf8_strlen(_RC(uint8_t*, aValue)) + aSimpleOffset,
                        &value) != WCS_OK)
         {
           goto test_simple_text_fail;
         }
-      strcat (aValue, value);
+      strcat(aValue, value);
     }
 
-  if (strcmp (aValue, ref + aSimpleOffset) != 0)
+  if (strcmp(aValue, ref + aSimpleOffset) != 0)
     goto test_simple_text_fail;
 
   delete [] ref;
 
-  if (WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+  if (WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
     goto test_simple_text_fail;
 
-  ref = insert_a_string (hnd, WIGNORE_FIELD, WIGNORE_OFF, true);
-  if ((WValueTextLength (hnd,
+  ref = insert_a_string(hnd, WIGNORE_FIELD, WIGNORE_OFF, true);
+  if ((WValueTextLength(hnd,
                          WIGNORE_FIELD,
                          WIGNORE_ROW,
                          WIGNORE_OFF,
                          &count) != WCS_OK)
-      || (_SC (int, count) != wh_utf8_strlen (_RC (const uint8_t*, ref)))
-      || (WDescribeStackTop (hnd, &rawType) != WCS_OK)
+      || (_SC(int, count) != wh_utf8_strlen(_RC(const uint8_t*, ref)))
+      || (WDescribeStackTop(hnd, &rawType) != WCS_OK)
       || (rawType != WHC_TYPE_TEXT))
     {
       goto test_simple_text_fail;
     }
 
-  aSimpleOffset = wh_rnd () % 7;
+  aSimpleOffset = wh_rnd() % 7;
   aValue[0]     = 0;
-  while (strlen (aValue) < strlen (ref + aSimpleOffset))
+  while(strlen(aValue) < strlen(ref + aSimpleOffset))
     {
-      if (WValueEntry (hnd,
+      if (WValueEntry(hnd,
                        WIGNORE_FIELD,
                        WIGNORE_ROW,
                        WIGNORE_OFF,
-                       wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                       wh_utf8_strlen(_RC(uint8_t*, aValue)) + aSimpleOffset,
                        &value) != WCS_OK)
         {
           goto test_simple_text_fail;
         }
-      strcat (aValue, value);
+      strcat(aValue, value);
     }
 
-  if (strcmp (aValue, ref + aSimpleOffset) != 0)
+  if (strcmp(aValue, ref + aSimpleOffset) != 0)
     goto test_simple_text_fail;
 
   delete [] ref;
@@ -174,7 +174,7 @@ test_simple_text_fail:
 }
 
 static bool
-test_table_text (WH_CONNECTION hnd)
+test_table_text(WH_CONNECTION hnd)
 {
 
   const uint_t        rowsCount = 2;
@@ -184,8 +184,8 @@ test_table_text (WH_CONNECTION hnd)
   uint_t              aSimpleOffset;
   char              aValue[MAX_STRING_SIZE];
 
-  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+  if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_table_text_fail;
     }
@@ -194,12 +194,12 @@ test_table_text (WH_CONNECTION hnd)
   for (uint_t row = 0; row < rowsCount; row++)
     {
 
-      ref[row * _fieldsCount] = insert_a_string (hnd,
+      ref[row * _fieldsCount] = insert_a_string(hnd,
                                                  "WHC_TYPE_TEXT",
                                                  row,
                                                  true);
 
-      ref[row * _fieldsCount + 1] = insert_a_string (hnd,
+      ref[row * _fieldsCount + 1] = insert_a_string(hnd,
                                                      "WHC_TYPE_TEXT_2",
                                                      row,
                                                      false);
@@ -207,40 +207,40 @@ test_table_text (WH_CONNECTION hnd)
 
   for (uint_t row = 0; row < rowsCount; row++)
     {
-      aSimpleOffset = wh_rnd () % 7;
+      aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
-      while (strlen (aValue) < strlen (ref[row * _fieldsCount] + aSimpleOffset))
+      while(strlen(aValue) < strlen(ref[row * _fieldsCount] + aSimpleOffset))
         {
-          if (WValueEntry (hnd,
+          if (WValueEntry(hnd,
                                    "WHC_TYPE_TEXT",
                                    row,
                                    WIGNORE_OFF,
-                                   wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                                   wh_utf8_strlen(_RC(uint8_t*, aValue)) + aSimpleOffset,
                                    &value) != WCS_OK)
             {
               goto test_table_text_fail;
             }
-          strcat (aValue, value);
+          strcat(aValue, value);
         }
-      if (strcmp (aValue, ref[row * _fieldsCount] + aSimpleOffset) != 0)
+      if (strcmp(aValue, ref[row * _fieldsCount] + aSimpleOffset) != 0)
         goto test_table_text_fail;
 
-      aSimpleOffset = wh_rnd () % 7;
+      aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
-      while (strlen (aValue) < strlen (ref[row * _fieldsCount + 1] + aSimpleOffset))
+      while(strlen(aValue) < strlen(ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
-          if (WValueEntry (hnd,
+          if (WValueEntry(hnd,
                            "WHC_TYPE_TEXT_2",
                            row,
                            WIGNORE_OFF,
-                           wh_utf8_strlen (_RC (uint8_t*, aValue)) + aSimpleOffset,
+                           wh_utf8_strlen(_RC(uint8_t*, aValue)) + aSimpleOffset,
                            &value) != WCS_OK)
             {
               goto test_table_text_fail;
             }
-          strcat (aValue, value);
+          strcat(aValue, value);
         }
-      if (strcmp (aValue, ref[row * _fieldsCount + 1] + aSimpleOffset) != 0)
+      if (strcmp(aValue, ref[row * _fieldsCount + 1] + aSimpleOffset) != 0)
         goto test_table_text_fail;
     }
 
@@ -268,42 +268,42 @@ test_table_text_fail:
 
 
 static bool
-test_for_errors (WH_CONNECTION hnd)
+test_for_errors(WH_CONNECTION hnd)
 {
   unsigned long long count;
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue (hnd, WHC_TYPE_TEXT | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
-      || (WFlush (hnd) != WCS_OP_NOTSUPP)
-      || (WPushValue (hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK)
-      || (WValueRowsCount (hnd, &count) != WCS_TYPE_MISMATCH)
-      || (WValueArraySize (hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
-      || (WValueArraySize (hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
-      || (WValueArraySize (hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
-      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, &count) != WCS_TYPE_MISMATCH)
-      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_TEXT | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
+      || (WFlush(hnd) != WCS_OP_NOTSUPP)
+      || (WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK)
+      || (WValueRowsCount(hnd, &count) != WCS_TYPE_MISMATCH)
+      || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
+      || (WValueArraySize(hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
+      || (WValueArraySize(hnd, WIGNORE_FIELD, 0, &count) != WCS_INVALID_ROW)
+      || (WValueTextLength(hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, &count) != WCS_TYPE_MISMATCH)
+      || (WValueTextLength(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_OK)
       || (count != 0)
-      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength (hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW))
+      || (WValueTextLength(hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength(hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW))
     {
       goto test_for_errors_fail;
     }
 
-  if ((WPushValue (hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount (NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (hnd, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount (hnd, &count) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK) //Just for fun!
+      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, &count) != WCS_OK)
       || (count != 0)
-      || (WValueTextLength (hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength (hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
-      || (WValueTextLength (hnd, "WHC_TYPE_TEXT", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
-      || (WPopValues (hnd, WPOP_ALL) != WCS_OK)
-      || (WFlush (hnd) != WCS_OK))
+      || (WValueTextLength(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength(hnd, "some_f", WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
+      || (WValueTextLength(hnd, "WHC_TYPE_TEXT", 0, WIGNORE_OFF, &count) != WCS_INVALID_ROW)
+      || (WPopValues(hnd, WPOP_ALL) != WCS_OK)
+      || (WFlush(hnd) != WCS_OK))
     {
       goto test_for_errors_fail;
     }
@@ -318,35 +318,35 @@ test_for_errors_fail:
 }
 
 const char*
-DefaultDatabaseName ()
+DefaultDatabaseName()
 {
   return "test_list_db";
 }
 
 const uint_t
-DefaultUserId ()
+DefaultUserId()
 {
   return 1;
 }
 
 const char*
-DefaultUserPassword ()
+DefaultUserPassword()
 {
   return "test_password";
 }
 
 int
-main (int argc, const char** argv)
+main(int argc, const char** argv)
 {
   WH_CONNECTION hnd        = NULL;
 
-  bool success = tc_settup_connection (argc, argv, &hnd);
+  bool success = tc_settup_connection(argc, argv, &hnd);
 
-  success = success && test_for_errors (hnd);
-  success = success && test_simple_text (hnd);
-  success = success && test_table_text (hnd);
+  success = success && test_for_errors(hnd);
+  success = success && test_simple_text(hnd);
+  success = success && test_table_text(hnd);
 
-  WClose (hnd);
+  WClose(hnd);
 
   if (!success)
     {

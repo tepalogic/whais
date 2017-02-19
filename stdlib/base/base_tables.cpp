@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -130,8 +130,8 @@ public:
 
       Value& operator= (const Value& src)
         {
-          _CC (const TableSortContainer*&, mContainer) = src.mContainer;
-          _CC (ROW_INDEX&, mRow) = src.mRow;
+          _CC(const TableSortContainer*&, mContainer) = src.mContainer;
+          _CC(ROW_INDEX&, mRow) = src.mRow;
 
           return *this;
         }
@@ -152,9 +152,9 @@ public:
 
     extract_fields_ids( fields);
 
-    mTable.LockTable ();
-    mRowsPermutation.reserve (mTable.AllocatedRows());
-    for (ROW_INDEX i = 0; i < mRowsPermutation.size (); ++i)
+    mTable.LockTable();
+    mRowsPermutation.reserve(mTable.AllocatedRows());
+    for (ROW_INDEX i = 0; i < mRowsPermutation.size(); ++i)
       mRowsPermutation[i] = i;
 
     for (FIELD_INDEX field = 0; field < mFields.size(); ++field)
@@ -170,63 +170,63 @@ public:
           }
 
         DBool sortOrder;
-        fieldsSortOrder.Get (field, sortOrder);
+        fieldsSortOrder.Get(field, sortOrder);
 
         switch( fd.type)
           {
           case T_BOOL:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DBool>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DBool>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DBool>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DBool>)
                                    );
             break;
 
           case T_CHAR:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DChar>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DChar>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DChar>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DChar>)
                                    );
             break;
 
           case T_DATE:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDate>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DDate>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DDate>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DDate>)
                                    );
             break;
 
           case T_DATETIME:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DDateTime>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DDateTime>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DDateTime>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DDateTime>)
                                    );
             break;
 
           case T_HIRESTIME:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DHiresTime>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DHiresTime>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DHiresTime>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DHiresTime>)
                                    );
             break;
 
           case T_INT8:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt8>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DInt8>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DInt8>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DInt8>)
                                    );
             break;
 
           case T_INT16:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt16>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DInt16>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DInt16>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DInt16>)
                                    );
             break;
 
@@ -234,48 +234,48 @@ public:
           case T_INT32:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt32>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DInt32>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DInt32>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DInt32>)
                                    );
             break;
 
           case T_INT64:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DInt64>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DInt64>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DInt64>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DInt64>)
                                    );
             break;
 
           case T_REAL:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DReal>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DReal>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DReal>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DReal>)
                                    );
             break;
 
           case T_RICHREAL:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DRichReal>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DRichReal>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DRichReal>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DRichReal>)
                                    );
             break;
 
           case T_UINT8:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt8>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt8>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt8>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DUInt8>)
                                    );
             break;
 
           case T_UINT16:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt16>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt16>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt16>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DUInt16>)
                                    );
             break;
 
@@ -283,24 +283,24 @@ public:
           case T_UINT32:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt32>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt32>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt32>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DUInt32>)
                                    );
             break;
 
           case T_UINT64:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt64>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DUInt64>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DUInt64>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DUInt64>)
                                    );
             break;
 
           case T_TEXT:
             mComparators.push_back(
                           sortOrder.mValue ?
-                            _SC (field_comparator, &TableSortContainer::compare_field_values_reverse<DText>) :
-                            _SC (field_comparator, &TableSortContainer::compare_field_values<DText>)
+                            _SC(field_comparator, &TableSortContainer::compare_field_values_reverse<DText>) :
+                            _SC(field_comparator, &TableSortContainer::compare_field_values<DText>)
                                    );
             break;
 
@@ -325,7 +325,7 @@ public:
 
   uint64_t Count() const
   {
-    return mRowsPermutation.size ();
+    return mRowsPermutation.size();
   }
 
   void Pivot( const uint64_t index)
@@ -340,10 +340,10 @@ public:
   }
 
 
-  void Commit ()
+  void Commit()
   {
     ROW_INDEX row = 0;
-    while (row < mRowsPermutation.size ())
+    while(row < mRowsPermutation.size())
       {
         if (mRowsPermutation[row] == row)
           {
@@ -361,15 +361,15 @@ public:
                 break;
               }
 
-            mTable.ExchangeRows (currentRow, correctRow, true);
+            mTable.ExchangeRows(currentRow, correctRow, true);
             mRowsPermutation[currentRow] = currentRow;
 
             currentRow = correctRow;
           }
-        while (true);
+        while(true);
       }
 
-    mTable.UnlockTable ();
+    mTable.UnlockTable();
   }
 
 private:
@@ -382,8 +382,8 @@ private:
   {
     T v1, v2;
 
-    mTable.Get (row1, field, v1, true);
-    mTable.Get (row2, field, v2, true);
+    mTable.Get(row1, field, v1, true);
+    mTable.Get(row2, field, v2, true);
 
     if (v1 == v2)
       return 0;
@@ -401,8 +401,8 @@ private:
   {
     T v1, v2;
 
-    mTable.Get (row1, field, v1, true);
-    mTable.Get (row2, field, v2, true);
+    mTable.Get(row1, field, v1, true);
+    mTable.Get(row2, field, v2, true);
 
     if (v1 == v2)
       return 0;
@@ -428,7 +428,7 @@ private:
           case T_INT8:
               {
                 DInt8 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -437,7 +437,7 @@ private:
           case T_INT16:
               {
                 DInt16 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -446,7 +446,7 @@ private:
           case T_INT32:
               {
                 DInt32 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -455,7 +455,7 @@ private:
           case T_INT64:
               {
                 DInt64 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -464,7 +464,7 @@ private:
           case T_UINT8:
               {
                 DUInt8 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -473,7 +473,7 @@ private:
           case T_UINT16:
               {
                 DUInt16 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -482,7 +482,7 @@ private:
           case T_UINT32:
               {
                 DUInt32 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -491,7 +491,7 @@ private:
           case T_UINT64:
               {
                 DUInt64 temp;
-                fields.Get (field, temp);
+                fields.Get(field, temp);
 
                 mFields.push_back( temp.mValue);
               }
@@ -523,7 +523,7 @@ proc_table_ispersistent( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
+      stack.Pop(1);
       stack.Push( DBool());
 
       return WOP_OK;
@@ -533,7 +533,7 @@ proc_table_ispersistent( SessionStack& stack, ISession&)
 
   DBool result(  ! table.IsTemporal());
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -552,7 +552,7 @@ proc_table_fields_count( SessionStack& stack, ISession&)
 
   DUInt64 result( table->FieldsCount());
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -576,7 +576,7 @@ proc_table_field_by_id( SessionStack& stack, ISession&)
     }
   StackValue result = op.GetFieldAt( fieldId.mValue);
 
-  stack.Pop (2);
+  stack.Pop(2);
   stack.Push( result);
 
   return WOP_OK;
@@ -613,10 +613,10 @@ proc_table_field_name( SessionStack& stack, ISession&)
   field.RawRead( 0, field.RawSize(), fieldName);
   fieldName[field.RawSize()] = 0;
 
-  const FIELD_INDEX fieldId = table->RetrieveField( _RC (char*, fieldName));
+  const FIELD_INDEX fieldId = table->RetrieveField( _RC(char*, fieldName));
   StackValue        result  = opTable.GetFieldAt( fieldId);
 
-  stack.Pop (2);
+  stack.Pop(2);
   stack.Push( result);
 
   return WOP_OK;
@@ -630,8 +630,8 @@ proc_table_rows_count( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DUInt64 (0));
+      stack.Pop(1);
+      stack.Push( DUInt64(0));
 
       return WOP_OK;
     }
@@ -640,7 +640,7 @@ proc_table_rows_count( SessionStack& stack, ISession&)
 
   DUInt64 result( table.AllocatedRows());
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -654,8 +654,8 @@ proc_table_reusable_rows_count( SessionStack& stack, ISession&)
 
   if (op.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DUInt64 (0));
+      stack.Pop(1);
+      stack.Push( DUInt64(0));
 
       return WOP_OK;
     }
@@ -664,7 +664,7 @@ proc_table_reusable_rows_count( SessionStack& stack, ISession&)
 
   DUInt64 result( table.AllocatedRows());
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -680,7 +680,7 @@ proc_table_add_row( SessionStack& stack, ISession&)
 
   DUInt64 result( table.AddRow());
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -696,7 +696,7 @@ proc_table_reusable_row( SessionStack& stack, ISession&)
 
   DUInt64 result( table.GetReusableRow( true));
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( result);
 
   return WOP_OK;
@@ -739,7 +739,7 @@ table_exchange_rows( SessionStack& stack, ISession&)
 
   if (op.IsNull() || row1.IsNull() || row2.IsNull())
     {
-      stack.Pop (3);
+      stack.Pop(3);
       stack.Push( DBool());
 
       return WOP_OK;
@@ -749,7 +749,7 @@ table_exchange_rows( SessionStack& stack, ISession&)
 
   table.ExchangeRows( row1.mValue, row2.mValue);
 
-  stack.Pop (3);
+  stack.Pop(3);
   stack.Push( DBool( true));
 
   return WOP_OK;
@@ -768,7 +768,7 @@ proc_table_sort( SessionStack& stack, ISession&)
 
   if (opTable.IsNull() || fields.IsNull())
     {
-      stack.Pop (2);
+      stack.Pop(2);
       return WOP_OK;
     }
   else if (fields.Count() <sortOrder.Count())
@@ -781,7 +781,7 @@ proc_table_sort( SessionStack& stack, ISession&)
     }
 
   for (int i = fields.Count() - sortOrder.Count(); i > 0; --i)
-    sortOrder.Add (DBool (false));
+    sortOrder.Add(DBool(false));
 
   ITable& table = opTable.GetTable();
   TableSortContainer container( table, fields, sortOrder);
@@ -792,9 +792,9 @@ proc_table_sort( SessionStack& stack, ISession&)
                                                    false,
                                                    container
                                                              );
-  container.Commit ();
+  container.Commit();
 
-  stack.Pop (2);
+  stack.Pop(2);
   return WOP_OK;
 }
 

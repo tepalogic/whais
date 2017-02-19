@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -31,22 +31,22 @@ extern "C"
 {
 
 void*
-custom_mem_alloc (size_t size)
+custom_mem_alloc(size_t size)
 {
-  return malloc (size);
+  return malloc(size);
 }
 
 void*
-custom_mem_realloc (void*     oldPtr,
+custom_mem_realloc(void*     oldPtr,
                     size_t    newSize)
 {
-  return realloc (oldPtr, newSize);
+  return realloc(oldPtr, newSize);
 }
 
 void
-custom_mem_free (void* ptr)
+custom_mem_free(void* ptr)
 {
-  free (ptr);
+  free(ptr);
 }
 
 }; /* extern "C" */
@@ -55,44 +55,44 @@ custom_mem_free (void* ptr)
 #undef new
 
 void*
-operator new (std::size_t size)
+operator new(std::size_t size)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc ();
+    throw std::bad_alloc();
   return ptr;
 }
 
 void*
-operator new (std::size_t size, const std::nothrow_t&) noexcept
+operator new(std::size_t size, const std::nothrow_t&) noexcept
 {
 #ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
 #endif
 
   return ptr;
 }
 
 void*
-operator new (std::size_t size, const char* file, uint_t line)
+operator new(std::size_t size, const char* file, uint_t line)
 {
 #ifndef ENABLE_MEMORY_TRACE
   (void)file;
   (void)line;
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, file, line);
+  void *ptr = custom_trace_mem_alloc(size, file, line);
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc ();
+    throw std::bad_alloc();
   return ptr;
 }
 
@@ -101,13 +101,13 @@ void*
 operator new [] (std::size_t size)
 {
 #ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc ();
+    throw std::bad_alloc();
   return ptr;
 }
 
@@ -115,9 +115,9 @@ void*
 operator new[] (std::size_t size, const std::nothrow_t&) noexcept
 {
 #ifndef ENABLE_MEMORY_TRACE
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
 #endif
 
   return ptr;
@@ -129,36 +129,36 @@ operator new [] (std::size_t size, const char* file, uint_t line)
 #ifndef ENABLE_MEMORY_TRACE
   (void)file;
   (void)line;
-  void *ptr = custom_mem_alloc (size);
+  void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc (size, file, line);
+  void *ptr = custom_trace_mem_alloc(size, file, line);
 #endif
 
   if (ptr == NULL)
-    throw std::bad_alloc ();
+    throw std::bad_alloc();
   return ptr;
 }
 
 
 void
-operator delete (void* ptr) noexcept
+operator delete(void* ptr) noexcept
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free (ptr);
+    custom_mem_free(ptr);
 #else
-  custom_trace_mem_free (ptr, NULL, 0);
+  custom_trace_mem_free(ptr, NULL, 0);
 #endif
 }
 
 void
-operator delete (void* ptr, const char*, uint_t)
+operator delete(void* ptr, const char*, uint_t)
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free (ptr);
+    custom_mem_free(ptr);
 #else
-  custom_trace_mem_free (ptr, NULL, 0);
+  custom_trace_mem_free(ptr, NULL, 0);
 #endif
 }
 
@@ -167,9 +167,9 @@ operator delete[] (void* ptr) noexcept
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free (ptr);
+    custom_mem_free(ptr);
 #else
-  custom_trace_mem_free (ptr, NULL, 0);
+  custom_trace_mem_free(ptr, NULL, 0);
 #endif
 }
 
@@ -178,9 +178,9 @@ operator delete[] (void* ptr, const char*, uint_t )
 {
   if (ptr != NULL)
 #ifndef ENABLE_MEMORY_TRACE
-    custom_mem_free (ptr);
+    custom_mem_free(ptr);
 #else
-    custom_trace_mem_free (ptr, NULL, 0);
+    custom_trace_mem_free(ptr, NULL, 0);
 #endif
 }
 

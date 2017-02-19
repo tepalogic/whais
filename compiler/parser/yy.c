@@ -1,6 +1,6 @@
 /******************************************************************************
  WHAISC - A compiler for whais programs
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -23,7 +23,7 @@
  ******************************************************************************/
 /*
  * yy.c - Implements a lexical analyzer for our bison generated parser.
- *        (e.g. provides the required yylex () and yyerror () functions).
+ *        (e.g. provides the required yylex() and yyerror() functions).
  */
 
 /* careful whit this to be the same as in
@@ -51,22 +51,22 @@ struct ParserState;
 #include "../semantics/wlog.h"
 
 INLINE static bool_t
-is_numeric (const char c, const bool_t isHex)
+is_numeric(const char c, const bool_t isHex)
 {
-  return isdigit (c)
+  return isdigit(c)
          || (isHex && ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')));
 }
 
 INLINE static bool_t
-is_idlegal (const char c)
+is_idlegal(const char c)
 {
-  return is_numeric (c, FALSE) || isalpha (c) || (c == '_');
+  return is_numeric(c, FALSE) || isalpha(c) || (c == '_');
 }
 
 INLINE static bool_t
-is_eol (const char c)
+is_eol(const char c)
 {
-  return (c == 0x0A || c == 0x0D);
+  return(c == 0x0A || c == 0x0D);
 }
 
 /* Identify the token type. */
@@ -77,7 +77,7 @@ typedef enum
   TK_DATETIME,         /* Date /moment constant. */
   TK_IDENTIFIER,       /* An identifier */
   TK_NUMERIC,          /* An integer constant.  */
-  TK_OPERATOR,         /* Expression operator (e.g. '+' , '-', '<='). */
+  TK_OPERATOR,         /* Expression operator(e.g. '+' , '-', '<='). */
   TK_REAL,             /* A real number */
   TK_KEYWORD,          /* Keyword. */
   TK_UNDETERMINED,     /* Undetermined token type. */
@@ -88,31 +88,31 @@ typedef enum
  * Read the next token from buffer, ignoring any white spaces
  */
 static TOKEN_TYPE
-next_token (const char*     buffer,
+next_token(const char*     buffer,
             char const**    outToken,
             uint_t* const   outTokenLen)
 {
   TOKEN_TYPE result = TK_UNDETERMINED;
 
-  assert (outToken != NULL);
-  assert (outTokenLen != NULL);
+  assert(outToken != NULL);
+  assert(outTokenLen != NULL);
 
-  while (isspace (*buffer))
+  while(isspace(*buffer))
     ++buffer;
 
   if (*buffer == '#')
     {
       /* skip line with commentaries and try again */
-      while (!is_eol( *buffer))
+      while(!is_eol( *buffer))
         ++buffer;
 
-      return next_token (buffer, outToken, outTokenLen);
+      return next_token(buffer, outToken, outTokenLen);
     }
 
   *outToken    = buffer;
   *outTokenLen = 0;
 
-  if ((*buffer == '-') && is_numeric (buffer[1], FALSE))
+  if ((*buffer == '-') && is_numeric(buffer[1], FALSE))
     buffer++;
 
   if (is_numeric( *buffer, FALSE))
@@ -126,7 +126,7 @@ next_token (const char*     buffer,
           buffer += 2;
         }
 
-      while (is_numeric( *buffer, isHexa))
+      while(is_numeric( *buffer, isHexa))
         buffer++;
 
       result = TK_NUMERIC;
@@ -134,7 +134,7 @@ next_token (const char*     buffer,
         {
           ++buffer;
 
-          while (is_numeric( *buffer, FALSE))
+          while(is_numeric( *buffer, FALSE))
             ++buffer;
 
           result = TK_REAL;
@@ -149,7 +149,7 @@ next_token (const char*     buffer,
     }
   else if (is_idlegal( *buffer))
     {
-      while (is_idlegal( *buffer))
+      while(is_idlegal( *buffer))
         buffer++;
 
       result = TK_IDENTIFIER;
@@ -182,7 +182,7 @@ next_token (const char*     buffer,
               return TK_ERROR;
             }
         }
-      while (*buffer != '\"');
+      while(*buffer != '\"');
 
       buffer++;
 
@@ -207,12 +207,12 @@ next_token (const char*     buffer,
               return TK_ERROR;
             }
         }
-      while (*buffer != '\'');
+      while(*buffer != '\'');
 
       buffer++;
 
       if (((*outToken)[1] == '\\')
-          && is_numeric ((*outToken)[entrySize], FALSE))
+          && is_numeric((*outToken)[entrySize], FALSE))
         {
           bool_t hexa = FALSE;
 
@@ -224,12 +224,12 @@ next_token (const char*     buffer,
               hexa = TRUE;
             }
 
-          while (is_numeric( (*outToken)[entrySize], hexa))
+          while(is_numeric( (*outToken)[entrySize], hexa))
             ++entrySize;
         }
       else
         {
-          entrySize += wh_load_utf8_cp ((const uint8_t*)(*outToken + entrySize),
+          entrySize += wh_load_utf8_cp((const uint8_t*)(*outToken + entrySize),
                                         &dummy);
         }
 
@@ -309,7 +309,7 @@ static TOKEN_SEMANTIC sgKeywords[] = {
 
 /* Get the semantic of specified keyword. */
 static int
-parse_keyword (const char* keyword, uint_t keyLen)
+parse_keyword(const char* keyword, uint_t keyLen)
 {
   uint_t i;
   char   normalKey[MAX_KEYWORD_LEN];
@@ -319,13 +319,13 @@ parse_keyword (const char* keyword, uint_t keyLen)
 
   /* Normalize the key, by conveting to the uppercase form. */
   for (i = 0; i < keyLen; i++)
-    normalKey[i] = toupper (keyword[i]);
+    normalKey[i] = toupper(keyword[i]);
 
   normalKey[i] = 0; /* add NULL at the end */
 
   /* Now search the key. */
   i = 0;
-  while (sgKeywords[i].text != NULL)
+  while(sgKeywords[i].text != NULL)
     {
       if (strcmp( sgKeywords[i].text, normalKey) == 0)
         break;
@@ -358,11 +358,11 @@ static TOKEN_SEMANTIC sgMultiCharOps[] = {
                                          };
 
 static int
-parse_multichar_operator (const char* op)
+parse_multichar_operator(const char* op)
 {
   uint_t i = 0;
 
-  while (sgMultiCharOps[i].text != NULL)
+  while(sgMultiCharOps[i].text != NULL)
     {
       if (strncmp( sgMultiCharOps[i].text, op, COMPOSED_OPERATOR_LEN) == 0)
         break;
@@ -374,7 +374,7 @@ parse_multichar_operator (const char* op)
 }
 
 static uint_t
-parse_integer (const char*      buffer,
+parse_integer(const char*      buffer,
                uint_t           bufferLen,
                const bool_t     checkForUnsigned,
                uint64_t* const  outValue,
@@ -384,14 +384,14 @@ parse_integer (const char*      buffer,
   uint_t       base     = 10;
   bool_t       negative = FALSE;
 
-  assert (buffer != NULL);
-  assert (bufferLen != 0);
-  assert (outValue != NULL);
+  assert(buffer != NULL);
+  assert(bufferLen != 0);
+  assert(outValue != NULL);
 
   *outValue = 0;
   if ((buffer[0] == '-')
       && (bufferLen > 1)
-      && is_numeric (buffer[1], FALSE))
+      && is_numeric(buffer[1], FALSE))
     {
       negative = *outSigned = TRUE;
       ++buffer, --bufferLen;
@@ -407,7 +407,7 @@ parse_integer (const char*      buffer,
   else if (buffer[0] == '0')
     ++buffer, --bufferLen;
 
-  while (bufferLen > 0)
+  while(bufferLen > 0)
     {
       uint8_t digit;
 
@@ -446,11 +446,11 @@ parse_integer (const char*      buffer,
   else
     *outSigned = negative;
 
-  return (oldLen - bufferLen);
+  return(oldLen - bufferLen);
 }
 
 static uint_t
-parse_real (const char*      buffer,
+parse_real(const char*      buffer,
             uint_t            bufferLen,
             struct SemCReal* outReal)
 {
@@ -459,22 +459,22 @@ parse_real (const char*      buffer,
   bool_t       negative          = FALSE;
   int64_t      precision         = 1;
 
-  assert (buffer != NULL);
-  assert (bufferLen != 0);
-  assert (outReal != NULL);
+  assert(buffer != NULL);
+  assert(bufferLen != 0);
+  assert(outReal != NULL);
 
   outReal->integerPart    = 0;
   outReal->fractionalPart = 0;
 
   if ((buffer[0] == '-') &&
       (bufferLen > 1) &&
-      is_numeric (buffer[1], FALSE))
+      is_numeric(buffer[1], FALSE))
     {
       negative = TRUE;
       ++buffer, --bufferLen;
     }
 
-  while (bufferLen > 0)
+  while(bufferLen > 0)
     {
       int digit = 0;
 
@@ -520,19 +520,19 @@ parse_real (const char*      buffer,
       outReal->fractionalPart = -outReal->fractionalPart;
     }
 
-  return (oldLen - bufferLen);
+  return(oldLen - bufferLen);
 }
 
 static uint_t
-parse_character (const char* buffer,
+parse_character(const char* buffer,
                 uint_t       bufferLen,
                 uint32_t*    outChar)
 {
   uint_t result = 0;
 
-  assert (buffer != NULL);
-  assert (bufferLen != 0);
-  assert (outChar != NULL);
+  assert(buffer != NULL);
+  assert(bufferLen != 0);
+  assert(outChar != NULL);
 
   if (*buffer == '\\')
     {
@@ -597,7 +597,7 @@ parse_character (const char* buffer,
           uint64_t  value = 0;
           bool_t    dummy = FALSE;
 
-          result += parse_integer (buffer, bufferLen, FALSE, &value, &dummy);
+          result += parse_integer(buffer, bufferLen, FALSE, &value, &dummy);
           if (value > 0xFFFFFFFF)
             return 0;
 
@@ -605,32 +605,32 @@ parse_character (const char* buffer,
         }
     }
   else
-    result = wh_load_utf8_cp ((uint8_t*)buffer, outChar);
+    result = wh_load_utf8_cp((uint8_t*)buffer, outChar);
 
   return result;
 }
 
 static uint_t
-parse_string (const char* buffer,
+parse_string(const char* buffer,
               uint_t      bufferLen,
               char*       destination,
               uint_t*     outDestinationLen)
 {
   const uint_t oldLen = bufferLen;
 
-  assert (buffer != NULL);
-  assert (bufferLen != 0);
-  assert (destination != NULL);
+  assert(buffer != NULL);
+  assert(bufferLen != 0);
+  assert(destination != NULL);
 
   *outDestinationLen = 0;
 
-  while ((bufferLen > 0) && (*buffer != '\"'))
+  while((bufferLen > 0) && (*buffer != '\"'))
     {
       uint32_t currChar = 0;
       uint_t   result;
 
       if (buffer[0] == '\\')
-        result = parse_character (buffer, bufferLen, &currChar);
+        result = parse_character(buffer, bufferLen, &currChar);
 
       else
         currChar = buffer[0], result = 1;
@@ -654,11 +654,11 @@ parse_string (const char* buffer,
   *destination        = 0;      /* add the null character */
   *outDestinationLen += 1;
 
-  return (oldLen - bufferLen);
+  return(oldLen - bufferLen);
 }
 
 static uint_t
-parse_time_value (const char*      buffer,
+parse_time_value(const char*      buffer,
                   uint_t           bufferLen,
                   struct SemCTime* outTime)
 {
@@ -668,11 +668,11 @@ parse_time_value (const char*      buffer,
   bool_t   dummy;
 
   /* Initialize the structure with default valid values */
-  memset (outTime, 0, sizeof (outTime[0]));
+  memset(outTime, 0, sizeof(outTime[0]));
   outTime->month = outTime->day = 1;
 
   /* found the year part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t*)&intVal,
@@ -700,7 +700,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the month part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t*)&intVal,
@@ -728,7 +728,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the day part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t *)&intVal,
@@ -756,7 +756,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the hour part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t *)&intVal,
@@ -781,7 +781,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the minute part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t *)&intVal,
@@ -809,7 +809,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the second part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t *)&intVal,
@@ -837,7 +837,7 @@ parse_time_value (const char*      buffer,
     ++result, ++buffer, --bufferLen;
 
   /* found the microsecond part */
-  intValLen = parse_integer (buffer,
+  intValLen = parse_integer(buffer,
                              bufferLen,
                              FALSE,
                              (uint64_t *)&intVal,
@@ -857,7 +857,7 @@ parse_time_value (const char*      buffer,
 }
 
 int
-yylex (YYSTYPE * lvalp, struct ParserState* parser)
+yylex(YYSTYPE * lvalp, struct ParserState* parser)
 {
   int           result    = 0;
   const char*   buffer    = parser->buffer;
@@ -871,7 +871,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
 
   /* Recall where to start from */
   buffer    += bufferOff;
-  tokenType  = next_token (buffer, &pToken, &tokenLen);
+  tokenType  = next_token(buffer, &pToken, &tokenLen);
 
   /* Start from here next call. */
   parser->bufferPos += (uint_t) ((pToken + tokenLen) - buffer);
@@ -881,12 +881,12 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
   if ((tokenType != TK_UNDETERMINED)
       && (tokenType != TK_OPERATOR)
       && ((tokenType != TK_IDENTIFIER)
-          || ((result = parse_keyword (pToken, tokenLen)) == 0)))
+          || ((result = parse_keyword(pToken, tokenLen)) == 0)))
     {
-      *lvalp = alloc_sem_value (parser);
+      *lvalp = alloc_sem_value(parser);
       if (*lvalp == NULL)
         {
-          log_message (parser,
+          log_message(parser,
                        IGNORE_BUFFER_POS,
                        parser->bufferPos,
                        MSG_NO_MEM);
@@ -903,7 +903,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
     return *pToken;
 
   /* Initialize the semantic value, based on the token type. */
-  switch (tokenType)
+  switch(tokenType)
     {
     case TK_IDENTIFIER:
       /* parsing was successful */
@@ -915,10 +915,10 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       break;
 
     case TK_OPERATOR:
-      return parse_multichar_operator (pToken);
+      return parse_multichar_operator(pToken);
 
     case TK_NUMERIC:
-      result = parse_integer (pToken,
+      result = parse_integer(pToken,
                               tokenLen,
                               TRUE,
                               &((*lvalp)->val.u_int.value),
@@ -934,7 +934,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       if ((tokenLen > 2) || (pToken[0] != '\''))
         {
           pToken++;
-          result = parse_character (pToken,
+          result = parse_character(pToken,
                                     tokenLen - 1,
                                     &((*lvalp)->val.u_char.value));
           if (pToken[result] != '\'')
@@ -954,9 +954,9 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       if ((tokenLen > 1) || (pToken[0] != '\"'))
         {
           pToken++;
-          (*lvalp)->val.u_text.text = alloc_str (parser->strings,
+          (*lvalp)->val.u_text.text = alloc_str(parser->strings,
                                                  tokenLen - 1);
-          result = parse_string (pToken,
+          result = parse_string(pToken,
                                  tokenLen,
                                  (char* )(*lvalp)->val.u_text.text,
                                  &(*lvalp)->val.u_text.length);
@@ -981,7 +981,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       if ((tokenLen > 2) || (pToken[0] != '\''))
         {
           pToken++;
-          result = parse_time_value (pToken,
+          result = parse_time_value(pToken,
                                      tokenLen - 1,
                                      &((*lvalp)->val.u_time));
           if (pToken[result] != '\'')
@@ -998,7 +998,7 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
       break;
 
     case TK_REAL:
-      result = parse_real (pToken, tokenLen, &((*lvalp)->val.u_real));
+      result = parse_real(pToken, tokenLen, &((*lvalp)->val.u_real));
       if (result != 0)
         {
           (*lvalp)->val_type = VAL_C_REAL;
@@ -1013,19 +1013,19 @@ yylex (YYSTYPE * lvalp, struct ParserState* parser)
   return result;
 }
 
-/* This is internally used by yyparse (),
+/* This is internally used by yyparse(),
  * it's declaration is found on wisper.y */
 int
-yyerror (struct ParserState* parser, const char* msg)
+yyerror(struct ParserState* parser, const char* msg)
 {
   char temp[128] = {0, };
 
   uint_t i, lastTokenOffset = parser->bufferPos;
-  while ((lastTokenOffset > 0) && ! isspace (parser->buffer[lastTokenOffset]))
+  while((lastTokenOffset > 0) && ! isspace(parser->buffer[lastTokenOffset]))
     --lastTokenOffset;
 
   for (i = 0;
-      (i < sizeof (temp)) && (lastTokenOffset + i < parser->bufferSize);
+      (i < sizeof(temp)) && (lastTokenOffset + i < parser->bufferSize);
       ++i)
     {
       temp[i] = parser->buffer[lastTokenOffset + i];
@@ -1036,7 +1036,7 @@ yyerror (struct ParserState* parser, const char* msg)
         }
     }
 
-  log_message (parser, parser->bufferPos, MSG_COMPILER_ERR, temp);
+  log_message(parser, parser->bufferPos, MSG_COMPILER_ERR, temp);
 
   return 0;
 }

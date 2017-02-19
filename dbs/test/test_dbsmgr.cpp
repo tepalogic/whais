@@ -27,19 +27,19 @@ static DBSFieldDescriptor field_descs[] =
   {"f_int8", T_UINT8, false}
 };
 
-static const uint_t descCount = sizeof (field_descs) / sizeof field_descs[0];
+static const uint_t descCount = sizeof(field_descs) / sizeof field_descs[0];
 
 bool
 operator!= (const DBSFieldDescriptor& field_1,
             const DBSFieldDescriptor& field_2)
 {
-  return (field_1.type != field_2.type) ||
+  return(field_1.type != field_2.type) ||
          (field_1.isArray != field_2.isArray) ||
-         (strcmp (field_1.name, field_2.name) != 0);
+         (strcmp(field_1.name, field_2.name) != 0);
 }
 
 static bool
-test_fields (ITable& table)
+test_fields(ITable& table)
 {
 
   DBSFieldDescriptor field_d;
@@ -47,47 +47,47 @@ test_fields (ITable& table)
   std::cout << "Real fields' order: " << std::endl;
   for (uint_t index = 0; index < descCount; ++index)
     {
-      field_d = table.DescribeField (index);
+      field_d = table.DescribeField(index);
       std::cout << "\t" << field_d.name << std::endl;
     }
 
-  if (table.FieldsCount () != descCount)
+  if (table.FieldsCount() != descCount)
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("Field_1"));
+  field_d = table.DescribeField(table.RetrieveField("Field_1"));
   if (field_d != field_descs[0])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("AnotherField"));
+  field_d = table.DescribeField(table.RetrieveField("AnotherField"));
   if (field_d != field_descs[1])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("dumy2field_"));
+  field_d = table.DescribeField(table.RetrieveField("dumy2field_"));
   if (field_d != field_descs[2])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("dumy21field_"));
+  field_d = table.DescribeField(table.RetrieveField("dumy21field_"));
   if (field_d != field_descs[3])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("dumy22field_"));
+  field_d = table.DescribeField(table.RetrieveField("dumy22field_"));
   if (field_d != field_descs[4])
     return false;
 
 
-  field_d = table.DescribeField (table.RetrieveField ("f_data"));
+  field_d = table.DescribeField(table.RetrieveField("f_data"));
   if (field_d != field_descs[5])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("f_int16"));
+  field_d = table.DescribeField(table.RetrieveField("f_int16"));
   if (field_d != field_descs[6])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("f_hirestime"));
+  field_d = table.DescribeField(table.RetrieveField("f_hirestime"));
   if (field_d != field_descs[7])
     return false;
 
-  field_d = table.DescribeField (table.RetrieveField ("f_int8"));
+  field_d = table.DescribeField(table.RetrieveField("f_int8"));
   if (field_d != field_descs[8])
     return false;
 
@@ -97,45 +97,45 @@ test_fields (ITable& table)
 
 
 int
-main ()
+main()
 {
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase ("baza_date_1");
+    DBSInit(DBSSettings());
+    DBSCreateDatabase("baza_date_1");
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
-  handler.AddTable ("table_1", descCount, field_descs);
-  ITable& table = handler.RetrievePersistentTable ("table_1");
-  handler.ReleaseTable (table);
-  DBSReleaseDatabase (handler);
-  DBSShoutdown ();
+  IDBSHandler& handler = DBSRetrieveDatabase("baza_date_1");
+  handler.AddTable("table_1", descCount, field_descs);
+  ITable& table = handler.RetrievePersistentTable("table_1");
+  handler.ReleaseTable(table);
+  DBSReleaseDatabase(handler);
+  DBSShoutdown();
 
     {
-      DBSInit (DBSSettings ());
+      DBSInit(DBSSettings());
 
-      IDBSHandler& handler = DBSRetrieveDatabase ("baza_date_1");
-      ITable& table = handler.RetrievePersistentTable ("table_1");
+      IDBSHandler& handler = DBSRetrieveDatabase("baza_date_1");
+      ITable& table = handler.RetrievePersistentTable("table_1");
 
-      if (table.FieldsCount () != descCount)
+      if (table.FieldsCount() != descCount)
         success = false;
       else
         {
-          success = test_fields (table);
+          success = test_fields(table);
 
           if (success)
             {
-              ITable& spawnedTable = table.Spawn ();
-              success = test_fields (spawnedTable);
-              handler.ReleaseTable (spawnedTable);
+              ITable& spawnedTable = table.Spawn();
+              success = test_fields(spawnedTable);
+              handler.ReleaseTable(spawnedTable);
             }
 
-          handler.ReleaseTable (table);
+          handler.ReleaseTable(table);
 
-          DBSReleaseDatabase (handler);
-          DBSRemoveDatabase ("baza_date_1");
-          DBSShoutdown ();
+          DBSReleaseDatabase(handler);
+          DBSRemoveDatabase("baza_date_1");
+          DBSShoutdown();
         }
     }
 

@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -52,56 +52,56 @@ extern "C"
 
 /* Initialise the buffer builder. */
 struct WOutputStream*
-wh_ostream_init (const uint_t                increment,
+wh_ostream_init(const uint_t                increment,
                  struct WOutputStream* const outStream);
 
 
 /* Clean the resources associated with this buffer. */
 void
-wh_ostream_clean (struct WOutputStream* const stream);
+wh_ostream_clean(struct WOutputStream* const stream);
 
 
 /* Send a chink of data to the stream. */
 struct WOutputStream*
-wh_ostream_write (struct WOutputStream* const stream,
+wh_ostream_write(struct WOutputStream* const stream,
                   const uint8_t*              data,
                   uint_t                      dataSize);
 
 
 INLINE static struct WOutputStream*
-wh_ostream_wint8 (struct WOutputStream* const stream, const uint8_t value)
+wh_ostream_wint8(struct WOutputStream* const stream, const uint8_t value)
 {
-  return wh_ostream_write (stream, &value, sizeof value);
+  return wh_ostream_write(stream, &value, sizeof value);
 }
 
 
 INLINE static struct WOutputStream*
-wh_ostream_wint16 (struct WOutputStream* const stream, const uint16_t value)
+wh_ostream_wint16(struct WOutputStream* const stream, const uint16_t value)
 {
   uint8_t temp[2];
 
-  store_le_int16 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  store_le_int16(value, temp);
+  return wh_ostream_write(stream, temp, sizeof temp);
 }
 
 
 INLINE static struct WOutputStream*
-wh_ostream_wint32 (struct WOutputStream* const stream, const uint32_t value)
+wh_ostream_wint32(struct WOutputStream* const stream, const uint32_t value)
 {
   uint8_t temp[4];
 
-  store_le_int32 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  store_le_int32(value, temp);
+  return wh_ostream_write(stream, temp, sizeof temp);
 }
 
 
 INLINE static struct WOutputStream*
-wh_ostream_wint64 (struct WOutputStream* stream, const uint64_t value)
+wh_ostream_wint64(struct WOutputStream* stream, const uint64_t value)
 {
   uint8_t temp[8];
 
-  store_le_int64 (value, temp);
-  return wh_ostream_write (stream, temp, sizeof temp);
+  store_le_int64(value, temp);
+  return wh_ostream_write(stream, temp, sizeof temp);
 }
 
 

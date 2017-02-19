@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAIS - An advanced database system
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -29,57 +29,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 uint_t
-wh_lock_init (WH_LOCK* const lock)
+wh_lock_init(WH_LOCK* const lock)
 {
-  InitializeCriticalSection (lock);
+  InitializeCriticalSection(lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_destroy (WH_LOCK* const lock)
+wh_lock_destroy(WH_LOCK* const lock)
 {
-  DeleteCriticalSection (lock);
+  DeleteCriticalSection(lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_acquire (WH_LOCK* const lock)
+wh_lock_acquire(WH_LOCK* const lock)
 {
-  EnterCriticalSection (lock);
+  EnterCriticalSection(lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_lock_try_acquire (WH_LOCK* const lock,
+wh_lock_try_acquire(WH_LOCK* const lock,
                      bool_t* const  outAcquired)
 {
-  *outAcquired = (TryEnterCriticalSection (lock) != 0);
+  *outAcquired = (TryEnterCriticalSection(lock) != 0);
   return WOP_OK;
 }
 
 
 
 uint_t
-wh_lock_release (WH_LOCK* const lock)
+wh_lock_release(WH_LOCK* const lock)
 {
-  LeaveCriticalSection (lock);
+  LeaveCriticalSection(lock);
 
   return WOP_OK;
 }
 
 
 uint_t
-wh_thread_create (WH_THREAD* const              outThread,
+wh_thread_create(WH_THREAD* const              outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void* const                   args)
 {
-  *outThread = CreateThread (NULL,
+  *outThread = CreateThread(NULL,
                            0,
                            (LPTHREAD_START_ROUTINE)routine,
                            args,
@@ -87,9 +87,9 @@ wh_thread_create (WH_THREAD* const              outThread,
                            NULL);
   if (*outThread == NULL)
     {
-      const uint_t result = GetLastError ();
+      const uint_t result = GetLastError();
 
-      return (result == WOP_OK) ? WOP_UNKNOW : result;
+      return(result == WOP_OK) ? WOP_UNKNOW : result;
     }
 
   return WOP_OK;
@@ -97,65 +97,65 @@ wh_thread_create (WH_THREAD* const              outThread,
 
 
 uint_t
-wh_thread_free (WH_THREAD thread)
+wh_thread_free(WH_THREAD thread)
 {
   //Give a chance of the thread to finish!
-  WaitForSingleObject (thread, INFINITE);
-  CloseHandle (thread);
+  WaitForSingleObject(thread, INFINITE);
+  CloseHandle(thread);
 
   return WOP_OK;
 }
 
 
 void
-wh_yield ()
+wh_yield()
 {
-  Sleep (0);
+  Sleep(0);
 }
 
 
 void
-wh_sleep (const uint_t millisecs)
+wh_sleep(const uint_t millisecs)
 {
   if (millisecs == 0)
     return;
 
-  Sleep (millisecs);
+  Sleep(millisecs);
 }
 
 
 int16_t
-wh_atomic_fetch_inc16 (volatile int16_t* const value)
+wh_atomic_fetch_inc16(volatile int16_t* const value)
 {
-  return _InterlockedIncrement16 (value) - 1;
+  return _InterlockedIncrement16(value) - 1;
 }
 
 int16_t
-wh_atomic_fetch_dec16 (volatile int16_t* const value)
+wh_atomic_fetch_dec16(volatile int16_t* const value)
 {
-  return _InterlockedDecrement16 (value) + 1;
+  return _InterlockedDecrement16(value) + 1;
 }
 
 int32_t
-wh_atomic_fetch_inc32 (volatile int32_t* const value)
+wh_atomic_fetch_inc32(volatile int32_t* const value)
 {
-  return InterlockedIncrement (value) - 1;
+  return InterlockedIncrement(value) - 1;
 }
 
 int32_t
-wh_atomic_fetch_dec32 (volatile int32_t* const value)
+wh_atomic_fetch_dec32(volatile int32_t* const value)
 {
-  return InterlockedDecrement (value) + 1;
+  return InterlockedDecrement(value) + 1;
 }
 
 int64_t
-wh_atomic_fetch_inc64 (volatile int64_t* const value)
+wh_atomic_fetch_inc64(volatile int64_t* const value)
 {
-  return InterlockedIncrement64 (value) - 1;
+  return InterlockedIncrement64(value) - 1;
 }
 
 int64_t
-wh_atomic_fetch_dec64 (volatile int64_t* const value)
+wh_atomic_fetch_dec64(volatile int64_t* const value)
 {
-  return InterlockedDecrement64 (value) + 1;
+  return InterlockedDecrement64(value) + 1;
 }

@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -36,12 +36,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 struct ReplacementTag
 {
-  ReplacementTag (const std::string& tagName,
+  ReplacementTag(const std::string& tagName,
                   const std::string& tagValue,
                   int                offset = BUILDIN_OFF)
-    : mTagName (tagName),
-      mTagValue (tagValue),
-      mDefinitionOffset (offset)
+    : mTagName(tagName),
+      mTagValue(tagValue),
+      mDefinitionOffset(offset)
   {
   }
 
@@ -55,7 +55,7 @@ struct ReplacementTag
 
 
 bool
-preprocess_source (const std::string&                  sourceFile,
+preprocess_source(const std::string&                  sourceFile,
                    const std::vector<std::string>&     inclusionPaths,
                    std::vector<ReplacementTag>&        tagPairs,
                    std::ostringstream&                 sourceCode,

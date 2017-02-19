@@ -19,36 +19,36 @@
 using namespace whais;
 using namespace pastra;
 
-bool test_bool_array ()
+bool test_bool_array()
 {
   std::cout << "Testing T_BOOL array... ";
   bool result = true;
-  DArray anotherArray ((DBool *)NULL);
+  DArray anotherArray((DBool *)NULL);
 
   if (result)
     {
-      DArray nullArray ((DBool *)NULL);
-      if (! nullArray.IsNull ())
+      DArray nullArray((DBool *)NULL);
+      if (! nullArray.IsNull())
         result = false;
 
-      if (! anotherArray.IsNull ())
+      if (! anotherArray.IsNull())
         result = false;
 
-      if ( anotherArray.Add(DBool (true)) != 0)
+      if ( anotherArray.Add(DBool(true)) != 0)
         result = false;
-      else if  (anotherArray.Add(DBool (false)) != 1)
+      else if  (anotherArray.Add(DBool(false)) != 1)
         result = false;
 
-      if ( ! (anotherArray.IsNull () == false) && (anotherArray.Count () != 2) )
+      if ( ! (anotherArray.IsNull() == false) && (anotherArray.Count() != 2) )
         result = false;
 
       DBool tv;
-      anotherArray.Get (0,  tv);
-      if ((tv.IsNull ()) || (tv.mValue == false))
+      anotherArray.Get(0,  tv);
+      if ((tv.IsNull()) || (tv.mValue == false))
         result = false;
 
-      anotherArray.Get (1,  tv);
-      if ((tv.IsNull ()) || (tv.mValue == true))
+      anotherArray.Get(1,  tv);
+      if ((tv.IsNull()) || (tv.mValue == true))
         result = false;
     }
 
@@ -56,20 +56,20 @@ bool test_bool_array ()
     {
 
 
-      anotherArray.Set (1, DBool (true));
+      anotherArray.Set(1, DBool(true));
       DBool tv;
-      anotherArray.Get (1,  tv);
-      if ((tv.IsNull ()) || (tv.mValue == false))
+      anotherArray.Get(1,  tv);
+      if ((tv.IsNull()) || (tv.mValue == false))
         result = false;
 
       const DBool nullBull;
-      anotherArray.Set (0, nullBull);
-      anotherArray.Get (0,  tv);
-      if ((tv.IsNull ()) || (tv.mValue == false) || (anotherArray.Count () > 1))
+      anotherArray.Set(0, nullBull);
+      anotherArray.Get(0,  tv);
+      if ((tv.IsNull()) || (tv.mValue == false) || (anotherArray.Count() > 1))
         result = false;
 
-      anotherArray.Set (0, nullBull);
-      if (anotherArray.IsNull () == false)
+      anotherArray.Set(0, nullBull);
+      if (anotherArray.IsNull() == false)
         result = false;
     }
 
@@ -78,35 +78,35 @@ bool test_bool_array ()
 }
 
 template <typename T, typename Tint> bool
-test_integers_array (const char* type)
+test_integers_array(const char* type)
 {
   std::cout << "Testing " << type << " array... ";
   bool result = true;
 
   uint64_t elementsCount = 0;
   T nullValue;
-  DArray testArray ((T *)NULL);
+  DArray testArray((T *)NULL);
 
   for (uint64_t index = 1; index < 10000; index += 13)
     {
-      if (testArray.Count () != elementsCount)
+      if (testArray.Count() != elementsCount)
         {
           result = false;
           break;
         }
       //Limit to 0xFF because of VC++ run time check!
       //Don't worry C++0x will take care of this in future.
-      testArray.Add (T(index & 0xFF));
+      testArray.Add(T(index & 0xFF));
       ++elementsCount;
     }
 
   if (result)
     {
-      testArray.Remove (0);
-      testArray.Set (elementsCount - 2, nullValue);
+      testArray.Remove(0);
+      testArray.Set(elementsCount - 2, nullValue);
       elementsCount -= 2;
 
-      if (testArray.Count () != elementsCount)
+      if (testArray.Count() != elementsCount)
         result = false;
     }
 
@@ -116,8 +116,8 @@ test_integers_array (const char* type)
       int64_t content = 14;
       for (uint_t index = 0; index < elementsCount; index++)
         {
-          testArray.Get (index, testValue);
-          if (testValue.IsNull () || ((content & 0xFF) != testValue.mValue))
+          testArray.Get(index, testValue);
+          if (testValue.IsNull() || ((content & 0xFF) != testValue.mValue))
             {
               result = false;
               break;
@@ -136,7 +136,7 @@ test_integers_array (const char* type)
 }
 
 bool
-test_dates_array ()
+test_dates_array()
 {
   std::cout << "Testing T_DATE array... ";
   bool result = true;
@@ -146,16 +146,16 @@ test_dates_array ()
   uint_t day = 1;
   uint_t month = 1;
 
-  DArray testArray ((DDate *)NULL);
+  DArray testArray((DDate *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.Count () != elementsCount)
+      if (testArray.Count() != elementsCount)
         {
           result = false;
           break;
         }
-      testArray.Add (DDate (year, month, day));
+      testArray.Add(DDate(year, month, day));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -168,7 +168,7 @@ test_dates_array ()
   for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DDate testValue;
-    testArray.Get (index, testValue);
+    testArray.Get(index, testValue);
 
     if ((testValue.mIsNull != false) ||
         (testValue.mYear != year) ||
@@ -187,9 +187,9 @@ test_dates_array ()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove (0);
+        testArray.Remove(0);
 
-      if (testArray.IsNull () != false)
+      if (testArray.IsNull() != false)
         result = false;
     }
 
@@ -198,7 +198,7 @@ test_dates_array ()
 }
 
 bool
-test_datetimes_array ()
+test_datetimes_array()
 {
   std::cout << "Testing T_DATETIME array... ";
   bool result = true;
@@ -211,16 +211,16 @@ test_datetimes_array ()
   uint_t mins = 3;
   uint_t sec = 3;
 
-  DArray testArray ((DDateTime *)NULL);
+  DArray testArray((DDateTime *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.Count () != elementsCount)
+      if (testArray.Count() != elementsCount)
         {
           result = false;
           break;
         }
-      testArray.Add (DDateTime (year, month, day, hour, mins, sec));
+      testArray.Add(DDateTime(year, month, day, hour, mins, sec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -237,7 +237,7 @@ test_datetimes_array ()
   for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DDateTime testValue;
-    testArray.Get (index, testValue);
+    testArray.Get(index, testValue);
 
     if ((testValue.mIsNull != false) ||
         (testValue.mYear != year) ||
@@ -262,9 +262,9 @@ test_datetimes_array ()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove (0);
+        testArray.Remove(0);
 
-      if (testArray.IsNull () != false)
+      if (testArray.IsNull() != false)
         result = false;
     }
 
@@ -273,7 +273,7 @@ test_datetimes_array ()
 }
 
 bool
-test_hiresdate_array ()
+test_hiresdate_array()
 {
   std::cout << "Testing T_HIRESTIME array... ";
   bool result = true;
@@ -287,16 +287,16 @@ test_hiresdate_array ()
   uint_t sec = 3;
   uint32_t msec = 4;
 
-  DArray testArray ((DHiresTime *)NULL);
+  DArray testArray((DHiresTime *)NULL);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
-      if (testArray.Count () != elementsCount)
+      if (testArray.Count() != elementsCount)
         {
           result = false;
           break;
         }
-      testArray.Add (DHiresTime (year, month, day, hour, mins, sec, msec));
+      testArray.Add(DHiresTime(year, month, day, hour, mins, sec, msec));
 
       year += 7;
       day += 3; day %= 25; day++;
@@ -315,7 +315,7 @@ test_hiresdate_array ()
   for (uint64_t index = 0; index < elementsCount; ++index)
   {
     DHiresTime testValue;
-    testArray.Get (index, testValue);
+    testArray.Get(index, testValue);
 
     if ((testValue.mIsNull != false) ||
         (testValue.mYear != year) ||
@@ -342,9 +342,9 @@ test_hiresdate_array ()
   if (result)
     {
       for (uint_t index = 0; index < elementsCount; ++ index)
-        testArray.Remove (0);
+        testArray.Remove(0);
 
-      if (testArray.IsNull () != false)
+      if (testArray.IsNull() != false)
         result = false;
     }
 
@@ -353,31 +353,31 @@ test_hiresdate_array ()
 }
 
 bool
-test_array_mirroring ()
+test_array_mirroring()
 {
   static uint32_t firstVals[] = {10, 1, 233, 0x4545};
   static uint32_t secondVals[] = {0, 12, 45};
   std::cout << "Testing array mirroring ...";
   bool result = true;
 
-  DArray array1 ((DUInt32*)NULL);
-  DArray array2 ((DUInt32*)NULL);
+  DArray array1((DUInt32*)NULL);
+  DArray array2((DUInt32*)NULL);
 
-  array1.Add (DUInt32 (firstVals[0]));
-  array1.Add (DUInt32 (firstVals[1]));
-  array1.Add (DUInt32 (firstVals[2]));
+  array1.Add(DUInt32(firstVals[0]));
+  array1.Add(DUInt32(firstVals[1]));
+  array1.Add(DUInt32(firstVals[2]));
 
-  array2.Add (DUInt32 (secondVals[0]));
-  array2.Add (DUInt32 (secondVals[1]));
-  array2.Add (DUInt32 (secondVals[2]));
+  array2.Add(DUInt32(secondVals[0]));
+  array2.Add(DUInt32(secondVals[1]));
+  array2.Add(DUInt32(secondVals[2]));
 
-  if (array2.Count () != array1.Count ())
+  if (array2.Count() != array1.Count())
     result = false;
 
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (temp.mValue != firstVals[index])
         {
@@ -385,7 +385,7 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != secondVals[index])
         {
           result = false;
@@ -395,12 +395,12 @@ test_array_mirroring ()
 
   array2 = array1;
 
-  if (array2.Count () != array1.Count ())
+  if (array2.Count() != array1.Count())
     result = false;
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (temp.mValue != firstVals[index])
         {
@@ -408,7 +408,7 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
@@ -416,13 +416,13 @@ test_array_mirroring ()
        }
     }
 
-  array1.Set (0, DUInt32 (0xFFFF));
-  if (array2.Count () != array1.Count ())
+  array1.Set(0, DUInt32(0xFFFF));
+  if (array2.Count() != array1.Count())
     result = false;
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (index == 0)
         {
@@ -438,7 +438,7 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
@@ -446,13 +446,13 @@ test_array_mirroring ()
        }
     }
 
-  array2.MakeMirror (array1);
-  if (array2.Count () != array1.Count ())
+  array2.MakeMirror(array1);
+  if (array2.Count() != array1.Count())
     result = false;
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (temp.mValue != firstVals[index])
         {
@@ -460,7 +460,7 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
@@ -468,13 +468,13 @@ test_array_mirroring ()
        }
     }
 
-  array1.Add (DUInt32 (firstVals [3]));
-  if (array2.Count () != array1.Count ())
+  array1.Add(DUInt32(firstVals [3]));
+  if (array2.Count() != array1.Count())
     result = false;
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (temp.mValue != firstVals[index])
         {
@@ -482,7 +482,7 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
@@ -493,10 +493,10 @@ test_array_mirroring ()
   DArray array3((DUInt32*) NULL);
   array3 = array1;
 
-  for (uint_t index = 0; result && (index < array1.Count ()); ++index)
+  for (uint_t index = 0; result && (index < array1.Count()); ++index)
     {
       DUInt32 temp;
-      array1.Get (index, temp);
+      array1.Get(index, temp);
 
       if (temp.mValue != firstVals[index])
         {
@@ -504,14 +504,14 @@ test_array_mirroring ()
           continue;
         }
 
-      array2.Get (index, temp);
+      array2.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
           continue;
        }
 
-      array3.Get (index, temp);
+      array3.Get(index, temp);
       if (temp.mValue != firstVals[index])
         {
           result = false;
@@ -524,23 +524,23 @@ test_array_mirroring ()
 }
 
 int
-main ()
+main()
 {
   bool success = true;
 
-  DBSInit (DBSSettings ());
+  DBSInit(DBSSettings());
 
-  success = success && test_bool_array ();
+  success = success && test_bool_array();
   success = success && test_integers_array<DUInt8, uint8_t> ("T_UINT8");
   success = success && test_integers_array<DUInt16, uint16_t> ("T_UINT16");
   success = success && test_integers_array<DUInt32, uint32_t> ("T_UINT32");
   success = success && test_integers_array<DInt64, int64_t> ("T_INT64");
-  success = success && test_dates_array ();
-  success = success && test_datetimes_array ();
-  success = success && test_hiresdate_array ();
-  success = success && test_array_mirroring ();
+  success = success && test_dates_array();
+  success = success && test_datetimes_array();
+  success = success && test_hiresdate_array();
+  success = success && test_array_mirroring();
 
-  DBSShoutdown ();
+  DBSShoutdown();
 
   if (!success)
     {

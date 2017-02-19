@@ -17,24 +17,24 @@ using namespace prima;
 
 static size_t sgMaxValue;
 
-template<typename T>bool test_stack_type (const char* optype)
+template<typename T>bool test_stack_type(const char* optype)
 {
-  std::cout.width (30);
+  std::cout.width(30);
   std::cout << std::left<< optype << std::right;
-  std::cout.width (0);
-  std::cout << " " << sizeof (T) << " ... " ;
+  std::cout.width(0);
+  std::cout << " " << sizeof(T) << " ... " ;
 
-  if (sgMaxValue < sizeof (T))
-    sgMaxValue = sizeof (T);
+  if (sgMaxValue < sizeof(T))
+    sgMaxValue = sizeof(T);
 
-  const bool result = (sizeof (T) <= sizeof (StackValue));
+  const bool result = (sizeof(T) <= sizeof(StackValue));
   std::cout << (result ? "OK" : "FAIL") << std::endl;
 
   return result;
 }
 
 int
-main ()
+main()
 {
   bool success = true;
 
@@ -140,10 +140,10 @@ main ()
 
   success &= test_stack_type<NativeObjectOperand> ("NativeObjectOperand");
 
-  success &= (sgMaxValue == sizeof (StackValue));
+  success &= (sgMaxValue == sizeof(StackValue));
 
   std::cout << "Largest operand is: " << sgMaxValue << std::endl;
-  std::cout << "Stack value size set at " <<  sizeof (StackValue) << " ... ";
+  std::cout << "Stack value size set at " <<  sizeof(StackValue) << " ... ";
   std::cout << (success ? "OK\n" : "FAIL\n");
 
   if (!success)

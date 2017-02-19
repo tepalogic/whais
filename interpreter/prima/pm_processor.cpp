@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -38,459 +38,459 @@ namespace prima {
 
 
 static void
-op_func_ldnull (ProcedureCall& call, int64_t&)
+op_func_ldnull(ProcedureCall& call, int64_t&)
 {
-  call.GetStack ().Push ();
+  call.GetStack().Push();
 }
 
 
 static void
-op_func_ldc (ProcedureCall& call, int64_t& offset)
+op_func_ldc(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  DChar value (load_le_int32 (data));
+  DChar value(load_le_int32(data));
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_ldi8 (ProcedureCall& call, int64_t& offset)
+op_func_ldi8(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
-  DUInt8 value (*data);
+  DUInt8 value(*data);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint8_t);
+  offset += sizeof(uint8_t);
 }
 
 
 static void
-op_func_ldi16 (ProcedureCall& call, int64_t& offset)
+op_func_ldi16(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
-  DUInt16 value (load_le_int16 (data));
+  DUInt16 value(load_le_int16(data));
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint16_t);
+  offset += sizeof(uint16_t);
 }
 
 
 static void
-op_func_ldi32 (ProcedureCall& call, int64_t& offset)
+op_func_ldi32(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
-                                offset;
-
-  DUInt32 value (load_le_int32 (data));
-
-  call.GetStack ().Push (value);
-
-  offset += sizeof (uint32_t);
-}
-
-
-static void
-op_func_ldi64 (ProcedureCall& call, int64_t& offset)
-{
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  DUInt64 value (load_le_int64 (data));
+  DUInt32 value(load_le_int32(data));
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint64_t);
+  offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_ldd (ProcedureCall& call, int64_t& offset)
+op_func_ldi64(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
+                                offset;
+
+  DUInt64 value(load_le_int64(data));
+
+  call.GetStack().Push(value);
+
+  offset += sizeof(uint64_t);
+}
+
+
+static void
+op_func_ldd(ProcedureCall& call, int64_t& offset)
+{
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
   const uint8_t day   = data[0];
   const uint8_t month = data[1];
-  const int16_t year  = load_le_int16 (data + 2);
+  const int16_t year  = load_le_int16(data + 2);
 
-  DDate value (year, month, day);
+  DDate value(year, month, day);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += 2 + sizeof (uint16_t);
+  offset += 2 + sizeof(uint16_t);
 }
 
 
 static void
-op_func_lddt (ProcedureCall& call, int64_t& offset)
+op_func_lddt(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
   const uint8_t sec   = data[0];
   const uint8_t min   = data[1];
   const uint8_t hour  = data[2];
   const uint8_t day   = data[3];
   const uint8_t month = data[4];
-  const int16_t year  = load_le_int16 (data + 5);
+  const int16_t year  = load_le_int16(data + 5);
 
-  DDateTime value (year, month, day, hour, min, sec);
+  DDateTime value(year, month, day, hour, min, sec);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += 5 + sizeof (uint16_t);
+  offset += 5 + sizeof(uint16_t);
 }
 
 
 static void
-op_func_ldht (ProcedureCall& call, int64_t& offset)
+op_func_ldht(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  const uint32_t usec  = load_le_int32 (data);
+  const uint32_t usec  = load_le_int32(data);
   const uint8_t  sec   = data[4];
   const uint8_t  min   = data[5];
   const uint8_t  hour  = data[6];
   const uint8_t  day   = data[7];
   const uint8_t  month = data[8];
-  const int16_t  year  = load_le_int16 (data + 9);
+  const int16_t  year  = load_le_int16(data + 9);
 
-  DHiresTime value (year, month, day, hour, min, sec, usec);
+  DHiresTime value(year, month, day, hour, min, sec, usec);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint32_t) + 5 + sizeof (uint16_t);
+  offset += sizeof(uint32_t) + 5 + sizeof(uint16_t);
 }
 
 
 static void
-op_func_ldrr (ProcedureCall& call, int64_t& offset)
+op_func_ldrr(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  int64_t intPart  = load_le_int64 (data);
-  int64_t fracPart = load_le_int64 (data + sizeof (uint64_t));
+  int64_t intPart  = load_le_int64(data);
+  int64_t fracPart = load_le_int64(data + sizeof(uint64_t));
 
-  const RICHREAL_T basicValue (intPart, fracPart, W_LDRR_PRECISSION);
+  const RICHREAL_T basicValue(intPart, fracPart, W_LDRR_PRECISSION);
 
-  DRichReal value (basicValue);
-  call.GetStack ().Push (value);
+  DRichReal value(basicValue);
+  call.GetStack().Push(value);
 
-  offset += (sizeof (uint64_t) + sizeof (uint64_t));
+  offset += (sizeof(uint64_t) + sizeof(uint64_t));
 }
 
 
 static void
-op_func_ldt (ProcedureCall& call, int64_t& offset)
+op_func_ldt(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  const uint32_t textOff = load_le_int32 (data);
-  const uint8_t* text    = call.GetUnit ().GetConstData (textOff);
+  const uint32_t textOff = load_le_int32(data);
+  const uint8_t* text    = call.GetUnit().GetConstData(textOff);
 
-  assert (text != NULL);
+  assert(text != NULL);
 
-  DText value (text);
+  DText value(text);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_ldbt (ProcedureCall& call, int64_t& offset)
+op_func_ldbt(ProcedureCall& call, int64_t& offset)
 {
-  DBool value (true);
+  DBool value(true);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 }
 
 
 static void
-op_func_ldbf (ProcedureCall& call, int64_t& offset)
+op_func_ldbf(ProcedureCall& call, int64_t& offset)
 {
-  DBool value (false);
+  DBool value(false);
 
-  call.GetStack ().Push (value);
+  call.GetStack().Push(value);
 }
 
 
 static void
-op_func_ldlo8 (ProcedureCall& call, int64_t& offset)
+op_func_ldlo8(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
   const uint8_t localIndex = *data;
 
-  LocalOperand localOp (call.GetStack (),
-                        call.StackBegin () + localIndex);
+  LocalOperand localOp(call.GetStack(),
+                        call.StackBegin() + localIndex);
 
-  call.GetStack ().Push (StackValue (localOp));
+  call.GetStack().Push(StackValue(localOp));
 
-  offset += sizeof (uint8_t);
+  offset += sizeof(uint8_t);
 }
 
 
 static void
-op_func_ldlo16 (ProcedureCall& call, int64_t& offset)
+op_func_ldlo16(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
-  const uint16_t localIndex = load_le_int16 (data);
+  const uint16_t localIndex = load_le_int16(data);
 
-  assert (localIndex < call.LocalsCount ());
+  assert(localIndex < call.LocalsCount());
 
-  LocalOperand localOp (call.GetStack (),
-                        call.StackBegin () + localIndex);
+  LocalOperand localOp(call.GetStack(),
+                        call.StackBegin() + localIndex);
 
-  call.GetStack ().Push (StackValue (localOp));
+  call.GetStack().Push(StackValue(localOp));
 
-  offset += sizeof (uint16_t);
+  offset += sizeof(uint16_t);
 }
 
 
 static void
-op_func_ldlo32 (ProcedureCall& call, int64_t& offset)
+op_func_ldlo32(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
-  const uint32_t localIndex = load_le_int32 (data);
+  const uint32_t localIndex = load_le_int32(data);
 
-  assert (localIndex < call.LocalsCount ());
+  assert(localIndex < call.LocalsCount());
 
-  LocalOperand localOp (call.GetStack (),
-                        call.StackBegin () + localIndex);
+  LocalOperand localOp(call.GetStack(),
+                        call.StackBegin() + localIndex);
 
-  call.GetStack ().Push (StackValue (localOp));
+  call.GetStack().Push(StackValue(localOp));
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_ldgb8 (ProcedureCall& call, int64_t& offset)
+op_func_ldgb8(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
   const uint8_t  globalIndex = *data;
-  const uint32_t glbId       = call.GetUnit ().GetGlobalId (globalIndex);
-  StackValue     glbValue    = call.GetSession ().GetGlobalValue (glbId);
+  const uint32_t glbId       = call.GetUnit().GetGlobalId(globalIndex);
+  StackValue     glbValue    = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack ().Push (glbValue);
+  call.GetStack().Push(glbValue);
 
-  offset += sizeof (uint8_t);
+  offset += sizeof(uint8_t);
 }
 
 
 static void
-op_func_ldgb16 (ProcedureCall& call, int64_t& offset)
+op_func_ldgb16(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  const uint16_t globalIndex = load_le_int16 (data);
-  const uint32_t glbId       = call.GetUnit ().GetGlobalId (globalIndex);
-  StackValue     glbValue    = call.GetSession ().GetGlobalValue (glbId);
+  const uint16_t globalIndex = load_le_int16(data);
+  const uint32_t glbId       = call.GetUnit().GetGlobalId(globalIndex);
+  StackValue     glbValue    = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack ().Push (glbValue);
+  call.GetStack().Push(glbValue);
 
-  offset += sizeof (uint16_t);
+  offset += sizeof(uint16_t);
 }
 
 
 static void
-op_func_ldgb32 (ProcedureCall& call, int64_t& offset)
+op_func_ldgb32(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  const uint32_t globalIndex = load_le_int32 (data);
-  const uint32_t glbId       = call.GetUnit ().GetGlobalId (globalIndex);
-  StackValue     glbValue    = call.GetSession ().GetGlobalValue (glbId);
+  const uint32_t globalIndex = load_le_int32(data);
+  const uint32_t glbId       = call.GetUnit().GetGlobalId(globalIndex);
+  StackValue     glbValue    = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack ().Push (glbValue);
+  call.GetStack().Push(glbValue);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_cts (ProcedureCall& call, int64_t& offset)
+op_func_cts(ProcedureCall& call, int64_t& offset)
 {
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
-          call.GetStack ().Size ());
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
+          call.GetStack().Size());
 
-  call.GetStack ().Pop (1);
+  call.GetStack().Pop(1);
 }
 
 
 template <class T> static void
-op_func_stXX (ProcedureCall& call, int64_t& offset)
+op_func_stXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& src  = stack[stackSize - 1].Operand ();
-  IOperand& dest = stack[stackSize - 2].Operand ();
+  IOperand& src  = stack[stackSize - 1].Operand();
+  IOperand& dest = stack[stackSize - 2].Operand();
 
   T value;
 
-  src.GetValue (value);
-  dest.SetValue (value);
+  src.GetValue(value);
+  dest.SetValue(value);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 static void
-op_func_stta (ProcedureCall& call, int64_t& offset)
+op_func_stta(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () -1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() -1 + 2) <=
           stackSize);
 
-  BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
-  BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
+  BaseOperand& src  = _SC(BaseOperand&, stack[stackSize - 1].Operand());
+  BaseOperand& dest = _SC(BaseOperand&, stack[stackSize - 2].Operand());
 
-  if (src.GetType () == T_UNKNOWN)
+  if (src.GetType() == T_UNKNOWN)
     {
-      assert (src.IsNull ());
-      assert (IS_TABLE (dest.GetType ()));
+      assert(src.IsNull());
+      assert(IS_TABLE(dest.GetType()));
 
-      TableReference& ref = dest.GetTableReference ();
-      dest.CopyTableOp (TableOperand (ref.GetDBSHandler (),
-                                      ref.GetTable ().Spawn (),
+      TableReference& ref = dest.GetTableReference();
+      dest.CopyTableOp(TableOperand(ref.GetDBSHandler(),
+                                      ref.GetTable().Spawn(),
                                       true));
     }
   else
-    dest.CopyTableOp (src.GetTableOp ());
+    dest.CopyTableOp(src.GetTableOp());
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 static void
-op_func_stf (ProcedureCall& call, int64_t& offset)
+op_func_stf(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  BaseOperand& src  = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
-  BaseOperand& dest = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
+  BaseOperand& src  = _SC(BaseOperand&, stack[stackSize - 1].Operand());
+  BaseOperand& dest = _SC(BaseOperand&, stack[stackSize - 2].Operand());
 
-  if (src.GetType () == T_UNKNOWN)
+  if (src.GetType() == T_UNKNOWN)
     {
-      assert (src.IsNull ());
-      assert (IS_FIELD (dest.GetType ()));
+      assert(src.IsNull());
+      assert(IS_FIELD(dest.GetType()));
 
-      dest.CopyFieldOp (FieldOperand (GET_FIELD_TYPE (dest.GetType ())));
+      dest.CopyFieldOp(FieldOperand(GET_FIELD_TYPE(dest.GetType())));
     }
   else
-    dest.CopyFieldOp (src.GetFieldOp ());
+    dest.CopyFieldOp(src.GetFieldOp());
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template<typename T> static void
-transfer_undef_value (IOperand& dest, IOperand& src)
+transfer_undef_value(IOperand& dest, IOperand& src)
 {
   T value;
 
-  src.GetValue (value);
-  dest.SetValue (value);
+  src.GetValue(value);
+  dest.SetValue(value);
 }
 
 
 static void
-op_func_stud (ProcedureCall& call, int64_t& offset)
+op_func_stud(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  BaseOperand& src   = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
-  BaseOperand& dest  = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
+  BaseOperand& src   = _SC(BaseOperand&, stack[stackSize - 1].Operand());
+  BaseOperand& dest  = _SC(BaseOperand&, stack[stackSize - 2].Operand());
 
-  const uint_t srcType = src.GetType ();
+  const uint_t srcType = src.GetType();
 
   if (srcType == T_UNDETERMINED)
     {
-      if (src.IsNull ())
-        dest.CopyNativeObjectOperand (NativeObjectOperand ());
+      if (src.IsNull())
+        dest.CopyNativeObjectOperand(NativeObjectOperand());
 
       else
         {
           dest.CopyNativeObjectOperand(
-                              NativeObjectOperand (src.NativeObject ())
+                              NativeObjectOperand(src.NativeObject())
                                        );
         }
     }
-  else if (IS_TABLE (srcType))
+  else if (IS_TABLE(srcType))
     {
       dest.CopyNativeObjectOperand(
-                            NativeObjectOperand (src.GetTableReference ())
+                            NativeObjectOperand(src.GetTableReference())
                                    );
     }
-  else if (IS_FIELD (srcType))
+  else if (IS_FIELD(srcType))
     {
-      TableReference* const temp = src.IsNull () ?
+      TableReference* const temp = src.IsNull() ?
                                     NULL :
-                                    &src.GetTableReference ();
+                                    &src.GetTableReference();
 
-      const uint_t      type        = src.GetType ();
-      const FIELD_INDEX fieldIndex  = src.GetField ();
+      const uint_t      type        = src.GetType();
+      const FIELD_INDEX fieldIndex  = src.GetField();
 
 
       dest.CopyNativeObjectOperand(
-                        NativeObjectOperand (temp, fieldIndex, type)
+                        NativeObjectOperand(temp, fieldIndex, type)
                                    );
     }
-  else if (IS_ARRAY (srcType))
+  else if (IS_ARRAY(srcType))
     transfer_undef_value<DArray> (dest, src);
 
   else
     {
-      switch (srcType)
+      switch(srcType)
         {
         case T_BOOL:
           transfer_undef_value<DBool> (dest, src);
@@ -530,1105 +530,1105 @@ op_func_stud (ProcedureCall& call, int64_t& offset)
           break;
 
         default:
-          throw InterException (_EXTRA (InterException::INTERNAL_ERROR));
+          throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
         }
     }
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 static void
-op_func_inull (ProcedureCall& call, int64_t& offset)
+op_func_inull(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
            stackSize);
 
-  IOperand& source = stack[stackSize - 1].Operand ();
-  DBool result (source.IsNull ());
+  IOperand& source = stack[stackSize - 1].Operand();
+  DBool result(source.IsNull());
 
-  stack.Pop (1);
-  stack.Push (result);
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
 static void
-op_func_nnull (ProcedureCall& call, int64_t& offset)
+op_func_nnull(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
            stackSize);
 
-  IOperand& source = stack[stackSize - 1].Operand ();
-  DBool result (! source.IsNull ());
+  IOperand& source = stack[stackSize - 1].Operand();
+  DBool result(! source.IsNull());
 
-  stack.Pop (1);
-  stack.Push (result);
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
 static void
-op_func_call (ProcedureCall& call, int64_t& offset)
+op_func_call(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code ()             +
-                                call.CurrentOffset ()  +
+  const uint8_t* const data = call.Code()             +
+                                call.CurrentOffset()  +
                                 offset;
 
-  const uint32_t procIndex = load_le_int32 (data);
+  const uint32_t procIndex = load_le_int32(data);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 
-  Session&       session = call.GetSession ();
-  SessionStack&  stack   = call.GetStack ();
-  const uint32_t procId  = call.GetUnit ().GetProcedureId (procIndex);
+  Session&       session = call.GetSession();
+  SessionStack&  stack   = call.GetStack();
+  const uint32_t procId  = call.GetUnit().GetProcedureId(procIndex);
 
-  ProcedureCall (session, stack, session.GetProcedure (procId));
+  ProcedureCall(session, stack, session.GetProcedure(procId));
 }
 
 
 static void
-op_func_ret (ProcedureCall& call, int64_t& offset)
+op_func_ret(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount ()) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount()) <= stackSize);
 
-  StackValue result = stack[stackSize - 1].Operand ().Duplicate ();
+  StackValue result = stack[stackSize - 1].Operand().Duplicate();
 
-  stack.Pop (stackSize - call.StackBegin ());
+  stack.Pop(stackSize - call.StackBegin());
 
-  if (result.Operand ().GetType () == T_UNKNOWN)
+  if (result.Operand().GetType() == T_UNKNOWN)
     {
-      assert (result.Operand ().IsNull ());
+      assert(result.Operand().IsNull());
 
-      stack.Push (call.GetLocalDefault (0));
+      stack.Push(call.GetLocalDefault(0));
     }
   else
-    stack.Push (result);
+    stack.Push(result);
 
-  offset = call.CodeSize (); //Signal the procedure return
+  offset = call.CodeSize(); //Signal the procedure return
 }
 
 
 template <class DBS_T> static void
-op_func_addXX (ProcedureCall& call, int64_t& offset)
+op_func_addXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  const DBS_T result (firstOp.mValue + secondOp.mValue);
+  const DBS_T result(firstOp.mValue + secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_addt (ProcedureCall& call, int64_t& offset)
+op_func_addt(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DText firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand().GetValue(firstOp);
 
   DText secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand().GetValue(secondOp);
 
   DText result;
-  if (firstOp.IsNull ())
+  if (firstOp.IsNull())
     result = secondOp;
 
-  else if (secondOp.IsNull ())
+  else if (secondOp.IsNull())
     result = firstOp;
 
   else
     {
       result = firstOp;
-      result.Append (secondOp);
+      result.Append(secondOp);
     }
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_andXX (ProcedureCall& call, int64_t& offset)
+op_func_andXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  DBS_T result (firstOp.mValue & secondOp.mValue);
+  DBS_T result(firstOp.mValue & secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_divXX (ProcedureCall& call, int64_t& offset)
+op_func_divXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  if (secondOp == DBS_T (0))
-    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
+  if (secondOp == DBS_T(0))
+    throw InterException(_EXTRA(InterException::DIVIDE_BY_ZERO));
 
-  DBS_T result (firstOp.mValue / secondOp.mValue);
+  DBS_T result(firstOp.mValue / secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_eqXX (ProcedureCall& call, int64_t& offset)
+op_func_eqXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand().GetValue(firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand().GetValue(secondOp);
 
-  DBool result (firstOp == secondOp);
+  DBool result(firstOp == secondOp);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_geXX (ProcedureCall& call, int64_t& offset)
+op_func_geXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
-  DBool result ((firstOp < secondOp) == false);
+  DBool result((firstOp < secondOp) == false);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_gtXX (ProcedureCall& call, int64_t& offset)
+op_func_gtXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
 
-  DBool result (((firstOp < secondOp) || (firstOp == secondOp)) == false);
+  DBool result(((firstOp < secondOp) || (firstOp == secondOp)) == false);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_leXX (ProcedureCall& call, int64_t& offset)
+op_func_leXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
-  DBool result ((firstOp < secondOp) || (firstOp == secondOp));
+  DBool result((firstOp < secondOp) || (firstOp == secondOp));
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_ltXX (ProcedureCall& call, int64_t& offset)
+op_func_ltXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBool());
+      stack.Pop(2);
+      stack.Push(DBool());
       return ;
     }
 
-  DBool result (firstOp < secondOp);
+  DBool result(firstOp < secondOp);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_mod (ProcedureCall& call, int64_t& offset)
+op_func_mod(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DInt64 firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DInt64());
+      stack.Pop(2);
+      stack.Push(DInt64());
       return ;
     }
 
   DInt64 secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DInt64());
+      stack.Pop(2);
+      stack.Push(DInt64());
       return ;
     }
 
-  if (secondOp == DInt64 (0))
-    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
+  if (secondOp == DInt64(0))
+    throw InterException(_EXTRA(InterException::DIVIDE_BY_ZERO));
 
   DInt64 result(firstOp.mValue % secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_modu (ProcedureCall& call, int64_t& offset)
+op_func_modu(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
   DUInt64 firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DUInt64());
+      stack.Pop(2);
+      stack.Push(DUInt64());
       return ;
     }
 
   DUInt64 secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DUInt64());
+      stack.Pop(2);
+      stack.Push(DUInt64());
       return ;
     };
 
-  if (secondOp == DUInt64 (0))
-    throw InterException (_EXTRA (InterException::DIVIDE_BY_ZERO));
+  if (secondOp == DUInt64(0))
+    throw InterException(_EXTRA(InterException::DIVIDE_BY_ZERO));
 
   DUInt64 result(firstOp.mValue % secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 
 template <class DBS_T> static void
-op_func_mulXX (ProcedureCall& call, int64_t& offset)
+op_func_mulXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T result(firstOp.mValue * secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_neXX (ProcedureCall& call, int64_t& offset)
+op_func_neXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
+  stack[stackSize - 2].Operand().GetValue(firstOp);
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
+  stack[stackSize - 1].Operand().GetValue(secondOp);
 
-  DBool result ((firstOp == secondOp) == false);
+  DBool result((firstOp == secondOp) == false);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_notXX (ProcedureCall& call, int64_t& offset)
+op_func_notXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBS_T operand;
-  stack[stackSize - 1].Operand ().GetValue (operand);
+  stack[stackSize - 1].Operand().GetValue(operand);
 
   DBS_T result;
-  if (operand.IsNull () == false)
-    result = DBS_T (~operand.mValue);
+  if (operand.IsNull() == false)
+    result = DBS_T(~operand.mValue);
 
-  stack.Pop (1);
-  stack.Push (result);
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
 template <> void
 op_func_notXX<DBool> (ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBool operand;
-  stack[stackSize - 1].Operand ().GetValue (operand);
+  stack[stackSize - 1].Operand().GetValue(operand);
 
   DBool result;
-  if (operand.IsNull () == false)
-    result = DBool (! operand.mValue);
+  if (operand.IsNull() == false)
+    result = DBool(! operand.mValue);
 
-  stack.Pop (1);
-  stack.Push (result);
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_orXX (ProcedureCall& call, int64_t& offset)
+op_func_orXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  DBS_T result (firstOp.mValue | secondOp.mValue);
+  DBS_T result(firstOp.mValue | secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_subXX (ProcedureCall& call, int64_t& offset)
+op_func_subXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  const DBS_T result (firstOp.mValue - secondOp.mValue);
+  const DBS_T result(firstOp.mValue - secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 template <class DBS_T> static void
-op_func_xorXX (ProcedureCall& call, int64_t& offset)
+op_func_xorXX(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <= stackSize);
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   DBS_T firstOp;
-  stack[stackSize - 2].Operand ().GetValue (firstOp);
-  if (firstOp.IsNull ())
+  stack[stackSize - 2].Operand().GetValue(firstOp);
+  if (firstOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
   DBS_T secondOp;
-  stack[stackSize - 1].Operand ().GetValue (secondOp);
-  if (secondOp.IsNull ())
+  stack[stackSize - 1].Operand().GetValue(secondOp);
+  if (secondOp.IsNull())
     {
-      stack.Pop (2);
-      stack.Push (DBS_T());
+      stack.Pop(2);
+      stack.Push(DBS_T());
       return ;
     }
 
-  DBS_T result (firstOp.mValue ^ secondOp.mValue);
+  DBS_T result(firstOp.mValue ^ secondOp.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_jf (ProcedureCall& call, int64_t& offset)
+op_func_jf(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].Operand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand().GetValue(firstOp);
 
-  if ((firstOp.IsNull () == false) && (firstOp.mValue == false))
+  if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
-      const uint8_t* const data = call.Code () +
-                                    call.CurrentOffset () +
+      const uint8_t* const data = call.Code() +
+                                    call.CurrentOffset() +
                                     offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+      const int32_t jmpOffset = _SC(int32_t, load_le_int32(data));
 
       offset = jmpOffset;
     }
   else
-    offset += sizeof (uint32_t);
+    offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_jfc (ProcedureCall& call, int64_t& offset)
+op_func_jfc(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].Operand ().GetValue (firstOp);
-  stack.Pop (1);
+  stack[stackSize - 1].Operand().GetValue(firstOp);
+  stack.Pop(1);
 
-  if ((firstOp.IsNull () == false) && (firstOp.mValue == false))
+  if ((firstOp.IsNull() == false) && (firstOp.mValue == false))
     {
-      const uint8_t* const data = call.Code () +
-                                    call.CurrentOffset () +
+      const uint8_t* const data = call.Code() +
+                                    call.CurrentOffset() +
                                     offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+      const int32_t jmpOffset = _SC(int32_t, load_le_int32(data));
       offset = jmpOffset;
     }
   else
-    offset += sizeof (uint32_t);
+    offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_jt (ProcedureCall& call, int64_t& offset)
+op_func_jt(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].Operand ().GetValue (firstOp);
+  stack[stackSize - 1].Operand().GetValue(firstOp);
 
-  if ((firstOp.IsNull () == false) && firstOp.mValue )
+  if ((firstOp.IsNull() == false) && firstOp.mValue )
     {
-      const uint8_t* const data = call.Code () +
-                                    call.CurrentOffset () +
+      const uint8_t* const data = call.Code() +
+                                    call.CurrentOffset() +
                                     offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+      const int32_t jmpOffset = _SC(int32_t, load_le_int32(data));
       offset = jmpOffset;
     }
   else
-    offset += sizeof (uint32_t);
+    offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_jtc (ProcedureCall& call, int64_t& offset)
+op_func_jtc(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DBool firstOp;
-  stack[stackSize - 1].Operand ().GetValue (firstOp);
-  stack.Pop (1);
+  stack[stackSize - 1].Operand().GetValue(firstOp);
+  stack.Pop(1);
 
-  if ((firstOp.IsNull () == false) && firstOp.mValue)
+  if ((firstOp.IsNull() == false) && firstOp.mValue)
     {
-      const uint8_t* const data = call.Code () +
-                                    call.CurrentOffset () +
+      const uint8_t* const data = call.Code() +
+                                    call.CurrentOffset() +
                                     offset;
 
-      const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+      const int32_t jmpOffset = _SC(int32_t, load_le_int32(data));
       offset = jmpOffset;
     }
   else
-    offset += sizeof (uint32_t);
+    offset += sizeof(uint32_t);
 }
 
 
 static void
-op_func_jmp (ProcedureCall& call, int64_t& offset)
+op_func_jmp(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
 
-  const int32_t jmpOffset = _SC (int32_t, load_le_int32 (data));
+  const int32_t jmpOffset = _SC(int32_t, load_le_int32(data));
   offset = jmpOffset;
 }
 
 
 template <uint_t EXCEPTION_CODE> void
-op_func_ind (ProcedureCall& call, int64_t& offset)
+op_func_ind(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DUInt64 index;
-  stack[stackSize - 1].Operand ().GetValue (index);
+  stack[stackSize - 1].Operand().GetValue(index);
 
-  if (index.IsNull ())
-    throw InterException (_EXTRA (EXCEPTION_CODE));
+  if (index.IsNull())
+    throw InterException(_EXTRA(EXCEPTION_CODE));
 
-  StackValue result = stack[stackSize - 2].Operand ().GetValueAt (index.mValue);
+  StackValue result = stack[stackSize - 2].Operand().GetValueAt(index.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_indta (ProcedureCall& call, int64_t& offset)
+op_func_indta(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
   DUInt64 index;
-  stack[stackSize - 1].Operand ().GetValue (index);
+  stack[stackSize - 1].Operand().GetValue(index);
 
-  if (index.IsNull ())
-    throw InterException (_EXTRA (InterException::ROW_INDEX_NULL));
+  if (index.IsNull())
+    throw InterException(_EXTRA(InterException::ROW_INDEX_NULL));
 
-  BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 2].Operand ());
+  BaseOperand& op = _SC(BaseOperand&, stack[stackSize - 2].Operand());
 
-  const uint8_t* const  pData = call.Code () +
-                                  call.CurrentOffset () +
+  const uint8_t* const  pData = call.Code() +
+                                  call.CurrentOffset() +
                                   offset;
-  const uint32_t       textOff = load_le_int32 (pData);
-  const uint8_t* const text    = call.GetUnit ().GetConstData (textOff);
+  const uint32_t       textOff = load_le_int32(pData);
+  const uint8_t* const text    = call.GetUnit().GetConstData(textOff);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 
-  FIELD_INDEX field = op.GetTable ().RetrieveField (_RC (const char*, text));
+  FIELD_INDEX field = op.GetTable().RetrieveField(_RC(const char*, text));
 
-  FieldOperand fieldOp (op.GetTableReference (), field);
-  StackValue   result = fieldOp.GetValueAt (index.mValue);
+  FieldOperand fieldOp(op.GetTableReference(), field);
+  StackValue   result = fieldOp.GetValueAt(index.mValue);
 
-  stack.Pop (2);
-  stack.Push (result);
+  stack.Pop(2);
+  stack.Push(result);
 }
 
 
 static void
-op_func_self (ProcedureCall& call, int64_t& offset)
+op_func_self(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
-  BaseOperand& op = _SC (BaseOperand&, stack[stackSize - 1].Operand ());
+  BaseOperand& op = _SC(BaseOperand&, stack[stackSize - 1].Operand());
 
-  const uint8_t* const  data = call.Code () +
-                                 call.CurrentOffset () +
+  const uint8_t* const  data = call.Code() +
+                                 call.CurrentOffset() +
                                  offset;
-  const uint32_t        textOff = load_le_int32 (data);
-  const uint8_t* const  text    = call.GetUnit ().GetConstData (textOff);
+  const uint32_t        textOff = load_le_int32(data);
+  const uint8_t* const  text    = call.GetUnit().GetConstData(textOff);
 
-  offset += sizeof (uint32_t);
+  offset += sizeof(uint32_t);
 
-  FIELD_INDEX field = op.GetTable ().RetrieveField (_RC (const char*, text));
+  FIELD_INDEX field = op.GetTable().RetrieveField(_RC(const char*, text));
 
-  FieldOperand fieldOp (op.GetTableReference (), field);
-  StackValue   result (fieldOp);
+  FieldOperand fieldOp(op.GetTableReference(), field);
+  StackValue   result(fieldOp);
 
-  stack.Pop (1);
-  stack.Push (result);
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
 static void
-op_func_bsync (ProcedureCall& call, int64_t& offset)
+op_func_bsync(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const  data = call.Code () +
-                                 call.CurrentOffset () +
+  const uint8_t* const  data = call.Code() +
+                                 call.CurrentOffset() +
                                offset;
   const uint8_t syncStmt = *data;
 
-  offset += sizeof (uint8_t);
+  offset += sizeof(uint8_t);
 
-  call.AquireSync (syncStmt);
+  call.AquireSync(syncStmt);
 }
 
 
 static void
-op_func_esync (ProcedureCall& call, int64_t& offset)
+op_func_esync(ProcedureCall& call, int64_t& offset)
 {
-  const uint8_t* const data = call.Code () +
-                                call.CurrentOffset () +
+  const uint8_t* const data = call.Code() +
+                                call.CurrentOffset() +
                                 offset;
   const uint8_t syncStmt = *data;
 
-  offset += sizeof (uint8_t);
+  offset += sizeof(uint8_t);
 
-  call.ReleaseSync (syncStmt);
+  call.ReleaseSync(syncStmt);
 }
 
 
 template <class DBS_T> static void
-op_func_sadd (ProcedureCall& call, int64_t& offset)
+op_func_sadd(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfAdd (delta);
+  destOp.SelfAdd(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_ssub (ProcedureCall& call, int64_t& offset)
+op_func_ssub(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfSub (delta);
+  destOp.SelfSub(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_smul (ProcedureCall& call, int64_t& offset)
+op_func_smul(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfMul (delta);
+  destOp.SelfMul(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_sdiv (ProcedureCall& call, int64_t& offset)
+op_func_sdiv(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfDiv (delta);
+  destOp.SelfDiv(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_smod (ProcedureCall& call, int64_t& offset)
+op_func_smod(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfMod (delta);
+  destOp.SelfMod(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_sand (ProcedureCall& call, int64_t& offset)
+op_func_sand(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfAnd (delta);
+  destOp.SelfAnd(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_sxor (ProcedureCall& call, int64_t& offset)
+op_func_sxor(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfXor (delta);
+  destOp.SelfXor(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template <class DBS_T> static void
-op_func_sor (ProcedureCall& call, int64_t& offset)
+op_func_sor(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 2) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <=
           stackSize);
 
-  IOperand& destOp = stack[stackSize - 2].Operand ();
+  IOperand& destOp = stack[stackSize - 2].Operand();
 
   DBS_T delta;
-  stack[stackSize - 1].Operand ().GetValue (delta);
+  stack[stackSize - 1].Operand().GetValue(delta);
 
-  destOp.SelfOr (delta);
+  destOp.SelfOr(delta);
 
-  stack.Pop (1);
+  stack.Pop(1);
 }
 
 
 template<bool reverse> static void
-op_start_iterate (ProcedureCall& call, int64_t& offset)
+op_start_iterate(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
-  IOperand& container = stack[stackSize - 1].Operand ();
-  if (container.IsNull ())
+  IOperand& container = stack[stackSize - 1].Operand();
+  if (container.IsNull())
     {
-      stack.Push (StackValue (BoolOperand (DBool (false))));
+      stack.Push(StackValue(BoolOperand(DBool(false))));
       return ;
     }
 
   NullOperand nullOp;
-  StackValue iterator (nullOp);
+  StackValue iterator(nullOp);
 
-  const bool started = container.StartIterate (reverse, iterator);
+  const bool started = container.StartIterate(reverse, iterator);
 
-  stack.Pop (1);
-  stack.Push (iterator);
-  stack.Push (StackValue (BoolOperand (DBool (started))));
+  stack.Pop(1);
+  stack.Push(iterator);
+  stack.Push(StackValue(BoolOperand(DBool(started))));
 }
 
 
 template<bool reverse> static void
-op_iterate (ProcedureCall& call, int64_t& offset)
+op_iterate(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
-  IOperand& iteratorOp = stack[stackSize - 1].Operand ();
+  IOperand& iteratorOp = stack[stackSize - 1].Operand();
 
-  const bool started = iteratorOp.Iterate (reverse);
-  stack.Push (StackValue (BoolOperand (DBool (started))));
+  const bool started = iteratorOp.Iterate(reverse);
+  stack.Push(StackValue(BoolOperand(DBool(started))));
 }
 
 static void
-op_iterator_offset (ProcedureCall& call, int64_t& offset)
+op_iterator_offset(ProcedureCall& call, int64_t& offset)
 {
-  SessionStack& stack     = call.GetStack ();
-  const size_t  stackSize = stack.Size ();
+  SessionStack& stack     = call.GetStack();
+  const size_t  stackSize = stack.Size();
 
-  assert ((call.StackBegin () + call.LocalsCount () - 1 + 1) <=
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <=
           stackSize);
 
-  IOperand& iteratorOp = stack[stackSize - 1].Operand ();
+  IOperand& iteratorOp = stack[stackSize - 1].Operand();
 
-  const uint64_t itOffset = iteratorOp.IteratorOffset ();
+  const uint64_t itOffset = iteratorOp.IteratorOffset();
 
-  stack.Pop (1);
-  stack.Push (StackValue (UInt64Operand (DUInt64 (itOffset))));
+  stack.Pop(1);
+  stack.Push(StackValue(UInt64Operand(DUInt64(itOffset))));
 }
 
 
-typedef void (*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
+typedef void(*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
 
 
 
@@ -1815,171 +1815,171 @@ static OP_FUNC operations[] = {
 
 
 
-ProcedureCall::ProcedureCall (Session&                  session,
+ProcedureCall::ProcedureCall(Session&                  session,
                               SessionStack&             stack,
                               const Procedure&          procedure)
-  : mProcedure (procedure),
-    mSession (session),
-    mStack (stack),
-    mCode (mProcedure.mNativeCode
+  : mProcedure(procedure),
+    mSession(session),
+    mStack(stack),
+    mCode(mProcedure.mNativeCode
            ? NULL
-           : procedure.mProcMgr->Code (procedure, NULL)),
-    mStackBegin (stack.Size () - procedure.mArgsCount),
-    mCodePos (0),
-    mAquiredSync (NO_INDEX)
+           : procedure.mProcMgr->Code(procedure, NULL)),
+    mStackBegin(stack.Size() - procedure.mArgsCount),
+    mCodePos(0),
+    mAquiredSync(NO_INDEX)
 {
   if (mProcedure.mNativeCode != NULL)
     {
-      const WLIB_STATUS status = procedure.mNativeCode (stack, session);
+      const WLIB_STATUS status = procedure.mNativeCode(stack, session);
       if (status != WOP_OK)
         {
-          throw InterException (_EXTRA (InterException::NATIVE_CALL_FAILED),
+          throw InterException(_EXTRA(InterException::NATIVE_CALL_FAILED),
                                 "Native procedure '%s' execution returned"
                                 " unexpected error code '%d'.",
-                                mProcedure.mProcMgr->Name (mProcedure.mId),
+                                mProcedure.mProcMgr->Name(mProcedure.mId),
                                 status);
         }
 
-      if (stack.Size () != mStackBegin + 1)
+      if (stack.Size() != mStackBegin + 1)
         {
           std::ostringstream log;
           log << "Native procedure called '"
-              << _RC (const char*, mProcedure.mProcMgr->Name (mProcedure.mId))
+              << _RC(const char*, mProcedure.mProcMgr->Name(mProcedure.mId))
               << "'.";
 
-          throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
+          throw InterException(_EXTRA(InterException::STACK_CORRUPTED),
                                 "Stack corruption detected after native"
                                 " procedure '%s' execution.",
-                                mProcedure.mProcMgr->Name (mProcedure.mId));
+                                mProcedure.mProcMgr->Name(mProcedure.mId));
         }
 
       return ;
     }
   else
     {
-      if (stack.Size () + LocalsCount () > session.MaxStackCount ())
+      if (stack.Size() + LocalsCount() > session.MaxStackCount())
         {
-          throw InterException (_EXTRA (InterException::STACK_TOO_BIG),
+          throw InterException(_EXTRA(InterException::STACK_TOO_BIG),
                                 "Failed to call procedure '%s' as it will "
                                   "exceed the maximum stack count of %u "
                                   "elements limit.",
-                                  mProcedure.mProcMgr->Name (mProcedure.mId),
-                                  session.MaxStackCount ());
+                                  mProcedure.mProcMgr->Name(mProcedure.mId),
+                                  session.MaxStackCount());
         }
 
-      //Fill the stack with default values for the local values (don't
+      //Fill the stack with default values for the local values(don't
       //include the arguments as they should be on the stack already and the
       uint32_t local = mProcedure.mArgsCount + 1;
-      if (local < LocalsCount ())
+      if (local < LocalsCount())
         {
-          const StackValue* localValue = &GetLocalDefault (local);
-          while (local < LocalsCount ())
+          const StackValue* localValue = &GetLocalDefault(local);
+          while(local < LocalsCount())
             {
-              stack.Push (*localValue);
+              stack.Push(*localValue);
               ++local, ++localValue;
             }
         }
 
       //Count only procedure's parameters and local values,
       //but not the result value too.
-      if ((LocalsCount () - 1) > stack.Size ())
+      if ((LocalsCount() - 1) > stack.Size())
         {
-          throw InterException (_EXTRA (InterException::STACK_CORRUPTED),
+          throw InterException(_EXTRA(InterException::STACK_CORRUPTED),
                                 "Stack corruption detected after procedure"
                                 " '%s' execution.",
-                                mProcedure.mProcMgr->Name (mProcedure.mId));
+                                mProcedure.mProcMgr->Name(mProcedure.mId));
         }
 
       try
       {
-        Run ();
+        Run();
       }
-      catch (Exception& e)
+      catch(Exception& e)
       {
-          const std::string message = e.Message ();
+          const std::string message = e.Message();
 
-          if ( ! message.empty ())
+          if ( ! message.empty())
             {
-              e.Message ("%s\n\tCalled from '%s' (PC: %04u).",
-                         message.c_str (),
-                         mProcedure.mProcMgr->Name (mProcedure.mId),
+              e.Message("%s\n\tCalled from '%s' (PC: %04u).",
+                         message.c_str(),
+                         mProcedure.mProcMgr->Name(mProcedure.mId),
                          mCodePos);
             }
           else
             {
-              e.Message ("Current procedure '%s'(PC: %04u).",
-                         mProcedure.mProcMgr->Name (mProcedure.mId),
+              e.Message("Current procedure '%s'(PC: %04u).",
+                         mProcedure.mProcMgr->Name(mProcedure.mId),
                          mCodePos);
             }
           throw ;
       }
     }
 
-  assert (mAquiredSync == NO_INDEX);
+  assert(mAquiredSync == NO_INDEX);
 }
 
 
 void
-ProcedureCall::Run ()
+ProcedureCall::Run()
 {
   W_OPCODE opcode;
 
   try
   {
-    while (mCodePos < CodeSize ())
+    while(mCodePos < CodeSize())
       {
-        if (mSession.IsServerShoutdowing ())
-          throw InterException (_EXTRA (InterException::SERVER_STOPPED));
+        if (mSession.IsServerShoutdowing())
+          throw InterException(_EXTRA(InterException::SERVER_STOPPED));
 
-        int64_t offset = wh_compiler_decode_op (mCode + mCodePos, &opcode);
+        int64_t offset = wh_compiler_decode_op(mCode + mCodePos, &opcode);
 
-        assert (opcode < _SC (int, (sizeof operations / sizeof operations[0])));
-        assert (opcode != 0);
-        assert ((offset > 0) && (offset < 3));
+        assert(opcode < _SC(int, (sizeof operations / sizeof operations[0])));
+        assert(opcode != 0);
+        assert((offset > 0) && (offset < 3));
 
         operations[opcode] (*this, offset);
 
         mCodePos += offset;
 
-        assert ((mCodePos <= CodeSize ())
-                || (_SC (uint64_t, offset) == CodeSize ()));
+        assert((mCodePos <= CodeSize())
+                || (_SC(uint64_t, offset) == CodeSize()));
       }
 
       if (mAquiredSync != NO_INDEX)
-       ReleaseSync (mAquiredSync);
+       ReleaseSync(mAquiredSync);
   }
-  catch (...)
+  catch(...)
   {
       if (mAquiredSync != NO_INDEX)
-       ReleaseSync (mAquiredSync);
+       ReleaseSync(mAquiredSync);
 
       throw;
   }
 
   //After a procedure execution, only the return value should be present
   //on the stack
-  assert (mStack.Size () == (mStackBegin + 1));
+  assert(mStack.Size() == (mStackBegin + 1));
 }
 
 
 void
-ProcedureCall::AquireSync (const uint8_t sync)
+ProcedureCall::AquireSync(const uint8_t sync)
 {
   if (mAquiredSync != NO_INDEX)
-    throw InterException (_EXTRA (InterException::NEESTED_SYNC_REQ));
+    throw InterException(_EXTRA(InterException::NEESTED_SYNC_REQ));
 
-  mProcedure.mProcMgr->AquireSync (mProcedure, sync);
+  mProcedure.mProcMgr->AquireSync(mProcedure, sync);
   mAquiredSync = sync;
 }
 
 
 void
-ProcedureCall::ReleaseSync (const uint8_t sync)
+ProcedureCall::ReleaseSync(const uint8_t sync)
 {
   if (mAquiredSync != sync)
-    throw InterException (_EXTRA (InterException::SYNC_NOT_AQUIRED));
+    throw InterException(_EXTRA(InterException::SYNC_NOT_AQUIRED));
 
-  mProcedure.mProcMgr->ReleaseSync (mProcedure, sync);
+  mProcedure.mProcMgr->ReleaseSync(mProcedure, sync);
   mAquiredSync = NO_INDEX;
 }
 

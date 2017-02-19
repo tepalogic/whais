@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -44,48 +44,48 @@ namespace whc {
 class CmdLineParser
 {
 public:
-  CmdLineParser (int argc, char **argv);
-  ~CmdLineParser ();
+  CmdLineParser(int argc, char **argv);
+  ~CmdLineParser();
 
-  const char* SourceFile () const
+  const char* SourceFile() const
   {
     return mSourceFile;
   }
 
-  const char* OutputFile () const
+  const char* OutputFile() const
   {
     return mOutputFile;
   }
 
 
-  const bool JustPreprocess () const
+  const bool JustPreprocess() const
   {
     return mPreprocessOnly;
   }
 
-  const bool BuildDependencies () const
+  const bool BuildDependencies() const
   {
     return mBuildDependencies;
   }
 
-  const std::vector<std::string>& InclusionPaths () const
+  const std::vector<std::string>& InclusionPaths() const
   {
     return mInclusionPaths;
   }
 
-  std::vector<ReplacementTag>& ReplacementTags ()
+  std::vector<ReplacementTag>& ReplacementTags()
   {
     return mReplacementTags;
   }
 
 private:
-  void Parse ();
+  void Parse();
 
-  void DisplayUsage () const;
+  void DisplayUsage() const;
 
-  void CheckArguments ();
+  void CheckArguments();
 
-  void AddInclusionPaths (const char* const paths);
+  void AddInclusionPaths(const char* const paths);
 
 private:
   int         mArgCount;
@@ -107,17 +107,17 @@ private:
 class CmdLineException : public Exception
 {
 public:
-  CmdLineException (const uint32_t      code,
+  CmdLineException(const uint32_t      code,
                     const char*         file,
                     const uint32_t      line,
                     const char*         fmtMsg = NULL,
                     ... );
 
-  virtual Exception* Clone () const;
+  virtual Exception* Clone() const;
 
-  virtual EXCEPTION_TYPE Type () const;
+  virtual EXCEPTION_TYPE Type() const;
 
-  virtual const char* Description () const;
+  virtual const char* Description() const;
 };
 
 } //namespace whc

@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -33,27 +33,27 @@ namespace whais
 {
 
 const std::string
-NextToken (const std::string&     text,
+NextToken(const std::string&     text,
            size_t&                inoutOff,
            const string&          delims)
 {
-  inoutOff = text.find_first_not_of (delims, inoutOff);
+  inoutOff = text.find_first_not_of(delims, inoutOff);
 
   if (inoutOff == string::npos)
     {
-      inoutOff  = text.length ();
-      return string ();
+      inoutOff  = text.length();
+      return string();
     }
 
-  assert (inoutOff != string::npos);
-  assert (inoutOff < text.length ());
+  assert(inoutOff != string::npos);
+  assert(inoutOff < text.length());
 
   size_t lastPos = inoutOff;
   if (text[lastPos] == '"')
     {
       bool ignoreEnd = false;
 
-      while ((text[++lastPos] != '"') || ignoreEnd)
+      while((text[++lastPos] != '"') || ignoreEnd)
         {
           ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)
@@ -66,14 +66,14 @@ NextToken (const std::string&     text,
 
       if (lastPos != string::npos)
         {
-          assert (text[lastPos] == '"');
+          assert(text[lastPos] == '"');
           ++lastPos;
         }
     }
   else if (text[lastPos] == '\'')
     {
       bool ignoreEnd = false;
-      while ((text[++lastPos] != '\'') || ignoreEnd)
+      while((text[++lastPos] != '\'') || ignoreEnd)
         {
           ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)
@@ -86,22 +86,22 @@ NextToken (const std::string&     text,
 
       if (lastPos != string::npos)
         {
-          assert (text[lastPos] == '\'');
+          assert(text[lastPos] == '\'');
           ++lastPos;
         }
     }
   else
-    lastPos = text.find_first_of (delims, inoutOff);
+    lastPos = text.find_first_of(delims, inoutOff);
 
   if (lastPos == string::npos)
-    lastPos = text.length () - 1;
+    lastPos = text.length() - 1;
 
   else
     --lastPos;
 
-  assert (inoutOff <= lastPos);
+  assert(inoutOff <= lastPos);
 
-  const string result = text.substr (inoutOff, lastPos - inoutOff + 1);
+  const string result = text.substr(inoutOff, lastPos - inoutOff + 1);
 
   inoutOff = lastPos + 1;
 
@@ -110,20 +110,20 @@ NextToken (const std::string&     text,
 
 
 std::string&
-NormalizeFilePath (std::string& path, const bool isDirectory)
+NormalizeFilePath(std::string& path, const bool isDirectory)
 {
-  const char directoryDelimiter = whf_dir_delim ();
+  const char directoryDelimiter = whf_dir_delim();
 
-  for (size_t i = 0; i < path.length (); ++i)
+  for (size_t i = 0; i < path.length(); ++i)
     {
       if ((path[i] == '\\') || (path[i] == '/'))
         path[i] = directoryDelimiter;
     }
 
   if (isDirectory
-      && (path[path.length () - 1] != directoryDelimiter))
+      && (path[path.length() - 1] != directoryDelimiter))
     {
-      path.append (1, directoryDelimiter);
+      path.append(1, directoryDelimiter);
     }
 
   return path;

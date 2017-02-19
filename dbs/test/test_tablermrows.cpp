@@ -26,15 +26,15 @@ struct DBSFieldDescriptor field_desc[] = {
 static uint_t gElemsCount = 5000000; /* Scale this down for debug purposes! */
 
 bool
-fill_table (ITable& table)
+fill_table(ITable& table)
 {
   std::cout << "Fill table with " << gElemsCount << " elements ... " << std::endl;
 
   bool result = true;
   for (uint32_t index = 0; index < gElemsCount; ++index)
     {
-      DUInt32 fieldValue (index);
-      uint_t rowIndex = table.AddRow ();
+      DUInt32 fieldValue(index);
+      uint_t rowIndex = table.AddRow();
 
       if (rowIndex != index)
         {
@@ -42,7 +42,7 @@ fill_table (ITable& table)
           break;
         }
 
-      table.Set (rowIndex, 0, fieldValue);
+      table.Set(rowIndex, 0, fieldValue);
 
       std::cout << index + 1 << " (" << gElemsCount << ")\r";
     }
@@ -52,7 +52,7 @@ fill_table (ITable& table)
 }
 
 bool
-remove_first_rows (ITable& table)
+remove_first_rows(ITable& table)
 {
   std::cout << "Deleting " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -63,15 +63,15 @@ remove_first_rows (ITable& table)
     {
       if ((rowIndex % 21) == 0)
         {
-          table.MarkRowForReuse (rowIndex);
+          table.MarkRowForReuse(rowIndex);
         }
       else
         {
           DUInt32 fieldValue;
-          table.Set (rowIndex, 0, fieldValue);
+          table.Set(rowIndex, 0, fieldValue);
         }
 
-      if (table.GetReusableRow (true) != rowIndex)
+      if (table.GetReusableRow(true) != rowIndex)
         {
           result = false;
           break;
@@ -85,7 +85,7 @@ remove_first_rows (ITable& table)
 }
 
 bool
-restore_first_rows (ITable& table)
+restore_first_rows(ITable& table)
 {
   std::cout << "Restore the first " << gElemsCount / 2 << " rows ... " << std::endl;
   bool result = true;
@@ -94,15 +94,15 @@ restore_first_rows (ITable& table)
 
   for (uint32_t rowIndex = 1; rowIndex <= count; ++rowIndex)
     {
-      DUInt32 fieldValue (rowIndex);
-      table.Set (rowIndex, 0, fieldValue);
+      DUInt32 fieldValue(rowIndex);
+      table.Set(rowIndex, 0, fieldValue);
 
-      if ((rowIndex < count) && (table.GetReusableRow (true) != (rowIndex + 1)))
+      if ((rowIndex < count) && (table.GetReusableRow(true) != (rowIndex + 1)))
         {
           result = false;
           break;
         }
-      else if ((rowIndex == count) && (table.GetReusableRow (true) != gElemsCount ))
+      else if ((rowIndex == count) && (table.GetReusableRow(true) != gElemsCount ))
         {
           result = false;
           break;
@@ -117,7 +117,7 @@ restore_first_rows (ITable& table)
 }
 
 bool
-test_for_radius_rows (ITable& table)
+test_for_radius_rows(ITable& table)
 {
   std::cout << "Delete rows symmetrically ... " << std::endl;
   bool result = true;
@@ -127,10 +127,10 @@ test_for_radius_rows (ITable& table)
   for (uint_t rowIndex = 0; rowIndex < count; ++rowIndex)
     {
       DUInt32 fieldValue;
-      table.Set ((gElemsCount / 2) - rowIndex, 0, fieldValue);
-      table.Set ((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
+      table.Set((gElemsCount / 2) - rowIndex, 0, fieldValue);
+      table.Set((gElemsCount / 2) + count - rowIndex, 0, fieldValue);
 
-      if (table.GetReusableRow (true) != ((gElemsCount / 2) - rowIndex))
+      if (table.GetReusableRow(true) != ((gElemsCount / 2) - rowIndex))
         {
           result = false;
           break;
@@ -147,13 +147,13 @@ test_for_radius_rows (ITable& table)
           rowIndex <= (gElemsCount / 2) + count;
           ++rowIndex)
         {
-          if (table.GetReusableRow (true) != rowIndex)
+          if (table.GetReusableRow(true) != rowIndex)
             {
               result = false;
               break;
             }
-          DUInt32 fieldValue (rowIndex);
-          table.Set (rowIndex, 0, fieldValue);
+          DUInt32 fieldValue(rowIndex);
+          table.Set(rowIndex, 0, fieldValue);
 
           std::cout << rowIndex - ((gElemsCount / 2) - count + 1) << " (" << count * 2 << ")\r";
 
@@ -167,41 +167,41 @@ test_for_radius_rows (ITable& table)
 const char db_name[] = "t_baza_date_1";
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
   if (argc > 1)
     {
-      gElemsCount = atol (argv[1]);
+      gElemsCount = atol(argv[1]);
     }
 
   bool success = true;
   {
-    DBSInit (DBSSettings ());
-    DBSCreateDatabase (db_name);
+    DBSInit(DBSSettings());
+    DBSCreateDatabase(db_name);
   }
 
-  IDBSHandler& handler = DBSRetrieveDatabase (db_name);
-  handler.AddTable ("t_test_tab", sizeof field_desc / sizeof (field_desc[0]), field_desc);
-  ITable& table        = handler.RetrievePersistentTable ("t_test_tab");
-  ITable& spawnedTable = table.Spawn ();
+  IDBSHandler& handler = DBSRetrieveDatabase(db_name);
+  handler.AddTable("t_test_tab", sizeof field_desc / sizeof(field_desc[0]), field_desc);
+  ITable& table        = handler.RetrievePersistentTable("t_test_tab");
+  ITable& spawnedTable = table.Spawn();
 
-  success = success && fill_table (table);
-  success = success && remove_first_rows (table);
-  success = success && restore_first_rows (table);
-  success = success && test_for_radius_rows (table);
+  success = success && fill_table(table);
+  success = success && remove_first_rows(table);
+  success = success && restore_first_rows(table);
+  success = success && test_for_radius_rows(table);
 
-  handler.ReleaseTable (table);
+  handler.ReleaseTable(table);
 
-  success = success && fill_table (spawnedTable);
-  success = success && remove_first_rows (spawnedTable);
-  success = success && restore_first_rows (spawnedTable);
-  success = success && test_for_radius_rows (spawnedTable);
+  success = success && fill_table(spawnedTable);
+  success = success && remove_first_rows(spawnedTable);
+  success = success && restore_first_rows(spawnedTable);
+  success = success && test_for_radius_rows(spawnedTable);
 
-  handler.ReleaseTable (spawnedTable);
+  handler.ReleaseTable(spawnedTable);
 
-  DBSReleaseDatabase (handler);
-  DBSRemoveDatabase (db_name);
-  DBSShoutdown ();
+  DBSReleaseDatabase(handler);
+  DBSRemoveDatabase(db_name);
+  DBSShoutdown();
 
   if (!success)
     {

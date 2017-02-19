@@ -1,6 +1,6 @@
 /******************************************************************************
 UTILS - Common routines used trough WHAIS project
-Copyright (C) 2009  Iulian Popa
+Copyright(C) 2009  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -36,18 +36,18 @@ extern "C" {
 
 /* Get the seed used to generate the pseudo randoms. */
 uint64_t
-wh_rnd_seed ();
+wh_rnd_seed();
 
 
 /* Reset the seed to a new value. If the new value is 0 then use
  * the default one. */
 void
-wh_rnd_set_seed (uint64_t seed);
+wh_rnd_set_seed(uint64_t seed);
 
 
 /* Generate a pseudo random. */
 uint64_t
-wh_rnd ();
+wh_rnd();
 
 
 #ifdef __cplusplus

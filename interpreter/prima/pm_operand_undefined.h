@@ -1,6 +1,6 @@
 /******************************************************************************
  PASTRA - A light database one file system and more.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -39,23 +39,23 @@ namespace prima {
 class NativeObjectOperand : public BaseOperand
 {
 public:
-  NativeObjectOperand ();
-  explicit NativeObjectOperand (INativeObject& object);
-  explicit NativeObjectOperand (const DArray&  array);
-  explicit NativeObjectOperand (const DText&   text);
+  NativeObjectOperand();
+  explicit NativeObjectOperand(INativeObject& object);
+  explicit NativeObjectOperand(const DArray&  array);
+  explicit NativeObjectOperand(const DText&   text);
 
-  NativeObjectOperand (const bool nullValue, const bool value);
+  NativeObjectOperand(const bool nullValue, const bool value);
 
-  NativeObjectOperand (const bool nullValue, const uint32_t value);
+  NativeObjectOperand(const bool nullValue, const uint32_t value);
 
-  NativeObjectOperand (const bool nullValue, const int64_t value);
-  NativeObjectOperand (const bool nullValue, const uint64_t value);
+  NativeObjectOperand(const bool nullValue, const int64_t value);
+  NativeObjectOperand(const bool nullValue, const uint64_t value);
 
-  NativeObjectOperand (const bool     nullValue,
+  NativeObjectOperand(const bool     nullValue,
                        const int64_t  valIntPart,
                        const int64_t  valFracPart);
 
-  NativeObjectOperand (const bool      nullValue,
+  NativeObjectOperand(const bool      nullValue,
                        const uint16_t  year,
                        const uint8_t   month,
                        const uint8_t   day,
@@ -64,70 +64,70 @@ public:
                        const uint8_t   secs         = 0,
                        const uint32_t  microsec     = 0);
 
-  explicit NativeObjectOperand (TableReference& tableRef);
+  explicit NativeObjectOperand(TableReference& tableRef);
 
-  explicit NativeObjectOperand (TableReference* const tableRef,
+  explicit NativeObjectOperand(TableReference* const tableRef,
                                 const uint_t          fieldIndex,
                                 const uint_t          type);
 
-  NativeObjectOperand (const NativeObjectOperand& source);
-  virtual ~NativeObjectOperand ();
+  NativeObjectOperand(const NativeObjectOperand& source);
+  virtual ~NativeObjectOperand();
 
   NativeObjectOperand& operator= (const NativeObjectOperand& source);
 
-  virtual bool IsNull () const;
-  virtual void GetValue (DBool& outValue) const;
-  virtual void GetValue (DChar& outValue) const;
-  virtual void GetValue (DDate& outValue) const;
-  virtual void GetValue (DDateTime& outValue) const;
-  virtual void GetValue (DHiresTime& outValue) const;
-  virtual void GetValue (DInt8& outValue) const;
-  virtual void GetValue (DInt16& outValue) const;
-  virtual void GetValue (DInt32& outValue) const;
-  virtual void GetValue (DInt64& outValue) const;
-  virtual void GetValue (DReal& outValue) const;
-  virtual void GetValue (DRichReal& outValue) const;
-  virtual void GetValue (DUInt8& outValue) const;
-  virtual void GetValue (DUInt16& outValue) const;
-  virtual void GetValue (DUInt32& outValue) const;
-  virtual void GetValue (DUInt64& outValue) const;
-  virtual void GetValue (DText& outValue) const;
-  virtual void GetValue (DArray& outValue) const;
+  virtual bool IsNull() const;
+  virtual void GetValue(DBool& outValue) const;
+  virtual void GetValue(DChar& outValue) const;
+  virtual void GetValue(DDate& outValue) const;
+  virtual void GetValue(DDateTime& outValue) const;
+  virtual void GetValue(DHiresTime& outValue) const;
+  virtual void GetValue(DInt8& outValue) const;
+  virtual void GetValue(DInt16& outValue) const;
+  virtual void GetValue(DInt32& outValue) const;
+  virtual void GetValue(DInt64& outValue) const;
+  virtual void GetValue(DReal& outValue) const;
+  virtual void GetValue(DRichReal& outValue) const;
+  virtual void GetValue(DUInt8& outValue) const;
+  virtual void GetValue(DUInt16& outValue) const;
+  virtual void GetValue(DUInt32& outValue) const;
+  virtual void GetValue(DUInt64& outValue) const;
+  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DArray& outValue) const;
 
-  virtual void SetValue (const DBool& value);
-  virtual void SetValue (const DChar& value);
-  virtual void SetValue (const DDate& value);
-  virtual void SetValue (const DDateTime& value);
-  virtual void SetValue (const DHiresTime& value);
-  virtual void SetValue (const DInt8& value);
-  virtual void SetValue (const DInt16& value);
-  virtual void SetValue (const DInt32& value);
-  virtual void SetValue (const DInt64& value);
-  virtual void SetValue (const DReal& value);
-  virtual void SetValue (const DRichReal& value);
-  virtual void SetValue (const DUInt8& value);
-  virtual void SetValue (const DUInt16& value);
-  virtual void SetValue (const DUInt32& value);
-  virtual void SetValue (const DUInt64& value);
-  virtual void SetValue (const DText& value);
-  virtual void SetValue (const DArray& value);
+  virtual void SetValue(const DBool& value);
+  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DDate& value);
+  virtual void SetValue(const DDateTime& value);
+  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DInt8& value);
+  virtual void SetValue(const DInt16& value);
+  virtual void SetValue(const DInt32& value);
+  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DReal& value);
+  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DUInt8& value);
+  virtual void SetValue(const DUInt16& value);
+  virtual void SetValue(const DUInt32& value);
+  virtual void SetValue(const DUInt64& value);
+  virtual void SetValue(const DText& value);
+  virtual void SetValue(const DArray& value);
 
-  virtual uint_t GetType ();
+  virtual uint_t GetType();
 
-  virtual FIELD_INDEX GetField ();
+  virtual FIELD_INDEX GetField();
 
-  virtual ITable& GetTable ();
+  virtual ITable& GetTable();
 
-  virtual StackValue Duplicate () const;
+  virtual StackValue Duplicate() const;
 
-  virtual void CopyNativeObjectOperand (const NativeObjectOperand& source);
+  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
 
-  virtual void           NativeObject (INativeObject* const value);
-  virtual INativeObject& NativeObject ();
+  virtual void           NativeObject(INativeObject* const value);
+  virtual INativeObject& NativeObject();
 
-  virtual bool PrepareToCopy (void* const dest);
+  virtual bool PrepareToCopy(void* const dest);
 
-  virtual TableReference& GetTableReference ();
+  virtual TableReference& GetTableReference();
 
 private:
   struct RealValue
@@ -168,8 +168,8 @@ private:
     bool       mNull;
   };
 
-  void Initialise ();
-  void Cleanup ();
+  void Initialise();
+  void Cleanup();
 
   uint16_t               mType;
   union
@@ -183,8 +183,8 @@ private:
       RealValue          mRealValue;
       TimeValue          mTimeValue;
 
-      uint8_t            mArrayValue[sizeof (DArray)];
-      uint8_t            mTextValue[sizeof (DText)];
+      uint8_t            mArrayValue[sizeof(DArray)];
+      uint8_t            mTextValue[sizeof(DText)];
     };
 };
 

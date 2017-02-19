@@ -1,6 +1,6 @@
 /******************************************************************************
 WHAISC - A compiler for whais programs
-Copyright (C) 2008  Iulian Popa
+Copyright(C) 2008  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <sys/types.h>
 
-#if ! (defined (YYTOKENTYPE) || defined (YYBISON))
+#if ! (defined(YYTOKENTYPE) || defined(YYBISON))
 /* Avoid some type name redefinition */
 
 #define WIN32_LEAN_AND_MEAN
@@ -122,7 +122,7 @@ typedef uint8_t       bool_t;
 #define FILE_LOCKED     ((HANDLE)-2)
 #define INVALID_SHL     NULL
 
-#define SHL_EXPORT_SYMBOL __declspec (dllexport)
-#define SHL_IMPORT_SYMBOL __declspec (dllimport)
+#define SHL_EXPORT_SYMBOL __declspec(dllexport)
+#define SHL_IMPORT_SYMBOL __declspec(dllimport)
 
 #endif /* WHAIS_TYPES_H */

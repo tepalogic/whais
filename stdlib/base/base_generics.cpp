@@ -1,6 +1,6 @@
 /******************************************************************************
  WSTDLIB - Standard mathemetically library for Whais.
- Copyright (C) 2008  Iulian Popa
+ Copyright(C) 2008  Iulian Popa
 
  Address: Str Olimp nr. 6
  Pantelimon Ilfov,
@@ -102,7 +102,7 @@ get_prev_value( SessionStack& stack, ISession& )
 
   value = value.Prev();
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( value);
 
   return WOP_OK;
@@ -119,7 +119,7 @@ get_next_value( SessionStack& stack, ISession& )
 
   value = value.Next();
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( value);
 
   return WOP_OK;
@@ -139,7 +139,7 @@ sleep( SessionStack& stack, ISession&)
   else
     wh_sleep( ms.mValue);
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( DBool( true));
 
 
@@ -163,7 +163,7 @@ write_log( SessionStack& stack, ISession& session)
       text.RawRead( 0, textRawSize, utf8Reserved);
       utf8Reserved[textRawSize] = 0;
 
-      session.GetLogger().Log (LT_INFO, _RC (const char*, utf8Reserved));
+      session.GetLogger().Log(LT_INFO, _RC(const char*, utf8Reserved));
       result = true;
     }
   else
@@ -173,21 +173,21 @@ write_log( SessionStack& stack, ISession& session)
       uint64_t offset = 0;
       while( offset < textRawSize)
         {
-          const uint64_t chunkSize = MIN (textRawSize - offset,
+          const uint64_t chunkSize = MIN(textRawSize - offset,
                                           sizeof( utf8Reserved) -  1);
 
           text.RawRead( offset, chunkSize, utf8Reserved);
           utf8Reserved[chunkSize] = 0;
 
-          logEntry << _RC (const char*, utf8Reserved);
+          logEntry << _RC(const char*, utf8Reserved);
 
           offset += chunkSize;
         }
-      session.GetLogger().Log (LT_INFO, logEntry.str ());
+      session.GetLogger().Log(LT_INFO, logEntry.str());
       result = true;
     }
 
-  stack.Pop (1);
+  stack.Pop(1);
   stack.Push( DBool( result));
 
   return WOP_OK;
@@ -203,8 +203,8 @@ ceil( SessionStack& stack, ISession& session)
 
   if (value.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DInt64 ());
+      stack.Pop(1);
+      stack.Push( DInt64());
 
       return WOP_OK;
     }
@@ -220,8 +220,8 @@ ceil( SessionStack& stack, ISession& session)
   else
     result =value.mValue.Integer();
 
-  stack.Pop (1);
-  stack.Push( DInt64 (result));
+  stack.Pop(1);
+  stack.Push( DInt64(result));
 
   return WOP_OK;
 }
@@ -236,8 +236,8 @@ floor( SessionStack& stack, ISession& session)
 
   if (value.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DInt64 ());
+      stack.Pop(1);
+      stack.Push( DInt64());
 
       return WOP_OK;
     }
@@ -253,8 +253,8 @@ floor( SessionStack& stack, ISession& session)
   else
     result =value.mValue.Integer();
 
-  stack.Pop (1);
-  stack.Push( DInt64 (result));
+  stack.Pop(1);
+  stack.Push( DInt64(result));
 
   return WOP_OK;
 }
@@ -269,8 +269,8 @@ round( SessionStack& stack, ISession& session)
 
   if (value.IsNull())
     {
-      stack.Pop (1);
-      stack.Push( DInt64 ());
+      stack.Pop(1);
+      stack.Push( DInt64());
 
       return WOP_OK;
     }
@@ -293,15 +293,15 @@ round( SessionStack& stack, ISession& session)
         --result;
     }
 
-  stack.Pop (1);
-  stack.Push( DInt64 (result));
+  stack.Pop(1);
+  stack.Push( DInt64(result));
 
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-abs (SessionStack& stack, ISession& session)
+abs(SessionStack& stack, ISession& session)
 {
   DRichReal value;
 
@@ -314,8 +314,8 @@ abs (SessionStack& stack, ISession& session)
                           -value.mValue.Fractional(),
                           DBS_RICHREAL_PREC);
 
-      stack.Pop (1);
-      stack.Push( DRichReal (t));
+      stack.Pop(1);
+      stack.Push( DRichReal(t));
     }
 
   return WOP_OK;
@@ -323,17 +323,17 @@ abs (SessionStack& stack, ISession& session)
 
 
 static WLIB_STATUS
-rnd (SessionStack& stack, ISession& session)
+rnd(SessionStack& stack, ISession& session)
 {
   DUInt64 maxValue;
   stack[stack.Size() - 1].Operand().GetValue( maxValue);
 
-  uint64_t result = wh_rnd ();
-  if ( ! maxValue.IsNull () && (maxValue.mValue > 0))
+  uint64_t result = wh_rnd();
+  if ( ! maxValue.IsNull() && (maxValue.mValue > 0))
     result %= maxValue.mValue;
 
-  stack.Pop (1);
-  stack.Push (DUInt64 (result));
+  stack.Pop(1);
+  stack.Push(DUInt64(result));
 
   return WOP_OK;
 }
