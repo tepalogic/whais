@@ -37,7 +37,7 @@ static bool_t
 check_used_vals(struct ParserState *state)
 {
   int vals_count = wh_array_count(&state->values);
-  while(--vals_count >= 0)
+  while (--vals_count >= 0)
     {
       struct SemValue *val = wh_array_get(&state->values, vals_count);
       if (val->val_type != VAL_REUSE)

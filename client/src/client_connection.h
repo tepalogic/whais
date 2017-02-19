@@ -33,11 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    connection autentication step. */
 
 uint_t
-read_raw_frame(struct INTERNAL_HANDLER* const pHnd,
-                uint_t* const                  outFrameSize);
+read_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
+                uint_t* const                   outFrameSize);
 
 uint_t
-write_raw_frame(struct INTERNAL_HANDLER* const pHnd,
-                 const  uint_t                  frameSize);
+write_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
+                 const  uint_t                   frameSize);
 
 #endif /* CLIENT_CONNECTION_H_ */

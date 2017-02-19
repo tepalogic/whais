@@ -152,7 +152,7 @@ test_procedures_list(WH_CONNECTION hnd)
 
       ++index; //Only good for conditional breakpoints.
     }
-  while(recvGlbName != NULL);
+  while (recvGlbName != NULL);
 
   for (index = 0; index < procsCount; ++index)
     {

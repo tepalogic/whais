@@ -326,7 +326,7 @@ test_record_container_update()
 
     storage.Flush();
    }
-  while(0);
+  while (0);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -389,7 +389,7 @@ test_record_record_update()
 
     storage.Flush();
    }
-  while(0);
+  while (0);
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;

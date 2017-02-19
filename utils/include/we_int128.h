@@ -457,7 +457,7 @@ private:
     if (sr == op)
       ++sq, sr = 0;
 
-    while(reminder.mHi > 0)
+    while (reminder.mHi > 0)
       {
         WE_I128 temp;
 

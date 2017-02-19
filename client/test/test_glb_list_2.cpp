@@ -50,7 +50,7 @@ check_type(const WH_CONNECTION          hnd,
 
 
   vector<size_t> offsets;
-  while(temp < 900000)
+  while (temp < 900000)
     {
       const char*     fieldName;
       uint_t          fieldType;
@@ -129,7 +129,7 @@ test_global_variables(WH_CONNECTION hnd, vector<string> glbNames, vector<string>
 
   const char* name = NULL;
   uint_t i = 0;
-  while(i < 9999999)
+  while (i < 9999999)
     {
       if (WFetchGlobal(hnd, &name) != WCS_OK)
         {

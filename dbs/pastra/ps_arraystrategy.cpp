@@ -226,7 +226,7 @@ IArrayStrategy::Remove(const uint64_t index)
 
   uint64_t offset = 0;
   uint8_t buffer[256];
-  while(offset < mElementRawSize * index)
+  while (offset < mElementRawSize * index)
     {
       uint_t chunkSize = MIN( sizeof buffer, mElementRawSize * index);
 
@@ -239,7 +239,7 @@ IArrayStrategy::Remove(const uint64_t index)
   assert(offset == mElementRawSize * index);
 
   offset += mElementRawSize;
-  while(offset < mElementRawSize * mElementsCount)
+  while (offset < mElementRawSize * mElementsCount)
     {
       uint_t chunkSize = MIN(sizeof buffer,
                               mElementRawSize * mElementsCount - offset);
@@ -527,7 +527,7 @@ IArrayStrategy::Clone()
 
   uint64_t offset = 0;
   uint8_t buffer[256];
-  while(offset < mElementRawSize * mElementsCount)
+  while (offset < mElementRawSize * mElementsCount)
    {
      uint_t chunkSize = MIN(sizeof buffer,
                              mElementRawSize * mElementsCount - offset);
@@ -838,7 +838,7 @@ RowFieldArray::RawWrite(const uint64_t       offset,
 
   uint8_t tbuffer[256];
   uint64_t coff = 0;
-  while(coff < mElementsCount * mElementRawSize)
+  while (coff < mElementsCount * mElementRawSize)
     {
       uint_t chunkSize = MIN(sizeof buffer,
                               mElementsCount * mElementRawSize - coff);
@@ -874,7 +874,7 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 
   uint8_t buffer[256];
   uint64_t coff = 0;
-  while(coff < offset)
+  while (coff < offset)
     {
       uint_t chunkSize = MIN(sizeof buffer, offset - coff);
 
@@ -889,7 +889,7 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 
   assert(coff == offset);
 
-  while(coff + count < mElementsCount * mElementRawSize)
+  while (coff + count < mElementsCount * mElementRawSize)
     {
       uint_t chunkSize = MIN(sizeof buffer,
                               mElementsCount * mElementRawSize - coff - count);

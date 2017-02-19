@@ -259,7 +259,7 @@ boot_server(const char* configFile, ostream& errOut)
     uint_t configLine = 0;
     config->clear();
     config->seekg(0);
-    while(FindNextContextSection(*config, configLine))
+    while (FindNextContextSection(*config, configLine))
       {
         svc_report_status(SERVICE_START_PENDING, NO_ERROR, 1000);
 
@@ -534,7 +534,7 @@ remove_sevice()
     }
 
   int timeOut = 30000;
-  while(srvStatus.dwCurrentState != SERVICE_STOPPED)
+  while (srvStatus.dwCurrentState != SERVICE_STOPPED)
     {
       if (timeOut <= 0)
         {

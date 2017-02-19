@@ -153,7 +153,7 @@ update_stack_value(const WH_CONNECTION         hnd,
   uint_t       utf8TextOff  = 0;
   const uint_t utf8ValueLen = wh_utf8_strlen(_RC(const uint8_t*, value));
   uint_t       valueOff     = 0;
-  while((utf8TextOff < utf8ValueLen)
+  while ((utf8TextOff < utf8ValueLen)
          && (wcs == WCS_OK))
     {
       assert(valueOff < strlen(value));
@@ -191,7 +191,7 @@ parse_value(const string&    cmdLine,
   assert(line[inoutLineOff - 1] == '\'');
 
   outValue.clear();
-  while(inoutLineOff < cmdLine.length())
+  while (inoutLineOff < cmdLine.length())
     {
       if (line[inoutLineOff] == '\'')
         {
@@ -237,7 +237,7 @@ parse_value(const string&    cmdLine,
           case 'u':
             {
               uint64_t charCode = 0;
-              while(line[inoutLineOff] != '&')
+              while (line[inoutLineOff] != '&')
                 {
                   charCode *= 16;
                   if (('0' <= line[inoutLineOff])
@@ -500,7 +500,7 @@ handle_procedure_array_param(WH_CONNECTION           hnd,
   assert(type != WHC_TYPE_TEXT);
   assert(line[inoutLineOff - 1] == '{');
 
-  while(inoutLineOff < cmdLine.length())
+  while (inoutLineOff < cmdLine.length())
     {
       if (line[inoutLineOff] == '}')
         {
@@ -563,7 +563,7 @@ handle_procedure_table_param(WH_CONNECTION       hnd,
 
   assert(line[inoutLineOff - 1] == '(');
 
-  while(inoutLineOff < cmdLine.length())
+  while (inoutLineOff < cmdLine.length())
     {
       if (ignoreSpaces
           && ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t')))
@@ -835,7 +835,7 @@ handle_procedure_parameters(WH_CONNECTION   hnd,
   uint_t              wcs        = WCS_OK;
   bool                needsFlush = false;
 
-  while((inoutLineOff < cmdLine.length())
+  while ((inoutLineOff < cmdLine.length())
          && (wcs == WCS_OK))
     {
       if ((line[inoutLineOff] == ' ') || (line[inoutLineOff] == '\t'))
@@ -859,7 +859,7 @@ handle_procedure_parameters(WH_CONNECTION   hnd,
           if (! parse_type(cmdLine, inoutLineOff, type))
             return false;
 
-          while((inoutLineOff < cmdLine.length())
+          while ((inoutLineOff < cmdLine.length())
                  && (line[inoutLineOff] == ' ')
                  && (line[inoutLineOff] == '\t'))
             {
@@ -987,7 +987,7 @@ fetch_execution_simple_result(WH_CONNECTION         hnd,
       if (length > 0)
         {
           cout << '\'';
-          while(offset < length)
+          while (offset < length)
             {
               wcs = WValueEntry(hnd,
                                  field,

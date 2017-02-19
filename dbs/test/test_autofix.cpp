@@ -353,7 +353,7 @@ add_char_row(ITable& table, const ROW_INDEX row)
     {
       int x = 0xD800;
 
-      while((x >= 0xD800) && (x <= 0xDFFF))
+      while ((x >= 0xD800) && (x <= 0xDFFF))
         x = (wh_rnd() + 1) % 0x10FFFF;
 
       value = DChar(x);

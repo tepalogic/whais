@@ -89,7 +89,7 @@ compare_extern_table_types(const struct DeclaredVar* const firstTable,
   const struct DeclaredVar* fit = firstTable->extra;
   const struct DeclaredVar* sit = secondFields;
 
-  while(fit != firstTable)
+  while (fit != firstTable)
     {
       if (sit == NULL)
         return FALSE;
@@ -104,10 +104,10 @@ compare_extern_table_types(const struct DeclaredVar* const firstTable,
     return FALSE;
 
   fit = firstTable->extra;
-  while(fit != firstTable)
+  while (fit != firstTable)
     {
       sit = secondFields;
-      while(sit != NULL)
+      while (sit != NULL)
         {
           if ((fit->labelLength == sit->labelLength)
               && (strncmp(fit->label, sit->label, fit->labelLength) == 0))
@@ -271,7 +271,7 @@ add_declaration(struct ParserState* const parser,
 
           else
             {
-              while(it->extra && IS_TABLE_FIELD(it->extra->type))
+              while (it->extra && IS_TABLE_FIELD(it->extra->type))
                 it = it->extra;
 
               it->extra = result;
@@ -315,7 +315,7 @@ add_list_declaration(struct ParserState* parser,
 
   free_sem_value(varsList);
 
-  while(it != NULL)
+  while (it != NULL)
     {
       struct SemValue id;
 
@@ -361,7 +361,7 @@ add_field_declaration(struct ParserState*       parser,
   assert(var->val_type == VAL_ID);
 
   /* Check for fields with the same name. */
-  while(it != NULL)
+  while (it != NULL)
     {
       assert(IS_TABLE_FIELD( it->type) != 0);
 
@@ -394,7 +394,7 @@ add_field_declaration(struct ParserState*       parser,
   result = add_declaration(parser, var, type, FALSE, FALSE);
 
   result->extra = NULL, it = extra;
-  while(it != NULL)
+  while (it != NULL)
     {
       /* Insert this alphabetically to avoid equivalent fields declarations. */
       const int compare = strncmp(it->label,

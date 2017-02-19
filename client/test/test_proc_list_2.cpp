@@ -160,7 +160,7 @@ test_procedures(WH_CONNECTION hnd, vector<ProcedureDescription> procs)
 
   const char* name = NULL;
   uint_t i = 0;
-  while(i < 9999999)
+  while (i < 9999999)
     {
       if (WFetchProcedure(hnd, &name) != WCS_OK)
         {

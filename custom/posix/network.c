@@ -202,7 +202,7 @@ whs_write(const WH_SOCKET      sd,
 
   assert(count > 0);
 
-  while(wrote < count)
+  while (wrote < count)
     {
       const ssize_t chunk = send(sd, srcBuffer + wrote, count - wrote, 0);
       if (chunk < 0)

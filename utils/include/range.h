@@ -438,7 +438,7 @@ struct Range
         return  *this;
       }
 
-    while((offsetR > 0) && (offset > 0))
+    while ((offsetR > 0) && (offset > 0))
       {
         --offsetR, --offset;
 
@@ -495,7 +495,7 @@ struct Range
       {
         size_t offset = 0;
 
-        while(offset < rangeSize)
+        while (offset < rangeSize)
           {
             if (mIntervals[offset].mTo == max)
               {
@@ -522,7 +522,7 @@ struct Range
         T      last;
         size_t offset   = 0;
 
-        while(offset < rangeSize)
+        while (offset < rangeSize)
           {
             v.mTo = Prev(mIntervals[offset].mFrom);
 
@@ -606,7 +606,7 @@ struct Range
 
         offset = (last + first) / 2;
       }
-    while(first < last);
+    while (first < last);
 
     assert(offset == mIntervals.size() ||
             (v <= mIntervals[offset].mTo));

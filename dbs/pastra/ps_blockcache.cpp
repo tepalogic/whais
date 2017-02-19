@@ -52,7 +52,7 @@ BlockCache::~BlockCache()
     return ; //This has not been initialized. So nothing to do here!
 
   map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin();
-  while(it != mCachedBlocks.end())
+  while (it != mCachedBlocks.end())
     {
       assert(it->second.IsInUse() == false);
       assert(mSkipFlush || it->second.IsDirty() == false);
@@ -106,7 +106,7 @@ BlockCache::Flush()
     return;
 
   map<uint64_t, BlockEntry>::iterator it = mCachedBlocks.begin();
-  while(it != mCachedBlocks.end())
+  while (it != mCachedBlocks.end())
     {
       FlushItem(it->first);
       ++it;
@@ -129,7 +129,7 @@ BlockCache::RetriveItem(const uint64_t item)
   if (mCachedBlocks.size() >= mMaxCachedBlocks)
     {
       it = mCachedBlocks.begin();
-      while(it != mCachedBlocks.end())
+      while (it != mCachedBlocks.end())
         {
           if (it->second.IsInUse())
             continue ;

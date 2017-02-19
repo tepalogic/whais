@@ -142,7 +142,7 @@ SeekAtConfigurationSection(ifstream& config, uint_t& outConfigLine)
   config.clear();
   config.seekg(0);
 
-  while(config.good())
+  while (config.good())
     {
       string line;
       getline(config, line);
@@ -166,7 +166,7 @@ FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine)
   static const string identifier("[DATABASE]");
   static const string delimiters(" \t");
 
-  while(config.good())
+  while (config.good())
     {
       string line;
       getline(config, line);
@@ -192,7 +192,7 @@ ParseConfigurationSection(ifstream&    config,
 {
   static const string delimiters(" \t=");
 
-  while( ! config.eof())
+  while ( ! config.eof())
     {
       const streampos lastPos = config.tellg();
 
@@ -609,7 +609,7 @@ ParseContextSection(Logger&          log,
   ostringstream logEntry;
   static const string delimiters = " \t=";
 
-  while(config.good())
+  while (config.good())
     {
       const streamoff lastPos = config.tellg();
 

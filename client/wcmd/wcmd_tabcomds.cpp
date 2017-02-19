@@ -480,7 +480,7 @@ cmdTableAdd(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
       assert(fields.size() == fieldsNames.size());
     }
-  while(linePos < cmdLine.length());
+  while (linePos < cmdLine.length());
 
   assert(fields.size() == fieldsNames.size());
 
@@ -538,7 +538,7 @@ cmdTableCopy(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   if (fieldSpecifier != "*")
     {
       size_t fieldsPos = 0;
-      while(fieldsPos < fieldSpecifier.length())
+      while (fieldsPos < fieldSpecifier.length())
         {
           string fieldEntry = NextToken(fieldSpecifier, fieldsPos, ",");
           if (fieldEntry.length() == 0)
@@ -662,7 +662,7 @@ cmdTableRemove(const string& cmdLine, ENTRY_CMD_CONTEXT context)
         printException(cerr, e);
       }
     }
-  while(linePos < cmdLine.length());
+  while (linePos < cmdLine.length());
 
   return result;
 
@@ -730,7 +730,7 @@ cmdTablePrint(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
             dbs.ReleaseTable(table);
           }
-        while(linePos < cmdLine.length());
+        while (linePos < cmdLine.length());
       }
   }
   catch(const Exception& e)
@@ -830,7 +830,7 @@ cmdTableAddIndex(const string& cmdLine, ENTRY_CMD_CONTEXT context)
         break;
       }
     }
-  while(linePos < cmdLine.length());
+  while (linePos < cmdLine.length());
 
   dbs.ReleaseTable(*table);
 
@@ -911,7 +911,7 @@ cmdTableRmIndex(const string& cmdLine, ENTRY_CMD_CONTEXT context)
         break;
       }
     }
-  while(linePos < cmdLine.length());
+  while (linePos < cmdLine.length());
 
   dbs.ReleaseTable(*table);
 
@@ -965,7 +965,7 @@ parse_list_table_fields(ITable&                      table,
     {
       size_t fieldSpecPos = 0;
 
-      while(fieldSpecPos < fieldSpec.length())
+      while (fieldSpecPos < fieldSpec.length())
         {
           const string fieldName = NextToken(fieldSpec,
                                               fieldSpecPos,
@@ -1014,11 +1014,11 @@ cmdFieldsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
     if (level >= VL_INFO)
       cout << "Alter table '" << tableName << "' fields:";
 
-    while((subCommand = NextToken(cmdLine, linePos, ",")).length() > 0)
+    while ((subCommand = NextToken(cmdLine, linePos, ",")).length() > 0)
       {
         size_t subCmdPos = 0;
 
-        while(subCmdPos < subCommand.length())
+        while (subCmdPos < subCommand.length())
           {
             token = CmdLineNextToken(subCommand, subCmdPos);
             if (token == "add")
@@ -1048,7 +1048,7 @@ cmdFieldsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
                     rules.AddField(token, type, isArray);
                   }
-                while(subCmdPos < subCommand.length());
+                while (subCmdPos < subCommand.length());
               }
             else if (token == "retype")
               {
@@ -1077,7 +1077,7 @@ cmdFieldsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
                     rules.RetypeField(token, type, isArray);
                   }
-                while(subCmdPos < subCommand.length());
+                while (subCmdPos < subCommand.length());
               }
             else if (token == "rename")
               {
@@ -1099,7 +1099,7 @@ cmdFieldsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
                     rules.RenameField(oldName, newName);
                   }
-                while(subCmdPos < subCommand.length());
+                while (subCmdPos < subCommand.length());
               }
             else if (token == "remove")
               {
@@ -1117,7 +1117,7 @@ cmdFieldsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
                     rules.DropField(token);
                   }
-                while(subCmdPos < subCommand.length());
+                while (subCmdPos < subCommand.length());
               }
             else
               {

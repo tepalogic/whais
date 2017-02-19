@@ -39,7 +39,7 @@ namespace pastra {
 static inline void
 safe_memcpy(uint8_t* to, uint8_t* from, uint64_t count)
 {
-  while(count-- > 0)
+  while (count-- > 0)
     *to++ = *from++;
 }
 
@@ -60,7 +60,7 @@ append_int_to_str(uint64_t number, string& inoutStr)
       *conv   = _SC(char, ('0' + (number % 10)));
       number /= 10;
     }
-  while(number != 0);
+  while (number != 0);
 
   inoutStr += conv;
 }
@@ -339,7 +339,7 @@ FileContainer::Colapse(uint64_t from, uint64_t to)
   else if (intervalSize == 0)
     return;
 
-  while(to < containerSize)
+  while (to < containerSize)
     {
       uint8_t buffer[1024];
       uint64_t stepSize = sizeof buffer;
@@ -424,7 +424,7 @@ FileContainer::Fix(const char* const           baseFile,
   uint64_t size                 = 0;
   uint_t   fileCount            = 0;
 
-  while(true)
+  while (true)
     {
       string fileName = baseFile;
 
@@ -511,7 +511,7 @@ TemporalContainer::Write(uint64_t to, uint64_t size, const uint8_t* buffer)
                                     );
     }
 
-  while(size > 0)
+  while (size > 0)
     {
       assert((mCacheStartPos_1 % mCacheSize) == 0);
       assert((mCacheStartPos_2 % mCacheSize) == 0);
@@ -568,7 +568,7 @@ TemporalContainer::Read(uint64_t from, uint64_t size, uint8_t* buffer)
                                     );
     }
 
-  while(size > 0)
+  while (size > 0)
     {
       assert((mCacheStartPos_1 % mCacheSize) == 0);
       assert((mCacheStartPos_2 % mCacheSize) == 0);
@@ -624,7 +624,7 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
       uint8_t   stepBuffer[128];
       uint64_t  tempFrom = from, tempTo = to;
 
-      while(tempTo < containerSize)
+      while (tempTo < containerSize)
         {
           uint_t stepSize = sizeof(stepBuffer);
 

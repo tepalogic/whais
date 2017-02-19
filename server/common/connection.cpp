@@ -313,7 +313,7 @@ ClientConnection::ReciveRawClientFrame()
 {
   uint16_t frameRead = 0;
 
-  while(frameRead < FRAME_HDR_SIZE)
+  while (frameRead < FRAME_HDR_SIZE)
     {
       const uint16_t chunkSize =
                    mUserHandler.mSocket.Read(&mData[frameRead],
@@ -336,7 +336,7 @@ ClientConnection::ReciveRawClientFrame()
                                      "Invalid frame received.");
         }
 
-      while(frameRead < mFrameSize)
+      while (frameRead < mFrameSize)
         {
           const uint16_t chunkSize =
                        mUserHandler.mSocket.Read(&mData[frameRead],
@@ -447,7 +447,7 @@ ClientConnection::SendRawClientFrame(const uint8_t type)
 
       const uint16_t plainSize = mFrameSize;
 
-      while(mFrameSize % sizeof(uint32_t) != 0)
+      while (mFrameSize % sizeof(uint32_t) != 0)
         mData[mFrameSize++] = wh_rnd() & 0xFF;
 
       const uint32_t firstKing  = wh_rnd() & 0xFFFFFFFF;
@@ -487,7 +487,7 @@ ClientConnection::SendRawClientFrame(const uint8_t type)
     {
       const uint16_t plainSize = mFrameSize;
 
-      while(mFrameSize % sizeof(uint64_t) != 0)
+      while (mFrameSize % sizeof(uint64_t) != 0)
         mData[mFrameSize++] = wh_rnd() & 0xFF;
 
       store_le_int16(plainSize,

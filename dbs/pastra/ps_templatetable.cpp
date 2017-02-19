@@ -216,7 +216,7 @@ PrototypeTable::AddRow(const bool skipThreadSafety)
 
   mRowCache.FlushItem(mRowsCount - 1);
 
-  while(toWrite > 0)
+  while (toWrite > 0)
     {
       const uint_t writeChunk = MIN(toWrite, sizeof(dummyValue));
 
@@ -239,7 +239,7 @@ PrototypeTable::AddRow(const bool skipThreadSafety)
         continue;
 
       const FieldDescriptor& fd = GetFieldDescriptorInternal(f);
-      while(true)
+      while (true)
         {
           if (! fd.IsAcquired())
             {
@@ -402,7 +402,7 @@ PrototypeTable::ReusableRowsCount()
         result += node->KeysCount();
         nodeId  = node->Next();
       }
-    while(nodeId != NIL_NODE);
+    while (nodeId != NIL_NODE);
 
   assert(result >= 2);
 
@@ -415,7 +415,7 @@ PrototypeTable::MarkRowForReuse(const ROW_INDEX row)
 {
     FIELD_INDEX fieldsCount = mFieldsCount;
 
-    while(fieldsCount-- > 0)
+    while (fieldsCount-- > 0)
       {
         const FieldDescriptor& field = GetFieldDescriptorInternal(fieldsCount);
 
@@ -968,7 +968,7 @@ PrototypeTable::CheckRowToReuse(const ROW_INDEX row)
 void
 PrototypeTable::AcquireFieldIndex(FieldDescriptor* const field)
 {
-  while(true)
+  while (true)
     {
       LockRAII<Lock> syncHolder(mIndexesSync);
 
@@ -2056,7 +2056,7 @@ public:
   ~SortTableContainer()
   {
     ROW_INDEX row = 0;
-    while(row < mRowsPermutation.size())
+    while (row < mRowsPermutation.size())
       {
         if (mRowsPermutation[row] == row)
           {
@@ -2079,7 +2079,7 @@ public:
 
             currentRow = correctRow;
           }
-        while(true);
+        while (true);
       }
   }
 
@@ -2566,7 +2566,7 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
 
       assert(keyIndex < currentNode->KeysCount());
 
-      while(true)
+      while (true)
         {
           IBTreeFieldIndexNode* node = _SC(IBTreeFieldIndexNode*,
                                             &*currentNode);
@@ -2667,7 +2667,7 @@ PrototypeTable::FlushInternal()
 
       FieldDescriptor& fd = GetFieldDescriptorInternal(field);
 
-      while(fd.IsAcquired())
+      while (fd.IsAcquired())
         wh_yield();
 
       mvIndexNodeMgrs[field]->FlushNodes();

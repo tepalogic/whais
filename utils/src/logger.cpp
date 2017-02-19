@@ -79,7 +79,7 @@ FileLogger::Log(const LOG_TYPE type, const char* str)
   /* Print white spaces where the time mark should have been for
      for string messages that have more than one line, to keep
      a mice indentation. */
-  while(*str != 0)
+  while (*str != 0)
     {
       if ((*str == '\n') && (*(str + 1) != '\n'))
         {

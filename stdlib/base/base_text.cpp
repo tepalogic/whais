@@ -224,7 +224,7 @@ load_utf8_text( SessionStack& stack, ISession&)
 
   const uint64_t arrayCount = source.Count();
   uint64_t       it = 0;
-  while( it < arrayCount)
+  while ( it < arrayCount)
     {
       uint8_t temp[UTF8_MAX_BYTES_COUNT * 16];
       uint_t  tempCount;
@@ -242,7 +242,7 @@ load_utf8_text( SessionStack& stack, ISession&)
 
       //Load the characters from the temporal buffer.
       uint_t i = 0;
-      while( i < tempCount)
+      while ( i < tempCount)
         {
           uint32_t ch;
 
@@ -342,7 +342,7 @@ load_utf16_text( SessionStack& stack, ISession&)
 
   const uint64_t arrayCount = source.Count();
   uint64_t       it = 0;
-  while( it < arrayCount)
+  while ( it < arrayCount)
     {
       uint16_t temp[16];
       uint_t   tempCount;
@@ -361,7 +361,7 @@ load_utf16_text( SessionStack& stack, ISession&)
 
       //Load the characters from the temporal buffer.
       uint_t i = 0;
-      while( i < tempCount)
+      while ( i < tempCount)
         {
           uint32_t ch;
 

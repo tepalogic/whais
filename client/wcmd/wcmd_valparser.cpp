@@ -196,7 +196,7 @@ ParseFieldSpecifier(ostream* const              os,
   size_t offset = 0;
   bool   result = false;
 
-  while((src[offset] != 0) && ! isspace(src[offset]))
+  while ((src[offset] != 0) && ! isspace(src[offset]))
     {
       T first, second;
 
@@ -445,7 +445,7 @@ parse_rows_selection(ostream* const     os,
   size_t&      offset  = *outSelectSize;
 
   offset = 0;
-  while((offset < strSize) && isspace(str[offset]))
+  while ((offset < strSize) && isspace(str[offset]))
     ++offset;
 
   outRowsRange.Clear();
@@ -473,20 +473,20 @@ parse_rows_selection(ostream* const     os,
       outRowsRange = allRows;
 
       //Make sure we parse all the white chars after it.
-      while((str[offset] != 0) && isspace(str[offset]))
+      while ((str[offset] != 0) && isspace(str[offset]))
         ++offset;
 
       return true;
     }
 
   ROW_INDEX from, to;
-  while((str[offset] != 0)
+  while ((str[offset] != 0)
          && ! isspace(str[offset]))
     {
       bool fromEntered = false;
 
       from = 0, to = table.AllocatedRows();
-      while(isdigit(str[offset]))
+      while (isdigit(str[offset]))
         {
           const ROW_INDEX temp = from;
 
@@ -508,7 +508,7 @@ parse_rows_selection(ostream* const     os,
 
           outRowsRange.Join(Interval<ROW_INDEX> (from, from));
 
-          while((str[offset] != 0) && isspace(str[offset]))
+          while ((str[offset] != 0) && isspace(str[offset]))
             ++offset;
 
           break;
@@ -528,7 +528,7 @@ parse_rows_selection(ostream* const     os,
       if (isdigit(str[offset]))
         to = 0;
 
-      while(isdigit(str[offset]))
+      while (isdigit(str[offset]))
         {
           const ROW_INDEX temp = to;
 
@@ -577,7 +577,7 @@ parse_field_values_selection(ostream* const              os,
   /* Get the field information first. */
   offset = 0;
   string field;
-  while((str[offset] != 0) && (str[offset] != '='))
+  while ((str[offset] != 0) && (str[offset] != '='))
     field.push_back(str[offset++]);
 
   outRowsRange->mFieldId = table.RetrieveField(field.c_str());
@@ -828,7 +828,7 @@ ParseRowsSelectionClause(ostream* const    os,
       return false;
     }
 
-  while(str[offset] != 0)
+  while (str[offset] != 0)
     {
       if (isspace(str[offset]))
         {
@@ -905,7 +905,7 @@ ParseFieldUpdateValues(ostream* const              os,
   outUpdates.clear();
   offset = 0;
 
-  while((str[offset] != 0) && isspace(str[offset]))
+  while ((str[offset] != 0) && isspace(str[offset]))
     ++offset;
 
   if (str[offset] == 0 )
@@ -916,11 +916,11 @@ ParseFieldUpdateValues(ostream* const              os,
       return false;
     }
 
-  while((str[offset] != 0) && ! isspace(str[offset]))
+  while ((str[offset] != 0) && ! isspace(str[offset]))
     {
       string field;
 
-      while((str[offset] != 0) && (str[offset] != '='))
+      while ((str[offset] != 0) && (str[offset] != '='))
           field.push_back(str[offset++]);
 
       if (str[offset] == 0)
@@ -958,7 +958,7 @@ ParseFieldUpdateValues(ostream* const              os,
           else if (str[offset++] != '[')
             return false;
 
-          while((str[offset] != 0) && (str[offset] != ']'))
+          while ((str[offset] != 0) && (str[offset] != ']'))
             {
               if (isspace(str[offset]))
                 {
@@ -1518,7 +1518,7 @@ ParseFieldUpdateValues(ostream* const              os,
                     return false;
 
                   const size_t strSize = strlen(str);
-                  while((str[offset] != 0) && (str[offset] != delimCh))
+                  while ((str[offset] != 0) && (str[offset] != delimCh))
                     {
                       DChar  ch;
 
@@ -1572,7 +1572,7 @@ UpdateTableRow(ostream const*                   os,
 {
   size_t field = fieldVals.size();
 
-  while(field-- > 0)
+  while (field-- > 0)
     {
       const FieldValuesUpdate& fv = fieldVals[field];
 

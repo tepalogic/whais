@@ -130,7 +130,7 @@ get_line_from_buffer(const char * buffer, uint_t buff_pos)
   if (buff_pos == WHC_IGNORE_BUFFER_POS)
     return -1;
 
-  while(count < buff_pos)
+  while (count < buff_pos)
     {
       if (buffer[count] == '\n')
         ++result;

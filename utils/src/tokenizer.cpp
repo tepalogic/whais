@@ -53,7 +53,7 @@ NextToken(const std::string&     text,
     {
       bool ignoreEnd = false;
 
-      while((text[++lastPos] != '"') || ignoreEnd)
+      while ((text[++lastPos] != '"') || ignoreEnd)
         {
           ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)
@@ -73,7 +73,7 @@ NextToken(const std::string&     text,
   else if (text[lastPos] == '\'')
     {
       bool ignoreEnd = false;
-      while((text[++lastPos] != '\'') || ignoreEnd)
+      while ((text[++lastPos] != '\'') || ignoreEnd)
         {
           ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
           if (text[lastPos] == 0)

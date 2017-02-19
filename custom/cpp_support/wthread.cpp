@@ -97,7 +97,7 @@ SpinLock::SpinLock()
 void
 SpinLock::Acquire()
 {
-  while(true)
+  while (true)
     {
       assert(mLock >= 0);
 
@@ -149,7 +149,7 @@ Thread::Run(WH_THREAD_ROUTINE routine,
              void* const       args,
              const bool        waitPrevEnd)
 {
-  while(true)
+  while (true)
     {
       if (wh_atomic_fetch_inc32(&mEnded) == 0)
         break;
@@ -205,7 +205,7 @@ Thread::~Thread()
 void
 Thread::WaitToEnd(const bool throwPending)
 {
-  while(wh_atomic_fetch_inc32(&mEnded) != 0)
+  while (wh_atomic_fetch_inc32(&mEnded) != 0)
     {
       wh_yield();
       LockRAII<Lock> _l(mRoutineExecutionLock); //Avoid spin locks!

@@ -56,7 +56,7 @@ clear_glbl_stmt(struct Statement* stmt)
   assert(stmt->parent == NULL);
   assert(stmt->type == STMT_GLOBAL);
 
-  while(procId-- > 0)
+  while (procId-- > 0)
     {
       struct Statement* proc = wh_array_get(&(stmt->spec.glb.procsDecls),
                                              procId);
@@ -138,7 +138,7 @@ stmt_find_declaration(struct Statement* stmt,
   uint_t              i           = 0;
   uint_t              stored_vals = wh_array_count(&stmt->decls);
 
-  while(i < stored_vals)
+  while (i < stored_vals)
     {
       result = wh_array_get(&stmt->decls, i);
 
@@ -173,7 +173,7 @@ stmt_find_declaration(struct Statement* stmt,
 
       /* index 0 is reserved to hold the return type */
       i = 1;
-      while(i < stored_vals)
+      while (i < stored_vals)
         {
           result = wh_array_get(&stmt->spec.proc.paramsList, i);
           assert(result != NULL);
@@ -305,7 +305,7 @@ find_type_spec(const uint8_t*         typeBuff,
 
   const struct TypeSpec* it;
 
-  while(position < typeBuffSize)
+  while (position < typeBuffSize)
     {
       it = (struct TypeSpec*)(typeBuff + position);
 
@@ -332,7 +332,7 @@ type_spec_fill_table_field(struct WOutputStream* const typeStream,
 {
   uint_t result = 0;
 
-  while(fields && IS_TABLE_FIELD(fields->type))
+  while (fields && IS_TABLE_FIELD(fields->type))
     {
       if ((wh_ostream_write( typeStream,
                         (uint8_t*)fields->label,

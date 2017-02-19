@@ -218,7 +218,7 @@ test_complete_field_global(WH_CONNECTION hnd)
       goto test_complete_field_global_err;
     }
 
-  while(fieldsCount-- > 0)
+  while (fieldsCount-- > 0)
     {
       if ((WValueFetchField(hnd, &fieldName, &type) != WCS_OK)
           || ! test_field_match(fieldName, type))

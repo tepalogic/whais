@@ -484,7 +484,7 @@ public:
     if ((toPos == 0) && (CompareKey(SentinelKey(), toPos) == 0))
       ++toPos;
 
-    while(fromPos >= toPos)
+    while (fromPos >= toPos)
       {
         if (sizeof(ROW_INDEX) == 8)
           output.Add(DUInt64(Serializer::LoadRow(rows + fromPos)));

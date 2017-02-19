@@ -288,7 +288,7 @@ get_tag_value(const string& line, const char* const tag)
 
   assert(from <= line.size());
 
-  while(from < line.size())
+  while (from < line.size())
     {
       if (line[from] == '\n' || line[from]=='\r')
         return string();
@@ -303,7 +303,7 @@ get_tag_value(const string& line, const char* const tag)
     return string();
 
   size_t size = 0;
-  while(from + size < line.size())
+  while (from + size < line.size())
     {
       if ((line[from + size] == '#') || isspace(line[from + size]))
         break;
@@ -323,7 +323,7 @@ process_line_tags(const string&                     file,
   size_t inoutOff = 0, lastOff = 0;
 
   string token, newLine, tags;
-  while( ! (token = NextToken(line, inoutOff, "\t ")).empty())
+  while ( ! (token = NextToken(line, inoutOff, "\t ")).empty())
     {
       do {
           const char ch = token[0];
@@ -337,7 +337,7 @@ process_line_tags(const string&                     file,
           else
             break;
       }
-      while(! token.empty());
+      while (! token.empty());
 
       newLine += line.substr(lastOff, inoutOff - lastOff - token.length());
       lastOff = inoutOff;
@@ -358,7 +358,7 @@ process_line_tags(const string&                     file,
           else
             break;
         }
-      while( ! token.empty());
+      while ( ! token.empty());
 
       if (token.empty())
         {
@@ -476,7 +476,7 @@ preprocess_directives(const string&                    file,
                                        lineIndex,
                                        file,
                                        levelSize));
-  while( includedSource.good())
+  while ( includedSource.good())
     {
       const char* occurence;
       string line;
@@ -511,7 +511,7 @@ preprocess_directives(const string&                    file,
 
               value += token;
             }
-          while( ! token.empty());
+          while ( ! token.empty());
 
           if (value.empty())
             {
@@ -538,7 +538,7 @@ preprocess_directives(const string&                    file,
           string tags;
           size_t inoutOffset = (occurence - line.c_str())
                                + strlen(cmdUndefine);
-          while(true)
+          while (true)
             {
               string token = NextToken(line, inoutOffset, "\t ");
               if (token.empty())

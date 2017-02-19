@@ -1873,7 +1873,7 @@ ProcedureCall::ProcedureCall(Session&                  session,
       if (local < LocalsCount())
         {
           const StackValue* localValue = &GetLocalDefault(local);
-          while(local < LocalsCount())
+          while (local < LocalsCount())
             {
               stack.Push(*localValue);
               ++local, ++localValue;
@@ -1926,7 +1926,7 @@ ProcedureCall::Run()
 
   try
   {
-    while(mCodePos < CodeSize())
+    while (mCodePos < CodeSize())
       {
         if (mSession.IsServerShoutdowing())
           throw InterException(_EXTRA(InterException::SERVER_STOPPED));

@@ -223,7 +223,7 @@ ProcedureManager::AquireSync(const Procedure& proc, const uint32_t sync)
           break;
         }
     }
-  while(true);
+  while (true);
 }
 
 

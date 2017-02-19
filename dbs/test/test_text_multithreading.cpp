@@ -54,7 +54,7 @@ test_append_char(void* )
 
         testValues[j].Append(testValues[z].CharAt(0));
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
         if (wh_rnd() & 1)
@@ -86,7 +86,7 @@ test_append_text(void* )
 
         testValues[j].Append(testValues[z]);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
         if (wh_rnd() & 1)
@@ -132,7 +132,7 @@ test_update_char(void* )
 
         testValues[j].CharAt(0, DChar(c));
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -166,7 +166,7 @@ test_find_in_text(void* )
         testValues[j].FindInText(testValues[z],
                                   (wh_rnd() & 1) ? true : false);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -201,7 +201,7 @@ test_find_subtext(void* )
         testValues[j].FindSubstring(testValues[z],
                                     (wh_rnd() & 1) ? true : false);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -233,7 +233,7 @@ test_to_lower(void* )
 
         testValues[j].LowerCase();
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -265,7 +265,7 @@ test_to_upper(void* )
 
         testValues[j].UpperCase();
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -299,7 +299,7 @@ test_compare(void *)
 
         const bool c = (testValues[j] <= testValues[z]);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
         if (c)
@@ -333,7 +333,7 @@ test_mirror(void* )
 
         testValues[j].MakeMirror(testValues[z]);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -357,7 +357,7 @@ reset_text_variables(void *)
 
   try
   {
-      while( ! testEnd)
+      while ( ! testEnd)
         {
           resetStart = true;
           if (wh_rnd() & 1)

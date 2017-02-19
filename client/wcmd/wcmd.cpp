@@ -251,7 +251,7 @@ ExecuteCommandStmt(const string& cmdStmt)
   bool   result     = true;
   bool   armedSlash = false;
 
-  while(result
+  while (result
          && (currentPos < cmdStmt.length()))
     {
       if (cmdStmt.c_str()[currentPos] != commandSep)
@@ -339,7 +339,7 @@ ExecuteInteractively(istream& is)
   RegisterCommand(entry);
 
   string commandStmt;
-  while(! sFinishInteraction)
+  while (! sFinishInteraction)
     {
       if ((commandStmt.length() == 0) && (&is == &cin))
         cout << "> ";
@@ -522,7 +522,7 @@ main(const int argc, char *argv[])
 
   InitCmdManager();
 
-  while(currentArg < argc)
+  while (currentArg < argc)
     {
       if ((strcmp(argv[currentArg], "--help") == 0) ||
           (strcmp(argv[currentArg], "-h") == 0))

@@ -199,7 +199,7 @@ find_string(uint_t msgCode)
 {
   uint_t i = 0;
 
-  while((msgCode != messages[i].id) && (messages[i].id != 0))
+  while ((msgCode != messages[i].id) && (messages[i].id != 0))
       ++i;
 
   if (messages[i].msg == NULL)

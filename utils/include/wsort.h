@@ -60,7 +60,7 @@ partition(int64_t      from,
       }
     ++from;
   }
-  while(from <= to);
+  while (from <= to);
 
   if (*outAlreadySorted)
     return to;
@@ -85,7 +85,7 @@ partition(int64_t      from,
 
       inoutContainer.Exchange(from, to);
     }
-  while(from < to);
+  while (from < to);
 
   assert(from == to);
 
@@ -126,7 +126,7 @@ partition_reverse(int64_t      from,
       }
     --to;
   }
-  while(from <= to);
+  while (from <= to);
 
   if (*outAlreadySorted)
     return to;
@@ -152,7 +152,7 @@ partition_reverse(int64_t      from,
 
       inoutContainer.Exchange(from, to);
     }
-  while(from < to);
+  while (from < to);
 
   assert(from == to);
 
@@ -222,7 +222,7 @@ quick_sort(int64_t           from,
             partStack.push_back(_partition_t(current.mFrom, pivot - 1));
         }
     }
-  while(partStack.size() > 0);
+  while (partStack.size() > 0);
 }
 
 

@@ -217,7 +217,7 @@ whs_write(const WH_SOCKET            sd,
 
   assert(count > 0);
 
-  while(wrote < count)
+  while (wrote < count)
     {
       const int chunk = send(sd, srcBuffer + wrote, count - wrote, 0);
       if (chunk < 0)
@@ -246,7 +246,7 @@ whs_read(const WH_SOCKET           sd,
   if (*inoutCount == 0)
     return WSAEINVAL;
 
-  while(TRUE)
+  while (TRUE)
     {
       const int chunk = recv(sd, dstBuffer, *inoutCount, 0);
       if (chunk < 0)

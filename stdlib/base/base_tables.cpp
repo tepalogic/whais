@@ -343,7 +343,7 @@ public:
   void Commit()
   {
     ROW_INDEX row = 0;
-    while(row < mRowsPermutation.size())
+    while (row < mRowsPermutation.size())
       {
         if (mRowsPermutation[row] == row)
           {
@@ -366,7 +366,7 @@ public:
 
             currentRow = correctRow;
           }
-        while(true);
+        while (true);
       }
 
     mTable.UnlockTable();

@@ -46,7 +46,7 @@ insert_a_string(WH_CONNECTION        hnd,
 
   memset(result, 0, MAX_STRING_SIZE);
 
-  while(true)
+  while (true)
     {
       const char* temp = _refStrings[wh_rnd() % MAX_REFS_STRINGS];
 
@@ -108,7 +108,7 @@ test_simple_text(WH_CONNECTION hnd)
     }
 
   aValue[0] = 0;
-  while(strlen(aValue) < strlen(ref + aSimpleOffset))
+  while (strlen(aValue) < strlen(ref + aSimpleOffset))
     {
       if (WValueEntry(hnd,
                        WIGNORE_FIELD,
@@ -145,7 +145,7 @@ test_simple_text(WH_CONNECTION hnd)
 
   aSimpleOffset = wh_rnd() % 7;
   aValue[0]     = 0;
-  while(strlen(aValue) < strlen(ref + aSimpleOffset))
+  while (strlen(aValue) < strlen(ref + aSimpleOffset))
     {
       if (WValueEntry(hnd,
                        WIGNORE_FIELD,
@@ -209,7 +209,7 @@ test_table_text(WH_CONNECTION hnd)
     {
       aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
-      while(strlen(aValue) < strlen(ref[row * _fieldsCount] + aSimpleOffset))
+      while (strlen(aValue) < strlen(ref[row * _fieldsCount] + aSimpleOffset))
         {
           if (WValueEntry(hnd,
                                    "WHC_TYPE_TEXT",
@@ -227,7 +227,7 @@ test_table_text(WH_CONNECTION hnd)
 
       aSimpleOffset = wh_rnd() % 7;
       aValue[0]     = 0;
-      while(strlen(aValue) < strlen(ref[row * _fieldsCount + 1] + aSimpleOffset))
+      while (strlen(aValue) < strlen(ref[row * _fieldsCount + 1] + aSimpleOffset))
         {
           if (WValueEntry(hnd,
                            "WHC_TYPE_TEXT_2",

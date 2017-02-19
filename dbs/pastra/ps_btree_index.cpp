@@ -69,7 +69,7 @@ IBTreeNode::FindBiggerOrEqual(const IBTreeKey&   key,
   if (CompareKey(key, topKey) > 0)
     return false;
 
-  while(bottomKey > topKey + 1)
+  while (bottomKey > topKey + 1)
     {
       const KEY_INDEX median = (bottomKey + topKey) / 2;
 
@@ -177,7 +177,7 @@ IBTreeNodeManager::~IBTreeNodeManager()
 {
   map<NODE_INDEX, CachedData>::iterator it = mNodesKeeper.begin();
 
-  while(it != mNodesKeeper.end())
+  while (it != mNodesKeeper.end())
     {
       assert(it->second.mRefsCount == 0);
 
@@ -300,7 +300,7 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
   if (mNodesKeeper.size() > MaxCachedNodes())
     {
       it = mNodesKeeper.begin();
-      while(it != mNodesKeeper.end())
+      while (it != mNodesKeeper.end())
         {
           assert(it->second.mNode->NodeId() == it->first);
 
@@ -344,7 +344,7 @@ IBTreeNodeManager::FlushNodes()
   LockRAII<Lock> syncHolder(mSync);
   map <NODE_INDEX, CachedData>::iterator it = mNodesKeeper.begin();
 
-  while(it != mNodesKeeper.end())
+  while (it != mNodesKeeper.end())
     {
       SaveNode(it->second.mNode);
       it->second.mNode->MarkClean();
@@ -383,7 +383,7 @@ BTree::FindBiggerOrEqual(const IBTreeKey& key,
       *outNode = node->NodeIdOfKey(*outKeyIndex);
       node     = mNodesManager.RetrieveNode(*outNode);
     }
-  while(true);
+  while (true);
 
   if ((*outKeyIndex == 0)
       && (node->CompareKey(node->SentinelKey(), 0) == 0))
@@ -409,7 +409,7 @@ BTree::InsertKey(const IBTreeKey&  key,
                                          outNode,
                                          outKeyIndex);
     }
-  while(tryAgain);
+  while (tryAgain);
 }
 
 
@@ -481,7 +481,7 @@ BTree::RecursiveInsertNodeKey(const NODE_INDEX         parentId,
                                            outNode,
                                            outKeyIndex);
     }
-  while(tryAgain);
+  while (tryAgain);
 
   return false;
 }

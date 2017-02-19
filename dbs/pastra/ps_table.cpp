@@ -210,7 +210,7 @@ get_fields_names_len(const DBSFieldDescriptor* fields, uint_t count)
 {
   uint_t result = 0;
 
-  while(count-- > 0)
+  while (count-- > 0)
     {
       result += strlen(fields[0].name) + 1;
       ++fields;
@@ -224,7 +224,7 @@ static bool
 validate_field_name(const char* name, bool failException = true)
 {
 
-  while(name[0])
+  while (name[0])
     {
       if (! (((name[0] >= 'a') && (name[0] <= 'z'))
               || ((name[0] >= 'A') && (name[0] <= 'Z'))
@@ -803,7 +803,7 @@ PersistentTable::PersistentTable(DbsHandler&       dbs,
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
   mRowCache.Init(*this, mRowSize, blkSize, blkCount, false);
@@ -838,7 +838,7 @@ PersistentTable::PersistentTable(DbsHandler&                     dbs,
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
   mRowCache.Init(*this, mRowSize, blkSize, blkCount, false);
@@ -1222,7 +1222,7 @@ check_array_buffer(const uint8_t* const        buffer,
       Serializer::SelectValidator(itemType);
 
   uint_t itemOffset = 0;
-  while(itemOffset < bufferSize)
+  while (itemOffset < bufferSize)
     {
       if ( ! validator(buffer + itemOffset))
         return false;
@@ -1246,7 +1246,7 @@ check_text_buffer(const uint8_t* const utf8buffer, const uint_t bufferSize)
     return false;
 
   uint_t verified = 0;
-  while(verified < bufferSize)
+  while (verified < bufferSize)
     {
       try
       {
@@ -1282,7 +1282,7 @@ remove_extra_container_files(FIX_ERROR_CALLBACK  fixCallback,
   if ((containerSize == 0) || (containerSize % maxFileSize == 0))
     --seriesStart ;
 
-  while(true)
+  while (true)
     {
       string fileName = baseFile;
 
@@ -1975,7 +1975,7 @@ TemporalTable::TemporalTable(DbsHandler&                     dbs,
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
   mRowCache.Init(*this, mRowSize, blkSize, blkCount, true);
@@ -1994,7 +1994,7 @@ TemporalTable::TemporalTable(const PrototypeTable& prototype)
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < mRowSize)
+  while (blkSize < mRowSize)
     blkSize *= 2;
 
   mRowCache.Init(*this, mRowSize, blkSize, blkCount, true);

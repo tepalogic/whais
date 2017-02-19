@@ -40,7 +40,7 @@ test_tokens(void)
   state.bufferSize = strlen(tokens);
 
   printf("Testing keywords...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if (tokens_values[count++] != result ||
           wh_array_count(&(state.values)) != 0)
@@ -86,7 +86,7 @@ test_buff_ids(void)
   state.bufferSize = strlen(state.buffer);
   wh_array_init(&state.values, sizeof(struct SemValue));
   printf("Testing identifiers...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != IDENTIFIER) ||
           (lvalp->val_type != VAL_ID) ||
@@ -126,7 +126,7 @@ test_buff_integers(void)
   state.bufferSize = strlen(state.buffer);
   wh_array_init(&state.values, sizeof(struct SemValue));
   printf("Testing integers...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != WHAIS_INTEGER) ||
           (lvalp->val_type != VAL_C_INT) ||
@@ -173,7 +173,7 @@ test_buff_reals(void)
   state.bufferSize = strlen(state.buffer);
   wh_array_init(&state.values, sizeof(struct SemValue));
   printf("Testing reals...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != WHAIS_REAL) ||
           (lvalp->val_type != VAL_C_REAL) ||
@@ -216,7 +216,7 @@ test_buff_chars(void)
   state.bufferSize = strlen(state.buffer);
   wh_array_init(&state.values, sizeof(struct SemValue));
   printf("Testing chars...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != WHAIS_CHAR) ||
           (lvalp->val_type != VAL_C_CHAR) ||
@@ -258,7 +258,7 @@ test_buff_dates(void)
   state.bufferSize = strlen(state.buffer);
   wh_array_init(&state.values, sizeof(struct SemValue));
   printf("Testing dates...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != WHAIS_TIME) ||
           (lvalp->val_type != VAL_C_TIME) ||
@@ -319,7 +319,7 @@ test_buff_strs(void)
   wh_array_init(&state.values, sizeof(struct SemValue));
   state.strings = create_string_store();
   printf("Testing string...");
-  while((result = yylex(&lvalp, &state)) != 0)
+  while ((result = yylex(&lvalp, &state)) != 0)
     {
       if ((result != WHAIS_TEXT) ||
           (lvalp->val_type != VAL_C_TEXT) ||

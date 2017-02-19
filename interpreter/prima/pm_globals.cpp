@@ -83,7 +83,7 @@ GlobalsManager::FindGlobal(const uint8_t* const name,
 
   uint32_t iterator = 0;
 
-  while(iterator < mGlobalsEntrys.size())
+  while (iterator < mGlobalsEntrys.size())
     {
       const GlobalEntry& entry     = mGlobalsEntrys[iterator];
       const char* const  entryName = _RC(const char*,

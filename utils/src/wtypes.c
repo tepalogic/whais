@@ -163,7 +163,7 @@ is_type_spec_valid(const struct TypeSpec* spec)
       if (GET_BASIC_TYPE( htype) != 0)
         result = FALSE;
 
-      while((index < (uint_t) (hsize - 2)) && (result != FALSE))
+      while ((index < (uint_t) (hsize - 2)) && (result != FALSE))
         {
           uint16_t type;
           uint_t   identifierLength = strlen((char *) &spec->data[index]);

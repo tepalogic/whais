@@ -119,7 +119,7 @@ get_random_text(uint_t count)
 {
   DText result;
 
-  while(count-- != 0)
+  while (count-- != 0)
     result.Append(DChar(wh_rnd() % 300 + 1));
 
   return result;

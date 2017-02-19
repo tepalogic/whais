@@ -137,12 +137,12 @@ struct WField
  */
 uint_t
 WConnect(const char* const      host,
-          const char* const      port,
-          const char* const      database,
-          const char* const      password,
-          const uint_t           userid,
-          const uint16_t         maxFrameSize,
-          WH_CONNECTION* const   outHnd);
+         const char* const      port,
+         const char* const      database,
+         const char* const      password,
+         const uint_t           userid,
+         const uint16_t         maxFrameSize,
+         WH_CONNECTION* const   outHnd);
 
 /* Close a connection.
  *
@@ -179,7 +179,8 @@ WPingServer(const WH_CONNECTION hnd);
  *                      error's case corresponding code.
  */
 uint_t
-WGreetServer(const WH_CONNECTION hnd, const char** outAnswer);
+WGreetServer(const WH_CONNECTION   hnd,
+             const char**          outAnswer);
 
 /* Get the list of the global values.
  *
@@ -199,7 +200,8 @@ WGreetServer(const WH_CONNECTION hnd, const char** outAnswer);
  *                      error's case corresponding code.
  */
 uint_t
-WStartGlobalsList(const WH_CONNECTION hnd, uint_t* const outCount);
+WStartGlobalsList(const WH_CONNECTION   hnd,
+                  uint_t* const         outCount);
 
 /* Fetch the name of the next global value.
  *
@@ -222,7 +224,8 @@ WStartGlobalsList(const WH_CONNECTION hnd, uint_t* const outCount);
  *       other API using the same connection handle.
  */
 uint_t
-WFetchGlobal(const WH_CONNECTION hnd, const char** const  outpName);
+WFetchGlobal(const WH_CONNECTION    hnd,
+             const char** const     outpName);
 
 /* Get the list of the procedures.
  *
@@ -242,7 +245,8 @@ WFetchGlobal(const WH_CONNECTION hnd, const char** const  outpName);
  *                      error's case corresponding code.
  */
 uint_t
-WStartProceduresList(const WH_CONNECTION hnd, uint_t* const outCount);
+WStartProceduresList(const WH_CONNECTION   hnd,
+                     uint_t* const         outCount);
 
 /* Fetch the name of the next procedure.
  *
@@ -268,7 +272,8 @@ WStartProceduresList(const WH_CONNECTION hnd, uint_t* const outCount);
  *       other API using the same connection handle.
  */
 uint_t
-WFetchProcedure(const WH_CONNECTION hnd, const char** const outpName);
+WFetchProcedure(const WH_CONNECTION   hnd,
+                const char** const    outpName);
 
 /* Get the parameters count of a procedure.
  *
@@ -290,9 +295,9 @@ WFetchProcedure(const WH_CONNECTION hnd, const char** const outpName);
  *          the communication maximum frame size should be increased.
  */
 uint_t
-WProcParamsCount(const WH_CONNECTION hnd,
-                  const char* const   name,
-                  uint_t* const       outCount);
+WProcParamsCount(const WH_CONNECTION   hnd,
+                 const char* const     name,
+                 uint_t* const         outCount);
 
 /* Get type information about a procedure parameter.
  *
@@ -315,9 +320,9 @@ WProcParamsCount(const WH_CONNECTION hnd,
  */
 uint_t
 WProcParamType(const WH_CONNECTION   hnd,
-                const char* const     procedure,
-                const uint_t          parameter,
-                uint_t* const         outRawType);
+               const char* const     procedure,
+               const uint_t          parameter,
+               uint_t* const         outRawType);
 
 /* Get the fields count of a table procedure parameter.
  *
@@ -345,9 +350,9 @@ WProcParamType(const WH_CONNECTION   hnd,
  */
 uint_t
 WProcParamFieldCount(const WH_CONNECTION   hnd,
-                      const char* const     procedure,
-                      const uint_t          param,
-                      uint_t* const         outCount);
+                     const char* const     procedure,
+                     const uint_t          param,
+                     uint_t* const         outCount);
 
 /* Describes a field of a procedure parameter.
  *
@@ -381,11 +386,11 @@ WProcParamFieldCount(const WH_CONNECTION   hnd,
  */
 uint_t
 WProcParamField(const WH_CONNECTION   hnd,
-                 const char* const     procedure,
-                 const uint_t          param,
-                 const uint_t          field,
-                 const char**          outpFieldName,
-                 uint_t* const         outFieldType);
+                const char* const     procedure,
+                const uint_t          param,
+                const uint_t          field,
+                const char**          outpFieldName,
+                uint_t* const         outFieldType);
 
 /* Get the type of a global value.
  *
@@ -408,8 +413,8 @@ WProcParamField(const WH_CONNECTION   hnd,
  */
 uint_t
 WDescribeGlobal(const WH_CONNECTION    hnd,
-                 const char* const      name,
-                 uint_t* const          outType);
+                const char* const      name,
+                uint_t* const          outType);
 
 /* Get the type of the stack top.
  *
@@ -419,7 +424,7 @@ WDescribeGlobal(const WH_CONNECTION    hnd,
  */
 uint_t
 WDescribeStackTop(const WH_CONNECTION   hnd,
-                   uint_t* const         outRawType);
+                  uint_t* const         outRawType);
 
 /* Get the list of fields of a table value.
  *
@@ -436,7 +441,7 @@ WDescribeStackTop(const WH_CONNECTION   hnd,
  */
 uint_t
 WValueFieldsCount(const WH_CONNECTION  hnd,
-                   uint_t* const        outCount);
+                  uint_t* const        outCount);
 
 /* Fetch the field type of the stack top value.
  *
@@ -460,9 +465,9 @@ WValueFieldsCount(const WH_CONNECTION  hnd,
  *       any other API using the same connection handle.
  */
 uint_t
-WValueFetchField(const WH_CONNECTION  hnd,
-                  const char**         outFieldName,
-                  uint_t* const        outFieldType);
+WValueFetchField(const WH_CONNECTION   hnd,
+                 const char**          outFieldName,
+                 uint_t* const         outFieldType);
 
 
 /* Add a value on the stack top.
@@ -474,10 +479,10 @@ WValueFetchField(const WH_CONNECTION  hnd,
  */
 
 uint_t
-WPushValue(const WH_CONNECTION             hnd,
-            const uint_t                    type,
-            const uint_t                    fieldsCount,
-            const struct WField* const      fields);
+WPushValue(const WH_CONNECTION          hnd,
+           const uint_t                 type,
+           const uint_t                 fieldsCount,
+           const struct WField* const   fields);
 
 /* Remove values from the stack top.
  *
@@ -502,21 +507,21 @@ WPopValues(const WH_CONNECTION hnd, const uint_t count);
  *          cached internally(see 'WFlush()' for more details).
  */
 uint_t
-WUpdateValue(const WH_CONNECTION     hnd,
-              const uint_t            type,
-              const char* const       field,
-              const WHT_ROW_INDEX     row,
-              const WHT_INDEX         arrayOff,
-              const WHT_INDEX         textOff,
-              const char* const       value);
+WUpdateValue(const WH_CONNECTION   hnd,
+             const uint_t          type,
+             const char* const     field,
+             const WHT_ROW_INDEX   row,
+             const WHT_INDEX       arrayOff,
+             const WHT_INDEX       textOff,
+             const char* const     value);
 
 /* Add rows to a stack's top table value.
  *
  *
  */
 uint_t
-WAddTableRows(const WH_CONNECTION    hnd,
-               const int32_t          rowsCount);
+WAddTableRows(const WH_CONNECTION   hnd,
+              const int32_t         rowsCount);
 
 /* Flush all stack commits.
  *
@@ -537,15 +542,15 @@ WFlush(const WH_CONNECTION hnd);
  * type(table or field).
  */
 uint_t
-WValueRowsCount(const WH_CONNECTION  hnd,
-                 ullong_t* const      outCount);
+WValueRowsCount(const WH_CONNECTION   hnd,
+                ullong_t* const       outCount);
 
 /* Get the top stack values array elements count. */
 uint_t
 WValueArraySize(const WH_CONNECTION   hnd,
-                 const char*           field,
-                 const WHT_ROW_INDEX   row,
-                 ullong_t* const       outCount);
+                const char*           field,
+                const WHT_ROW_INDEX   row,
+                ullong_t* const       outCount);
 
 /* Get the stack top text length.
  *
@@ -554,11 +559,11 @@ WValueArraySize(const WH_CONNECTION   hnd,
  * text. Also the length does not count the null terminator character.
  */
 uint_t
-WValueTextLength(const WH_CONNECTION     hnd,
-                  const char*             field,
-                  const WHT_ROW_INDEX     row,
-                  const WHT_INDEX         arrayOff,
-                  ullong_t* const         outCount);
+WValueTextLength(const WH_CONNECTION   hnd,
+                 const char*           field,
+                 const WHT_ROW_INDEX   row,
+                 const WHT_INDEX       arrayOff,
+                 ullong_t* const       outCount);
 
 /* Retrieve the stack top value.
  *
@@ -575,12 +580,12 @@ WValueTextLength(const WH_CONNECTION     hnd,
  *          bytes.
  */
 uint_t
-WValueEntry(const WH_CONNECTION hnd,
-             const char* const   field,
-             WHT_ROW_INDEX       row,
-             const WHT_INDEX     arrayOff,
-             const WHT_INDEX     textOff,
-             const char** const  outpValue);
+WValueEntry(const WH_CONNECTION   hnd,
+            const char* const     field,
+            WHT_ROW_INDEX         row,
+            const WHT_INDEX       arrayOff,
+            const WHT_INDEX       textOff,
+            const char** const    outpValue);
 
 /* Execute a procedure remotely.
  *
@@ -588,8 +593,8 @@ WValueEntry(const WH_CONNECTION hnd,
  * stack, using the stack update functions.
  */
 uint_t
-WExecuteProcedure(const WH_CONNECTION     hnd,
-                   const char* const       procedure);
+WExecuteProcedure(const WH_CONNECTION   hnd,
+                  const char* const     procedure);
 
 #ifdef __cplusplus
 }

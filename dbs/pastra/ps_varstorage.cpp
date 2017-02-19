@@ -218,7 +218,7 @@ VariableSizeStore::CheckArrayEntry(const uint64_t         recordFirstEntry,
   uint_t     itemBytesRead  = 0;
   uint8_t    itemBuffer[StoreEntry::ENTRY_SIZE];
   bool       entryValidated = false;
-  while(itemsChecked < itemsCount)
+  while (itemsChecked < itemsCount)
     {
       const bool lastEntry = (recordSize - actualSize) <=
                                   (StoreEntry::ENTRY_SIZE -
@@ -343,7 +343,7 @@ VariableSizeStore::CheckTextEntry(const uint64_t   recordFirstEntry,
   uint8_t  codeUnitsCount  = 0;
   uint8_t  codeUnits[7]; //UTF-8 has a maximum of 6 code units per
   bool     entryValidated  = false;
-  while(checkedChars < charsCount)
+  while (checkedChars < charsCount)
     {
       const bool lastEntry = (recordSize - actualSize) <=
                                   (StoreEntry::ENTRY_SIZE -
@@ -462,7 +462,7 @@ VariableSizeStore::ConcludeStorageCheck()
   assert(mUsedEntries[0]);
   assert(mUsedEntries.size() == mEntriesCount);
 
-  while(mEntriesCount > 0)
+  while (mEntriesCount > 0)
     {
       if (mUsedEntries[mEntriesCount - 1])
         break;
@@ -498,7 +498,7 @@ VariableSizeStore::ConcludeStorageCheck()
   mFirstFreeEntry = StoreEntry::LAST_DELETED_ENTRY;
 
   uint64_t lastFreeEntry = 0, currentEntry = 1;
-  while(currentEntry < mUsedEntries.size())
+  while (currentEntry < mUsedEntries.size())
     {
       if (mUsedEntries[currentEntry])
         {
@@ -532,7 +532,7 @@ VariableSizeStore::ConcludeStorageCheck()
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < sizeof(StoreEntry))
+  while (blkSize < sizeof(StoreEntry))
     blkSize *= 2;
 
   mEntriesCache.Init(*this, sizeof(StoreEntry), blkSize, blkCount, false);
@@ -561,7 +561,7 @@ VariableSizeStore::FinishInit(const bool nonPersitentData)
 
   assert((blkSize != 0) && (blkCount != 0));
 
-  while(blkSize < sizeof(StoreEntry))
+  while (blkSize < sizeof(StoreEntry))
     blkSize *= 2;
 
   mEntriesCache.Init(*this,
@@ -726,9 +726,9 @@ VariableSizeStore::GetRecord(uint64_t  recordFirstEntry,
       offset           -= entry->Size();
       recordFirstEntry  = entry->NextEntry();
     }
-  while(true);
+  while (true);
 
-  while(size > 0)
+  while (size > 0)
     {
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
@@ -787,9 +787,9 @@ VariableSizeStore::UpdateRecord(uint64_t       recordFirstEntry,
       prevEntry         = recordFirstEntry;
       recordFirstEntry  = entry->NextEntry();
     }
-  while(true);
+  while (true);
 
-  while(size > 0)
+  while (size > 0)
     {
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         recordFirstEntry = AllocateEntry(prevEntry);
@@ -854,7 +854,7 @@ VariableSizeStore::UpdateRecord(uint64_t           recordFirstEntry,
       recordFirstEntry  = entry->NextEntry();
 
     }
-  while(true);
+  while (true);
 
   do
     {
@@ -881,9 +881,9 @@ VariableSizeStore::UpdateRecord(uint64_t           recordFirstEntry,
       sourceOffset     -= entry->Size();
       sourceFirstEntry  = entry->NextEntry();
     }
-  while(true);
+  while (true);
 
-  while(sourceSize > 0)
+  while (sourceSize > 0)
     {
       if (sourceFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
@@ -977,9 +977,9 @@ VariableSizeStore::UpdateRecord(uint64_t         recordFirstEntry,
       recordFirstEntry  = entry->NextEntry();
 
     }
-  while(true);
+  while (true);
 
-  while(sourceSize > 0)
+  while (sourceSize > 0)
     {
       if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
         recordFirstEntry = AllocateEntry(prevEntry);
@@ -1214,7 +1214,7 @@ VariableSizeStore::RemoveRecord(uint64_t recordFirstEntry)
   assert(entry->IsDeleted() == false);
   assert(entry->IsFirstEntry());
 
-  while(recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
+  while (recordFirstEntry != StoreEntry::LAST_CHAINED_ENTRY)
     {
       StoredItem cachedItem   = mEntriesCache.RetriveItem(recordFirstEntry);
       const StoreEntry* entry = _RC(const StoreEntry*,

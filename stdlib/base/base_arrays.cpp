@@ -108,7 +108,7 @@ binary_array_search( const DArray&     array,
   uint64_t i = 0, j = arrayCount;
   T        current;
 
-  while( i < j)
+  while ( i < j)
     {
       const uint64_t c = (i + j) / 2;
 
@@ -340,7 +340,7 @@ unsorted_array_search( const DArray&     array,
   uint64_t i = 0;
   T        current;
 
-  while( i < arrayCount)
+  while ( i < arrayCount)
     {
       array.Get(i, current);
 
@@ -540,7 +540,7 @@ retrieve_minim_value( const DArray& array)
   uint64_t foundPos = NOT_FOUND_VALUE;
   T        minim    = T::Max();
 
-  while( pos < arrayCount)
+  while ( pos < arrayCount)
     {
       T value;
       array.Get(pos, value);
@@ -566,7 +566,7 @@ retrieve_maxim_value( const DArray& array)
   uint64_t foundPos = NOT_FOUND_VALUE;
   T        maxim    = T::Min();
 
-  while( pos < arrayCount)
+  while ( pos < arrayCount)
     {
       T value;
       array.Get(pos, value);
@@ -868,7 +868,7 @@ intersect_arrays( DArray& ar1, DArray ar2)
   ar2.Sort();
 
   int64_t  i = ar1.Count() - 1, j = ar2.Count() - 1;
-  while(  (0 <= i) && (0 <= j))
+  while (  (0 <= i) && (0 <= j))
     {
       T ti, tj;
 
@@ -1003,7 +1003,7 @@ diff_arrays( DArray& ar1, DArray ar2)
   ar2.Sort();
 
   int64_t  i = ar1.Count() - 1, j = ar2.Count() - 1;
-  while(  (0 <= i) && (0 <= j))
+  while (  (0 <= i) && (0 <= j))
     {
       T ti, tj;
 
@@ -1024,7 +1024,7 @@ diff_arrays( DArray& ar1, DArray ar2)
         }
     }
 
-  while( 0 <= i)
+  while ( 0 <= i)
     {
       T t;
 

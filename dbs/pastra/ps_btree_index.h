@@ -382,7 +382,7 @@ make_array_room(const uint_t   lastIndex,
   uint_t lastPos = lastIndex * elemSize + elemSize - 1;
   uint_t fromPos = fromIndex * elemSize;
 
-  while(lastPos >= fromPos)
+  while (lastPos >= fromPos)
     {
       array[lastPos + elemSize] = array[lastPos];
       --lastPos;
@@ -399,7 +399,7 @@ remove_array_elemes(const uint_t   lastIndex,
   uint_t lastPos = lastIndex  * elemSize + elemSize - 1;
   uint_t fromPos = fromIndex  * elemSize;
 
-  while(fromPos + elemSize <= lastPos)
+  while (fromPos + elemSize <= lastPos)
     {
       array[fromPos] = array[fromPos + elemSize];
       ++fromPos;

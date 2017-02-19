@@ -171,7 +171,7 @@ write_log( SessionStack& stack, ISession& session)
       std::stringstream logEntry;
 
       uint64_t offset = 0;
-      while( offset < textRawSize)
+      while ( offset < textRawSize)
         {
           const uint64_t chunkSize = MIN(textRawSize - offset,
                                           sizeof( utf8Reserved) -  1);

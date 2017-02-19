@@ -162,7 +162,7 @@ find_field(const char* const           label,
 {
   assert(fieldsList != NULL);
 
-  while(IS_TABLE_FIELD( fieldsList->type))
+  while (IS_TABLE_FIELD( fieldsList->type))
     {
       if ((fieldsList->labelLength == labelLen)
           && (memcmp( fieldsList->label, label, labelLen) == 0))
@@ -1377,7 +1377,7 @@ are_compatible_tables(struct ParserState* const         parser,
 
   field2 = table2->extra;
 
-  while(IS_TABLE_FIELD( field1->type))
+  while (IS_TABLE_FIELD( field1->type))
     {
       char temp[128];
 
@@ -2594,7 +2594,7 @@ translate_call_exp(struct ParserState* const   parser,
     }
 
   expArg = exp->secondTree;
-  while(expArg != NULL)
+  while (expArg != NULL)
     {
       struct SemValue* const param   = expArg->val.u_args.expr;
       struct SemValue*       tempVal = NULL;

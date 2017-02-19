@@ -38,7 +38,7 @@ find_proc_decl(struct ParserState* parser,
   const struct WArray* procs  = &(parser->globalStmt.spec.glb.procsDecls);
   uint_t               procIt = wh_array_count(procs);
 
-  while(procIt-- > 0)
+  while (procIt-- > 0)
     {
       struct Statement* result = (struct Statement*) wh_array_get(procs,
                                                                    procIt);
@@ -107,7 +107,7 @@ install_proc_args(struct ParserState* const parser,
       identifier.val_type = VAL_ID;
       type.val_type       = VAL_TYPE_SPEC;
 
-      while(paramsList != NULL)
+      while (paramsList != NULL)
         {
           assert(paramsList->val_type == VAL_PRCDCL_LIST);
 
@@ -376,7 +376,7 @@ set_proc_rettype(struct ParserState* const parser,
         retVar->extra = retVar;
       else
         {
-          while(field->extra != NULL)
+          while (field->extra != NULL)
             {
               assert(IS_TABLE_FIELD( field->type));
 

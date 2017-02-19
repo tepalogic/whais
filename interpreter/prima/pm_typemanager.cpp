@@ -119,7 +119,7 @@ TypeManager::FindType(const uint8_t* const typeDesc)
 
   uint32_t result = 0;
 
-  while(result < mTypesDescriptions.size())
+  while (result < mTypesDescriptions.size())
     {
       assert(IsTypeValid(&mTypesDescriptions[result]));
 
@@ -163,7 +163,7 @@ create_non_persistent_table(IDBSHandler&       dbs,
   vector<DBSFieldDescriptor> fields;
   int                        typeOff = 0;
 
-  while(typeOff < spec.DataSize() - 2)
+  while (typeOff < spec.DataSize() - 2)
     {
       DBSFieldDescriptor fd;
       uint16_t           type;

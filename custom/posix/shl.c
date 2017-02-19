@@ -44,7 +44,7 @@ wh_shl_load(const char* const library)
     return INVALID_SHL;
 
   strcpy(name, library);
-  while(--i >= 0)
+  while (--i >= 0)
     {
       if (name[i] == '/')
         break;

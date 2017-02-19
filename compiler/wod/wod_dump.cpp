@@ -183,7 +183,7 @@ wod_dump_const_area(WIFunctionalUnit& obj, ostream& output)
         }
       constantOff += rowSize;
     }
-  while(constantOff < obj.ConstsAreaSize());
+  while (constantOff < obj.ConstsAreaSize());
 
   output << setw(0);
   output.flags(ios::dec);
@@ -314,7 +314,7 @@ wod_dump_table_type_inf(const uint8_t* typeDesc, ostream& output)
       bool_t printComma = FALSE;
 
       output << " (";
-      while(typeDesc[0] != ';' && typeDesc[1] != 0)
+      while (typeDesc[0] != ';' && typeDesc[1] != 0)
         {
           if (printComma)
             output << ", ";
@@ -414,7 +414,7 @@ wod_dump_code(const uint8_t*       code,
 {
   uint_t currPos = 0;
 
-  while(currPos < codeSize)
+  while (currPos < codeSize)
     {
       if (prefix != NULL)
         {

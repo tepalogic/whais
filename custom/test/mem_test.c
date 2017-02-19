@@ -70,7 +70,7 @@ test_print_unfree_mem(void)
          "Count", "Size", "Line", "File");
 
   assert(pIt->size >= (sizeof( W_ALLOCATED_MEMORY) + 1));
-  while(pIt != NULL)
+  while (pIt != NULL)
     {
       printf("%10llu %10d %5d %s\n",
               (unsigned long long)pIt->count,

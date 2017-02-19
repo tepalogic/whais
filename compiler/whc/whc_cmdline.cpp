@@ -95,7 +95,7 @@ CmdLineParser::Parse()
                              );
     }
 
-  while(index < mArgCount)
+  while (index < mArgCount)
     {
       if (isStrEqual(mArgs[index], "-h")
           || isStrEqual(mArgs[index], "--help"))
@@ -229,7 +229,7 @@ CmdLineParser::AddInclusionPaths(const char* const paths)
   const char* currentPath = paths;
   const char* nextPath    = currentPath;
 
-  while(nextPath && (*nextPath != 0))
+  while (nextPath && (*nextPath != 0))
     {
       nextPath = strpbrk(currentPath, ";");
       if (nextPath == NULL)

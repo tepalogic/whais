@@ -30,7 +30,7 @@ create_container(uint_t max_file_size, const uint_t container_size)
   uint64_t current_pos = 0;
   uint_t left_to_write = container_size;
 
-  while(left_to_write > 0)
+  while (left_to_write > 0)
     {
       uint_t write_size = MIN(sizeof(buffer), left_to_write);
 
@@ -59,7 +59,7 @@ check_container(uint_t max_file_size,
   if (container.Size() != container_size)
     return false;
 
-  while(left_to_read > 0)
+  while (left_to_read > 0)
     {
       uint_t read_size = MIN(sizeof(buffer), left_to_read);
       container.Read(current_pos, read_size, buffer);
@@ -86,7 +86,7 @@ colapse_container(uint_t max_file_size, const uint_t container_size)
   if (new_container_size != container_size)
     return false;
 
-  while(current_pos < container.Size())
+  while (current_pos < container.Size())
     {
       uint64_t to_delete = MIN(sizeof buffer,
                                 container.Size() - current_pos);
@@ -109,7 +109,7 @@ check_temp_container(uint_t uTestContainerSize)
   uint64_t current_pos = 0;
   uint_t left_to_write = uTestContainerSize;
 
-  while(left_to_write > 0)
+  while (left_to_write > 0)
     {
       uint_t write_size = MIN(uStepSize, left_to_write);
 
@@ -138,7 +138,7 @@ check_temp_container(uint_t uTestContainerSize)
   marker = 1;
   current_pos = 0;
 
-  while(left_to_read > 0)
+  while (left_to_read > 0)
     {
       uint_t read_size = MIN(uStepSize, left_to_read);
       container.Read(current_pos, read_size, buffer);
@@ -183,7 +183,7 @@ main()
     success = false;
 
   //delete container
-  while(new_container_size > 0)
+  while (new_container_size > 0)
     new_container_size = colapse_container(max_file_size,
                                             new_container_size);
 

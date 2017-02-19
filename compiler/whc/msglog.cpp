@@ -49,7 +49,7 @@ get_line_from_buffer(const vector<SourceCodeMark>& codeMarks,
     return -1;
 
   *mark = 0;
-  while(*mark + 1 < codeMarks.size())
+  while (*mark + 1 < codeMarks.size())
     {
       if (codeMarks[*mark + 1].mBufferOffset <= bufferOff)
         *mark += 1;
@@ -61,7 +61,7 @@ get_line_from_buffer(const vector<SourceCodeMark>& codeMarks,
   uint_t count  = codeMarks[*mark].mBufferOffset;
   int    result = codeMarks[*mark].mBufferLine;
 
-  while(count < bufferOff)
+  while (count < bufferOff)
     {
       if (buffer[count] == '\n')
         ++result;
@@ -113,11 +113,11 @@ whc_messenger(WH_MESSENGER_CTXT    data,
                msgId);
       vfprintf(stderr, msgFormat, args);
 
-      while(codeMarks[mark].mLevel > 0)
+      while (codeMarks[mark].mLevel > 0)
         {
           const uint_t prevLevel = codeMarks[mark].mLevel - 1;
 
-          while(codeMarks[mark].mLevel > prevLevel)
+          while (codeMarks[mark].mLevel > prevLevel)
             {
               assert(mark > 0);
               --mark;

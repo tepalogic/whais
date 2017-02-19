@@ -303,7 +303,7 @@ wh_utf8_strlen(const uint8_t* utf8Str)
 {
   int result = 0;
 
-  while(*utf8Str != 0)
+  while (*utf8Str != 0)
     {
       const uint_t chSize = wh_utf8_cu_count(utf8Str[0]);
       if (chSize == 0)
@@ -321,7 +321,7 @@ wh_utf16_strlen(const uint16_t* utf16Str)
 {
   int result = 0;
 
-  while(*utf16Str != 0)
+  while (*utf16Str != 0)
     {
       const uint_t chSize = wh_utf16_cu_count(utf16Str[0]);
       if (chSize == 0)

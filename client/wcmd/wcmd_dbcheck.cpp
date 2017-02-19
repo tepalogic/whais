@@ -42,7 +42,7 @@ ask_question(const char* question, const bool allowAllYes = false)
   if (sgAllAnswersYes)
     return true;
 
-  while(true)
+  while (true)
     {
       char c;
 

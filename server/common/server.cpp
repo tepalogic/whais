@@ -167,7 +167,7 @@ client_handler_routine(void* args)
       client->mLastReqTick = wh_msec_ticks(); //Start authentication timer.
       ClientConnection connection(*client, *sDbsDescriptors);
 
-      while(true)
+      while (true)
         {
           const COMMAND_HANDLER* cmds;
 
@@ -371,7 +371,7 @@ ticks_routine()
         if (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
           reqCheckElapsedTics = 0;
     }
-  while(true);
+  while (true);
 
   LockRAII<Lock> holder(sClosingLock);
 
@@ -411,7 +411,7 @@ listener_routine(void* args)
 
     bool acceptUserConnections = sAcceptUsersConnections;
 
-    while(acceptUserConnections)
+    while (acceptUserConnections)
       {
         try
         {

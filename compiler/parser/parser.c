@@ -39,7 +39,7 @@ alloc_sem_value(struct ParserState* const parser)
   uint_t           iter        = 0;
   uint_t           stored_vals = wh_array_count(&parser->values);
 
-  while(iter < stored_vals)
+  while (iter < stored_vals)
     {
       result = wh_array_get(&parser->values, iter);
       assert(result != NULL);

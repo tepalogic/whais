@@ -76,7 +76,7 @@ CmdLineParser::Parse()
                              );
     }
 
-  while(index < mArgCount)
+  while (index < mArgCount)
     {
       if (isStrEqual(mArgs[index], "-h") ||
           isStrEqual(mArgs[index], "--help"))

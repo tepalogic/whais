@@ -135,7 +135,7 @@ whf_read(WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
   bool_t result       = TRUE;
   uint_t actual_count = 0;
 
-  while(actual_count < size)
+  while (actual_count < size)
     {
       DWORD count;
       if ( ! ReadFile(hnd,
@@ -164,7 +164,7 @@ whf_write(WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
   bool_t result       = TRUE;
   uint_t actualCount = 0;
 
-  while(actualCount < size)
+  while (actualCount < size)
     {
       DWORD count;
       if ( ! WriteFile(hnd,

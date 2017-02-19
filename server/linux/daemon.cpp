@@ -206,7 +206,7 @@ boot_server()
     uint_t configLine = 0;
     config->clear();
     config->seekg(0);
-    while(FindNextContextSection(*config, configLine))
+    while (FindNextContextSection(*config, configLine))
       {
         DBSDescriptors dbs(configLine);
 

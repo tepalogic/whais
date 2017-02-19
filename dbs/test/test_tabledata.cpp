@@ -285,7 +285,7 @@ print_table_fields(IDBSHandler& rDbs, const char* tb_name)
   ITable& table      = rDbs.RetrievePersistentTable(tb_name);
 
   std::cout << "Field list:" << std::endl;
-  while(fieldIndex < table.FieldsCount())
+  while (fieldIndex < table.FieldsCount())
     {
       DBSFieldDescriptor currField = table.DescribeField(fieldIndex);
 
@@ -304,7 +304,7 @@ add_fixed_values_vector_to_table(ITable& table, std::vector<T> &vectValues)
 {
   uint_t fieldIndex = 0;
 
-  while(fieldIndex < table.FieldsCount())
+  while (fieldIndex < table.FieldsCount())
     {
       DBSFieldDescriptor desc = table.DescribeField(fieldIndex);
       if ((desc.type == vectValues[0].DBSType()) &&
@@ -361,7 +361,7 @@ test_fixed_values_vector_reverse(ITable& table,
       if (! (fieldValue == vectValues[rowIndex]))
         return false;
     }
-  while(rowIndex > 0);
+  while (rowIndex > 0);
 
   return true;
 }

@@ -144,7 +144,7 @@ cmdHelp(const string& cmdLine, ENTRY_CMD_CONTEXT)
       //This is the only token. List commands.
       map<string, CmdEntry>::iterator it = sCommands.begin();
 
-      while(it != sCommands.end())
+      while (it != sCommands.end())
         {
           const streamsize prevWidth = cout.width(20);
           const char       prevFill  = cout.fill(' ');
@@ -195,7 +195,7 @@ cmdEcho(const string& cmdLine, ENTRY_CMD_CONTEXT)
 
   assert(token == "echo");
 
-  while(currPosition < cmdLine.length()
+  while (currPosition < cmdLine.length()
          && isspace(cmdLine.at(currPosition)))
     {
       ++currPosition;

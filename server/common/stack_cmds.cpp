@@ -614,7 +614,7 @@ cmd_update_stack_top(ClientConnection& conn, uint_t* const inoutDataOff)
               if (*inoutDataOff > dataSize)
                 goto update_frame_error;
 
-              while((*inoutDataOff < dataSize) && (elCount > 0))
+              while ((*inoutDataOff < dataSize) && (elCount > 0))
                 {
                   IOperand& operand          = rowValue.Operand();
                   StackValue arrayValuevalue = operand.GetValueAt(fromPos);
@@ -666,7 +666,7 @@ cmd_update_stack_top(ClientConnection& conn, uint_t* const inoutDataOff)
                   if (*inoutDataOff >= dataSize)
                     goto update_frame_error;
                 }
-              while(data[*inoutDataOff] != 0);
+              while (data[*inoutDataOff] != 0);
 
               *inoutDataOff += sizeof(uint8_t);
 
@@ -711,7 +711,7 @@ cmd_update_stack_top(ClientConnection& conn, uint_t* const inoutDataOff)
           uint64_t fromPos = load_le_int64(data + *inoutDataOff);
           *inoutDataOff += sizeof(uint64_t);
 
-          while((*inoutDataOff < dataSize) && (elCount > 0))
+          while ((*inoutDataOff < dataSize) && (elCount > 0))
             {
               IOperand&  operand    = stackTop.Operand();
               StackValue arrayValue = operand.GetValueAt(fromPos);
@@ -762,7 +762,7 @@ cmd_update_stack_top(ClientConnection& conn, uint_t* const inoutDataOff)
               if (*inoutDataOff >= dataSize)
                 goto update_frame_error;
             }
-          while(data[*inoutDataOff] != 0);
+          while (data[*inoutDataOff] != 0);
 
           *inoutDataOff += sizeof(uint8_t);
 
@@ -1308,7 +1308,7 @@ cmd_read_table_stack_top(ClientConnection& conn,
   store_le_int16(fieldsCount, data + *inoutDataOffset);
   *inoutDataOffset += sizeof(uint16_t);
 
-  while(currentRow < rowsCount)
+  while (currentRow < rowsCount)
     {
       for (uint_t fieldId = 0; fieldId < fieldsCount; ++fieldId)
         {

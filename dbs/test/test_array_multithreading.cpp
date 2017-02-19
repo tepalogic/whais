@@ -52,7 +52,7 @@ test_array_sort(void *)
 
         testValues[j].Sort();
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
         if (wh_rnd() & 1)
@@ -84,7 +84,7 @@ test_array_remove(void* )
 
         testValues[j].Remove(0);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -116,7 +116,7 @@ test_array_set(void* )
 
         testValues[j].Set(0, (wh_rnd() & 1) ? DInt64() : DInt64(wh_rnd()));
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -149,7 +149,7 @@ test_array_add(void* )
 
         testValues[j].Add(DInt64(wh_rnd()));
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -183,7 +183,7 @@ test_array_get(void* )
 
         testValues[j].Get(0, v);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -217,7 +217,7 @@ test_mirror(void* )
 
         testValues[j].MakeMirror(testValues[z]);
 
-        while(resetStart)
+        while (resetStart)
           wh_sleep(1);
 
 
@@ -241,7 +241,7 @@ reset_array_variables(void *)
 
   try
   {
-      while( ! testEnd)
+      while ( ! testEnd)
         {
           resetStart = true;
           uint_t i;

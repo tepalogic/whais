@@ -119,7 +119,7 @@ whf_read(WH_FILE hnd, uint8_t* dstBuffer, uint_t size)
   bool_t result      = TRUE;
   uint_t actualCount = 0;
 
-  while(actualCount < size)
+  while (actualCount < size)
     {
       uint_t count = read(hnd,
                            dstBuffer + actualCount,
@@ -156,7 +156,7 @@ whf_write(WH_FILE hnd, const uint8_t* srcBuffer, uint_t size)
   bool_t result       = TRUE;
   uint_t actual_count = 0;
 
-  while(actual_count < size)
+  while (actual_count < size)
     {
       uint_t count = write(hnd,
                             srcBuffer + actual_count,

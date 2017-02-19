@@ -70,7 +70,7 @@ ITextStrategy::operator== (ITextStrategy& o)
   uint8_t buff2[sizeof buff1];
 
   uint64_t offset = 0;
-  while(offset < utf8Count)
+  while (offset < utf8Count)
     {
       const uint_t chunkSize = MIN(sizeof buff1, utf8Count - offset);
       ReadUtf8U(offset, chunkSize, buff1);
@@ -118,7 +118,7 @@ ITextStrategy::CharsUntilOffsetU(const uint64_t offset)
 
   uint64_t buffOffset = 0, buffValid = 0;
   uint8_t tempBuffer[256];
-  while(mCachedCharIndexOffset < maxOffset)
+  while (mCachedCharIndexOffset < maxOffset)
     {
       if (buffOffset >= buffValid)
         {
@@ -177,7 +177,7 @@ ITextStrategy::OffsetOfCharU(const uint64_t index)
       const uint64_t maxOffset = Utf8CountU();
       uint64_t buffOffset = 0, buffValid = 0;
       uint8_t tempBuffer[256];
-      while(mCachedCharIndex < index)
+      while (mCachedCharIndex < index)
         {
           if (buffOffset >= buffValid)
             {
@@ -200,7 +200,7 @@ ITextStrategy::OffsetOfCharU(const uint64_t index)
       uint64_t startOffset = 0;
       uint_t   tempValid   = 0;
       uint8_t  tempBuffer[128];
-      while(mCachedCharIndex > index)
+      while (mCachedCharIndex > index)
         {
           startOffset = max<int64_t> (lastOffset - sizeof tempBuffer, 0);
           tempValid = lastOffset - startOffset;
@@ -217,7 +217,7 @@ ITextStrategy::OffsetOfCharU(const uint64_t index)
                     break;
                 }
             }
-          while(startOffset < lastOffset);
+          while (startOffset < lastOffset);
         }
     }
 
@@ -262,7 +262,7 @@ ITextStrategy::CharAtU(const uint64_t index)
       const uint64_t maxOffset = Utf8CountU();
       uint64_t buffOffset = 0, buffValid = 0;
       uint8_t tempBuffer[256];
-      while(true)
+      while (true)
         {
           if (buffOffset >= buffValid)
             {
@@ -304,7 +304,7 @@ ITextStrategy::CharAtU(const uint64_t index)
       uint64_t startOffset = 0;
       uint_t   tempValid   = 0;
       uint8_t  tempBuffer[128];
-      while(true)
+      while (true)
         {
           if (mCachedCharIndex == index)
             {
@@ -344,7 +344,7 @@ ITextStrategy::CharAtU(const uint64_t index)
                     break;
                 }
             }
-          while(startOffset < lastOffset);
+          while (startOffset < lastOffset);
         }
     }
 
@@ -365,7 +365,7 @@ ITextStrategy::DuplicateU()
   const uint64_t utf8Count = Utf8CountU();
   uint64_t offset = 0;
   uint8_t tempBuffer[256];
-  while(offset < utf8Count)
+  while (offset < utf8Count)
     {
       const uint_t chunkSize  = MIN(sizeof tempBuffer, utf8Count - offset);
       ReadUtf8U(offset, chunkSize, tempBuffer);
@@ -403,7 +403,7 @@ ITextStrategy::ToCaseU(const bool toLower)
   const uint64_t utf8Count = Utf8CountU();
   uint64_t offset = 0, charsRemained = mCachedCharsCount;
   uint8_t tempBuffer[256];
-  while(charsRemained > 0)
+  while (charsRemained > 0)
     {
       assert(offset < utf8Count);
 
@@ -411,7 +411,7 @@ ITextStrategy::ToCaseU(const bool toLower)
       ReadUtf8U(offset, chunkSize, tempBuffer);
 
       uint_t buffValid = 0;
-      while(charsRemained > 0)
+      while (charsRemained > 0)
       {
         uint32_t cp = 0;
         if (buffValid >= chunkSize)
@@ -527,7 +527,7 @@ ITextStrategy::AppendU(ITextStrategy& text)
   uint8_t tempBuffer[256];
   uint64_t offset = 0;
   const uint64_t utf8Count = text.Utf8CountU();
-  while(offset < utf8Count)
+  while (offset < utf8Count)
     {
       const uint_t chunkSize = MIN(sizeof tempBuffer, utf8Count - offset);
 
@@ -593,13 +593,13 @@ ITextStrategy::AppendU(ITextStrategy&   text,
   uint8_t tempBuffer[256];
   uint64_t offset = utf8OffFrom;
   const uint64_t utf8To = MIN(text.Utf8CountU(), utf8OffTo);
-  while(offset < utf8To)
+  while (offset < utf8To)
     {
       const uint_t chunkSize = MIN(sizeof tempBuffer, utf8To - offset);
       text.ReadUtf8U(offset, chunkSize, tempBuffer);
 
       uint_t buffValid = 0;
-      while(buffValid < chunkSize)
+      while (buffValid < chunkSize)
         {
           const uint8_t cuCount = wh_utf8_cu_count(tempBuffer[buffValid]);
 
@@ -731,7 +731,7 @@ ITextStrategy::UpdateCharAtU(const uint32_t   newCh,
         uint8_t buffer[256];
         uint64_t  offset = result->Utf8CountU();
         const uint64_t from = mCachedCharIndexOffset + oldCUCnt;
-        while(from < offset)
+        while (from < offset)
           {
             const uint_t chunkSize = MIN(sizeof buffer, offset - from);
 
@@ -755,7 +755,7 @@ ITextStrategy::UpdateCharAtU(const uint32_t   newCh,
       result->WriteUtf8U(mCachedCharIndexOffset, newCUCnt, newBuff);
       const uint64_t utf8Count = result->Utf8CountU();
       uint64_t offset = mCachedCharIndexOffset + oldCUCnt;
-      while(offset < utf8Count)
+      while (offset < utf8Count)
         {
           const uint_t chunkSize = MIN(sizeof buffer, utf8Count - offset);
           result->ReadUtf8U(offset, chunkSize, buffer);
@@ -841,7 +841,7 @@ ITextStrategy::Replace(ITextStrategy&   text,
                                                  fromCh,
                                                  toCh,
                                                  ignoreCase);
-  while(matchPos >= 0)
+  while (matchPos >= 0)
     {
       result->AppendU(text, lastMatchPos, matchPos);
       result->AppendU(*ns);
@@ -1004,7 +1004,7 @@ get_utf8_string_length(const uint8_t* utf8Str,
   uint64_t result = 0;
 
   *outCharsCount = 0;
-  while((maxBytesCount > 0) && (utf8Str[0] != 0))
+  while ((maxBytesCount > 0) && (utf8Str[0] != 0))
     {
       const uint_t charSize = _cuCache.Count(utf8Str[0]);
 
@@ -1267,7 +1267,7 @@ RowFieldText::WriteUtf8U(const uint64_t       offset,
       uint8_t buffer[256];
       uint64_t offset = 0;
 
-      while(offset < mUtf8Count)
+      while (offset < mUtf8Count)
         {
           const uint_t chunkSize = MIN(sizeof buffer, mUtf8Count - offset);
           mStorage.GetRecord(mFirstEntry,
@@ -1302,7 +1302,7 @@ RowFieldText::TruncateUtf8U(const uint64_t atOffset)
       uint8_t buffer[256];
       uint64_t offset = 0;
 
-      while(offset < MIN(mUtf8Count, atOffset))
+      while (offset < MIN(mUtf8Count, atOffset))
         {
           const uint_t chunkSize = MIN(sizeof buffer,
                                         MIN(mUtf8Count, atOffset) - offset);
@@ -1363,7 +1363,7 @@ StringMatcher::StringMatcher(ITextStrategy& pattern)
   if (mPatternSize < pattern.Utf8CountU())
     {
       uint_t chOffset = 0;
-      while(chOffset < mPatternSize)
+      while (chOffset < mPatternSize)
         {
           const uint32_t codeUnits = _cuCache.Count(mPatternRaw[chOffset]);
 
@@ -1423,7 +1423,7 @@ StringMatcher::FindMatch(ITextStrategy&  text,
     {
       uint_t chOffset = 0;
 
-      while(chOffset < mPatternSize)
+      while (chOffset < mPatternSize)
         {
           uint32_t codePoint;
 
@@ -1499,7 +1499,7 @@ compare_text_buffers(const uint8_t* buffer1,
   const uint_t maxSize = *ioSize;
 
   uint_t offset = 0;
-  while(offset < maxSize)
+  while (offset < maxSize)
     {
       const uint_t chSize = _cuCache.Count(buffer1[offset]);
 
@@ -1545,7 +1545,7 @@ StringMatcher::SuffixesMatch() const
   if (mText->Utf8CountU() < (mCurrentRawOffset + buffSize))
     return false;
 
-  while(buffOffset < buffSize)
+  while (buffOffset < buffSize)
     {
       uint8_t   buffer1[64];
       uint8_t   buffer2[sizeof buffer1];
@@ -1575,7 +1575,7 @@ StringMatcher::FindInCache() const
 
   uint_t windowsPos = mCurrentRawOffset - mCacheStartPos + mPatternSize - 1;
 
-  while(windowsPos < mCacheValid)
+  while (windowsPos < mCacheValid)
     {
       const uint_t shift = ComparingWindowShift(windowsPos);
 
@@ -1598,7 +1598,7 @@ StringMatcher::CountCachedChars(const uint_t offset)
   assert((mCacheStartPos <= mCurrentRawOffset)
           && (mCurrentRawOffset < (mCacheStartPos + mCacheValid)));
 
-  while(chOffset < offset)
+  while (chOffset < offset)
     {
       const uint_t codeUnits = _cuCache.Count(mTextRawCache[chOffset]);
 
@@ -1641,7 +1641,7 @@ StringMatcher::FillTextCache()
     {
       uint_t chOffset = 0;
 
-      while(chOffset < mCacheValid)
+      while (chOffset < mCacheValid)
         {
           uint32_t codePoint;
 
@@ -1676,7 +1676,7 @@ StringMatcher::FindSubstr()
   const uint64_t textSize = mText->OffsetOfCharU(mLastChar);
 
   int cacheOffset = 0;
-  while(mCurrentRawOffset < textSize)
+  while (mCurrentRawOffset < textSize)
     {
       if ( ! FillTextCache())
         return PATTERN_NOT_FOUND;

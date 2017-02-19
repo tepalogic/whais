@@ -45,7 +45,7 @@ static bool_t
 check_used_vals(struct ParserState* pState)
 {
   int vals_count = wh_array_count(&pState->values);
-  while(--vals_count >= 0)
+  while (--vals_count >= 0)
     {
       struct SemValue *val = wh_array_get(&pState->values, vals_count);
       if (val->val_type != VAL_REUSE)
@@ -78,7 +78,7 @@ check_type_spec_fill(const struct TypeSpec* ts,
         return TRUE;
     }
 
-  while(count < ((uint_t)load_le_int16(ts->dataSize)) - 2)
+  while (count < ((uint_t)load_le_int16(ts->dataSize)) - 2)
     {
       uint16_t temp = strlen((char *) it) + 1;
 
@@ -112,7 +112,7 @@ check_container_field(struct Statement *stmt,
   char result = TRUE;
   unsigned int f_len = (field != NULL) ? strlen(field) : 0;
 
-  while(extra != NULL)
+  while (extra != NULL)
     {
       result = FALSE;                /* changed to TRUE if everything is good */
       if (IS_TABLE_FIELD( extra->type) == FALSE)

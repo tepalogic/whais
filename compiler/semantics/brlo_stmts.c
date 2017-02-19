@@ -284,7 +284,7 @@ finalize_if_stmt(struct ParserState* const parser)
       allBranchesReturn &= branchIt->returnDetected;
       allBranchesReturn &= branchIt->prevReturnDetected;
     }
-  while(branchIt->type == BT_ELSEIF);
+  while (branchIt->type == BT_ELSEIF);
 
   wh_array_resize(branchStack, branchId);
 
@@ -472,7 +472,7 @@ finalize_for_stmt(struct ParserState* const parser)
       /* Make the jump corrections. */
       store_le_int32(offset, code + loopIt->breakMark + 1);
     }
-  while((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   assert((loopIt->type == LE_FOR_BEGIN)
           || (loopIt->type == LE_FOREACH_BEGIN));
@@ -574,7 +574,7 @@ finalize_while_stmt(struct ParserState* const parser)
       /* Make the jump corrections. */
       store_le_int32(offset, code + loopIt->breakMark + 1);
     }
-  while((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   assert(loopIt->type == LE_WHILE_BEGIN);
 
@@ -659,7 +659,7 @@ finalize_until_stmt(struct ParserState* const parser, YYSTYPE exp)
         }
       store_le_int32(offset, code + loopIt->breakMark + 1);
     }
-  while((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
+  while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   wh_array_resize(loopsStack, loopId);
 }
@@ -710,7 +710,7 @@ handle_continue_stmt(struct ParserState* const parser)
   const struct Loop*   loopIt     = NULL;
   struct Loop          loop;
 
-  while(loopId != 0)
+  while (loopId != 0)
     {
       loopIt = wh_array_get(loopsStack, --loopId);
       if ((loopIt->type != LE_CONTINUE) && (loopIt->type != LE_BREAK))

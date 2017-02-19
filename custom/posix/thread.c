@@ -50,7 +50,7 @@ wh_lock_init(WH_LOCK* const lock)
 
   do
     result = pthread_mutex_init(lock, &attrs);
-  while(result == EAGAIN);
+  while (result == EAGAIN);
 
 
   if (result == 0)
@@ -68,7 +68,7 @@ wh_lock_destroy(WH_LOCK* const lock)
 
   do
     result = pthread_mutex_destroy(lock);
-  while(result == EAGAIN);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -84,7 +84,7 @@ wh_lock_acquire(WH_LOCK* const lock)
 
   do
     result = pthread_mutex_lock(lock);
-  while(result == EAGAIN);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -101,7 +101,7 @@ wh_lock_try_acquire(WH_LOCK* const lock,
 
   do
     result = pthread_mutex_trylock(lock);
-  while(result == EAGAIN);
+  while (result == EAGAIN);
 
   if (result == 0)
     {
@@ -125,7 +125,7 @@ wh_lock_release(WH_LOCK* const lock)
 
   do
     result = pthread_mutex_unlock(lock);
-  while(result == EAGAIN);
+  while (result == EAGAIN);
 
   if (result == 0)
     return WOP_OK;
@@ -143,7 +143,7 @@ wh_thread_create(WH_THREAD*  const             outThread,
 
   do
     result = pthread_create(outThread, NULL, (void* (*)(void*))routine, args);
-  while(result == (uint_t)EAGAIN);
+  while (result == (uint_t)EAGAIN);
 
   if (result == 0)
     result = pthread_detach(*outThread);
@@ -222,7 +222,7 @@ __sync_fetch_and_add_8(volatile int64_t* const value, int64_t v)
 
   int64_t result;
 
-  while(__sync_fetch_and_add(&m, 1) != 0)
+  while (__sync_fetch_and_add(&m, 1) != 0)
     {
       __sync_fetch_and_sub(&m, 1);
       sched_yield();
@@ -243,7 +243,7 @@ __sync_fetch_and_sub_8(volatile int64_t* const value, int64_t v)
 
   int64_t result;
 
-  while(__sync_fetch_and_add(&m, 1) != 0)
+  while (__sync_fetch_and_add(&m, 1) != 0)
     {
       __sync_fetch_and_sub(&m, 1);
       sched_yield();

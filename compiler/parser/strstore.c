@@ -67,7 +67,7 @@ void
 release_string_store(StringStoreHnd* handle)
 {
   struct StoreLink* link = (struct StoreLink*) handle;
-  while(link != NULL)
+  while (link != NULL)
     {
       struct StoreLink* const temp = link->next;
 
@@ -83,7 +83,7 @@ alloc_str(StringStoreHnd handle, uint_t length)
   struct StoreLink* link   = (struct StoreLink*) handle;
   char*             result = NULL;
 
-  while((link->unused < length) && (link->next != NULL))
+  while ((link->unused < length) && (link->next != NULL))
     link = link->next;
 
   if (link->unused >= length)

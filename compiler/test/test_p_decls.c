@@ -34,7 +34,7 @@ static bool_t
 check_used_vals(struct ParserState *state)
 {
   int vals_count = wh_array_count(&state->values);
-  while(--vals_count >= 0)
+  while (--vals_count >= 0)
     {
       struct SemValue *val = wh_array_get(&state->values, vals_count);
       if (val->val_type != VAL_REUSE)
@@ -53,7 +53,7 @@ check_container_field(struct DeclaredVar *extra, char * field,
 {
   char result = FALSE;
   unsigned int f_len = strlen(field);
-  while(extra != NULL)
+  while (extra != NULL)
     {
       if (IS_TABLE_FIELD( extra->type) == FALSE)
         {
@@ -127,7 +127,7 @@ general_proc_check(struct Statement *glb_stmt,
       return FALSE;
     }
 
-  while(count < wh_array_count(&(proc_stmt->decls)))
+  while (count < wh_array_count(&(proc_stmt->decls)))
     {
       struct DeclaredVar *var = wh_array_get(&(proc_stmt->decls), count);
       if (IS_TABLE_FIELD( var->type) == FALSE)

@@ -56,7 +56,7 @@ read_real(const uint8_t*   from,
     }
 
   uint64_t intPart = 0, fracPart = 0, precision = 1;
-  while(('0' <= *from) && (*from <= '9' ))
+  while (('0' <= *from) && (*from <= '9' ))
     {
       if ((intPart * 10 + (*from - '0')) > MAX_SIGNED_ABS)
         return 0; // Overflow
@@ -75,7 +75,7 @@ read_real(const uint8_t*   from,
         return 0;
     }
 
-  while(('0' <= *from) && (*from <= '9' ))
+  while (('0' <= *from) && (*from <= '9' ))
     {
       if ((fracPart > (fracPart * 10 + (*from - '0')))
           || (precision > precision * 10))
@@ -132,7 +132,7 @@ read_integer(const uint8_t*    from,
       *outCount  += 1;
     }
 
-  while(*from >= '0' && *from <= '9')
+  while (*from >= '0' && *from <= '9')
     {
       if ((isSigned && ((result * 10 + (*from - '0')) > MAX_SIGNED_ABS))
           || ( ! isSigned && (result > (result * 10 + (*from - '0')))))
@@ -1156,7 +1156,7 @@ Utf8Translator::Write(uint8_t* const      utf8Dest,
          }
 
        uint64_t precision = value.mValue.Precision() / 10;
-       while(precision > fracPart)
+       while (precision > fracPart)
          {
            if (result + 1 >= maxSize)
              return 0;
@@ -1169,7 +1169,7 @@ Utf8Translator::Write(uint8_t* const      utf8Dest,
            precision /= 10;
          }
 
-       while((fracPart % 10) == 0)
+       while ((fracPart % 10) == 0)
          fracPart /= 10;
 
        if (snprintf(tempBuffer,
@@ -1255,7 +1255,7 @@ Utf8Translator::Write(uint8_t* const      utf8Dest,
          }
 
        uint64_t precision = value.mValue.Precision() / 10;
-       while(precision > fracPart)
+       while (precision > fracPart)
          {
            if (result + 1 >= maxSize)
              return 0;
@@ -1268,7 +1268,7 @@ Utf8Translator::Write(uint8_t* const      utf8Dest,
            precision /= 10;
          }
 
-       while((fracPart % 10) == 0)
+       while ((fracPart % 10) == 0)
          fracPart /= 10;
 
        if (snprintf(tempBuffer,

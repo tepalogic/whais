@@ -174,7 +174,7 @@ cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  while(linePos <= cmdLine.length())
+  while (linePos <= cmdLine.length())
     {
       token = CmdLineNextToken(cmdLine, linePos);
       if (token.length() == 0)
@@ -194,7 +194,7 @@ cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
 
   uint_t glbIt = glbsCount;
-  while((cs == WCS_OK)
+  while ((cs == WCS_OK)
           && (glbIt-- > 0))
     {
       const char* glbName = NULL;
@@ -290,7 +290,7 @@ cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
       else
         cout << wcmd_decode_typeinfo(rawType) << endl;
     }
-  while((linePos < globals.length())
+  while ((linePos < globals.length())
          && (cs == WCS_OK));
 
   if ((cs == WCS_OK)
@@ -351,7 +351,7 @@ cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
       return false;
     }
 
-  while(linePos <= cmdLine.length())
+  while (linePos <= cmdLine.length())
     {
       token = CmdLineNextToken(cmdLine, linePos);
       if (token.length() == 0)
@@ -371,7 +371,7 @@ cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
     }
 
   uint_t procIt = procsCount;
-  while((cs == WCS_OK)
+  while ((cs == WCS_OK)
           && (procIt-- > 0))
     {
       const char* procName = NULL;
@@ -507,11 +507,11 @@ cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
           else
             cout << wcmd_decode_typeinfo(paramType);
         }
-      while(param++ > 0);
+      while (param++ > 0);
 
       cout << endl;
     }
-  while((linePos < procedures.length())
+  while ((linePos < procedures.length())
          && (cs == WCS_OK));
 
   if ((cs == WCS_OK)

@@ -144,7 +144,7 @@ DbsHandler::DbsHandler(const DBSSettings&    settings,
 
   buffer += PS_DBS_HEADER_SIZE;
 
-  while(tablesCount-- > 0)
+  while (tablesCount-- > 0)
     {
       mTables.insert(
           pair<string, PersistentTable*> (_RC(char*, buffer),
@@ -200,7 +200,7 @@ DbsHandler::RetrievePersistentTable(const TABLE_INDEX index)
 
   TABLES::iterator it = mTables.begin();
 
-  while(iterator-- > 0)
+  while (iterator-- > 0)
     {
       assert(it != mTables.end());
 
@@ -351,7 +351,7 @@ DbsHandler::TableName(const TABLE_INDEX index)
 
   TABLES::iterator it = mTables.begin();
 
-  while(iterator-- > 0)
+  while (iterator-- > 0)
     {
       assert(it != mTables.end());
 
@@ -399,7 +399,7 @@ DbsHandler::SyncAllTablesContent()
 
   TABLES::iterator it = mTables.begin();
 
-  while(it != mTables.end())
+  while (it != mTables.end())
     {
       if (it->second != NULL)
         it->second->Flush();
@@ -435,7 +435,7 @@ DbsHandler::SyncTableContent(const TABLE_INDEX index)
 
   TABLE_INDEX      iterator = index;
   TABLES::iterator it       = mTables.begin();
-  while(iterator-- > 0)
+  while (iterator-- > 0)
     {
       assert(it != mTables.end());
 
@@ -691,7 +691,7 @@ DBSValidateDatabase(const char* const name,
   uint16_t       actualCount  = 0;
   const uint16_t tablesCount  = load_le_int16(buffer + PS_DBS_NUM_TABLES_OFF);
   const char*    tableName    = _RC(const char*, buffer + PS_DBS_HEADER_SIZE);
-  while(*tableName != 0)
+  while (*tableName != 0)
    {
       ++actualCount;
 
@@ -766,7 +766,7 @@ DBSRepairDatabase(const char* const            name,
   uint16_t       tablesCount  = load_le_int16(buffer + PS_DBS_NUM_TABLES_OFF);
   uint16_t       actualCount  = 0;
   const char*    tableName    = _RC(const char*, buffer + PS_DBS_HEADER_SIZE);
-  while((*tableName != 0)
+  while ((*tableName != 0)
          && (_SC(uint64_t, (_RC(const uint8_t*, tableName) - buffer))
              < fileSize))
     {

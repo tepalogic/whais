@@ -106,7 +106,7 @@ cmd_value_desc(ClientConnection& conn)
                 }
 
               bool oneAtLeast = false;
-              while(fieldHint < fieldsCount)
+              while (fieldHint < fieldsCount)
                 {
                   const char* fieldName =
                           session.GlobalValueFieldName(glbName, fieldHint);
@@ -190,7 +190,7 @@ cmd_value_desc(ClientConnection& conn)
                 }
 
               bool oneAtLeast = false;
-              while(fieldHint < fieldsCount)
+              while (fieldHint < fieldsCount)
                 {
                   const DBSFieldDescriptor fd = table.DescribeField(fieldHint);
 
@@ -382,7 +382,7 @@ cmd_update_stack(ClientConnection& conn)
       goto cmd_update_exit;
     }
 
-  while(dataOff < conn.DataSize())
+  while (dataOff < conn.DataSize())
     {
       const uint8_t subcmd = data[dataOff++];
       switch(subcmd)
@@ -840,7 +840,7 @@ cmd_procedure_param_desc(ClientConnection& conn)
           oneAtLeast      = true;
           lastValidOffset = offset;
         }
-      while(hint < paramsCount);
+      while (hint < paramsCount);
 
       if (! oneAtLeast)
         {

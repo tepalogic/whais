@@ -98,7 +98,7 @@ Exception::Message(const char* fmtMsg, va_list vl)
 
   int maxSize = 128;
 
-  while(true)
+  while (true)
     {
       msgHolder.resize(maxSize);
       va_copy(c_vl, vl);

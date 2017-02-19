@@ -97,13 +97,13 @@ next_token(const char*     buffer,
   assert(outToken != NULL);
   assert(outTokenLen != NULL);
 
-  while(isspace(*buffer))
+  while (isspace(*buffer))
     ++buffer;
 
   if (*buffer == '#')
     {
       /* skip line with commentaries and try again */
-      while(!is_eol( *buffer))
+      while (!is_eol( *buffer))
         ++buffer;
 
       return next_token(buffer, outToken, outTokenLen);
@@ -126,7 +126,7 @@ next_token(const char*     buffer,
           buffer += 2;
         }
 
-      while(is_numeric( *buffer, isHexa))
+      while (is_numeric( *buffer, isHexa))
         buffer++;
 
       result = TK_NUMERIC;
@@ -134,7 +134,7 @@ next_token(const char*     buffer,
         {
           ++buffer;
 
-          while(is_numeric( *buffer, FALSE))
+          while (is_numeric( *buffer, FALSE))
             ++buffer;
 
           result = TK_REAL;
@@ -149,7 +149,7 @@ next_token(const char*     buffer,
     }
   else if (is_idlegal( *buffer))
     {
-      while(is_idlegal( *buffer))
+      while (is_idlegal( *buffer))
         buffer++;
 
       result = TK_IDENTIFIER;
@@ -182,7 +182,7 @@ next_token(const char*     buffer,
               return TK_ERROR;
             }
         }
-      while(*buffer != '\"');
+      while (*buffer != '\"');
 
       buffer++;
 
@@ -207,7 +207,7 @@ next_token(const char*     buffer,
               return TK_ERROR;
             }
         }
-      while(*buffer != '\'');
+      while (*buffer != '\'');
 
       buffer++;
 
@@ -224,7 +224,7 @@ next_token(const char*     buffer,
               hexa = TRUE;
             }
 
-          while(is_numeric( (*outToken)[entrySize], hexa))
+          while (is_numeric( (*outToken)[entrySize], hexa))
             ++entrySize;
         }
       else
@@ -325,7 +325,7 @@ parse_keyword(const char* keyword, uint_t keyLen)
 
   /* Now search the key. */
   i = 0;
-  while(sgKeywords[i].text != NULL)
+  while (sgKeywords[i].text != NULL)
     {
       if (strcmp( sgKeywords[i].text, normalKey) == 0)
         break;
@@ -362,7 +362,7 @@ parse_multichar_operator(const char* op)
 {
   uint_t i = 0;
 
-  while(sgMultiCharOps[i].text != NULL)
+  while (sgMultiCharOps[i].text != NULL)
     {
       if (strncmp( sgMultiCharOps[i].text, op, COMPOSED_OPERATOR_LEN) == 0)
         break;
@@ -407,7 +407,7 @@ parse_integer(const char*      buffer,
   else if (buffer[0] == '0')
     ++buffer, --bufferLen;
 
-  while(bufferLen > 0)
+  while (bufferLen > 0)
     {
       uint8_t digit;
 
@@ -474,7 +474,7 @@ parse_real(const char*      buffer,
       ++buffer, --bufferLen;
     }
 
-  while(bufferLen > 0)
+  while (bufferLen > 0)
     {
       int digit = 0;
 
@@ -624,7 +624,7 @@ parse_string(const char* buffer,
 
   *outDestinationLen = 0;
 
-  while((bufferLen > 0) && (*buffer != '\"'))
+  while ((bufferLen > 0) && (*buffer != '\"'))
     {
       uint32_t currChar = 0;
       uint_t   result;
@@ -1021,7 +1021,7 @@ yyerror(struct ParserState* parser, const char* msg)
   char temp[128] = {0, };
 
   uint_t i, lastTokenOffset = parser->bufferPos;
-  while((lastTokenOffset > 0) && ! isspace(parser->buffer[lastTokenOffset]))
+  while ((lastTokenOffset > 0) && ! isspace(parser->buffer[lastTokenOffset]))
     --lastTokenOffset;
 
   for (i = 0;

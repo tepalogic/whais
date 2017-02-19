@@ -27,7 +27,7 @@ get_buffer_line_from_pos(const char *buffer, uint_t buff_pos)
       return -1;
     }
 
-  while(count < buff_pos)
+  while (count < buff_pos)
     {
       if (buffer[count] == '\n')
         {

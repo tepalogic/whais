@@ -82,7 +82,7 @@ wh_ostream_write(struct WOutputStream* const stream,
     }
 
   /* add the data at the end */
-  while(dataSize-- > 0)
+  while (dataSize-- > 0)
     stream->data[stream->dataSize++] = *data++;
 
   return stream;

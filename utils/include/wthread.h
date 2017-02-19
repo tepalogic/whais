@@ -140,7 +140,7 @@ public:
         return ;
       }
 
-    while(true)
+    while (true)
       {
         mLock1.Acquire();
         mIsAcquireed1 = true;
@@ -201,7 +201,7 @@ public:
 
   void AcquireAll()
   {
-    while(true)
+    while (true)
       {
         mLock1.Acquire();
         mIsAcquireed1 = true;

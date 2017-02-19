@@ -93,10 +93,10 @@ compute_year_attrs( const int                refYear,
   int  cYear            = refYear;
   int  firstJanWeekDay  = refFirstJan;
 
-  while( cYear < year)
+  while ( cYear < year)
     firstJanWeekDay += is_leap_year( cYear++) ? 2 : 1;
 
-  while( year < cYear)
+  while ( year < cYear)
     firstJanWeekDay -= is_leap_year( --cYear) ? 2 : 1;
 
   oAttrs->leaps  = is_leap_year( year);
@@ -247,7 +247,7 @@ add_date_days( int32_t          days,
   int year = *ioYear;
   if (days > 0)
     {
-      while( days > days_of_year( year))
+      while ( days > days_of_year( year))
         {
           if (year > 32767)
             return false;
@@ -258,7 +258,7 @@ add_date_days( int32_t          days,
     }
   else
     {
-      while( days <= 0)
+      while ( days <= 0)
         {
           if (year <= -32768)
             return false;
@@ -272,7 +272,7 @@ add_date_days( int32_t          days,
   assert( (-32768 <= year) && (year <= 32767));
 
   uint8_t month = 2;
-  while( (month <= 12) && (days > days_to_month( year, month)))
+  while ( (month <= 12) && (days > days_to_month( year, month)))
     ++month;
 
   days -= days_to_month( year, --month);

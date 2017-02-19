@@ -28,19 +28,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "client_connection.h"
 
 uint_t
-read_raw_frame(struct INTERNAL_HANDLER* const pHnd,
-                uint_t* const                  outFrameSize)
+read_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
+               uint_t* const                    outFrameSize)
 {
   uint32_t frameId;
   uint16_t frameSize = 0;
 
-  while(frameSize < FRAME_HDR_SIZE)
+  while (frameSize < FRAME_HDR_SIZE)
     {
       uint_t chunkSize = FRAME_HDR_SIZE - frameSize;
 
       const uint32_t status = whs_read(pHnd->socket,
-                                        &pHnd->data[frameSize],
-                                        &chunkSize);
+                                       &pHnd->data[frameSize],
+                                       &chunkSize);
       if (status != WOP_OK)
         return WENC_OS_ERROR(status);
 
@@ -58,34 +58,31 @@ read_raw_frame(struct INTERNAL_HANDLER* const pHnd,
   {
   case FRAME_TYPE_NORMAL:
   case FRAME_TYPE_AUTH_CLNT:
+  {
+    const uint16_t expected = load_le_int16(&pHnd->data[FRAME_SIZE_OFF]);
+
+    if (expected < frameSize || expected > pHnd->dataSize)
+        return WCS_UNEXPECTED_FRAME;
+
+    while (frameSize < expected)
     {
-      const uint16_t expected = load_le_int16(&pHnd->data[FRAME_SIZE_OFF]);
+        uint_t chunkSize = expected - frameSize;
 
-      if ((expected < frameSize)
-          || (expected > pHnd->dataSize))
-        {
-          return WCS_UNEXPECTED_FRAME;
-        }
-
-      while(frameSize < expected)
-        {
-          uint_t chunkSize = expected - frameSize;
-
-          const uint32_t status = whs_read(pHnd->socket,
-                                            &pHnd->data[frameSize],
-                                            &chunkSize);
-          if (status != WOP_OK)
+        const uint32_t status = whs_read(pHnd->socket,
+                                         &pHnd->data[frameSize],
+                                         &chunkSize);
+        if (status != WOP_OK)
             return WENC_OS_ERROR(status);
 
-          else if (chunkSize == 0)
+        else if (chunkSize == 0)
             return WCS_DROPPED;
 
-          frameSize += chunkSize;
-        }
-      *outFrameSize = expected;
-
-      return WCS_OK;
+        frameSize += chunkSize;
     }
+    *outFrameSize = expected;
+        return WCS_OK;
+  }
+
   case FRAME_TYPE_SERV_BUSY:
     return WCS_SERVER_BUSY;
 
@@ -94,7 +91,6 @@ read_raw_frame(struct INTERNAL_HANDLER* const pHnd,
 
   case FRAME_TYPE_COMM_NOSYNC:
     return WCS_COMM_OUT_OF_SYNC;
-
   }
 
   return WCS_UNEXPECTED_FRAME;
@@ -102,8 +98,8 @@ read_raw_frame(struct INTERNAL_HANDLER* const pHnd,
 
 
 uint_t
-write_raw_frame(struct INTERNAL_HANDLER* const pHnd,
-                 const  uint_t                  frameSize)
+write_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
+                 const  uint_t                   frameSize)
 {
   uint_t result = whs_write(pHnd->socket, pHnd->data, frameSize);
 

@@ -880,7 +880,7 @@ DText::ReplaceStrategy(ITextStrategy* const strategy)
       wh_yield();
       _l.Acquire();
     }
-  while(true);
+  while (true);
 }
 
 
@@ -1634,7 +1634,7 @@ DArray::ReplaceStrategy(IArrayStrategy* const strategy)
       wh_yield();
       _l.Acquire();
     }
-  while(true);
+  while (true);
 }
 
 
