@@ -420,12 +420,7 @@ CompiledFileUnit::CompiledFileUnit (const char* file)
     mGlobalsCount (0),
     mProcsCount (0),
     mTypeAreaSize (0),
-    mSymbolsSize (0),
-    mTypeInfo (NULL),
-    mSymbols (NULL),
-    mGlobals (NULL),
-    mProcs (NULL),
-    mProcData (NULL)
+    mSymbolsSize (0)
 {
   ProcessHeader ();
 

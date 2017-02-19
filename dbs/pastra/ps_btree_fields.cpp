@@ -31,7 +31,7 @@ namespace pastra {
 
 
 FieldIndexNodeManager::FieldIndexNodeManager (
-                    auto_ptr<IDataContainer>& container,
+                    unique_ptr<IDataContainer>& container,
                     const uint_t              nodeSize,
                     const uint_t              maxCacheMem,
                     const DBS_FIELD_TYPE      fieldType,
@@ -164,7 +164,7 @@ FieldIndexNodeManager::LoadNode (const NODE_INDEX nodeId)
 {
   assert (nodeId > 0);
 
-  auto_ptr<IBTreeNode> node (NodeFactory (nodeId));
+  unique_ptr<IBTreeNode> node (NodeFactory (nodeId));
 
   assert (mContainer->Size () % NodeRawSize () == 0);
 
@@ -207,7 +207,7 @@ FieldIndexNodeManager::SaveNode (IBTreeNode* const node)
 void
 FieldIndexNodeManager::InitContainer ()
 {
-  auto_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node (NodeFactory (0));
 
   node->Next (NIL_NODE);
   node->Prev (NIL_NODE);
@@ -218,7 +218,7 @@ FieldIndexNodeManager::InitContainer ()
 void
 FieldIndexNodeManager::UpdateContainer ()
 {
-  auto_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node (NodeFactory (0));
 
   node->Next (mFirstFreeNode);
   node->Prev (mRootNode);
@@ -229,7 +229,7 @@ FieldIndexNodeManager::UpdateContainer ()
 void
 FieldIndexNodeManager::InitFromContainer ()
 {
-  auto_ptr<IBTreeNode> node (NodeFactory (0));
+  unique_ptr<IBTreeNode> node (NodeFactory (0));
 
   mContainer->Read (0, NodeRawSize (), node->RawData ());
 

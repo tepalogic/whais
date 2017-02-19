@@ -140,8 +140,8 @@ set_signals ()
 int
 main (int argc, char** argv)
 {
-  auto_ptr<ifstream>   config (NULL);
-  auto_ptr<FileLogger> glbLog (NULL);
+  unique_ptr<ifstream>   config;
+  unique_ptr<FileLogger> glbLog;
 
   displayLicenseInformation (cout, sProgramName, sProgramDesc);
   cout << endl << endl;

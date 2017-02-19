@@ -45,11 +45,12 @@ class StringMatcher;
 
 class ITextStrategy
 {
-  friend class std::auto_ptr<ITextStrategy>;
+  friend class std::unique_ptr<ITextStrategy>;
   friend class pastra::PrototypeTable;
   friend class pastra::StringMatcher;
 
 public:
+  virtual ~ITextStrategy ();
   bool operator== (ITextStrategy& o);
 
   uint64_t CharsCount ();
@@ -125,7 +126,6 @@ protected:
   virtual void TruncateUtf8U (const uint64_t offset) = 0;
 
   ITextStrategy (uint32_t charsCount = 0);
-  virtual ~ITextStrategy ();
 
   virtual uint32_t ReferenceCount () const;
   virtual uint32_t MirrorsCount () const;

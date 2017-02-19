@@ -606,7 +606,7 @@ typedef DBS_BTreeNode<DRichReal, RICHREAL_T, 14>  RichRealBTreeNode;
 class FieldIndexNodeManager : public IBTreeNodeManager
 {
 public:
-  FieldIndexNodeManager (std::auto_ptr<IDataContainer>& container,
+  FieldIndexNodeManager (std::unique_ptr<IDataContainer>& container,
                          const uint_t                   nodeSize,
                          const uint_t                   maxCacheMem,
                          const DBS_FIELD_TYPE           nodeType,
@@ -648,7 +648,7 @@ protected:
   const uint_t                          mMaxCachedMem;
   NODE_INDEX                            mRootNode;
   NODE_INDEX                            mFirstFreeNode;
-  std::auto_ptr<IDataContainer>         mContainer;
+  std::unique_ptr<IDataContainer>         mContainer;
   const DBS_FIELD_TYPE                  mFieldType;
 
 private:

@@ -58,9 +58,6 @@ PrototypeTable::PrototypeTable (DbsHandler& dbs)
     mRowSize (0),
     mDescriptorsSize (0),
     mFieldsCount (0),
-    mFieldsDescriptors (NULL),
-    mRowsSync (),
-    mIndexesSync (),
     mRowModified (false),
     mLockInProgress (false)
 {
@@ -554,8 +551,8 @@ PrototypeTable::CreateIndex (const FIELD_INDEX                 field,
 
   const uint_t nodeSizeKB  = 16; //16KB
 
-  auto_ptr<IDataContainer> indexContainer (CreateIndexContainer (field));
-  auto_ptr<FieldIndexNodeManager> nodeMgr(
+  unique_ptr<IDataContainer> indexContainer (CreateIndexContainer (field));
+  unique_ptr<FieldIndexNodeManager> nodeMgr(
                             new FieldIndexNodeManager (indexContainer,
                                                        nodeSizeKB * 1024,
                                                        0x400000, //4MB
@@ -682,7 +679,7 @@ PrototypeTable::RemoveIndex (const FIELD_INDEX field)
   desc.IndexNodeSizeKB (0);
   desc.IndexUnitsCount (0);
 
-  auto_ptr<FieldIndexNodeManager> fieldMgr (mvIndexNodeMgrs[field]);
+  unique_ptr<FieldIndexNodeManager> fieldMgr (mvIndexNodeMgrs[field]);
   fieldMgr->MarkForRemoval ();
 
   mvIndexNodeMgrs[field] = NULL;
@@ -832,7 +829,7 @@ PrototypeTable::MaxCachedNodes ()
 IBTreeNode*
 PrototypeTable::LoadNode (const NODE_INDEX nodeId)
 {
-  auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
+  unique_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
 
   assert (TableContainer ().Size () % NodeRawSize () == 0);
 
@@ -1730,7 +1727,7 @@ PrototypeTable::RetrieveEntry (const ROW_INDEX   row,
     }
   else if ((fieldValueSize & 0x8000000000000000ull) != 0)
     {
-      std::auto_ptr<IArrayStrategy> strategy (
+      std::unique_ptr<IArrayStrategy> strategy (
                           new TemporalArray (GET_BASIC_TYPE (desc.Type ()))
                                              );
 

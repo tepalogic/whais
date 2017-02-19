@@ -282,7 +282,7 @@ IBTreeNodeManager::RetrieveNode (const NODE_INDEX nodeId)
 
   if (it == mNodesKeeper.end ())
     {
-      auto_ptr<IBTreeNode>         node (LoadNode (nodeId));
+      unique_ptr<IBTreeNode>         node (LoadNode (nodeId));
       pair<NODE_INDEX, CachedData> cachedNode (nodeId,
                                                CachedData (node.get ()));
       mNodesKeeper.insert (cachedNode);

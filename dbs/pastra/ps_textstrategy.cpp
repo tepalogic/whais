@@ -360,7 +360,7 @@ ITextStrategy::DuplicateU ()
   assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+  unique_ptr<ITextStrategy> result (new pastra::TemporalText ());
 
   const uint64_t utf8Count = Utf8CountU ();
   uint64_t offset = 0;
@@ -398,7 +398,7 @@ ITextStrategy::ToCaseU (const bool toLower)
   assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+  unique_ptr<ITextStrategy> result (new pastra::TemporalText ());
 
   const uint64_t utf8Count = Utf8CountU ();
   uint64_t offset = 0, charsRemained = mCachedCharsCount;
@@ -462,7 +462,7 @@ ITextStrategy::AppendU (const uint32_t ch)
   assert (ReferenceCount () > 0);
   assert (ch != 0);
 
-  auto_ptr<ITextStrategy> keeper (NULL);
+  unique_ptr<ITextStrategy> keeper;;
   ITextStrategy* result = this;
 
   if (ReferenceCount () > 1)
@@ -509,7 +509,7 @@ ITextStrategy::AppendU (ITextStrategy& text)
   if (text.Utf8CountU () == 0)
     return this;
 
-  auto_ptr<ITextStrategy> keeper (NULL);
+  unique_ptr<ITextStrategy> keeper;
   ITextStrategy* result = this;
 
   if (ReferenceCount () > 1)
@@ -575,7 +575,7 @@ ITextStrategy::AppendU (ITextStrategy&   text,
       return this;
     }
 
-  auto_ptr<ITextStrategy> keeper (NULL);
+  unique_ptr<ITextStrategy> keeper;
   ITextStrategy* result = this;
 
   if (ReferenceCount () > 1)
@@ -686,7 +686,7 @@ ITextStrategy::UpdateCharAtU (const uint32_t   newCh,
   const uint_t oldCUCnt = wh_utf8_store_size (oldCh.mValue);
   const uint_t newCUCnt = wh_store_utf8_cp (newCh, newBuff);
 
-  auto_ptr<ITextStrategy> keeper (NULL);
+  unique_ptr<ITextStrategy> keeper;
   ITextStrategy* result = this;
 
   if (ReferenceCount () > 1)
@@ -818,7 +818,7 @@ ITextStrategy::Replace (ITextStrategy&   text,
 {
   TripleLockRAII<Lock> _l (mLock, text.mLock, newSubstr.mLock);
 
-  std::auto_ptr<ITextStrategy> _ns (NULL);
+  std::unique_ptr<ITextStrategy> _ns;
   ITextStrategy* ns = &newSubstr;
 
   if (this == ns)
@@ -831,7 +831,7 @@ ITextStrategy::Replace (ITextStrategy&   text,
     }
 
   const uint64_t subStrSize = Utf8CountU ();
-  std::auto_ptr<ITextStrategy> result (new pastra::TemporalText ());
+  std::unique_ptr<ITextStrategy> result (new pastra::TemporalText ());
 
   if (mMatcher == NULL)
     mMatcher = new pastra::StringMatcher (*this);

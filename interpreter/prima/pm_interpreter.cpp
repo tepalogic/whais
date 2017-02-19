@@ -286,7 +286,7 @@ Session::LoadCompiledUnit (WIFunctionalUnit& unit)
                                     unit.GetProcLocalTypeOff (procIt, localIt);
 
             const uint_t tdSize = TypeManager::GetTypeLength (localTypeDesc);
-            auto_ptr<uint8_t> tdBuffer (new uint8_t [tdSize]);
+            unique_ptr<uint8_t> tdBuffer (new uint8_t [tdSize]);
             memcpy (tdBuffer.get (), localTypeDesc, tdSize);
 
             //For table type values, the type would be changed to reflect the
@@ -412,7 +412,7 @@ Session::LoadSharedLib (WH_SHLIB shl)
           const uint8_t* const localType = proc.localsTypes[local];
 
           const uint_t tdSize = TypeManager::GetTypeLength (localType);
-          auto_ptr<uint8_t> td (new uint8_t [tdSize]);
+          unique_ptr<uint8_t> td (new uint8_t [tdSize]);
           memcpy (td.get (), localType, tdSize);
 
           //For table type values, the type would be changed to reflect the
@@ -920,7 +920,7 @@ Session::DefineGlobalValue (const uint8_t* const   name,
     }
 
 
-  auto_ptr<uint8_t> tdBuff (new uint8_t[TypeManager::GetTypeLength (typeDesc)]);
+  unique_ptr<uint8_t> tdBuff (new uint8_t[TypeManager::GetTypeLength (typeDesc)]);
   memcpy (tdBuff.get (), typeDesc, TypeManager::GetTypeLength (typeDesc));
 
   TypeManager& typeMgr = mPrivateNames.Get ().GetTypeManager ();

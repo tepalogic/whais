@@ -196,8 +196,8 @@ clean_frameworks (FileLogger& log)
 static bool
 boot_server (const char* configFile, ostream& errOut)
 {
-  auto_ptr<ifstream>   config (NULL);
-  auto_ptr<FileLogger> glbLog (NULL);
+  unique_ptr<ifstream>   config (NULL);
+  unique_ptr<FileLogger> glbLog (NULL);
 
   config.reset (new ifstream (configFile,
                               ios_base::in | ios_base::binary));

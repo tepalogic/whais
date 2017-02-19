@@ -557,7 +557,7 @@ protected:
   uint32_t                              mRowSize;
   uint32_t                              mDescriptorsSize;
   FIELD_INDEX                           mFieldsCount;
-  std::auto_ptr<uint8_t>                mFieldsDescriptors;
+  std::unique_ptr<uint8_t>                mFieldsDescriptors;
   std::vector<FieldIndexNodeManager*>   mvIndexNodeMgrs;
   BlockCache                            mRowCache;
   Lock                                  mRowsSync;

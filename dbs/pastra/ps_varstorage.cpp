@@ -73,7 +73,6 @@ StoreEntry::Write (uint_t offset, uint_t count, const uint8_t* buffer)
 
 VariableSizeStore::VariableSizeStore ()
   : IBlocksManager (),
-    mEntriesContainer (NULL),
     mEntriesCache (),
     mFirstFreeEntry (0),
     mEntriesCount (0),

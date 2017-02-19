@@ -67,7 +67,7 @@ static const uint64_t PS_FLAG_NOT_CLOSED      = 1;
 static const uint64_t PS_FLAG_TO_REPAIR       = 2;
 
 
-static auto_ptr<DbsManager> dbsMgrs_;
+static unique_ptr<DbsManager> dbsMgrs_;
 
 DbsHandler::DbsHandler (const DBSSettings&    settings,
                         const std::string&    locationDir,
@@ -84,7 +84,7 @@ DbsHandler::DbsHandler (const DBSSettings&    settings,
     mNeedsSync (false)
 {
   const uint_t      fileSize = mFile.Size ();
-  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
+  unique_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t*          buffer = fileContent.get ();
 
   mFile.Seek (0, WH_SEEK_BEGIN);
@@ -559,7 +559,7 @@ DbsHandler::RemoveFromStorage ()
       assert (it->first.c_str () != NULL);
       assert (it->second == NULL);
 
-      auto_ptr<PersistentTable> table (new PersistentTable (*this, it->first));
+      unique_ptr<PersistentTable> table (new PersistentTable (*this, it->first));
 
       table->RemoveFromDatabase ();
     }
@@ -636,7 +636,7 @@ DBSCreateDatabase (const char* const name,
 
   File dbsFile (fileName.c_str (), WH_FILECREATE_NEW | WH_FILEWRITE);
 
-  auto_ptr<uint8_t> header (new uint8_t[PS_DBS_HEADER_SIZE]);
+  unique_ptr<uint8_t> header (new uint8_t[PS_DBS_HEADER_SIZE]);
   uint8_t* const    buffer = header.get ();
 
   memset (buffer, 0, PS_DBS_HEADER_SIZE);
@@ -666,7 +666,7 @@ DBSValidateDatabase (const char* const name,
                           WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
   const uint_t      fileSize = inputFile.Size ();
-  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
+  unique_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
   inputFile.Seek (0, WH_SEEK_BEGIN);
@@ -721,7 +721,7 @@ DBSRepairDatabase (const char* const            name,
                           WH_FILEOPEN_EXISTING | WH_FILERDWR);
 
   const uint64_t    fileSize = inputFile.Size ();
-  auto_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
+  unique_ptr<uint8_t> fileContent (new uint8_t[fileSize]);
   uint8_t* const    buffer = fileContent.get ();
 
   inputFile.Seek (0, WH_SEEK_BEGIN);

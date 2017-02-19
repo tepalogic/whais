@@ -95,31 +95,31 @@ void custom_mem_free (void* ptr);
 
 
 void*
-operator new (std::size_t size) throw (std::bad_alloc);
+operator new (std::size_t size);
 
 void*
-operator new (std::size_t size, const std::nothrow_t&) throw ();
+operator new (std::size_t size, const std::nothrow_t&) noexcept;
 
 void*
 operator new (std::size_t size, const char* file, uint_t line);
 
 void*
-operator new[] (std::size_t size) throw (std::bad_alloc);
+operator new[] (std::size_t size);
 
 void*
-operator new[] (std::size_t size, const std::nothrow_t&) throw ();
+operator new[] (std::size_t size, const std::nothrow_t&) noexcept;
 
 void*
 operator new[] (std::size_t size, const char* file, uint_t line);
 
 void
-operator delete (void* ptr) throw ();
+operator delete (void* ptr) noexcept;
 
 void
 operator delete (void* ptr, const char*, uint_t);
 
 void
-operator delete[] (void* ptr) throw ();
+operator delete[] (void* ptr) noexcept;
 
 void
 operator delete[] (void* ptr, const char*, uint_t );

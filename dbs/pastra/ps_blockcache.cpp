@@ -148,7 +148,7 @@ BlockCache::RetriveItem (const uint64_t item)
         }
     }
 
-  auto_ptr<uint8_t> block (new uint8_t[mBlockSize]);
+  unique_ptr<uint8_t> block (new uint8_t[mBlockSize]);
   uint8_t* const    data_ = block.get ();
 
   mCachedBlocks.insert (pair<uint64_t, BlockEntry> (baseBlockItem,

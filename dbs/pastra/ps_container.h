@@ -170,9 +170,9 @@ public:
 private:
   void  FillCache (uint64_t position);
 
-  std::auto_ptr<TemporalFileContainer> mFileContainer;
-  std::auto_ptr<uint8_t>               mCache_1;
-  std::auto_ptr<uint8_t>               mCache_2;
+  std::unique_ptr<TemporalFileContainer> mFileContainer;
+  std::unique_ptr<uint8_t[]>             mCache_1;
+  std::unique_ptr<uint8_t[]>             mCache_2;
   uint64_t                             mCacheStartPos_1;
   uint64_t                             mCacheEndPos_1;
   uint64_t                             mCacheStartPos_2;

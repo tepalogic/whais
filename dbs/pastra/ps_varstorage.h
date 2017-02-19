@@ -221,7 +221,7 @@ private:
 
   void AddToFreeList (const uint64_t entryId);
 
-  std::auto_ptr<IDataContainer> mEntriesContainer;
+  std::unique_ptr<IDataContainer> mEntriesContainer;
   BlockCache                    mEntriesCache;
   uint64_t                      mFirstFreeEntry;
   uint64_t                      mEntriesCount;

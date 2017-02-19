@@ -44,10 +44,12 @@ class PrototypeTable;
 
 class IArrayStrategy
 {
-  friend class std::auto_ptr<IArrayStrategy>;
+  friend class std::unique_ptr<IArrayStrategy>;
   friend class pastra::PrototypeTable;
 
 public:
+  virtual ~IArrayStrategy ();
+
   uint64_t Count ();
   DBS_BASIC_TYPE Type ();
 
@@ -140,7 +142,7 @@ public:
 
 protected:
   IArrayStrategy (const DBS_BASIC_TYPE elemsType);
-  virtual ~IArrayStrategy ();
+
 
   virtual uint32_t ReferenceCount () const;
   virtual uint32_t MirrorsCount () const;

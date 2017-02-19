@@ -110,7 +110,7 @@ IArrayStrategy::Set (const DBS_BASIC_TYPE type,
   assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  std::auto_ptr<IArrayStrategy> array (NULL);
+  std::unique_ptr<IArrayStrategy> array;
   IArrayStrategy* r = this;
 
   if (type != mElementsType)
@@ -159,7 +159,7 @@ IArrayStrategy::Add (const DBS_BASIC_TYPE type,
   assert ((MirrorsCount () == 0) || (ReferenceCount () == 1));
   assert (ReferenceCount () > 0);
 
-  std::auto_ptr<IArrayStrategy> array (NULL);
+  std::unique_ptr<IArrayStrategy> array;
   IArrayStrategy* r = this;
 
   assert ((T_UNKNOWN < type) && (type < T_TEXT));
@@ -219,7 +219,7 @@ IArrayStrategy::Remove (const uint64_t index)
       return this;
     }
 
-  std::auto_ptr<IArrayStrategy> r (new pastra::TemporalArray (mElementsType));
+  std::unique_ptr<IArrayStrategy> r (new pastra::TemporalArray (mElementsType));
 
   assert (r->mElementRawSize == mElementRawSize);
   assert (r->mElementsType == mElementsType);
@@ -269,7 +269,7 @@ IArrayStrategy::Sort (const bool reverse)
   if (mElementsCount == 0)
     return this;
 
-  std::auto_ptr<IArrayStrategy> array (NULL);
+  std::unique_ptr<IArrayStrategy> array;
   IArrayStrategy* r = this;
 
   assert ((T_UNKNOWN < mElementsType) && (mElementsType < T_TEXT));
@@ -520,7 +520,7 @@ IArrayStrategy::MakeClone ()
 IArrayStrategy*
 IArrayStrategy::Clone ()
 {
-  std::auto_ptr<IArrayStrategy> r (new pastra::TemporalArray (mElementsType));
+  std::unique_ptr<IArrayStrategy> r (new pastra::TemporalArray (mElementsType));
 
   assert (r->mElementRawSize == mElementRawSize);
   assert (r->mElementsType == mElementsType);

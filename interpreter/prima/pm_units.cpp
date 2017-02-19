@@ -112,7 +112,7 @@ UnitsManager::AddUnit (const uint32_t     glbsCount,
                            (glbsCount + procsCount) * sizeof (uint32_t) +
                            constDataSize;
 
-  auto_ptr<uint8_t> entryBuff (new uint8_t[entrySize]);
+  unique_ptr<uint8_t> entryBuff (new uint8_t[entrySize]);
   Unit* const       entry = _RC (Unit*, entryBuff.get ());
 
   entry->mGlbsCount  = glbsCount;

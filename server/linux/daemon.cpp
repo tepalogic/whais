@@ -129,8 +129,8 @@ set_signals ()
 static bool
 boot_server ()
 {
-  auto_ptr<ifstream>   config (NULL);
-  auto_ptr<FileLogger> glbLog (NULL);
+  unique_ptr<ifstream>   config;
+  unique_ptr<FileLogger> glbLog;
 
   config.reset (new ifstream (sConfigFile,
                               ios_base::in | ios_base::binary));

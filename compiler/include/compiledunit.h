@@ -175,16 +175,12 @@ private:
   uint32_t mSymbolsSize;
   uint32_t mConstAreaSize;
 
-#pragma warning (disable: 4251)
-  //Ignore this warning at the STL auto_ptr does not
-  //have any static memebers
-  std::auto_ptr<uint8_t>  mTypeInfo;
-  std::auto_ptr<uint8_t>  mSymbols;
-  std::auto_ptr<uint8_t>  mConstArea;
-  std::auto_ptr<uint8_t>  mGlobals;
-  std::auto_ptr<uint8_t>  mProcs;
-  std::auto_ptr<uint8_t*> mProcData;
-#pragma warning (default: 4251)
+  std::unique_ptr<uint8_t>  mTypeInfo;
+  std::unique_ptr<uint8_t>  mSymbols;
+  std::unique_ptr<uint8_t>  mConstArea;
+  std::unique_ptr<uint8_t>  mGlobals;
+  std::unique_ptr<uint8_t>  mProcs;
+  std::unique_ptr<uint8_t*> mProcData;
 };
 
 

@@ -484,10 +484,7 @@ TemporalFileContainer::TemporalFileContainer (const char*    baseName,
 
 
 TemporalContainer::TemporalContainer (const uint_t reservedMemory)
-  : IDataContainer (),
-    mFileContainer (NULL),
-    mCache_1 (new uint8_t[reservedMemory / 2]),
-    mCache_2 (NULL),
+  : mCache_1 (new uint8_t[reservedMemory / 2]),
     mCacheStartPos_1 (0),
     mCacheEndPos_1 (0),
     mCacheStartPos_2 (0),

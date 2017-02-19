@@ -920,7 +920,7 @@ wh_array_init (const T* const       array,
   else if (array == NULL)
     throw DBSException (_EXTRA (DBSException::BAD_PARAMETERS));
 
-  auto_ptr<IArrayStrategy> s (new TemporalArray (array[0].DBSType ()));
+  unique_ptr<IArrayStrategy> s (new TemporalArray (array[0].DBSType ()));
 
   for (uint64_t index = 0; index < count; ++index)
     {

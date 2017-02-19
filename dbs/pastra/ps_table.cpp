@@ -363,14 +363,14 @@ create_table_file (const uint64_t                  maxFileSize,
   validate_field_descriptors (fields, fieldsCount);
 
   vector<DBSFieldDescriptor> vect (fields + 0, fields + fieldsCount);
-  auto_ptr<uint8_t>          fieldsDescs (new uint8_t[descriptorsSize]);
+  unique_ptr<uint8_t>          fieldsDescs (new uint8_t[descriptorsSize]);
   uint_t                     rowSize;
 
   normalize_fields (vect, &rowSize, fieldsDescs.get ());
 
   File tableFile (filePrefix, WH_FILECREATE_NEW | WH_FILERDWR);
 
-  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
+  unique_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
 
   memcpy (header, PS_TABLE_SIGNATURE, sizeof PS_TABLE_SIGNATURE);
@@ -490,7 +490,7 @@ repair_table_header (const string&             name,
       return false;
     }
 
-  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
+  unique_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
   uint8_t* const    header = tableHeader.get ();
 
   tableFile.Seek (0, WH_SEEK_BEGIN);
@@ -527,7 +527,7 @@ repair_table_header (const string&             name,
       return false;
     }
 
-  auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
+  unique_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
   uint8_t* const     descriptors = fieldsDescs.get ();
 
   if (tableFile.Size () < PS_HEADER_SIZE + descSize)
@@ -728,7 +728,7 @@ private:
 
   virtual IBTreeNode* LoadNode (const NODE_INDEX nodeId)
   {
-    auto_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
+    unique_ptr<TableRmNode> node (new TableRmNode (*this, nodeId));
 
     if (nodeId < mContainer.Size () / NodeRawSize ())
       {
@@ -780,8 +780,6 @@ PersistentTable::PersistentTable (DbsHandler&       dbs,
     mMaxFileSize (0),
     mVSDataSize (0),
     mFileNamePrefix (dbs.WorkingDir () + name),
-    mTableData (NULL),
-    mRowsData (NULL),
     mVSData (NULL),
     mRemoved (false)
 {
@@ -824,8 +822,6 @@ PersistentTable::PersistentTable (DbsHandler&                     dbs,
     mMaxFileSize (0),
     mVSDataSize (0),
     mFileNamePrefix (dbs.WorkingDir () + name),
-    mTableData (NULL),
-    mRowsData (NULL),
     mVSData (NULL),
     mRemoved (false)
 {
@@ -983,7 +979,7 @@ PersistentTable::InitVariableStorages ()
 
         if (fieldDesc.isArray || (fieldDesc.type == T_TEXT))
           {
-            auto_ptr<VariableSizeStore> hold (new VariableSizeStore);
+            unique_ptr<VariableSizeStore> hold (new VariableSizeStore);
 
             hold->Init ((mFileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str (),
                         mVSDataSize,
@@ -1022,7 +1018,7 @@ PersistentTable::InitIndexedFields ()
                               field.NameOffset ();
       containerName += "_bt";
 
-      auto_ptr<IDataContainer> indexContainer(
+      unique_ptr<IDataContainer> indexContainer(
                              new FileContainer (containerName.c_str (),
                                                 mMaxFileSize,
                                                 field.IndexUnitsCount (),
@@ -1333,7 +1329,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
 
   assert (tableFile.Size () >= TableRmNode::RAW_NODE_SIZE);
 
-  auto_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
+  unique_ptr<uint8_t> tableHeader (new uint8_t[PS_HEADER_SIZE]);
 
   tableFile.Seek (0, WH_SEEK_BEGIN);
   tableFile.Read (tableHeader.get (), PS_HEADER_SIZE);
@@ -1356,7 +1352,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
   uint64_t vsDataSize = load_le_int64 (tableHeader.get () +
                                        PS_TABLE_VARSTORAGE_SIZE_OFF);
 
-  auto_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
+  unique_ptr<uint8_t>  fieldsDescs (new uint8_t[descSize]);
 
   assert (tableFile.Size () >= PS_HEADER_SIZE + descSize);
 
@@ -1389,7 +1385,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
 
       FileContainer::Fix (containerName.c_str (), settings.mMaxFileSize, 0);
 
-      auto_ptr<IDataContainer> indexContainer(
+      unique_ptr<IDataContainer> indexContainer(
                              new FileContainer (containerName.c_str (),
                                                 settings.mMaxFileSize,
                                                 0,
@@ -1442,7 +1438,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
                    rowsCount);
     }
 
-  auto_ptr<VariableSizeStore> vsData (new VariableSizeStore);
+  unique_ptr<VariableSizeStore> vsData (new VariableSizeStore);
   if (vsDataSize > 0)
     {
       vsData->Init ((fileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str (),
@@ -1451,7 +1447,7 @@ PersistentTable::RepairTable (DbsHandler&                 dbs,
       vsData->PrepareToCheckStorage ();
     }
 
-  auto_ptr<uint8_t> _d (new uint8_t[rowSize]);
+  unique_ptr<uint8_t> _d (new uint8_t[rowSize]);
   uint8_t* const rowData = _d.get ();
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
     {
@@ -1939,8 +1935,6 @@ TemporalTable::TemporalTable (DbsHandler&                     dbs,
                               const DBSFieldDescriptor* const fields,
                               const FIELD_INDEX               fieldsCount)
   : PrototypeTable (dbs),
-    mTableData (NULL),
-    mRowsData (NULL),
     mVSData (NULL)
 {
 
@@ -1963,7 +1957,7 @@ TemporalTable::TemporalTable (DbsHandler&                     dbs,
   validate_field_descriptors (fields, fieldsCount);
 
   vector<DBSFieldDescriptor> vect (fields + 0, fields + fieldsCount);
-  auto_ptr<uint8_t> fieldDescs (new uint8_t[descriptorsSize]);
+  unique_ptr<uint8_t> fieldDescs (new uint8_t[descriptorsSize]);
 
   uint_t rowSize;
 
@@ -1990,8 +1984,6 @@ TemporalTable::TemporalTable (DbsHandler&                     dbs,
 
 TemporalTable::TemporalTable (const PrototypeTable& prototype)
   : PrototypeTable (prototype),
-    mTableData (NULL),
-    mRowsData (NULL),
     mVSData (NULL)
 {
 
@@ -2029,7 +2021,7 @@ TemporalTable::IsTemporal () const
 ITable&
 TemporalTable::Spawn () const
 {
-  ITable* const result = new TemporalTable (*this);
+  ITable* const result = new TemporalTable ((PrototypeTable&)*this);
 
   mDbs.RegisterTableSpawn ();
 
@@ -2085,7 +2077,7 @@ TemporalTable::VSStore ()
 {
   if (mVSData == NULL)
     {
-      auto_ptr<VariableSizeStore> hold (new VariableSizeStore ());
+      unique_ptr<VariableSizeStore> hold (new VariableSizeStore ());
 
       hold->Init (mDbs.WorkingDir ().c_str (), 4096);
 

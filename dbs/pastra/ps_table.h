@@ -76,8 +76,8 @@ protected:
   uint64_t                     mMaxFileSize;
   uint64_t                     mVSDataSize;
   std::string                  mFileNamePrefix;
-  std::auto_ptr<FileContainer> mTableData;
-  std::auto_ptr<FileContainer> mRowsData;
+  std::unique_ptr<FileContainer> mTableData;
+  std::unique_ptr<FileContainer> mRowsData;
   VariableSizeStore*           mVSData;
   bool                         mRemoved;
 
@@ -131,8 +131,8 @@ protected:
 
   virtual VariableSizeStore& VSStore ();
 
-  std::auto_ptr<TemporalContainer>  mTableData;
-  std::auto_ptr<TemporalContainer>  mRowsData;
+  std::unique_ptr<TemporalContainer>  mTableData;
+  std::unique_ptr<TemporalContainer>  mRowsData;
   VariableSizeStore*                mVSData;
 };
 

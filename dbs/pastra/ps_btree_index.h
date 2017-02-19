@@ -230,7 +230,7 @@ protected:
   const uint_t             mRawNodeSize;
 
 private:
-  std::auto_ptr<NodeHeader> mHeader;
+  std::unique_ptr<NodeHeader> mHeader;
 };
 
 
