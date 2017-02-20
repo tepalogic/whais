@@ -37,23 +37,23 @@ typedef ullong_t  WHT_ROW_INDEX;
 typedef ullong_t  WHT_INDEX;
 
 /* Constants describing the type of values or table fields. */
-static const uint_t WHC_TYPE_BOOL       = 0x0001;
-static const uint_t WHC_TYPE_CHAR       = 0x0002;
-static const uint_t WHC_TYPE_DATE       = 0x0003;
-static const uint_t WHC_TYPE_DATETIME   = 0x0004;
-static const uint_t WHC_TYPE_HIRESTIME  = 0x0005;
-static const uint_t WHC_TYPE_INT8       = 0x0006;
-static const uint_t WHC_TYPE_INT16      = 0x0007;
-static const uint_t WHC_TYPE_INT32      = 0x0008;
-static const uint_t WHC_TYPE_INT64      = 0x0009;
-static const uint_t WHC_TYPE_UINT8      = 0x000A;
-static const uint_t WHC_TYPE_UINT16     = 0x000B;
-static const uint_t WHC_TYPE_UINT32     = 0x000C;
-static const uint_t WHC_TYPE_UINT64     = 0x000D;
-static const uint_t WHC_TYPE_REAL       = 0x000E;
-static const uint_t WHC_TYPE_RICHREAL   = 0x000F;
-static const uint_t WHC_TYPE_TEXT       = 0x0010;
-static const uint_t WHC_TYPE_NOTSET     = 0x0011;
+static const uint_t WHC_TYPE_BOOL        = 0x0001;
+static const uint_t WHC_TYPE_CHAR        = 0x0002;
+static const uint_t WHC_TYPE_DATE        = 0x0003;
+static const uint_t WHC_TYPE_DATETIME    = 0x0004;
+static const uint_t WHC_TYPE_HIRESTIME   = 0x0005;
+static const uint_t WHC_TYPE_INT8        = 0x0006;
+static const uint_t WHC_TYPE_INT16       = 0x0007;
+static const uint_t WHC_TYPE_INT32       = 0x0008;
+static const uint_t WHC_TYPE_INT64       = 0x0009;
+static const uint_t WHC_TYPE_UINT8       = 0x000A;
+static const uint_t WHC_TYPE_UINT16      = 0x000B;
+static const uint_t WHC_TYPE_UINT32      = 0x000C;
+static const uint_t WHC_TYPE_UINT64      = 0x000D;
+static const uint_t WHC_TYPE_REAL        = 0x000E;
+static const uint_t WHC_TYPE_RICHREAL    = 0x000F;
+static const uint_t WHC_TYPE_TEXT        = 0x0010;
+static const uint_t WHC_TYPE_NOTSET      = 0x0011;
 
 /* Type modifiers to identify Whais's composite types. */
 static const uint_t WHC_TYPE_ARRAY_MASK = 0x0100;
@@ -61,53 +61,53 @@ static const uint_t WHC_TYPE_FIELD_MASK = 0x0200;
 static const uint_t WHC_TYPE_TABLE_MASK = 0x0400;
 
 /* Constants returned by connector's API to communicate their results. */
-static const uint_t WCS_OK                 = 0;
-static const uint_t WCS_INVALID_ARGS       = 1;
-static const uint_t WCS_OP_NOTSUPP         = 2;
-static const uint_t WCS_OP_NOTPERMITED     = 3;
-static const uint_t WCS_DROPPED            = 4;
-static const uint_t WCS_PROTOCOL_NOTSUPP   = 5;
-static const uint_t WCS_ENCTYPE_NOTSUPP    = 6;
-static const uint_t WCS_UNEXPECTED_FRAME   = 7;
-static const uint_t WCS_INVALID_FRAME      = 8;
-static const uint_t WCS_COMM_OUT_OF_SYNC   = 9;
-static const uint_t WCS_LARGE_ARGS         = 10;
-static const uint_t WCS_LARGE_RESPONSE     = 11;
-static const uint_t WCS_CONNECTION_TIMEOUT = 12;
-static const uint_t WCS_SERVER_BUSY        = 13;
-static const uint_t WCS_INCOMPLETE_CMD     = 14;
-static const uint_t WCS_INVALID_ARRAY_OFF  = 15;
-static const uint_t WCS_INVALID_TEXT_OFF   = 16;
-static const uint_t WCS_INVALID_ROW        = 17;
-static const uint_t WCS_INVALID_FIELD      = 18;
-static const uint_t WCS_TYPE_MISMATCH      = 19;
-static const uint_t WCS_PROC_NOTFOUND      = 20;
-static const uint_t WCS_PROC_RUNTIME_ERR   = 21;
-static const uint_t WCS_GENERAL_ERR        = 0x0FFF;
-static const uint_t WCS_OS_ERR_BASE        = 0x1000;
+static const uint_t WCS_OK                   = 0;
+static const uint_t WCS_INVALID_ARGS         = 1;
+static const uint_t WCS_OP_NOTSUPP           = 2;
+static const uint_t WCS_OP_NOTPERMITED       = 3;
+static const uint_t WCS_DROPPED              = 4;
+static const uint_t WCS_PROTOCOL_NOTSUPP     = 5;
+static const uint_t WCS_ENCTYPE_NOTSUPP      = 6;
+static const uint_t WCS_UNEXPECTED_FRAME     = 7;
+static const uint_t WCS_INVALID_FRAME        = 8;
+static const uint_t WCS_COMM_OUT_OF_SYNC     = 9;
+static const uint_t WCS_LARGE_ARGS           = 10;
+static const uint_t WCS_LARGE_RESPONSE       = 11;
+static const uint_t WCS_CONNECTION_TIMEOUT   = 12;
+static const uint_t WCS_SERVER_BUSY          = 13;
+static const uint_t WCS_INCOMPLETE_CMD       = 14;
+static const uint_t WCS_INVALID_ARRAY_OFF    = 15;
+static const uint_t WCS_INVALID_TEXT_OFF     = 16;
+static const uint_t WCS_INVALID_ROW          = 17;
+static const uint_t WCS_INVALID_FIELD        = 18;
+static const uint_t WCS_TYPE_MISMATCH        = 19;
+static const uint_t WCS_PROC_NOTFOUND        = 20;
+static const uint_t WCS_PROC_RUNTIME_ERR     = 21;
+static const uint_t WCS_GENERAL_ERR          = 0x0FFF;
+static const uint_t WCS_OS_ERR_BASE          = 0x1000;
 
 /* If a failure at the OS layer occurs, it will be signaled with the help of
  * 'WCS_OS_ERR_BASE'. Following macros encodes/decodes the error as it was
  * returned by the OS layer. That value is OS dependent. */
-#define WENC_OS_ERROR(x)     ((x) + WCS_OS_ERR_BASE)
-#define WDEC_OS_ERROR(x)     ((x) - WCS_OS_ERR_BASE)
+#define WENC_OS_ERROR(x)   ((x) + WCS_OS_ERR_BASE)
+#define WDEC_OS_ERROR(x)   ((x) - WCS_OS_ERR_BASE)
 
 /* Standard default parameters for connector's APIs. */
-#define WIGNORE_FIELD        NULL
-#define WIGNORE_ROW          (~0ull)
-#define WIGNORE_OFF          (~0ull)
-#define WPOP_ALL             (~0)
+#define WIGNORE_FIELD   NULL
+#define WIGNORE_ROW     (~0ull)
+#define WIGNORE_OFF     (~0ull)
+#define WPOP_ALL        (~0)
 
 /* The interval of valid maximum communication frame sizes. */
-#define MIN_FRAME_SIZE                  512
-#define MAX_FRAME_SIZE                  65535
-#define DEFAULT_FRAME_SIZE              MAX_FRAME_SIZE
+#define MIN_FRAME_SIZE       512
+#define MAX_FRAME_SIZE       65535
+#define DEFAULT_FRAME_SIZE   MAX_FRAME_SIZE
 
 /* Describes the field of a table. */
 struct WField
 {
-  const    char*    name;    /* Field name. */
-  uint_t            type;    /* Field type. */
+  const char*   name;    /* Field name. */
+  uint_t        type;    /* Field type. */
 };
 
 
