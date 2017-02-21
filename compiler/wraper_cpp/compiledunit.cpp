@@ -424,7 +424,8 @@ CompiledFileUnit::CompiledFileUnit(const char* file)
 {
   ProcessHeader();
 
-  mProcData.reset(new uint8_t*[mProcsCount]);
+//  mProcData.reset(new uint8_t*[mProcsCount]);
+  mProcData = unique_array_make(uint8_t*, mProcsCount);
 
   for (uint_t count = 0; count < mProcsCount; ++count)
     mProcData.get()[count] = NULL;
@@ -463,29 +464,29 @@ CompiledFileUnit::ProcessHeader()
   temp32        = load_le_int32(t_buffer + WHC_TYPEINFO_START_OFF);
   mTypeAreaSize = load_le_int32(t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
-  mTypeInfo.reset(new uint8_t[mTypeAreaSize]);
+  mTypeInfo = unique_array_make(uint8_t, mTypeAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mTypeInfo.get(), mTypeAreaSize);
 
   temp32       = load_le_int32(t_buffer + WHC_SYMTABLE_START_OFF);
   mSymbolsSize = load_le_int32(t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
-  mSymbols.reset(new uint8_t[mSymbolsSize]);
+  mSymbols = unique_array_make(uint8_t, mSymbolsSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mSymbols.get(), mSymbolsSize);
 
   temp32         = load_le_int32(t_buffer + WHC_CONSTAREA_START_OFF);
   mConstAreaSize = load_le_int32(t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
-  mConstArea.reset(new uint8_t[mConstAreaSize]);
+  mConstArea = unique_array_make(uint8_t, mConstAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mConstArea.get(), mConstAreaSize);
 
   temp32 = (mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE) +
              (mProcsCount * WHC_PROC_ENTRY_SIZE);
 
-  mGlobals.reset(new uint8_t[mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE]);
-  mProcs.reset(new uint8_t[mProcsCount * WHC_PROC_ENTRY_SIZE]);
+  mGlobals = unique_array_make(uint8_t, mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE);
+  mProcs   = unique_array_make(uint8_t, mProcsCount * WHC_PROC_ENTRY_SIZE);
 
   mFile.Seek((-1 * _SC(int64_t, temp32)), WH_SEEK_END);
   mFile.Read(mGlobals.get(), mGlobalsCount * WHC_GLOBS_COUNT_OFF);

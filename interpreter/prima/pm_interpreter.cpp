@@ -60,7 +60,7 @@ InitInterpreter(const char* adminDbsDir)
 
   static IDBSHandler& glbDbsHnd = DBSRetrieveDatabase(gDBSName, adminDbsDir);
 
-  prima::NameSpaceHolder handler = std::make_shared<prima::NameSpace>(glbDbsHnd);
+  prima::NameSpaceHolder handler = shared_make(prima::NameSpace, glbDbsHnd);
 
   gmNameSpaces.insert(NameSpacePair(gDBSName, handler));
 }

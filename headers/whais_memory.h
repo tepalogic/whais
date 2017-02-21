@@ -151,6 +151,12 @@ _placement_new(void* place)
 #include <iostream>
 #include "custom/include/test/test_fmw.h"
 
+
+#define shared_make(T,...)       std::shared_ptr<T>(new T(__VA_ARGS__))
+#define shared_array_make(T,s)   std::shared_ptr<T>(new T[(s)])
+#define unique_make(T,...)       std::unique_ptr<T>(new T(__VA_ARGS__))
+#define unique_array_make(T,s)   std::unique_ptr<T>(new T[(s)])
+
 class WMemoryTracker
 {
 public:
@@ -210,7 +216,7 @@ public:
 private:
   static void PrintMemoryStatistics()
   {
-    if((GetCurrentMemoryUsage() == 0) && (! PrintMemResume()))
+    if ( ! PrintMemResume())
       return ;
 
     std::cout << '(' << smModule << ") ";
@@ -231,7 +237,13 @@ private:
 
 static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;
 
+#else
+#define shared_make(T,...)       std::make_shared<T>(__VA_ARGS__)
+#define shared_array_make(T,s)   std::make_shared<T>((std::size_t)(s))
+#define unique_make(T,...)       std::make_unique<T>(__VA_ARGS__)
+#define unique_array_make(T,s)   std::make_unique<T>((std::size_t)(s))
 #endif /* ENABLE_MEMORY_TRACE */
+
 #endif /*  __cplusplus */
 
 #endif /* WHAIS_MEMORY_H */

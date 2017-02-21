@@ -78,9 +78,7 @@ private:
 };
 
 
-
 using NameSpaceHolder=std::shared_ptr<NameSpace>;
-
 
 #if 0
 class NameSpaceHolder
