@@ -209,40 +209,36 @@ find_string(uint_t msgCode)
 }
 
 void
-log_message(struct ParserState* parser, uint_t buffPos, uint_t msgCode, ...)
+log_message(struct ParserState* const   parser,
+            const uint_t                buffPos,
+            const uint_t                msgCode,
+            ...)
 {
   const struct MsgCodeEntry* entry = find_string(msgCode);
 
   va_list args;
 
   if (entry == NULL)
-    {
-      log_message(parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
-      return;
-    }
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
+    return;
+  }
 
   va_start(args, msgCode);
   if (parser->messenger != NULL)
-    {
-      parser->messenger( parser->messengerCtxt,
-                        buffPos,
-                        msgCode,
-                        entry->type,
-                        entry->msg,
-                        args);
-    }
+    parser->messenger(parser->messengerCtxt, buffPos, msgCode, entry->type, entry->msg, args);
   else
-    {
-      /* Just don't send the message. */
-      assert(parser->messengerCtxt == NULL);
-    }
+  {
+    /* Just don't send the message. */
+    assert(parser->messengerCtxt == NULL);
+  }
 
-  if ((entry->type == MSG_ERROR_EVENT)
-      || (entry->type == MSG_INTERNAL_ERROR)
-      || (entry->type == MSG_GENERAL_EVENT))
-    {
-      parser->abortError = TRUE;
-    }
+  if (entry->type == MSG_ERROR_EVENT
+      || entry->type == MSG_INTERNAL_ERROR
+      || entry->type == MSG_GENERAL_EVENT)
+  {
+    parser->abortError = TRUE;
+  }
 
   va_end(args);
 }

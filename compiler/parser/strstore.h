@@ -31,17 +31,20 @@
 
 #include "whais.h"
 
+
 /* A handler for a string store */
 typedef void* StringStoreHnd;
+
 
 StringStoreHnd
 create_string_store();
 
 void
-release_string_store(StringStoreHnd* pStore);
+release_string_store(StringStoreHnd* const store);
 
 char*
-alloc_str(StringStoreHnd store, uint_t length);
+alloc_str(StringStoreHnd   store,
+         const uint_t      length);
+
 
 #endif /* STRSTORE_H */
-

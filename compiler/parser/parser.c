@@ -35,36 +35,35 @@
 struct SemValue*
 alloc_sem_value(struct ParserState* const parser)
 {
-  struct SemValue* result      = NULL;
+  struct SemValue *result      = NULL;
   uint_t           iter        = 0;
   uint_t           stored_vals = wh_array_count(&parser->values);
 
   while (iter < stored_vals)
-    {
-      result = wh_array_get(&parser->values, iter);
-      assert(result != NULL);
+  {
+    result = wh_array_get(&parser->values, iter);
+    assert(result != NULL);
 
-      if (result->val_type == VAL_REUSE)
-        break;                        /* found something to be reused */
+    if (result->val_type == VAL_REUSE)
+      break; /* found something to be reused */
 
-      iter++;
-    }
+    iter++;
+  }
 
-   if (result == NULL || result->val_type != VAL_REUSE)
-    {
-      static struct SemValue dummy;
-      result = (struct SemValue*) wh_array_add(&parser->values, &dummy);
-    }
+  if (result == NULL || result->val_type != VAL_REUSE)
+  {
+    static struct SemValue dummy;
 
+    result = (struct SemValue*)wh_array_add(&parser->values, &dummy);
+  }
   return result;
 }
 
-
 struct SemValue*
-alloc_bool_sem_value(struct ParserState* const parser,
-                         const bool_t              value)
+alloc_bool_sem_value(struct ParserState* const   parser,
+                     const bool_t                value)
 {
-  struct SemValue *val = alloc_sem_value(parser);
+  struct SemValue* const val = alloc_sem_value(parser);
 
   if (val == NULL)
     log_message(parser, IGNORE_BUFFER_POS, parser->bufferPos, MSG_NO_MEM);
@@ -77,4 +76,3 @@ alloc_bool_sem_value(struct ParserState* const parser,
 
   return val;
 }
-

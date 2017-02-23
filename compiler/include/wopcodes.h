@@ -26,8 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define WOPCODES_H
 
 #include "whais.h"
-
 #include "whaisc.h"
+
 
 enum W_OPCODE
 {
@@ -217,14 +217,16 @@ enum W_OPCODE
 
 static const int64_t W_LDRR_PRECISSION = 1000000000000000000ll;
 
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+
 COMPILER_SHL uint_t
-wh_compiler_decode_op(const uint8_t*        instrs,
-                       enum W_OPCODE* const  outOpcode);
+wh_compiler_decode_op(const uint8_t         *instrs,
+                      enum W_OPCODE* const   outOpcode);
 #ifdef __cplusplus
 }
 #endif

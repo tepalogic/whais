@@ -406,7 +406,7 @@ test_array_read_value(DArray array, const DBS_T testVal)
 
   for (int index = array.Count() - 1; index >= 0; --index)
     {
-      if (iterator.Operand().IteratorOffset() != index)
+      if ((int)iterator.Operand().IteratorOffset() != index)
         return false;
 
       DBS_T first, second;
@@ -569,7 +569,7 @@ test_table_value(TableOperand&  tableOp,
       DBS_T ref, val;
       array.Get(i, ref);
 
-      if (temp.Operand().IteratorOffset() != i)
+      if ((int)temp.Operand().IteratorOffset() != i)
         return false;
 
       temp.Operand().GetValue(val);

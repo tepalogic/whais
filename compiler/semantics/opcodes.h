@@ -27,8 +27,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "compiler/wopcodes.h"
 #include "utils/woutstream.h"
-
 #include "vardecl.h"
+
 
 extern const enum W_OPCODE inc_op[T_END_OF_TYPES];
 extern const enum W_OPCODE dec_op[T_END_OF_TYPES];
@@ -49,14 +49,15 @@ extern const enum W_OPCODE xor_op[T_END_OF_TYPES][T_END_OF_TYPES];
 extern const enum W_OPCODE and_op[T_END_OF_TYPES][T_END_OF_TYPES];
 extern const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES];
 
+
 struct WOutputStream*
-encode_opcode(struct WOutputStream *stream, const enum W_OPCODE opcode);
+encode_opcode(struct WOutputStream  *stream,
+              const enum W_OPCODE    opcode);
 
 enum W_OPCODE
-decode_opcode(const uint8_t* instrs);
+decode_opcode(const uint8_t *instrs);
 
 uint_t
 opcode_bytes(const enum W_OPCODE);
 
 #endif /* OPCODES_H_ */
-

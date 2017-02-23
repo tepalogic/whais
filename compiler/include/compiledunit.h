@@ -36,8 +36,8 @@ namespace whais
 {
 
 
-
-class COMPILER_SHL WIFunctionalUnit
+class COMPILER_SHL
+WIFunctionalUnit
 {
 public:
   virtual ~WIFunctionalUnit();
@@ -67,44 +67,44 @@ public:
   virtual bool_t         IsProcExternal(uint_t procId) = 0;
 };
 
-
-
-class COMPILER_SHL FunctionalUnitException : public Exception
+class COMPILER_SHL
+FunctionalUnitException : public Exception
 {
 public:
-  FunctionalUnitException(const uint32_t     code,
-                           const char*        file,
-                           const uint32_t     line,
-                           const char*        fmtMsg = NULL,
-                           ...);
+  FunctionalUnitException(const uint32_t   code,
+                          const char      *file,
+                          const uint32_t   line,
+                          const char      *fmtMsg = NULL,
+                          ...);
 
-  virtual Exception* Clone() const;
-
+  virtual Exception*     Clone() const;
   virtual EXCEPTION_TYPE Type() const;
-
-  virtual const char* Description() const;
+  virtual const char*    Description() const;
 };
 
-
-class COMPILER_SHL CompiledBufferUnit : public WIFunctionalUnit
+class COMPILER_SHL
+CompiledBufferUnit : public WIFunctionalUnit
 {
 public:
-  CompiledBufferUnit(const uint8_t*    buffer,
-                      uint_t            bufferSize,
-                      WH_MESSENGER      messenger,
-                      WH_MESSENGER_CTXT messengerContext);
+  CompiledBufferUnit(const uint8_t     *buffer,
+                     uint_t             bufferSize,
+                     WH_MESSENGER       messenger,
+                     WH_MESSENGER_CTXT  messengerContext);
   virtual ~CompiledBufferUnit();
+
+  CompiledBufferUnit(CompiledBufferUnit&) = delete;
+  CompiledBufferUnit& operator= (CompiledBufferUnit&) = delete;
 
   virtual uint_t         TypeAreaSize();
   virtual const uint8_t* RetriveTypeArea();
   virtual uint_t         ConstsAreaSize();
   virtual const uint8_t* RetrieveConstArea();
 
-  virtual uint_t        GlobalsCount();
-  virtual uint_t        GlobalNameLength(const uint_t id);
-  virtual const char*   RetriveGlobalName(const uint_t id);
-  virtual uint_t        GlobalTypeOff(const uint_t id);
-  virtual bool_t        IsGlobalExternal(const uint_t id);
+  virtual uint_t         GlobalsCount();
+  virtual uint_t         GlobalNameLength(const uint_t id);
+  virtual const char*    RetriveGlobalName(const uint_t id);
+  virtual uint_t         GlobalTypeOff(const uint_t id);
+  virtual bool_t         IsGlobalExternal(const uint_t id);
 
   virtual uint_t         ProceduresCount();
   virtual uint_t         ProcSyncStatementsCount(const uint_t id);
@@ -119,21 +119,19 @@ public:
   virtual bool_t         IsProcExternal(uint_t procId);
 
 private:
-    CompiledBufferUnit(CompiledBufferUnit&);
-    CompiledBufferUnit& operator= (CompiledBufferUnit&);
-
-private:
-    WH_COMPILED_UNIT mHandler;
+  WH_COMPILED_UNIT mHandler;
 };
 
-
-
-class COMPILER_SHL CompiledFileUnit : public WIFunctionalUnit
+class COMPILER_SHL
+CompiledFileUnit : public WIFunctionalUnit
 {
 
 public:
-  explicit CompiledFileUnit(const char* file);
+  explicit CompiledFileUnit(const char *file);
   virtual ~CompiledFileUnit();
+
+  CompiledFileUnit(CompiledFileUnit&) = delete;
+  CompiledFileUnit& operator= (CompiledFileUnit&) = delete;
 
   virtual uint_t         TypeAreaSize();
   virtual const uint8_t* RetriveTypeArea();
@@ -159,13 +157,9 @@ public:
   virtual bool_t         IsProcExternal(uint_t procId);
 
 private:
-  CompiledFileUnit(CompiledFileUnit&);
-  CompiledFileUnit& operator= (CompiledFileUnit&);
-
   void ProcessHeader();
   void LoadProcInMemory(const uint_t id);
 
-private:
 #pragma warning(disable: 4251)
   File     mFile;
 #pragma warning(default: 4251)
@@ -188,10 +182,6 @@ private:
 };
 
 
-
 } //namespace whais
 
-
-
 #endif /* COMPILEDUNIT_H_ */
-

@@ -34,44 +34,13 @@
 #define YYSTYPE struct SemValue*
 #endif
 
+
 enum BRANCH_TYPE
 {
   BT_UNKNOWN,
   BT_IF,
   BT_ELSEIF
 };
-
-struct Branch
-{
-  enum BRANCH_TYPE type;
-  int32_t          startPos;
-  int32_t          elsePos;
-
-  bool_t           prevReturnDetected;
-  bool_t           returnDetected;
-  bool_t           deadCodeWarned;
-};
-
-
-
-void
-check_for_dead_statement(struct ParserState* const parser);
-
-void
-begin_if_stmt(struct ParserState* const parser,
-               YYSTYPE                   expression,
-               enum BRANCH_TYPE          branchType);
-
-void
-begin_else_stmt(struct ParserState* const parser);
-
-void
-begin_elseif_stmt(struct ParserState* const parser, YYSTYPE exp);
-
-void
-finalize_if_stmt(struct ParserState* const parser);
-
-
 
 enum LOOP_ELEMENT_TYPE
 {
@@ -84,37 +53,67 @@ enum LOOP_ELEMENT_TYPE
   LE_CONTINUE
 };
 
+struct Branch
+{
+  enum BRANCH_TYPE   type;
+  int32_t            startPos;
+  int32_t            elsePos;
+  bool_t             prevReturnDetected;
+  bool_t             returnDetected;
+  bool_t             deadCodeWarned;
+};
+
 struct Loop
 {
-  enum LOOP_ELEMENT_TYPE type;
-  uint32_t               continueMark;
-  int32_t                breakMark;
+  enum LOOP_ELEMENT_TYPE   type;
+  uint32_t                 continueMark;
+  int32_t                  breakMark;
 };
 
-struct LoopIterator {
-  const char* name;
-  uint32_t    nameLen;
-  uint32_t    localIndex;
-  uint16_t    type;
+struct LoopIterator
+{
+  const char  *name;
+  uint32_t     nameLen;
+  uint32_t     localIndex;
+  uint16_t     type;
 };
 
 
 void
-begin_for_stmt(struct ParserState* const parser,
-                YYSTYPE                   exp1,
-                YYSTYPE                   exp2,
-                YYSTYPE                   exp3);
+check_for_dead_statement(struct ParserState* const parser);
 
 void
-begin_foreach_stmt(struct ParserState* const parser,
-                    YYSTYPE                   id,
-                    YYSTYPE                   exp,
-                    const bool_t              reverse);
+begin_if_stmt(struct ParserState* const   parser,
+              YYSTYPE                     expression,
+              const enum BRANCH_TYPE      branchType);
+
+void
+begin_else_stmt(struct ParserState* const parser);
+
+void
+begin_elseif_stmt(struct ParserState* const   parser,
+                  YYSTYPE                     exp);
+
+void
+finalize_if_stmt(struct ParserState* const parser);
+
+void
+begin_for_stmt(struct ParserState* const   parser,
+               YYSTYPE                     exp1,
+               YYSTYPE                     exp2,
+               YYSTYPE                     exp3);
+
+void
+begin_foreach_stmt(struct ParserState* const   parser,
+                   YYSTYPE                     id,
+                   YYSTYPE                     exp,
+                   const bool_t                reverse);
 void
 finalize_for_stmt(struct ParserState* const parser);
 
 void
-begin_while_stmt(struct ParserState* const parser, YYSTYPE exp);
+begin_while_stmt(struct ParserState* const   parser,
+                 YYSTYPE                     exp);
 
 void
 finalize_while_stmt(struct ParserState* const parser);
@@ -123,7 +122,8 @@ void
 begin_until_stmt(struct ParserState* const parser);
 
 void
-finalize_until_stmt(struct ParserState* const parser, YYSTYPE exp);
+finalize_until_stmt(struct ParserState* const   parser,
+                    YYSTYPE                     exp);
 
 void
 handle_break_stmt(struct ParserState* const parser);

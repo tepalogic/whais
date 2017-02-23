@@ -216,7 +216,7 @@ public:
 private:
   static void PrintMemoryStatistics()
   {
-    if ( ! PrintMemResume())
+    if (GetCurrentMemoryUsage() != 0 || ! PrintMemResume())
       return ;
 
     std::cout << '(' << smModule << ") ";

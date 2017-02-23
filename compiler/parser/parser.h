@@ -29,10 +29,8 @@
 #define PARSER_H
 
 #include "whais.h"
-
 #include "utils/warray.h"
 #include "compiler/whaisc.h"
-
 #include "strstore.h"
 #include "../semantics/statement.h"
 
@@ -64,34 +62,30 @@ enum SEMVALUE_TYPE
 /* Describes semantically an identifier. */
 struct SemId
 {
-  const char*   name;         /* identifier name(not null terminated) */
-  uint_t        length;       /* name's length */
+  const char  *name;   /* identifier name(not null terminated) */
+  uint_t       length; /* name's length */
 };
-
 
 /* Describes semantically an integer constant */
 struct SemCInt
 {
-  uint64_t  value;           /* bit value representation. */
-  bool_t    isSigned;        /* should we tread as signed value. */
+  uint64_t   value;    /* bit value representation. */
+  bool_t     isSigned; /* should we tread as signed value. */
 };
-
 
 /* Describes semantically an real constant. */
 struct SemCReal
 {
-  int64_t integerPart;        /* TODO: Clarify these fields. */
-  int64_t fractionalPart;
+  int64_t   integerPart;
+  int64_t   fractionalPart;
 };
 
-
-/* Describes semantically a string constant(e.g. a text delimited by "" ) */
+/* Describes semantically a string constant. */
 struct SemCText
 {
-  const char* text;     /* The entry(not null terminated. */
-  uint_t      length;   /* The length of the entry */
+  const char  *text;   /* The entry(not null terminated). */
+  uint_t       length; /* The length of the entry */
 };
-
 
 /* Describes semantically a character constant. */
 struct SemCChar
@@ -99,19 +93,17 @@ struct SemCChar
   uint32_t value;       /* The Unicode code point value. */
 };
 
-
 /* Describes semantically a time/moment constant. */
 struct SemCTime
 {
-  uint32_t usec;        /* microseconds */
-  int16_t  year;
-  uint8_t  month;
-  uint8_t  day;
-  uint8_t  hour;
-  uint8_t  min;
-  uint8_t  sec;
+  uint32_t   usec;  /* microseconds part */
+  int16_t    year;
+  uint8_t    month;
+  uint8_t    day;
+  uint8_t    hour;
+  uint8_t    min;
+  uint8_t    sec;
 };
-
 
 /* Describes semantically a boolean constant. */
 struct SemCBool
@@ -119,105 +111,96 @@ struct SemCBool
   bool_t value;
 };
 
-
 /* Represents a list of ids used during variable declarations. */
 struct SemIdList
 {
-  struct SemValue* next;
-  struct SemId     id;
+  struct SemValue  *next;
+  struct SemId      id;
 };
-
 
 /* Holds the semantics for type specifier. */
 struct SemTypeSpec
 {
-  void*    extra;       /* Extra info for container types */
-  uint16_t type;        /* Contains the type specification */
+  void      *extra; /* Extra info for container types */
+  uint16_t   type;  /* Contains the type specification */
 };
-
 
 /* Semantics for representing the declaration list of a procedure
    parameters */
 struct SemProcParamList
 {
-  struct SemValue*   next;      /* next in list */
-  struct SemId       id;        /* the id of this parameter */
-  struct SemTypeSpec type;      /* type of this parameter */
+  struct SemValue     *next; /* next in list */
+  struct SemId         id;   /* the id of this parameter */
+  struct SemTypeSpec   type; /* type of this parameter */
 };
-
 
 /* Semantic used to evaluate an expression(node).
    Depending on the type of the operator, it holds a pointer operands
    expression tree for evaluation. */
 struct SemExpression
 {
-  struct SemValue* firstTree;    /* First operand. */
-  struct SemValue* secondTree;   /* Second operand, for binary operators. */
-  struct SemValue* thirdTree;    /* Third op, for ternary operators. */
-  uint16_t         opcode;       /* Operator code. */
+  struct SemValue  *firstTree;  /* First operand. */
+  struct SemValue  *secondTree; /* Second operand, for binary operators. */
+  struct SemValue  *thirdTree;  /* Third op, for ternary operators. */
+  uint16_t          opcode;     /* Operator code. */
 };
-
 
 /* Holds the list of the parameters t be evaluated, before a procedure call. */
 struct SemProcArgumentsList
 {
-  struct SemValue* next;   /* Next argument in list */
-  struct SemValue* expr;   /* Expression tree of this parameter. */
+  struct SemValue  *next; /* Next argument in list */
+  struct SemValue  *expr; /* Expression tree of this parameter. */
 };
 
-
-/* Wrapper type to allow uniform access/evaluation for different semantic
-   entries. */
+/* Wrapper to allow uniform access for different semantic entries. */
 struct SemValue
 {
   enum SEMVALUE_TYPE val_type;   /* Type of the value */
+
   union
   {
-    struct SemId                u_id;
-    struct SemCInt              u_int;
-    struct SemCReal             u_real;
-    struct SemCText             u_text;
-    struct SemCChar             u_char;
-    struct SemCTime             u_time;
-    struct SemCBool             u_bool;
-    struct SemIdList            u_idlist;
-    struct SemTypeSpec          u_tspec;
-    struct SemProcParamList     u_prdcl;
-    struct SemProcArgumentsList u_args;
-    struct SemExpression        u_exp;
+    struct SemId                  u_id;
+    struct SemCInt                u_int;
+    struct SemCReal               u_real;
+    struct SemCText               u_text;
+    struct SemCChar               u_char;
+    struct SemCTime               u_time;
+    struct SemCBool               u_bool;
+    struct SemIdList              u_idlist;
+    struct SemTypeSpec            u_tspec;
+    struct SemProcParamList       u_prdcl;
+    struct SemProcArgumentsList   u_args;
+    struct SemExpression          u_exp;
   } val;
 };
-
 
 /* Context type used during source code parsing. */
 struct ParserState
 {
-  WH_MESSENGER          messenger;     /* Register messenger. */
-  WH_MESSENGER_CTXT     messengerCtxt; /* Register messenger context. */
+  WH_MESSENGER        messenger;     /* Register messenger. */
+  WH_MESSENGER_CTXT   messengerCtxt; /* Register messenger context. */
 
-  const char*           buffer;        /* Program source code. */
-  uint_t                bufferSize;    /* The length of the code. */
-  uint_t                bufferPos;     /* Current parser position. */
-  StringStoreHnd        strings;       /* Container for constant strings. */
-  struct WArray         values;        /* Container to temporary hold
-                                          semantic entries. */
-  struct Statement      globalStmt;    /* The global statement */
-  struct Statement*     pCurrentStmt;  /* The current statement. */
-  bool_t                abortError;    /* Flag to abort parsing. */
-  bool_t                externDecl;    /* Flag to indicate the parsing of an
-                                          external declaration. */
+  const char*         buffer;        /* Program source code. */
+  uint_t              bufferSize;    /* The length of the code. */
+  uint_t              bufferPos;     /* Current parser position. */
+  StringStoreHnd      strings;       /* Container for constant strings. */
+  struct WArray       values;        /* Container to temporary hold semantic entries. */
+  struct Statement    globalStmt;    /* The global statement */
+  struct Statement   *pCurrentStmt;  /* The current statement. */
+  bool_t              abortError;    /* Set if parsing was aborted. */
+  bool_t              externDecl;    /* Indicates the parsing of an external declaration. */
 };
 
 
-/* Reuse or allocate space to hold a semantic description. Tries not to avoid
-   allocation of many small memory buffers. */
+/* Reuse or allocate space to hold a semantic description.
+ * Limits the allocations of many small memory buffers. */
 struct SemValue*
 alloc_sem_value(struct ParserState* const parser);
 
 /* Allocate and initialize a semantic description for a boolean value. */
 struct SemValue*
-alloc_bool_sem_value(struct ParserState* const parser,
-                      const bool_t              value);
+alloc_bool_sem_value(struct ParserState* const   parser,
+                     const bool_t                value);
 
 /* Marks a previously allocated semantic description, as ready for reuse. */
 INLINE static void
@@ -227,4 +210,3 @@ free_sem_value(struct SemValue* const value)
 }
 
 #endif /* PARSER_H */
-

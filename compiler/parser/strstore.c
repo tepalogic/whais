@@ -28,30 +28,25 @@
 #include <assert.h>
 
 #include "whais.h"
-
 #include "strstore.h"
 
-#define DEFAULT_STR_SIZE  128
+#define DEFAULT_STR_SIZE   128
 
 struct StoreLink
 {
-  struct StoreLink*     next;
-  uint_t                allocated;
-  uint_t                unused;
-  char                  data[1];
+  struct StoreLink  *next;
+  uint_t             allocated;
+  uint_t             unused;
+  char               data[1];
 };
+
 
 static struct StoreLink*
 alloc_link(const uint_t size)
 {
-  struct StoreLink* const link = mem_alloc(sizeof( struct StoreLink) +
-                                            size * sizeof(char));
+  struct StoreLink* const link = mem_alloc(sizeof(struct StoreLink) + size * sizeof(char));
   if (link != NULL)
-    {
-      link->next      = NULL;
-      link->unused    = size;
-      link->allocated = size;
-    }
+    link->next = NULL, link->unused = link->allocated = size;
 
   return link;
 }
@@ -59,54 +54,53 @@ alloc_link(const uint_t size)
 StringStoreHnd
 create_string_store()
 {
-  return(StringStoreHnd) alloc_link(DEFAULT_STR_SIZE);
+  return (StringStoreHnd)alloc_link(DEFAULT_STR_SIZE);
 }
 
-
 void
-release_string_store(StringStoreHnd* handle)
+release_string_store(StringStoreHnd* const store)
 {
-  struct StoreLink* link = (struct StoreLink*) handle;
+  struct StoreLink* link = (struct StoreLink*)store;
+
   while (link != NULL)
     {
-      struct StoreLink* const temp = link->next;
+      struct StoreLink* const t = link->next;
 
       mem_free(link);
-      link = temp;
+      link = t;
     }
 }
 
-
 char*
-alloc_str(StringStoreHnd handle, uint_t length)
+alloc_str(StringStoreHnd   store,
+          const uint_t     length)
 {
-  struct StoreLink* link   = (struct StoreLink*) handle;
-  char*             result = NULL;
+  struct StoreLink *link   = (struct StoreLink*)store;
+  char             *result = NULL;
 
-  while ((link->unused < length) && (link->next != NULL))
+  while (link->unused < length && link->next != NULL)
     link = link->next;
 
   if (link->unused >= length)
+  {
+    result = (link->allocated - link->unused) + link->data;
+    link->unused -= length;
+  }
+  else
+  {
+    assert(link->next == NULL);
+
+    link->next = alloc_link(MAX(length, DEFAULT_STR_SIZE));
+    link = link->next;
+    if (link == NULL)
+      result = NULL;
+
+    else
     {
-      result        = (link->allocated - link->unused) + link->data;
+      result = (link->allocated - link->unused) + link->data;
       link->unused -= length;
     }
-  else
-    {
-      assert(link->next == NULL);
-
-      link->next = alloc_link(MAX(length,  DEFAULT_STR_SIZE));
-      link       = link->next;
-
-      if (link == NULL)
-        result = NULL;
-
-      else
-        {
-          result        =  (link->allocated - link->unused) + link->data;
-          link->unused -= length;
-        }
-    }
+  }
 
   return result;
 }
