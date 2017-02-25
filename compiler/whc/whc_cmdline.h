@@ -30,77 +30,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 #include "whais.h"
-
-
 #include "whc_preprocess.h"
 
+
+// Declaration of error codes
+#define ECMD_LINE_NO_ARGS      1
+#define ECMD_LINE_INVAL_ARGS   2
 
 
 namespace whais {
 namespace whc {
 
 
-
 class CmdLineParser
 {
 public:
   CmdLineParser(int argc, char **argv);
-  ~CmdLineParser();
 
-  const char* SourceFile() const
-  {
-    return mSourceFile;
-  }
+  auto SourceFile() const { return mSourceFile; }
+  auto OutputFile() const { return mOutputFile; }
+  auto JustPreprocess() const { return mPreprocessOnly; }
+  auto BuildDependencies() const { return mBuildDependencies; }
+  auto InclusionPaths() const { return mInclusionPaths; }
+  auto ReplacementTags() const { return mReplacementTags; }
 
-  const char* OutputFile() const
-  {
-    return mOutputFile;
-  }
-
-
-  const bool JustPreprocess() const
-  {
-    return mPreprocessOnly;
-  }
-
-  const bool BuildDependencies() const
-  {
-    return mBuildDependencies;
-  }
-
-  const std::vector<std::string>& InclusionPaths() const
-  {
-    return mInclusionPaths;
-  }
-
-  std::vector<ReplacementTag>& ReplacementTags()
-  {
-    return mReplacementTags;
-  }
-
-private:
   void Parse();
 
+private:
   void DisplayUsage() const;
-
   void CheckArguments();
-
   void AddInclusionPaths(const char* const paths);
 
 private:
   int         mArgCount;
   char**      mArgs;
-  const char* mSourceFile;
-  const char* mOutputFile;
   bool        mShowHelp;
-  bool        mOutputFileOwn;
   bool        mPreprocessOnly;
   bool        mBuildDependencies;
   bool        mShowLogo;
   bool        mShowLicense;
 
-  std::vector<std::string>            mInclusionPaths;
-  std::vector<ReplacementTag>         mReplacementTags;
+  std::vector<std::string>      mSourceFile;
+  std::vector<std::string>      mOutputFile;
+  std::vector<std::string>      mInclusionPaths;
+  std::vector<ReplacementTag>   mReplacementTags;
 };
 
 
@@ -108,24 +81,19 @@ class CmdLineException : public Exception
 {
 public:
   CmdLineException(const uint32_t      code,
-                    const char*         file,
-                    const uint32_t      line,
-                    const char*         fmtMsg = NULL,
-                    ... );
+                   const char*         file,
+                   const uint32_t      line,
+                   const char*         fmtMsg = NULL,
+                   ... );
 
   virtual Exception* Clone() const;
-
   virtual EXCEPTION_TYPE Type() const;
-
   virtual const char* Description() const;
 };
+
 
 } //namespace whc
 } //namespace whais
 
-// Declaration of error codes
-#define ECMD_LINE_NO_ARGS        1
-#define ECMD_LINE_INVAL_ARGS     2
 
 #endif // __WHC_CMDLINE_H
-

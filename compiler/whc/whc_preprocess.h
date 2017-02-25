@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef __WHC_PREPROCESS_H
 #define __WHC_PREPROCESS_H
 
+
 #include <vector>
 #include <string>
 
@@ -33,12 +34,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "msglog.h"
 
 
-
 struct ReplacementTag
 {
-  ReplacementTag(const std::string& tagName,
-                  const std::string& tagValue,
-                  int                offset = BUILDIN_OFF)
+  ReplacementTag(const std::string&  tagName,
+                 const std::string&  tagValue,
+                 int                 offset = BUILDIN_OFF)
     : mTagName(tagName),
       mTagValue(tagValue),
       mDefinitionOffset(offset)
@@ -55,12 +55,12 @@ struct ReplacementTag
 
 
 bool
-preprocess_source(const std::string&                  sourceFile,
-                   const std::vector<std::string>&     inclusionPaths,
-                   std::vector<ReplacementTag>&        tagPairs,
-                   std::ostringstream&                 sourceCode,
-                   std::vector<SourceCodeMark>&        codeMarks,
-                   std::vector<std::string>&           usedFiles);
+preprocess_source(const std::string&               sourceFile,
+                  const std::vector<std::string>&  inclusionPaths,
+                  std::vector<ReplacementTag>&     tagPairs,
+                  std::ostringstream&              sourceCode,
+                  std::vector<SourceCodeMark>&     codeMarks,
+                  std::vector<std::string>&        usedFiles);
 
 
 #endif /* __WHC_PREPROCESS_H */

@@ -22,26 +22,24 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+#ifndef MSGLOG_H_
+#define MSGLOG_H_
+
+
 #include <cstdarg>
 #include <vector>
 #include <string>
 
-
 #include "whais.h"
-
 #include "compiler/whaisc.h"
-
-#ifndef MSGLOG_H_
-#define MSGLOG_H_
-
 
 
 struct SourceCodeMark
 {
   SourceCodeMark(uint32_t      bufferOffset,
-                  uint32_t      bufferLine,
-                  std::string   bufferSource,
-                  uint_t        inclusionLevel)
+                 uint32_t      bufferLine,
+                 std::string   bufferSource,
+                 uint_t        inclusionLevel)
     : mBufferOffset(bufferOffset),
       mBufferLine(bufferLine),
       mLevel(inclusionLevel),
@@ -55,11 +53,10 @@ struct SourceCodeMark
   std::string   mBufferSource;
 };
 
-
 struct WHC_MESSAGE_CTX
 {
-  WHC_MESSAGE_CTX(const std::vector<SourceCodeMark>& codeMarks,
-                   const char* const                  sourceCode)
+  WHC_MESSAGE_CTX(const std::vector<SourceCodeMark>&  codeMarks,
+                  const char* const                   sourceCode)
     : mCodeMarks(codeMarks),
       mCode(sourceCode)
   {
@@ -73,19 +70,18 @@ struct WHC_MESSAGE_CTX
 
 void
 whc_messenger(WH_MESSENGER_CTXT data,
-               uint_t            buffOff,
-               uint_t            msgId,
-               uint_t            msgType,
-               const char*       msgFormat,
-               va_list           args);
+              uint_t            buffOff,
+              uint_t            msgId,
+              uint_t            msgType,
+              const char*       msgFormat,
+              va_list           args);
 
 void
-whc_messenger(WH_MESSENGER_CTXT data,
-               uint_t            buffOff,
-               uint_t            msgId,
-               uint_t            msgType,
-               const char*       msgFormat,
-               ...);
+whc_messenger(WH_MESSENGER_CTXT   data,
+              uint_t              buffOff,
+              uint_t              msgId,
+              uint_t              msgType,
+              const char         *msgFormat,
+              ...);
 
 #endif /* MSGLOG_H_ */
-

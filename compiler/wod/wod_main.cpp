@@ -27,14 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "compiler/compiledunit.h"
 #include "utils/wfile.h"
 #include "utils/endianness.h"
-
 #include "../whc/wo_format.h"
 #include "wod_dump.h"
 #include "wod_cmdline.h"
 
+
 using namespace std;
 using namespace whais;
 using namespace whais::wod;
+
 
 int
 main(int argc, char **argv)
@@ -57,16 +58,16 @@ main(int argc, char **argv)
     wod_dump_procs(inUnit, cmdLine.OutStream(), false);
 
   }
-  catch(FunctionalUnitException& e)
+  catch (FunctionalUnitException& e)
   {
     cerr << e.Message() << endl;
     retCode = -1;
   }
-  catch(FileException& e)
+  catch (FileException& e)
   {
     cerr << "File IO error " << e.Code();
 
-    if ( ! e.Message().empty())
+    if (!e.Message().empty())
       cerr << ": " << e.Message() << endl;
 
     else
@@ -74,11 +75,11 @@ main(int argc, char **argv)
 
     retCode = -1;
   }
-  catch(CmdLineException& e)
+  catch (CmdLineException& e)
   {
     cerr << e.Message() << endl;
   }
-  catch(Exception & e)
+  catch (Exception & e)
   {
     cerr << "error : " << e.Message() << endl;
     cerr << "file: " << e.File() << " : " << e.Line() << endl;
@@ -86,23 +87,22 @@ main(int argc, char **argv)
 
     retCode = -1;
   }
-  catch(bad_alloc &)
+  catch (bad_alloc &)
   {
     cerr << "Memory allocation failed!" << endl;
 
     retCode = -1;
   }
-  catch(...)
+  catch (...)
   {
     cerr << "Unknown exception thrown!" << endl;
     retCode = -1;
   }
-
   return retCode;
 }
+
 
 #ifdef ENABLE_MEMORY_TRACE
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "WOD";
 #endif
-

@@ -138,52 +138,50 @@ wod_dump_const_area(WIFunctionalUnit& obj, ostream& output)
 
   uint_t constantOff = 0;
   do
+  {
+    const uint_t rowSize = 16; //Chars per row to print.
+
+    output.flags(ios::hex | ios::uppercase);
+    output << endl << setw(sizeof(uint32_t) * 2) << setfill('0') << constantOff << ":\t";
+
+    /* Print first the binary representation. */
+    for (uint_t rowPos = 0; rowPos < rowSize; rowPos++)
     {
-      const uint_t rowSize = 16; //Chars per row to print.
+      if (rowPos && (rowPos % sizeof(uint32_t) == 0))
+        output << ' ';
 
-      output.flags(ios::hex | ios::uppercase);
-      output << endl << setw(sizeof(uint32_t) * 2)
-             << setfill('0') << constantOff << ":\t";
+      if (rowPos + constantOff >= obj.ConstsAreaSize())
+        output << "  ";
 
-      /* Print first the binary representation. */
-      for (uint_t rowPos = 0; rowPos < rowSize; rowPos++)
-        {
-          if (rowPos && (rowPos % sizeof(uint32_t) == 0))
-            output << ' ';
-
-          if (rowPos + constantOff >= obj.ConstsAreaSize())
-            output << "  ";
-
-          else
-            {
-              output << setw(sizeof(uint8_t) * 2) << setfill('0')
-                     << _SC(uint_t, constArea[constantOff + rowPos]);
-            }
-        }
-
-      /* Try to print the constant symbols. */
-      output << '\t';
-      for (uint_t rowPos = 0; rowPos < rowSize; rowPos++)
-        {
-          if (rowPos + constantOff >= obj.ConstsAreaSize())
-            break;
-
-          else
-            {
-              if (rowPos && (rowPos % sizeof(uint32_t) == 0))
-                output << ' ';
-
-              const uint_t codeUnit = constArea[constantOff + rowPos];
-              if (isalnum(codeUnit) || ispunct(codeUnit))
-                output << _SC(char, codeUnit);
-
-              else
-                output << '.'; //Default representation for unprintable chars.
-            }
-        }
-      constantOff += rowSize;
+      else
+      {
+        output << setw(sizeof(uint8_t) * 2) << setfill('0')
+               << _SC(uint_t, constArea[constantOff + rowPos]);
+      }
     }
-  while (constantOff < obj.ConstsAreaSize());
+
+    /* Try to print the constant symbols. */
+    output << '\t';
+    for (uint_t rowPos = 0; rowPos < rowSize; rowPos++)
+    {
+      if (rowPos + constantOff >= obj.ConstsAreaSize())
+        break;
+
+      else
+      {
+        if (rowPos && (rowPos % sizeof(uint32_t) == 0))
+          output << ' ';
+
+        const uint_t codeUnit = constArea[constantOff + rowPos];
+        if (isalnum(codeUnit) || ispunct(codeUnit))
+          output << _SC(char, codeUnit);
+
+        else
+          output << '.'; //Default representation for unprintable chars.
+      }
+    }
+    constantOff += rowSize;
+  } while (constantOff < obj.ConstsAreaSize());
 
   output << setw(0);
   output.flags(ios::dec);
@@ -195,105 +193,105 @@ wod_dump_nontable_type_info(ostream& output, uint16_t type)
   assert((IS_TABLE(type) == FALSE) && (IS_TABLE_FIELD(type) == FALSE));
 
   if (IS_FIELD(type))
-    {
-      output << "FIELD";
+  {
+    output << "FIELD";
 
-      type = GET_FIELD_TYPE(type);
-      if (type != T_UNDETERMINED)
-        output << " ";
+    type = GET_FIELD_TYPE(type);
+    if (type != T_UNDETERMINED)
+      output << " ";
 
-      else
-        return;
-    }
+    else
+      return;
+  }
 
   if (IS_ARRAY(type))
-    {
-      output << "ARRAY";
+  {
+    output << "ARRAY";
 
-      type = GET_BASIC_TYPE(type);
-      if (type != T_UNDETERMINED)
-        output << " ";
+    type = GET_BASIC_TYPE(type);
+    if (type != T_UNDETERMINED)
+      output << " ";
 
-      else
-        return;
-    }
+    else
+      return;
+  }
 
   assert(type > T_UNKNOWN);
   assert(type < T_END_OF_TYPES);
 
-  switch(type)
-    {
-    case T_BOOL:
-      output << "BOOL";
-      break;
+  switch (type)
+  {
+  case T_BOOL:
+    output << "BOOL";
+    break;
 
-    case T_CHAR:
-      output << "CHAR";
-      break;
+  case T_CHAR:
+    output << "CHAR";
+    break;
 
-    case T_DATE:
-      output << "DATE";
-      break;
+  case T_DATE:
+    output << "DATE";
+    break;
 
-    case T_DATETIME:
-      output << "DATETIME";
-      break;
+  case T_DATETIME:
+    output << "DATETIME";
+    break;
 
-    case T_HIRESTIME:
-      output << "HIRESTME";
-      break;
+  case T_HIRESTIME:
+    output << "HIRESTME";
+    break;
 
-    case T_INT8:
-      output << "INT8";
-      break;
+  case T_INT8:
+    output << "INT8";
+    break;
 
-    case T_INT16:
-      output << "INT16";
-      break;
+  case T_INT16:
+    output << "INT16";
+    break;
 
-    case T_INT32:
-      output << "INT32";
-      break;
+  case T_INT32:
+    output << "INT32";
+    break;
 
-    case T_INT64:
-      output << "INT64";
-      break;
+  case T_INT64:
+    output << "INT64";
+    break;
 
-    case T_REAL:
-      output << "REAL";
-      break;
+  case T_REAL:
+    output << "REAL";
+    break;
 
-    case T_RICHREAL:
-      output << "RICHREAL";
-      break;
+  case T_RICHREAL:
+    output << "RICHREAL";
+    break;
 
-    case T_TEXT:
-      output << "TEXT";
-      break;
+  case T_TEXT:
+    output << "TEXT";
+    break;
 
-    case T_UINT8:
-      output << "UINT8";
-      break;
+  case T_UINT8:
+    output << "UINT8";
+    break;
 
-    case T_UINT16:
-      output << "UINT16";
-      break;
+  case T_UINT16:
+    output << "UINT16";
+    break;
 
-    case T_UINT32:
-      output << "UINT32";
-      break;
+  case T_UINT32:
+    output << "UINT32";
+    break;
 
-    case T_UINT64:
-      output << "UINT64";
-      break;
+  case T_UINT64:
+    output << "UINT64";
+    break;
 
-    case T_UNDETERMINED:
-      output << "UNDEFINED";
-      break;
+  case T_UNDETERMINED:
+    output << "UNDEFINED";
+    break;
 
-    default:
-      assert(false);
-    }
+  default:
+    assert(false);
+  }
 }
 
 
@@ -310,44 +308,42 @@ wod_dump_table_type_inf(const uint8_t* typeDesc, ostream& output)
     output << "TABLE";
 
   if (descSize > 2)
+  {
+    bool_t printComma = FALSE;
+
+    output << " (";
+    while (typeDesc[0] != ';' && typeDesc[1] != 0)
     {
-      bool_t printComma = FALSE;
+      if (printComma)
+        output << ", ";
 
-      output << " (";
-      while (typeDesc[0] != ';' && typeDesc[1] != 0)
-        {
-          if (printComma)
-            output << ", ";
+      else
+        printComma = TRUE;
 
-          else
-            printComma = TRUE;
+      output << typeDesc << " ";
+      typeDesc += strlen(_RC(const char *, typeDesc)) + 1;
 
-          output << typeDesc << " ";
-          typeDesc += strlen(_RC(const char *, typeDesc)) + 1;
+      uint16_t type = load_le_int16(typeDesc);
 
-          uint16_t type = load_le_int16(typeDesc);
-
-          typeDesc += sizeof(uint16_t);
-          wod_dump_nontable_type_info(output, type);
-        }
-      output << " )";
+      typeDesc += sizeof(uint16_t);
+      wod_dump_nontable_type_info(output, type);
     }
-
+    output << " )";
+  }
 }
-
 
 static void
 wod_dump_type_info(const uint8_t* typeDesc, ostream& output)
 {
-  const uint16_t type     = load_le_int16(typeDesc);
+  const uint16_t type = load_le_int16(typeDesc);
   const uint16_t descSize = load_le_int16(typeDesc + sizeof(uint16_t));
 
-  if ((descSize < 2) ||
-      (typeDesc[descSize + sizeof(uint16_t)] != ';') ||
-      (typeDesc[descSize + sizeof(uint16_t) + 1] != 0x0))
-    {
-      throw DumpException(_EXTRA(0), "Object file is corrupt!");
-    }
+  if (descSize < 2
+      || typeDesc[descSize + sizeof(uint16_t)] != ';'
+      || typeDesc[descSize + sizeof(uint16_t) + 1] != 0x0)
+  {
+    throw DumpException(_EXTRA(0), "Object file is corrupt!");
+  }
 
   if (IS_TABLE(type) == FALSE)
     return wod_dump_nontable_type_info(output, type);
@@ -371,10 +367,10 @@ wod_dump_globals_tables(WIFunctionalUnit& obj, ostream& output)
 
   const int globalsCount = obj.GlobalsCount();
   if (globalsCount == 0)
-    {
-      output << "No globals entries.\n\n";
-      return;
-    }
+  {
+    output << "No globals entries.\n\n";
+    return;
+  }
 
   output.width(ID_SIZE);
   output << setfill(' ') << left << "Id. ";
@@ -387,62 +383,59 @@ wod_dump_globals_tables(WIFunctionalUnit& obj, ostream& output)
          << '*' << setw(0) << endl;
 
   for (int i = 0; i < globalsCount; ++i)
-    {
-      output.width(ID_SIZE);
-      output << setfill(' ') << i << setw(0) << ' ';
+  {
+    output.width(ID_SIZE);
+    output << setfill(' ') << i << setw(0) << ' ';
 
-      output.width(NAME_LEN - 1);
-      output << left << obj.RetriveGlobalName(i) << setw(0) << ' ';
+    output.width(NAME_LEN - 1);
+    output << left << obj.RetriveGlobalName(i) << setw(0) << ' ';
 
-      output.width(VISIBLE_LEN - 1);
-      output << left << (obj.IsGlobalExternal(i) ? "EXT " : "DEF ");
-      output.width(0);
+    output.width(VISIBLE_LEN - 1);
+    output << left << (obj.IsGlobalExternal(i) ? "EXT " : "DEF ");
+    output.width(0);
 
-      wod_dump_type_info(obj.RetriveTypeArea() + obj.GlobalTypeOff(i),
-                          output);
-      output << endl;
-    }
+    wod_dump_type_info(obj.RetriveTypeArea() + obj.GlobalTypeOff(i), output);
+    output << endl;
+  }
   output << endl;
 }
 
 
 static void
-wod_dump_code(const uint8_t*       code,
-               const uint_t         codeSize,
-               ostream&             output,
-               const char*          prefix)
+wod_dump_code(const uint8_t  *code,
+              const uint_t    codeSize,
+              ostream&        output,
+              const char*     prefix)
 {
   uint_t currPos = 0;
 
   while (currPos < codeSize)
+  {
+    if (prefix != NULL)
     {
-      if (prefix != NULL)
-        {
-          output << prefix << "+";
-          output << setw(4) << setfill('0') << right << currPos;
-          output << left << ' ';
-        }
-
-      char operand1[MAX_OP_STRING];
-      char operand2[MAX_OP_STRING];
-
-      enum W_OPCODE opcode    = W_NA;
-      uint_t        instrSize = wh_compiler_decode_op(code, &opcode);
-
-      instrSize += wod_decode_table[opcode] (code + instrSize,
-                                             operand1,
-                                             operand2);
-
-      output << setw(10) << setfill(' ') << wod_str_table[opcode];
-      output << setw(0) << operand1;
-
-      if (operand2[0] != 0)
-        output << ", " << operand2;
-
-      output << endl;
-
-      code += instrSize, currPos += instrSize;
+      output << prefix << "+";
+      output << setw(4) << setfill('0') << right << currPos;
+      output << left << ' ';
     }
+
+    char operand1[MAX_OP_STRING];
+    char operand2[MAX_OP_STRING];
+
+    enum W_OPCODE opcode = W_NA;
+    uint_t instrSize = wh_compiler_decode_op(code, &opcode);
+
+    instrSize += wod_decode_table[opcode](code + instrSize, operand1, operand2);
+
+    output << setw(10) << setfill(' ') << wod_str_table[opcode];
+    output << setw(0) << operand1;
+
+    if (operand2[0] != 0)
+      output << ", " << operand2;
+
+    output << endl;
+
+    code += instrSize, currPos += instrSize;
+  }
 
   assert(currPos == codeSize);
 }
@@ -453,63 +446,55 @@ wod_dump_procs(WIFunctionalUnit& obj, ostream& output, bool_t showCode)
 {
 
   output << endl << endl << setw(HEADER_SEPARATOR_LENGTH) << setfill('*')
-    << '*' << setw(0) << "\nPROCEDURES DESCRIPTIONS\n"
-    << setw(HEADER_SEPARATOR_LENGTH) << setfill('*') << '*' << setw(0)
-    << endl << endl;
+         << '*' << setw(0) << "\nPROCEDURES DESCRIPTIONS\n"
+         << setw(HEADER_SEPARATOR_LENGTH) << setfill('*') << '*' << setw(0)
+         << endl << endl;
 
   const uint_t procsCount = obj.ProceduresCount();
   if (procsCount == 0)
-    {
-      output << "No procedures entries.\n\n";
-      return;
-    }
+  {
+    output << "No procedures entries.\n\n";
+    return;
+  }
 
   for (uint_t proc = 0; proc < procsCount; ++proc)
+  {
+    const bool externalProc = obj.ProcCodeAreaSize(proc) == 0;
+    output << '[' << proc << "] ";
+    output << (externalProc ? "EXTERN PROCEDURE " : "PROCEDURE ");
+
+    output << obj.RetriveProcName(proc) << endl << setw(HEADER_SEPARATOR_LENGTH)
+           << setfill('*') << '*' << setw(0) << endl;
+
+    const uint_t localsCount = obj.ProcLocalsCount(proc);
+    for (uint_t local = 0; local < localsCount; ++local)
     {
-      const bool externalProc = obj.ProcCodeAreaSize(proc) == 0;
-      output << '[' << proc << "] ";
-      if (externalProc)
-          output << "EXTERN PROCEDURE ";
+      if (local == 0)
+        output << "return(id: -)\t\t";
+
+      else if (local <= obj.ProcParametersCount(proc))
+        output << "param(id: " << local - 1 << " )\t\t";
 
       else
-          output << "PROCEDURE ";
+        output << "local(id:  " << local - 1 << " )\t\t";
 
-      output << obj.RetriveProcName(proc) << endl
-             << setw(HEADER_SEPARATOR_LENGTH) << setfill('*') << '*'
-             << setw(0) << endl;
-
-      const uint_t localsCount = obj.ProcLocalsCount(proc);
-      for (uint_t local = 0; local < localsCount; ++local)
-        {
-          if (local == 0)
-            output << "return(id: -)\t\t";
-
-          else if (local <= obj.ProcParametersCount(proc))
-            output << "param(id: " << local - 1 << " )\t\t";
-
-          else
-            output << "local(id:  " << local - 1 << " )\t\t";
-
-          wod_dump_type_info(obj.RetriveTypeArea() +
-                                obj.GetProcLocalTypeOff(proc, local),
-                              output);
-          output << endl;
-        }
-
-      if (! externalProc)
-        {
-          output << endl << "Code:" << endl;
-
-          wod_dump_code(obj.RetriveProcCodeArea(proc),
-                         obj.ProcCodeAreaSize(proc),
-                         output,
-                         obj.RetriveProcName(proc));
-        }
-
-      output << endl << endl;
+      wod_dump_type_info(obj.RetriveTypeArea() + obj.GetProcLocalTypeOff(proc, local), output);
+      output << endl;
     }
+
+    if (!externalProc)
+    {
+      output << endl << "Code:" << endl;
+
+      wod_dump_code(obj.RetriveProcCodeArea(proc),
+                    obj.ProcCodeAreaSize(proc),
+                    output,
+                    obj.RetriveProcName(proc));
+    }
+    output << endl << endl;
+  }
 }
+
 
 } //namespace wod
 } //namespace whais
-

@@ -38,30 +38,26 @@ using namespace std;
 
 
 static const char sProgramName[] = "Whais Compiler";
-static const char sProgramDesc[] = "A tool to create procedures for data"
-                                   " record handling.";
+static const char sProgramDesc[] = "A tool to create procedures for data records handling.";
+const static string outputFileExt(".wo");
+const static string inputFileExt(".w");
+
 
 namespace whais {
 namespace whc {
 
 
-
 static inline bool
-isStrEqual(const char* str1, const char* str2)
+areStrsEqual(const char* str1, const char* str2)
 {
   return strcmp(str1, str2) == 0;
 }
 
 
-
-
 CmdLineParser::CmdLineParser(int argc, char** argv)
   : mArgCount(argc),
     mArgs(argv),
-    mSourceFile(NULL),
-    mOutputFile(NULL),
     mShowHelp(false),
-    mOutputFileOwn(true),
     mPreprocessOnly(false),
     mBuildDependencies(false),
     mShowLogo(false),
@@ -70,15 +66,6 @@ CmdLineParser::CmdLineParser(int argc, char** argv)
     mReplacementTags()
 {
   AddInclusionPaths(whf_current_dir());
-
-  Parse();
-}
-
-
-CmdLineParser::~CmdLineParser()
-{
-  if (mOutputFileOwn)
-    delete [] mOutputFile;
 }
 
 
@@ -88,134 +75,85 @@ CmdLineParser::Parse()
   int index = 1;
 
   if (index >= mArgCount)
-    {
-      throw CmdLineException(
-                  _EXTRA(0),
-                  "No arguments provided. Use '--help' for information."
-                             );
-    }
+    throw CmdLineException(_EXTRA(0), "No arguments provided. Use '--help' for information.");
 
   while (index < mArgCount)
+  {
+    if (areStrsEqual(mArgs[index], "-h")
+        || areStrsEqual(mArgs[index], "--help"))
     {
-      if (isStrEqual(mArgs[index], "-h")
-          || isStrEqual(mArgs[index], "--help"))
-        {
-          mShowHelp = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-P"))
-        {
-          mPreprocessOnly = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-I"))
-        {
-          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "Missing value for parameter '-I'.");
-            }
-          AddInclusionPaths(mArgs[index++]);
-        }
-      else if (isStrEqual(mArgs[index], "-D"))
-        {
-          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "Incorrect use of parameter '-D'.");
-            }
-          else if (mArgs[index][0] == '=')
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "Missing tag name for parameter '-D'.");
-            }
-
-          const string param(mArgs[index]);
-          const size_t separatorPos = param.find('=');
-
-          if (separatorPos == string::npos)
-            {
-              throw CmdLineException(
-                        _EXTRA(0),
-                        "Missing tag value name for parameter '-D'."
-                                     );
-            }
-          else
-            {
-              const string value = param.substr(separatorPos + 1);
-              if (value.empty())
-                {
-                  throw CmdLineException(
-                            _EXTRA(0),
-                            "Missing tag value name for parameter '-D'."
-                                         );
-                }
-              mReplacementTags.push_back(
-                  ReplacementTag(param.substr(0, separatorPos),
-                                  value,
-                                  ReplacementTag::CMDLINE_OFF)
-                                         );
-            }
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "--make_deps"))
-        {
-          mBuildDependencies = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-o"))
-        {
-          if (mOutputFile != NULL)
-            {
-              throw CmdLineException(
-                                  _EXTRA(0),
-                                  "Parameter '-o' is given multiple times."
-                                      );
-            }
-
-          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "Missing value for parameter '-o'.");
-            }
-
-          else
-            mOutputFile = mArgs[index++];
-
-          mOutputFileOwn = false;
-        }
-      else if (isStrEqual(mArgs[index], "-v")
-               || isStrEqual(mArgs[index], "--version"))
-        {
-          mShowLogo = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-l")
-               || isStrEqual(mArgs[index], "--license"))
-        {
-          mShowLicense = true;
-          ++index;
-        }
-      else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
-        {
-          if (mSourceFile != NULL)
-            {
-              throw CmdLineException(
-                              _EXTRA(0),
-                              "An input  file was already specified('%s').",
-                              mSourceFile
-                                     );
-            }
-
-          mSourceFile = mArgs[index++];
-        }
-      else
-        {
-          throw CmdLineException(_EXTRA(0),
-                                  "Cannot handle argument '%s.'",
-                                  mArgs[index]);
-        }
+      mShowHelp = true;
+      ++index;
     }
+    else if (areStrsEqual(mArgs[index], "-P"))
+    {
+      mPreprocessOnly = true;
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "-I"))
+    {
+      if (++index >= mArgCount || mArgs[index][0] == '-')
+        throw CmdLineException(_EXTRA(0), "Missing value for parameter '-I'.");
+
+      AddInclusionPaths(mArgs[index++]);
+    }
+    else if (areStrsEqual(mArgs[index], "-D"))
+    {
+      if (++index >= mArgCount || mArgs[index][0] == '-')
+        throw CmdLineException(_EXTRA(0), "Incorrect use of parameter '-D'.");
+
+      else if (mArgs[index][0] == '=')
+        throw CmdLineException(_EXTRA(0), "Missing tag name for parameter '-D'.");
+
+      const string param(mArgs[index]);
+      const size_t separatorPos = param.find('=');
+
+      if (separatorPos == string::npos)
+        throw CmdLineException(_EXTRA(0), "Missing tag value name for parameter '-D'.");
+
+      else
+      {
+        const string value = param.substr(separatorPos + 1);
+        if (value.empty())
+          throw CmdLineException(_EXTRA(0), "Missing tag value name for parameter '-D'.");
+
+        mReplacementTags.push_back(ReplacementTag(param.substr(0, separatorPos),
+                                                  value,
+                                                  ReplacementTag::CMDLINE_OFF));
+      }
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "--make_deps"))
+    {
+      mBuildDependencies = true;
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "-o"))
+    {
+      if (++index >= mArgCount || mArgs[index][0] == '-')
+        throw CmdLineException(_EXTRA(0), "Missing value for parameter '-o'.");
+
+      else
+        mOutputFile.push_back(mArgs[index++]);
+    }
+    else if (areStrsEqual(mArgs[index], "-v")
+             || areStrsEqual(mArgs[index], "--version"))
+    {
+      mShowLogo = true;
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "-l")
+             || areStrsEqual(mArgs[index], "--license"))
+    {
+      mShowLicense = true;
+      ++index;
+    }
+    else if (mArgs[index][0] != '-' && mArgs[index][0] != '\\')
+      mSourceFile.push_back(mArgs[index++]);
+
+    else
+      throw CmdLineException(_EXTRA(0), "Cannot handle argument '%s.'", mArgs[index]);
+  }
 
   CheckArguments();
 }
@@ -226,28 +164,28 @@ CmdLineParser::AddInclusionPaths(const char* const paths)
 {
   assert(paths != NULL);
 
-  const char* currentPath = paths;
-  const char* nextPath    = currentPath;
+  const char *currentPath = paths;
+  const char *nextPath    = currentPath;
 
   while (nextPath && (*nextPath != 0))
+  {
+    nextPath = strpbrk(currentPath, ";");
+    if (nextPath == NULL)
     {
-      nextPath = strpbrk(currentPath, ";");
-      if (nextPath == NULL)
-        {
-          string path(currentPath);
-          mInclusionPaths.push_back(NormalizeFilePath(path, true));
-        }
-      else
-        {
-          const uint_t pathSize = nextPath - currentPath;
-          if (pathSize > 0)
-            {
-              string path(currentPath, pathSize);
-              mInclusionPaths.push_back(NormalizeFilePath(path, true));
-            }
-          currentPath = ++nextPath;
-        }
+      string path(currentPath);
+      mInclusionPaths.push_back(NormalizeFilePath(path, true));
     }
+    else
+    {
+      const uint_t pathSize = nextPath - currentPath;
+      if (pathSize > 0)
+      {
+        string path(currentPath, pathSize);
+        mInclusionPaths.push_back(NormalizeFilePath(path, true));
+      }
+      currentPath = ++nextPath;
+    }
+  }
 }
 
 
@@ -255,48 +193,44 @@ void
 CmdLineParser::CheckArguments()
 {
   if (mShowHelp)
-    {
-      DisplayUsage();
-      exit(0);
-    }
+  {
+    DisplayUsage();
+    exit(0);
+  }
   else if (mShowLicense)
-    {
-      displayLicenseInformation(cout, sProgramName, sProgramDesc);
-      exit(0);
-    }
+  {
+    displayLicenseInformation(cout, sProgramName, sProgramDesc);
+    exit(0);
+  }
   else if (mShowLogo)
-    {
-      displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
-      exit(0);
-    }
-  else if (mSourceFile == NULL)
+  {
+    displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
+    exit(0);
+  }
+  else if (mSourceFile.size() == 0)
     throw CmdLineException(_EXTRA(0), "The input file was not specified.");
 
-  else if (mOutputFile == NULL)
+  else if (mOutputFile.size() < mSourceFile.size())
   {
-    const char    fileExt[]   = ".wo";
-    const uint_t  fileNameLen = strlen(mSourceFile);
-    char* const   tempBuffer  = new char[fileNameLen + sizeof fileExt];
+    for (auto i = mOutputFile.size(); i < mSourceFile.size(); ++i)
+    {
+      const auto& input = mSourceFile[i];
+      mOutputFile.push_back(input);
 
-    strcpy(tempBuffer, mSourceFile);
+      if (input.find_last_of(inputFileExt) == input.length() - inputFileExt.length() + 1)
+        mOutputFile[i] += 'o';
 
-    if ((mSourceFile[fileNameLen - 1] == 'w') &&
-        (mSourceFile[fileNameLen - 2] == '.'))
-      {
-        strcat(tempBuffer, "o");
-      }
-    else
-      strcat(tempBuffer, fileExt);
-
-    mOutputFile = tempBuffer;
+      else
+        mOutputFile[i] += outputFileExt;
+    }
   }
 
   const char* const defaultIncDirs = getenv("WHAIS_INC");
   if (defaultIncDirs != NULL)
     AddInclusionPaths(defaultIncDirs);
 
-  char  temp[64];
-  const WTime t  = wh_get_currtime();
+  char temp[64];
+  const auto t  = wh_get_currtime();
 
   snprintf(temp, sizeof temp, "%d", t.year);
   mReplacementTags.push_back(ReplacementTag("_YEAR_", temp));
@@ -320,15 +254,15 @@ CmdLineParser::CheckArguments()
   mReplacementTags.push_back(ReplacementTag("_USEC_", temp));
 
   snprintf(temp,
-            sizeof temp,
-            "%d/%02u/%02u %02u:%02u:%02u.%06u",
-            t.year,
-            t.month,
-            t.day,
-            t.hour,
-            t.min,
-            t.sec,
-            t.usec);
+           sizeof temp,
+           "%d/%02u/%02u %02u:%02u:%02u.%06u",
+           t.year,
+           t.month,
+           t.day,
+           t.hour,
+           t.min,
+           t.sec,
+           t.usec);
 
   mReplacementTags.push_back(ReplacementTag("_TIME_STAMP_", temp));
 
@@ -361,23 +295,22 @@ CmdLineParser::DisplayUsage() const
 }
 
 
-CmdLineException::CmdLineException(const uint32_t      code,
-                                    const char*         file,
-                                    const uint32_t      line,
-                                    const char*         fmtMsg,
-                                    ... )
+CmdLineException::CmdLineException(const uint32_t   code,
+                                   const char      *file,
+                                   const uint32_t   line,
+                                   const char      *fmtMsg,
+                                   ... )
   : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
-    {
-      va_list vl;
+  {
+    va_list vl;
 
-      va_start(vl, fmtMsg);
-      this->Message(fmtMsg, vl);
-      va_end(vl);
-    }
+    va_start(vl, fmtMsg);
+    this->Message(fmtMsg, vl);
+    va_end(vl);
+  }
 }
-
 
 Exception*
 CmdLineException::Clone() const
@@ -385,13 +318,11 @@ CmdLineException::Clone() const
   return new CmdLineException(*this);
 }
 
-
 EXCEPTION_TYPE
 CmdLineException::Type() const
 {
   return COMPILER_CMD_LINE_EXCEPTION;
 }
-
 
 const char*
 CmdLineException::Description() const
@@ -399,6 +330,6 @@ CmdLineException::Description() const
   return "Invalid command line.";
 }
 
+
 } //namespace whc
 } //namespace whais
-

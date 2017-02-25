@@ -26,13 +26,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "compiler/compiledunit.h"
 #include "utils/endianness.h"
-
 #include "../whc/wo_format.h"
 
 
-
 namespace whais {
-
 
 
 WIFunctionalUnit::~WIFunctionalUnit()
@@ -42,20 +39,19 @@ WIFunctionalUnit::~WIFunctionalUnit()
 
 /////////////******CompiledBufferUnit********//////////////////////////////
 
-CompiledBufferUnit::CompiledBufferUnit(const uint8_t*     buffer,
-                                        uint_t             bufferSize,
-                                        WH_MESSENGER       messenger,
-                                        WH_MESSENGER_CTXT  messengerContext)
+CompiledBufferUnit::CompiledBufferUnit(const uint8_t      *buffer,
+                                       uint_t              bufferSize,
+                                       WH_MESSENGER        messenger,
+                                       WH_MESSENGER_CTXT   messengerContext)
   : mHandler(NULL)
 {
   mHandler = wh_compiler_load(_RC(const char*, buffer),
-                               bufferSize,
-                               messenger,
-                               messengerContext);
+                              bufferSize,
+                              messenger,
+                              messengerContext);
   if (mHandler == NULL)
     throw FunctionalUnitException(_EXTRA(0), "Buffer could not be compiled.");
 }
-
 
 CompiledBufferUnit::~CompiledBufferUnit()
 {
@@ -63,37 +59,33 @@ CompiledBufferUnit::~CompiledBufferUnit()
     wh_compiler_discard(mHandler);
 }
 
-
 uint_t
 CompiledBufferUnit::TypeAreaSize()
 {
-  const uint8_t* dummy;
-  const uint_t   result = wh_unit_type_descriptors(mHandler, &dummy);
+  const uint8_t *dummy;
+  const uint_t result = wh_unit_type_descriptors(mHandler, &dummy);
 
   return result;
 }
 
-
 const uint8_t*
 CompiledBufferUnit::RetriveTypeArea()
 {
-  const uint8_t* typePool = NULL;
+  const uint8_t *typePool = NULL;
 
   wh_unit_type_descriptors(mHandler, &typePool);
 
   return typePool;
 }
 
-
 uint_t
 CompiledBufferUnit::ConstsAreaSize()
 {
-  const uint8_t* dummy;
-  const uint_t   result = wh_unit_constants(mHandler, &dummy);
+  const uint8_t *dummy;
+  const uint_t result = wh_unit_constants(mHandler, &dummy);
 
   return result;
 }
-
 
 const uint8_t*
 CompiledBufferUnit::RetrieveConstArea()
@@ -105,13 +97,11 @@ CompiledBufferUnit::RetrieveConstArea()
   return constArea;
 }
 
-
 uint_t
 CompiledBufferUnit::GlobalsCount()
 {
   return wh_unit_globals_count(mHandler);
 }
-
 
 uint_t
 CompiledBufferUnit::ProceduresCount()
@@ -119,24 +109,20 @@ CompiledBufferUnit::ProceduresCount()
   return wh_unit_procedures_count(mHandler);
 }
 
-
 uint_t
 CompiledBufferUnit::GlobalNameLength(const uint_t id)
 {
   WCompilerGlobalDesc globalDesc = {NULL, };
 
   if ( ! wh_unit_global(mHandler, id, &globalDesc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve global value(index: '%u') description.",
-              id
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve global value(index: '%u') description.",
+                                  id);
+  }
 
   return globalDesc.nameLength;
 }
-
 
 const char*
 CompiledBufferUnit::RetriveGlobalName(const uint_t id)
@@ -144,17 +130,13 @@ CompiledBufferUnit::RetriveGlobalName(const uint_t id)
   WCompilerGlobalDesc globalDesc;
 
   if ( ! wh_unit_global(mHandler, id, &globalDesc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve global value(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve global value(index: '%u') description.",
+                                  id);
+  }
   return globalDesc.name;
 }
-
 
 uint_t
 CompiledBufferUnit::GlobalTypeOff(const uint_t id)
@@ -162,24 +144,19 @@ CompiledBufferUnit::GlobalTypeOff(const uint_t id)
   WCompilerGlobalDesc globalDesc;
 
   if ( ! wh_unit_global(mHandler, id, &globalDesc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve global value(index: '%u') description.",
-              id
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve global value(index: '%u') description.",
+                                  id);
+  }
 
-  const uint8_t* temp;
-
+  const uint8_t *temp;
   wh_unit_type_descriptors(mHandler, &temp);
 
   assert(temp && (temp <= globalDesc.type));
 
   return globalDesc.type - temp;
-
 }
-
 
 bool_t
 CompiledBufferUnit::IsGlobalExternal(const uint_t id)
@@ -187,14 +164,11 @@ CompiledBufferUnit::IsGlobalExternal(const uint_t id)
   WCompilerGlobalDesc globalDesc;
 
   if ( ! wh_unit_global(mHandler, id, &globalDesc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve global value(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve global value(index: '%u') description.",
+                                  id);
+  }
   return(globalDesc.defined == FALSE);
 }
 
@@ -205,14 +179,11 @@ CompiledBufferUnit::ProcSyncStatementsCount(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.syncsCount;
 }
 
@@ -223,14 +194,11 @@ CompiledBufferUnit::ProcCodeAreaSize(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.codeSize;
 }
 
@@ -241,14 +209,11 @@ CompiledBufferUnit::RetriveProcCodeArea(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.code;
 }
 
@@ -259,14 +224,11 @@ CompiledBufferUnit::ProcLocalsCount(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.localsCount;
 }
 
@@ -277,14 +239,11 @@ CompiledBufferUnit::ProcParametersCount(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.paramsCount;
 }
 
@@ -295,13 +254,7 @@ CompiledBufferUnit::GetProcReturnTypeOff(const uint_t id)
   WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get(mHandler, id);
 
   if (hProc == NULL)
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not obtain procedure(index: '%u') handle.",
-              id
-                                    );
-    }
+    throw FunctionalUnitException(_EXTRA(0), "Could not obtain procedure(index: '%u') handle.", id);
 
   const uint8_t* temp;
   wh_unit_type_descriptors(mHandler, &temp);
@@ -322,14 +275,11 @@ CompiledBufferUnit::GetProcNameSize(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.nameLength;
 }
 
@@ -340,14 +290,11 @@ CompiledBufferUnit::RetriveProcName(const uint_t id)
   WCompilerProcedureDesc desc;
 
   if ( ! wh_unit_procedure(mHandler, id, &desc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              id
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  id);
+  }
   return desc.name;
 }
 
@@ -362,48 +309,39 @@ CompiledBufferUnit::GetProcLocalTypeOff(uint_t procId, uint_t localId)
   WCompilerProcedureDesc  procDesc;
 
   if ( ! wh_unit_procedure(mHandler, procId, &procDesc))
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not retrieve procedure(index: '%u') description.",
-              procId
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not retrieve procedure(index: '%u') description.",
+                                  procId);
+  }
 
   WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get(mHandler, procId);
 
   if (hProc == NULL)
-    {
-      throw FunctionalUnitException(
-              _EXTRA(0),
-              "Could not obtain procedure(index: '%u') handle.",
-              procId
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Could not obtain procedure(index: '%u') handle.",
+                                  procId);
+  }
 
   localType = wh_procedure_local_type(mHandler, hProc, localId);
-
   wh_unit_procedure_release(mHandler, hProc);
 
   if (localType == NULL)
-    {
-      throw FunctionalUnitException(
-          _EXTRA(0),
-          "Cannot obtain the procedure's local value description "
-            "(procedure index: %u, local index: %u).",
-          procId,
-          localId
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Cannot obtain the procedure's local value description "
+                                    "(procedure index: %u, local index: %u).",
+                                  procId,
+                                  localId);
+  }
 
   const uint8_t* localDesc;
   wh_unit_type_descriptors(mHandler, &localDesc);
-
   assert(localDesc && (localDesc <= localType));
 
   return localType - localDesc;
 }
-
 
 bool_t
 CompiledBufferUnit::IsProcExternal(uint_t procId)
@@ -450,43 +388,39 @@ CompiledFileUnit::ProcessHeader()
   mFile.Read(t_buffer, sizeof t_buffer);
 
   if ((t_buffer[0] != 'W') || (t_buffer[1] != 'O'))
-    {
-      throw FunctionalUnitException(
-                  _EXTRA(0),
-                  "File signature does not match a whais compiled object."
-                                    );
-    }
-
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "File signature does not match a whais compiled object.");
+  }
 
   mGlobalsCount = load_le_int32(t_buffer + WHC_GLOBS_COUNT_OFF);
-  mProcsCount   = load_le_int32(t_buffer + WHC_PROCS_COUNT_OFF);
+  mProcsCount = load_le_int32(t_buffer + WHC_PROCS_COUNT_OFF);
 
-  temp32        = load_le_int32(t_buffer + WHC_TYPEINFO_START_OFF);
+  temp32 = load_le_int32(t_buffer + WHC_TYPEINFO_START_OFF);
   mTypeAreaSize = load_le_int32(t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
   mTypeInfo = unique_array_make(uint8_t, mTypeAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mTypeInfo.get(), mTypeAreaSize);
 
-  temp32       = load_le_int32(t_buffer + WHC_SYMTABLE_START_OFF);
+  temp32 = load_le_int32(t_buffer + WHC_SYMTABLE_START_OFF);
   mSymbolsSize = load_le_int32(t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
   mSymbols = unique_array_make(uint8_t, mSymbolsSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mSymbols.get(), mSymbolsSize);
 
-  temp32         = load_le_int32(t_buffer + WHC_CONSTAREA_START_OFF);
+  temp32 = load_le_int32(t_buffer + WHC_CONSTAREA_START_OFF);
   mConstAreaSize = load_le_int32(t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
   mConstArea = unique_array_make(uint8_t, mConstAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mConstArea.get(), mConstAreaSize);
 
-  temp32 = (mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE) +
-             (mProcsCount * WHC_PROC_ENTRY_SIZE);
+  temp32 = mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE + mProcsCount * WHC_PROC_ENTRY_SIZE;
 
   mGlobals = unique_array_make(uint8_t, mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE);
-  mProcs   = unique_array_make(uint8_t, mProcsCount * WHC_PROC_ENTRY_SIZE);
+  mProcs = unique_array_make(uint8_t, mProcsCount * WHC_PROC_ENTRY_SIZE);
 
   mFile.Seek((-1 * _SC(int64_t, temp32)), WH_SEEK_END);
   mFile.Read(mGlobals.get(), mGlobalsCount * WHC_GLOBS_COUNT_OFF);
@@ -552,17 +486,15 @@ uint_t
 CompiledFileUnit::GlobalNameLength(const uint_t id)
 {
   if (id >= mGlobalsCount)
-    {
-      throw FunctionalUnitException(
-                              _EXTRA(0),
-                              "Global value index out of range(%d of %d).",
-                              id,
-                              mGlobalsCount
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Global value index out of range(%d of %d).",
+                                  id,
+                                  mGlobalsCount);
+  }
 
   const uint8_t* const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
-  uint32_t             offset = load_le_int32(global + WHC_GLB_ENTRY_NAME_OFF);
+  uint32_t offset = load_le_int32(global + WHC_GLB_ENTRY_NAME_OFF);
 
   assert(offset < mSymbolsSize);
 
@@ -576,17 +508,15 @@ CompiledFileUnit::RetriveGlobalName(const uint_t id)
   if (id >= mGlobalsCount)
     {
       {
-        throw FunctionalUnitException(
-                                _EXTRA(0),
-                                "Global value index out of range(%d of %d).",
-                                id,
-                                mGlobalsCount
-                                      );
+        throw FunctionalUnitException(_EXTRA(0),
+                                      "Global value index out of range(%d of %d).",
+                                      id,
+                                      mGlobalsCount);
       }
     }
 
   const uint8_t* const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
-  uint32_t             offset = load_le_int32(global + WHC_GLB_ENTRY_NAME_OFF);
+  uint32_t offset = load_le_int32(global + WHC_GLB_ENTRY_NAME_OFF);
 
   assert(offset < mSymbolsSize);
 
@@ -598,16 +528,14 @@ CompiledFileUnit::GlobalTypeOff(const uint_t id)
 {
   if (id >= mGlobalsCount)
     {
-      throw FunctionalUnitException(
-                              _EXTRA(0),
-                              "Global value index out of range(%d of %d).",
-                              id,
-                              mGlobalsCount
-                                    );
+      throw FunctionalUnitException(_EXTRA(0),
+                                    "Global value index out of range(%d of %d).",
+                                    id,
+                                    mGlobalsCount);
     }
 
-  const uint8_t *const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
-  uint32_t             offset = load_le_int32(global + WHC_GLB_ENTRY_TYPE_OFF);
+  const uint8_t * const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
+  uint32_t offset = load_le_int32(global + WHC_GLB_ENTRY_TYPE_OFF);
 
   offset &= ~EXTERN_MASK;
 
@@ -620,19 +548,17 @@ bool_t
 CompiledFileUnit::IsGlobalExternal(const uint_t id)
 {
   if (id >= mGlobalsCount)
-    {
-      throw FunctionalUnitException(
-                              _EXTRA(0),
-                              "Global value index out of range(%d of %d).",
-                              id,
-                              mGlobalsCount
-                                    );
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Global value index out of range(%d of %d).",
+                                  id,
+                                  mGlobalsCount);
+  }
 
-  const uint8_t *const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
-  uint32_t             offset = load_le_int32(global + WHC_GLB_ENTRY_TYPE_OFF);
+  const uint8_t * const global = mGlobals.get() + (WHC_GLOBAL_ENTRY_SIZE * id);
+  uint32_t offset = load_le_int32(global + WHC_GLB_ENTRY_TYPE_OFF);
 
-  return(offset & EXTERN_MASK) != 0;
+  return (offset & EXTERN_MASK) != 0;
 }
 
 uint_t
@@ -664,52 +590,48 @@ uint_t
 CompiledFileUnit::ProcCodeAreaSize(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                   "Procedure index out of range(%d of %d).",
+                                   id,
+                                   mProcsCount);
+  }
 
-  return load_le_int32(mProcs.get() 			+
-                          (id * WHC_PROC_ENTRY_SIZE) 	+
-                          WHC_PROC_ENTRY_CODE_SIZE);
+  return load_le_int32(mProcs.get() + id * WHC_PROC_ENTRY_SIZE + WHC_PROC_ENTRY_CODE_SIZE);
 }
 
 const uint8_t*
 CompiledFileUnit::RetriveProcCodeArea(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                   "Procedure index out of range(%d of %d).",
+                                   id,
+                                   mProcsCount);
+  }
 
   const uint_t nlocals = ProcLocalsCount(id);
 
   LoadProcInMemory(id);
 
-  return(mProcData.get()[id] +
-            (nlocals * WHC_PROC_BODY_LOCAL_ENTRY_SIZE) +
-            WHC_PROC_BODY_SYNCS_ENTRY_SYZE);
+  return (mProcData.get()[id]
+          + nlocals * WHC_PROC_BODY_LOCAL_ENTRY_SIZE
+          + WHC_PROC_BODY_SYNCS_ENTRY_SYZE);
 }
 
 uint_t
 CompiledFileUnit::ProcLocalsCount(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure index out of range(%d of %d).",
+                                  id,
+                                  mProcsCount);
+  }
 
-  return load_le_int16(mProcs.get() +
-                          (id * WHC_PROC_ENTRY_SIZE) +
-                          WHC_PROC_ENTRY_NLOCAL_OFF);
+  return load_le_int16(mProcs.get() + id * WHC_PROC_ENTRY_SIZE + WHC_PROC_ENTRY_NLOCAL_OFF);
 }
 
 uint_t
@@ -718,30 +640,26 @@ CompiledFileUnit::ProcParametersCount(const uint_t id)
   if (id >= mProcsCount)
     {
       throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
+                                    "Procedure index out of range(%d of %d).",
+                                    id,
+                                    mProcsCount);
     }
 
-  return load_le_int16(mProcs.get() +
-                          (id * WHC_PROC_ENTRY_SIZE)
-                          + WHC_PROC_ENTRY_NPARMS_OFF);
+  return load_le_int16(mProcs.get() + id * WHC_PROC_ENTRY_SIZE + WHC_PROC_ENTRY_NPARMS_OFF);
 }
 
 uint_t
 CompiledFileUnit::GetProcReturnTypeOff(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure index out of range(%d of %d).",
+                                  id,
+                                  mProcsCount);
+  }
 
-  uint_t type = load_le_int32(mProcs.get() +
-                                 (id * WHC_PROC_ENTRY_SIZE) +
-                                 WHC_PROC_ENTRY_TYPE_OFF);
+  uint_t type = load_le_int32(mProcs.get() + id * WHC_PROC_ENTRY_SIZE + WHC_PROC_ENTRY_TYPE_OFF);
   type &= ~EXTERN_MASK;
 
   assert(type < mTypeAreaSize);
@@ -753,16 +671,16 @@ uint_t
 CompiledFileUnit::GetProcNameSize(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure index out of range(%d of %d).",
+                                  id,
+                                  mProcsCount);
+  }
 
-  const uint_t offset = load_le_int32(mProcs.get() +
-                                         (id * WHC_PROC_ENTRY_SIZE) +
-                                         WHC_PROC_ENTRY_NAME_OFF);
+  const uint_t offset = load_le_int32(mProcs.get()
+                                      + id * WHC_PROC_ENTRY_SIZE
+                                      + WHC_PROC_ENTRY_NAME_OFF);
   assert(offset < mSymbolsSize);
 
   return strlen(_RC(const char*, mSymbols.get() + offset));
@@ -772,16 +690,16 @@ const char*
 CompiledFileUnit::RetriveProcName(const uint_t id)
 {
   if (id >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     id,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure index out of range(%d of %d).",
+                                  id,
+                                  mProcsCount);
+  }
 
-  const uint_t temp32 = load_le_int32(mProcs.get() +
-                                         (id * WHC_PROC_ENTRY_SIZE) +
-                                         WHC_PROC_ENTRY_NAME_OFF);
+  const uint_t temp32 = load_le_int32(mProcs.get()
+                                     + id * WHC_PROC_ENTRY_SIZE
+                                     + WHC_PROC_ENTRY_NAME_OFF);
   assert(temp32 < mSymbolsSize);
 
   return _RC(const char *, mSymbols.get() + temp32);
@@ -794,22 +712,20 @@ CompiledFileUnit::GetProcLocalTypeOff(uint_t procId, uint_t localId)
     return GetProcReturnTypeOff(procId);
 
   if (localId >= ProcLocalsCount(procId))
-    {
-      throw FunctionalUnitException(
-          _EXTRA(0),
-          "Procedure(%d) local index out of range( %d of %d).",
-          procId,
-          localId,
-          ProcLocalsCount(procId),
-          mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure(%d) local index out of range( %d of %d).",
+                                  procId,
+                                  localId,
+                                  ProcLocalsCount(procId),
+                                  mProcsCount);
+  }
 
   LoadProcInMemory(procId);
 
-  const uint8_t* const entry = mProcData.get()[procId] +
-                                 (localId * WHC_PROC_BODY_LOCAL_ENTRY_SIZE);
-
+  const uint8_t* const entry = mProcData.get()[procId] + localId * WHC_PROC_BODY_LOCAL_ENTRY_SIZE;
   const uint_t offset = load_le_int32(entry);
+
   assert(offset < mTypeAreaSize);
 
   return offset;
@@ -819,37 +735,32 @@ bool_t
 CompiledFileUnit::IsProcExternal(uint_t procId)
 {
   if (procId >= mProcsCount)
-    {
-      throw FunctionalUnitException(_EXTRA(0),
-                                     "Procedure index out of range(%d of %d).",
-                                     procId,
-                                     mProcsCount);
-    }
+  {
+    throw FunctionalUnitException(_EXTRA(0),
+                                  "Procedure index out of range(%d of %d).",
+                                  procId,
+                                  mProcsCount);
+  }
 
-  return(load_le_int32(mProcs.get() +
-                           (procId * WHC_PROC_ENTRY_SIZE) +
-                           WHC_PROC_ENTRY_TYPE_OFF) &
-           EXTERN_MASK) != 0;
+  return (load_le_int32(mProcs.get() + procId * WHC_PROC_ENTRY_SIZE + WHC_PROC_ENTRY_TYPE_OFF)
+         & EXTERN_MASK) != 0;
 }
 
-
-
-
-FunctionalUnitException::FunctionalUnitException(const uint32_t     code,
-                                                  const char*        file,
-                                                  const uint32_t     line,
-                                                  const char*        fmtMsg,
-                                                  ...)
+FunctionalUnitException::FunctionalUnitException(const uint32_t   code,
+                                                 const char      *file,
+                                                 const uint32_t   line,
+                                                 const char      *fmtMsg,
+                                                 ...)
   : Exception(code, file, line)
 {
     if (fmtMsg != NULL)
-      {
-        va_list vl;
+    {
+      va_list vl;
 
-        va_start(vl, fmtMsg);
-        this->Message(fmtMsg, vl);
-        va_end(vl);
-      }
+      va_start(vl, fmtMsg);
+      this->Message(fmtMsg, vl);
+      va_end(vl);
+    }
 }
 
 
@@ -874,8 +785,8 @@ FunctionalUnitException::Description() const
 }
 
 
-
 } //namespace whais;
+
 
 #if defined(ENABLE_MEMORY_TRACE) && defined(USE_COMPILER_SHL)
 uint32_t WMemoryTracker::smInitCount = 0;

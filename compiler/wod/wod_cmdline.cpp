@@ -30,8 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wod_cmdline.h"
 #include "utils/license.h"
 
-using namespace std;
 
+using namespace std;
 
 
 namespace whais {
@@ -39,10 +39,11 @@ namespace wod {
 
 
 static inline bool
-isStrEqual(const char* str1, const char* str2)
+areStrsEqual(const char* str1, const char* str2)
 {
   return::strcmp(str1, str2) == 0;
 }
+
 
 CmdLineParser::CmdLineParser(int argc, char ** argv)
   : mArgCount(argc),
@@ -56,80 +57,59 @@ CmdLineParser::CmdLineParser(int argc, char ** argv)
   Parse();
 }
 
-
 CmdLineParser::~CmdLineParser()
 {
   if (mOutStream != &cout)
     delete mOutStream;
 }
 
-
 void
 CmdLineParser::Parse()
 {
   int index = 1;
   if (index >= mArgCount)
-    {
-      throw CmdLineException(
-                  _EXTRA(0),
-                  "No arguments provided. Use '--help' for information."
-                             );
-    }
+    throw CmdLineException(_EXTRA(0), "No arguments provided. Use '--help' for information.");
 
   while (index < mArgCount)
+  {
+    if (areStrsEqual(mArgs[index], "-h") || areStrsEqual(mArgs[index], "--help"))
     {
-      if (isStrEqual(mArgs[index], "-h") ||
-          isStrEqual(mArgs[index], "--help"))
-        {
-          mShowHelp = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-v")
-               || isStrEqual(mArgs[index], "--version"))
-        {
-          mShowLogo = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-l")
-               || isStrEqual(mArgs[index], "--license"))
-        {
-          mShowLicense = true;
-          ++index;
-        }
-      else if (isStrEqual(mArgs[index], "-o"))
-        {
-          if (mOutStream != &cout)
-            {
-              throw CmdLineException(
-                  _EXTRA(0),
-                  "The output file '-o' is specified multiple times."
-                                     );
-            }
-
-          if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "Missing parameter for argument '-o'.");
-            }
-          else
-            mOutStream = new ofstream(mArgs[index++]);
-        }
-      else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
-        {
-          if ((void *) mSourceFile != NULL)
-            {
-              throw CmdLineException(_EXTRA(0),
-                                      "The input file was already specified.");
-            }
-          mSourceFile = mArgs[index++];
-        }
-      else
-        {
-          throw CmdLineException(_EXTRA(0),
-                                  "Cannot handle argument '%s' Try '--help'!",
-                                  mArgs[index]);
-        }
+      mShowHelp = true;
+      ++index;
     }
+    else if (areStrsEqual(mArgs[index], "-v")
+             || areStrsEqual(mArgs[index], "--version"))
+    {
+      mShowLogo = true;
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "-l")
+             || areStrsEqual(mArgs[index], "--license"))
+    {
+      mShowLicense = true;
+      ++index;
+    }
+    else if (areStrsEqual(mArgs[index], "-o"))
+    {
+      if (mOutStream != &cout)
+        throw CmdLineException(_EXTRA(0), "The output file '-o' is specified multiple times.");
+
+      if ((++index >= mArgCount) || (mArgs[index][0] == '-'))
+        throw CmdLineException(_EXTRA(0), "Missing parameter for argument '-o'.");
+
+      else
+        mOutStream = new ofstream(mArgs[index++]);
+    }
+    else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
+    {
+      if ((void *) mSourceFile != NULL)
+        throw CmdLineException(_EXTRA(0), "The input file was already specified.");
+
+      mSourceFile = mArgs[index++];
+    }
+    else
+      throw CmdLineException(_EXTRA(0), "Cannot handle argument '%s' Try '--help'!", mArgs[index]);
+  }
   CheckArguments();
 }
 
@@ -138,20 +118,20 @@ void
 CmdLineParser::CheckArguments()
 {
   if (mShowHelp)
-    {
-      DisplayUsage();
-      exit(0);
-    }
+  {
+    DisplayUsage();
+    exit(0);
+  }
   else if (mShowLogo)
-    {
-      displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
-      exit(0);
-    }
+  {
+    displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
+    exit(0);
+  }
   else if (mShowLicense)
-    {
-      displayLicenseInformation(cout, sProgramName, NULL);
-      exit(0);
-    }
+  {
+    displayLicenseInformation(cout, sProgramName, NULL);
+    exit(0);
+  }
   else if (mSourceFile == NULL)
     throw CmdLineException(_EXTRA(0), "The input file was not specified.");
 }
@@ -173,23 +153,22 @@ CmdLineParser::DisplayUsage() const
 }
 
 
-CmdLineException::CmdLineException(const uint32_t  code,
-                                    const char*     file,
-                                    uint32_t        line,
-                                    const char*     fmtMsg,
-                                    ...)
+CmdLineException::CmdLineException(const uint32_t   code,
+                                   const char      *file,
+                                   uint32_t         line,
+                                   const char      *fmtMsg,
+                                   ...)
   : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
-    {
-      va_list vl;
+  {
+    va_list vl;
 
-      va_start(vl, fmtMsg);
-      this->Message(fmtMsg, vl);
-      va_end(vl);
-    }
+    va_start(vl, fmtMsg);
+    this->Message(fmtMsg, vl);
+    va_end(vl);
+  }
 }
-
 
 Exception*
 CmdLineException::Clone() const
@@ -197,14 +176,11 @@ CmdLineException::Clone() const
   return new CmdLineException(*this);
 }
 
-
-
 EXCEPTION_TYPE
 CmdLineException::Type() const
 {
   return DUMP_CMD_LINE_EXCEPTION;
 }
-
 
 const char*
 CmdLineException::Description() const
@@ -213,7 +189,5 @@ CmdLineException::Description() const
 }
 
 
-
 } //namespace wod
 } //namespace whais
-

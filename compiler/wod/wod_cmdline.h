@@ -42,54 +42,41 @@ public:
   CmdLineParser(int argc, char** argv);
   ~CmdLineParser();
 
-  const char* SourceFile() const
-  {
-    return mSourceFile;
-  }
-
-  std::ostream& OutStream() const
-  {
-    return *mOutStream;
-  }
+  auto SourceFile() const { return mSourceFile; }
+  auto& OutStream() const { return *mOutStream; }
 
 private:
   void Parse();
-
   void DisplayUsage() const;
-
   void CheckArguments();
 
 private:
-  int           mArgCount;
-  char**        mArgs;
-  const char*   mSourceFile;
-  std::ostream* mOutStream;
-  bool          mShowHelp;
-  bool          mShowLogo;
-  bool          mShowLicense;
-
+  int            mArgCount;
+  char**         mArgs;
+  const char    *mSourceFile;
+  std::ostream  *mOutStream;
+  bool           mShowHelp;
+  bool           mShowLogo;
+  bool           mShowLicense;
 };
-
 
 
 class CmdLineException : public Exception
 {
 public:
-  CmdLineException(const uint32_t  code,
-                    const char*     file,
-                    uint32_t        line,
-                    const char*     fmtMsg = NULL,
-                    ...);
-
+  CmdLineException(const uint32_t   code,
+                   const char      *file,
+                   uint32_t         line,
+                   const char      *fmtMsg = NULL,
+                   ...);
   virtual Exception* Clone() const;
-
   virtual EXCEPTION_TYPE Type() const;
-
   virtual const char* Description() const;
 };
+
 
 } //namespace wod
 } //namespace whais
 
-#endif /* WOD_CMDLINE_H_ */
 
+#endif /* WOD_CMDLINE_H_ */

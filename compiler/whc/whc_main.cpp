@@ -27,19 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include "whais.h"
-
 #include "compiler/compiledunit.h"
-
 #include "utils/wfile.h"
 #include "utils/endianness.h"
 #include "utils/woutstream.h"
 #include "utils/auto_array.h"
-
 #include "msglog.h"
 #include "whc_cmdline.h"
 #include "whc_preprocess.h"
 #include "wo_format.h"
-
 
 
 using namespace std;
@@ -51,92 +47,90 @@ uint8_t wh_header[WHC_TABLE_SIZE] = { 0, };
 
 
 static void
-fill_globals_table(WIFunctionalUnit&     unit,
-                    struct WOutputStream* symbols,
-                    struct WOutputStream* glblsTable)
+fill_globals_table(WIFunctionalUnit&      unit,
+                   struct WOutputStream  *symbols,
+                   struct WOutputStream  *glblsTable)
 {
   const uint_t globals_count = unit.GlobalsCount();
 
   for (uint_t glbIt = 0; glbIt < globals_count; ++glbIt)
+  {
+    auto glbTypeIndex = unit.GlobalTypeOff(glbIt);
+    auto glbNameIndex = wh_ostream_size(symbols);
+
+    if (unit.IsGlobalExternal(glbIt))
+      glbTypeIndex |= EXTERN_MASK;
+
+    if ( ! wh_ostream_wint32(glblsTable, glbTypeIndex)
+        || ! wh_ostream_wint32(glblsTable, glbNameIndex)
+        || ! wh_ostream_write(symbols,
+                              _RC(const uint8_t *, unit.RetriveGlobalName(glbIt)),
+                              unit.GlobalNameLength(glbIt))
+        || ! wh_ostream_wint8(symbols, 0))
     {
-      uint32_t glbTypeIndex = unit.GlobalTypeOff(glbIt);
-      uint32_t glbNameIndex = wh_ostream_size(symbols);
-
-      if (unit.IsGlobalExternal(glbIt))
-        glbTypeIndex |= EXTERN_MASK;
-
-      if ((wh_ostream_wint32(glblsTable, glbTypeIndex) == NULL)
-          || (wh_ostream_wint32(glblsTable, glbNameIndex) == NULL)
-          || (wh_ostream_write(symbols,
-                                _RC(const uint8_t *,
-                                     unit.RetriveGlobalName(glbIt)),
-                                unit.GlobalNameLength(glbIt)) == NULL)
-          || (wh_ostream_wint8(symbols, 0) == NULL))
-        {
-          throw bad_alloc();
-        }
+      throw bad_alloc();
     }
+  }
 }
 
 
 static void
-process_procedures_table(WIFunctionalUnit&   unit,
-                          File&               destFile,
-                          WOutputStream*      symbols,
-                          WOutputStream*      procTable)
+process_procedures_table(WIFunctionalUnit&  unit,
+                          File&             destFile,
+                          WOutputStream    *symbols,
+                          WOutputStream    *procTable)
 {
-  const uint_t proc_count = unit.ProceduresCount();
+  const auto proc_count = unit.ProceduresCount();
 
   for (uint_t procIt = 0; procIt < proc_count; ++procIt)
+  {
+    const uint16_t localsCount = unit.ProcLocalsCount(procIt);
+    const uint16_t paramsCound = unit.ProcParametersCount(procIt);
+    const uint32_t procOff = destFile.Tell();
+    const uint32_t procCodeSize = unit.ProcCodeAreaSize(procIt);
+    uint32_t procRetType = unit.GetProcReturnTypeOff(procIt);
+
+    assert(localsCount >= paramsCound);
+
+    for (uint_t localIt = 0; localIt < localsCount; ++localIt)
     {
-      const uint16_t localsCount  = unit.ProcLocalsCount(procIt);
-      const uint16_t paramsCound  = unit.ProcParametersCount(procIt);
-      const uint32_t procOff      = destFile.Tell();
-      const uint32_t procCodeSize = unit.ProcCodeAreaSize(procIt);
-      uint32_t       procRetType  = unit.GetProcReturnTypeOff(procIt);
+      const uint32_t localTypeOff = unit.GetProcLocalTypeOff(procIt, localIt);
 
-      assert(localsCount >= paramsCound);
+      uint8_t offset[sizeof(localTypeOff)];
+      store_le_int32(localTypeOff, offset);
 
-      for (uint_t localIt = 0; localIt < localsCount; ++localIt)
-        {
-          const uint32_t localTypeOff = unit.GetProcLocalTypeOff(procIt,
-                                                                     localIt);
-          uint8_t offset[sizeof(localTypeOff)];
-          store_le_int32(localTypeOff, offset);
-
-          destFile.Write(offset, sizeof offset);
-        }
-
-      if (unit.IsProcExternal(procIt))
-        procRetType |= EXTERN_MASK;
-      else
-        {
-          uint8_t n_sync_stmts = unit.ProcSyncStatementsCount(procIt);
-          destFile.Write(_RC(uint8_t *, &n_sync_stmts),
-                           sizeof n_sync_stmts);
-          destFile.Write(unit.RetriveProcCodeArea(procIt),
-                           unit.ProcCodeAreaSize(procIt));
-        }
-
-      if ((wh_ostream_wint32(procTable, wh_ostream_size(symbols)) == NULL)
-          || (wh_ostream_wint32(procTable, procOff) == NULL)
-          || (wh_ostream_wint32(procTable, procRetType) == NULL)
-          || (wh_ostream_wint16(procTable, localsCount) == NULL)
-          || (wh_ostream_wint16(procTable, paramsCound) == NULL)
-          || (wh_ostream_wint32(procTable, procCodeSize) == NULL))
-        {
-          throw bad_alloc();
-        }
-
-      if ((wh_ostream_write(symbols,
-                             _RC(const uint8_t *,
-                                  unit.RetriveProcName(procIt)),
-                             unit.GetProcNameSize(procIt)) == NULL)
-          || (wh_ostream_wint8(symbols, 0) == NULL))
-        {
-          throw bad_alloc();
-        }
+      destFile.Write(offset, sizeof offset);
     }
+
+    if (unit.IsProcExternal(procIt))
+      procRetType |= EXTERN_MASK;
+
+    else
+    {
+      uint8_t n_sync_stmts = unit.ProcSyncStatementsCount(procIt);
+
+      destFile.Write(_RC(uint8_t *, &n_sync_stmts), sizeof n_sync_stmts);
+      destFile.Write(unit.RetriveProcCodeArea(procIt), unit.ProcCodeAreaSize(procIt));
+    }
+
+    if ( ! wh_ostream_wint32(procTable, wh_ostream_size(symbols))
+        || ! wh_ostream_wint32(procTable, procOff)
+        || ! wh_ostream_wint32(procTable, procRetType)
+        || ! wh_ostream_wint16(procTable, localsCount)
+        || ! wh_ostream_wint16(procTable, paramsCound)
+        || ! wh_ostream_wint32(procTable, procCodeSize))
+    {
+      throw bad_alloc();
+    }
+
+    if ( ! wh_ostream_write(symbols,
+                            _RC(const uint8_t *, unit.RetriveProcName(procIt)),
+                            unit.GetProcNameSize(procIt))
+        || ! wh_ostream_wint8(symbols, 0))
+    {
+      throw bad_alloc();
+    }
+  }
 }
 
 
@@ -246,96 +240,109 @@ create_object_file(const char* const                  outFile,
 int
 main(int argc, char **argv)
 {
-  int                        retCode  = 0;
-
-  ostringstream              buffer;
-  vector<SourceCodeMark>     codeMarks;
-  vector<string>             usedFiles;
+  CmdLineParser args(argc, argv);
 
   try
   {
-    CmdLineParser args(argc, argv);
-
-    if (! preprocess_source(args.SourceFile(),
-                             args.InclusionPaths(),
-                             args.ReplacementTags(),
-                             buffer,
-                             codeMarks,
-                             usedFiles))
-      {
-        //In case of an error encountered during the processing stage its
-        //corresponding message was already displayed.
-        //Just return the error code here.
-        return -1;
-      }
-
-    if (args.JustPreprocess())
-      {
-        cout << endl << buffer.str() << endl;
-
-        return 0;
-      }
-    else if (args.BuildDependencies())
-      {
-        assert(usedFiles.size() > 0);
-
-        cout << args.OutputFile() << " : ";
-        for (size_t i = 0; i < usedFiles.size(); ++i)
-          {
-            cout << usedFiles[i];
-            if (i < usedFiles.size() - 1)
-              cout << " \\\n ";
-
-            else
-              cout << endl << endl;
-          }
-
-        return 0;
-      }
-
-    create_object_file(args.OutputFile(),
-                        buffer.str(),
-                        codeMarks);
-  }
-  catch(FileException & e)
-  {
-    std::cerr << "File IO error: " << e.Code();
-
-    if ( ! e.Message().empty())
-      std::cerr << ": " << e.Message() << std::endl;
-
-    else
-      std::cerr << '.' << std::endl;
-
-    retCode = -1;
-  }
-  catch(FunctionalUnitException&)
-  {
-    retCode = -1;
+    args.Parse();
   }
   catch(CmdLineException& e)
   {
     std::cerr << e.Message() << std::endl;
   }
-  catch(Exception& e)
-  {
-    std::cerr << "error: " << e.Message() << std::endl;
-    std::cerr << "file:  " << e.File() << " : " << e.Line() << std::endl;
-    std::cerr << "extra: " << e.Code() << std::endl;
 
-    retCode = -1;
-  }
-  catch(std::bad_alloc&)
-  {
-    std::cerr << "Memory allocation failed!" << std::endl;
+  int retCode  = 0;
 
-    retCode = -1;
-  }
-  catch(...)
-  {
-    std::cerr << "Unknown exception thrown!" << std::endl;
 
-    retCode = -1;
+  for (size_t i = 0; i < args.SourceFile().size(); ++i)
+  {
+
+    ostringstream buffer;
+    vector<SourceCodeMark> codeMarks;
+    vector<string> usedFiles;
+
+
+    try
+    {
+      auto replacementTags = args.ReplacementTags();
+
+      if (! preprocess_source(args.SourceFile()[i],
+                              args.InclusionPaths(),
+                              replacementTags,
+                              buffer,
+                              codeMarks,
+                              usedFiles))
+        {
+          //In case of an error encountered during the processing stage its
+          //corresponding message was already displayed.
+          //Just return the error code here.
+          return -1;
+        }
+
+      if (args.JustPreprocess())
+        {
+          cout << endl << buffer.str() << endl;
+          continue ;
+        }
+      else if (args.BuildDependencies())
+        {
+          assert(usedFiles.size() > 0);
+
+          cout << args.OutputFile()[i] << " : ";
+          for (size_t i = 0; i < usedFiles.size(); ++i)
+            {
+              cout << usedFiles[i];
+              if (i < usedFiles.size() - 1)
+                cout << " \\\n ";
+
+              else
+                cout << endl << endl;
+            }
+          continue;
+        }
+
+      create_object_file(args.OutputFile()[i].c_str(), buffer.str(), codeMarks);
+      if (args.SourceFile().size () > 1)
+        cout << "Compiling of '" << args.SourceFile()[i] << "' done.\n";
+    }
+    catch(FileException & e)
+    {
+      std::cerr << "File IO error: " << e.Code();
+
+      if ( ! e.Message().empty())
+        std::cerr << ": " << e.Message() << std::endl;
+
+      else
+        std::cerr << '.' << std::endl;
+
+      return -1;
+    }
+    catch(FunctionalUnitException&)
+    {
+      retCode = -1;
+      cout << "Compiling of '" << args.SourceFile()[i] << "' failed.\n";
+    }
+    catch(Exception& e)
+    {
+      std::cerr << "error: " << e.Message() << std::endl;
+      std::cerr << "file:  " << e.File() << " : " << e.Line() << std::endl;
+      std::cerr << "extra: " << e.Code() << std::endl;
+
+      retCode = -1;
+    }
+    catch(std::bad_alloc&)
+    {
+      std::cerr << "Memory allocation failed!" << std::endl;
+
+      retCode = -1;
+    }
+    catch(...)
+    {
+      std::cerr << "Unknown exception thrown!" << std::endl;
+
+      retCode = -1;
+    }
+
   }
 
   return retCode;

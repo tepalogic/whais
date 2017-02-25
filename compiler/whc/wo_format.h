@@ -27,8 +27,8 @@
 
 #include "whais.h"
 
-const uint8_t WH_SIGNATURE[] = { 'W', 'O' };
 
+const uint8_t WH_SIGNATURE[] = { 'W', 'O' };
 const int8_t WH_FFVER_MAJ = 1;
 const int8_t WH_FFVER_MIN = 0;
 
@@ -46,23 +46,23 @@ const uint_t WHC_SYMTABLE_SIZE_OFF     = 28;
 const uint_t WHC_CONSTAREA_START_OFF   = 32;
 const uint_t WHC_CONSTAREA_SIZE_OFF    = 36;
 
-const uint_t   WHC_TABLE_SIZE          = 40;
-const uint32_t EXTERN_MASK             = 0x80000000;
+const uint_t   WHC_TABLE_SIZE   = 40;
+const uint32_t EXTERN_MASK      = 0x80000000;
 
-const uint_t WHC_GLB_ENTRY_TYPE_OFF    = 0;
-const uint_t WHC_GLB_ENTRY_NAME_OFF    = 4;
-const uint_t WHC_GLOBAL_ENTRY_SIZE     = 8;
+const uint_t WHC_GLB_ENTRY_TYPE_OFF   = 0;
+const uint_t WHC_GLB_ENTRY_NAME_OFF   = 4;
+const uint_t WHC_GLOBAL_ENTRY_SIZE    = 8;
 
-const uint_t WHC_PROC_ENTRY_NAME_OFF   = 0;
-const uint_t WHC_PROC_ENTRY_BODY_OFF   = 4;
-const uint_t WHC_PROC_ENTRY_TYPE_OFF   = 8;
-const uint_t WHC_PROC_ENTRY_NLOCAL_OFF = 12;
-const uint_t WHC_PROC_ENTRY_NPARMS_OFF = 14;
-const uint_t WHC_PROC_ENTRY_CODE_SIZE  = 16;
-const uint_t WHC_PROC_ENTRY_SIZE       = 20;
+const uint_t WHC_PROC_ENTRY_NAME_OFF     = 0;
+const uint_t WHC_PROC_ENTRY_BODY_OFF     = 4;
+const uint_t WHC_PROC_ENTRY_TYPE_OFF     = 8;
+const uint_t WHC_PROC_ENTRY_NLOCAL_OFF   = 12;
+const uint_t WHC_PROC_ENTRY_NPARMS_OFF   = 14;
+const uint_t WHC_PROC_ENTRY_CODE_SIZE    = 16;
+const uint_t WHC_PROC_ENTRY_SIZE         = 20;
 
-const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE = sizeof(uint32_t);
-const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE = sizeof(uint8_t);
+const uint_t WHC_PROC_BODY_LOCAL_ENTRY_SIZE   = sizeof(uint32_t);
+const uint_t WHC_PROC_BODY_SYNCS_ENTRY_SYZE   = sizeof(uint8_t);
 
 #endif /* WO_FORMAT_H_ */
 

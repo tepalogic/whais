@@ -28,20 +28,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 
 #include "utils/endianness.h"
-
 #include "wod_dump.h"
+
 
 namespace whais {
 namespace wod {
 
-static const uint_t MAX_INT64_LENGTH = 25;        //log(MAX_UINT64) = 19.34
-static const uint_t MAX_RREAL_LENGTH = 64;        //log(MAX_UINT64) = 19.34
+
+static const uint_t MAX_INT64_LENGTH   = 25; //log(MAX_UINT64) = 19.34
+static const uint_t MAX_RREAL_LENGTH   = 64; //log(MAX_UINT64) = 19.34
+
 
 static const char*
 into_ascii(uint64_t value, char* const dest, const bool_t isUnsigned = TRUE)
 {
-  uint_t       index    = MAX_INT64_LENGTH - 1;
-  const bool_t negative = isUnsigned ? FALSE : ((value >> 63) & 1) != 0;
+  const bool_t negative = isUnsigned ? FALSE : ((value & 0x8000000000000000ull) != 0);
+  uint_t index = MAX_INT64_LENGTH - 1;
 
   dest[index--] = 0;
 
@@ -49,12 +51,13 @@ into_ascii(uint64_t value, char* const dest, const bool_t isUnsigned = TRUE)
     value *= -1;
 
   for (;; value /= 10)
-    {
-      dest[index] = (value % 10) + '0';
-      if (value < 10)
-        break;
-      --index;
-    }
+  {
+    dest[index] = (value % 10) + '0';
+    if (value < 10)
+      break;
+
+    --index;
+  }
 
   if (negative)
     dest[--index] = '-';
@@ -65,19 +68,18 @@ into_ascii(uint64_t value, char* const dest, const bool_t isUnsigned = TRUE)
 static const char*
 fracint_to_ascii(uint64_t value, char* const dest, const uint64_t precision)
 {
-  uint_t index  = MAX_INT64_LENGTH - 1;
+  uint_t index = MAX_INT64_LENGTH - 1;
 
   dest[index--] = 0;
   for (uint64_t p = 1; p < precision; p *= 10)
-    {
-      dest[index] = (value % 10) + '0';
-      value /= 10;
-      --index;
-    }
+  {
+    dest[index] = (value % 10) + '0';
+    value /= 10;
+    --index;
+  }
 
   return dest + index + 1;
 }
-
 
 static inline void
 int8_str_conv(char* const dest, const uint8_t value)
@@ -111,23 +113,23 @@ wod_dec_w_ldc(const uint8_t* args, char* const op1, char* const op2)
 
   /* If is printable ASCII, then print the character. */
   if ((args[0] >= 0x20) && (args[0] <= 0x7E)
-       && (args[1] == 0)
-       && (args[2] == 0)
-       && (args[3] == 0))
-    {
-      op1[0] = '\'';
-      op1[1] = args[0];
-      op1[2] = '\'';
-      op1[3] = 0;
-    }
+      && args[1] == 0
+      && args[2] == 0
+      && args[3] == 0)
+  {
+    op1[0] = '\'';
+    op1[1] = args[0];
+    op1[2] = '\'';
+    op1[3] = 0;
+  }
   else
-    {
-      int8_str_conv(op1, args[3]);
-      int8_str_conv(op1 + 2, args[2]);
-      int8_str_conv(op1 + 4, args[1]);
-      int8_str_conv(op1 + 6, args[0]);
-      strcat(op1, "h");
-    }
+  {
+    int8_str_conv(op1, args[3]);
+    int8_str_conv(op1 + 2, args[2]);
+    int8_str_conv(op1 + 4, args[1]);
+    int8_str_conv(op1 + 6, args[0]);
+    strcat(op1, "h");
+  }
 
   op2[0] = 0;
 
@@ -137,11 +139,9 @@ wod_dec_w_ldc(const uint8_t* args, char* const op1, char* const op2)
 static uint_t
 wod_dec_w_ldi8(const uint8_t* args, char* const op1, char* const op2)
 {
-  //Does not support any extended character set yet!
   int8_str_conv(op1, args[0]);
 
   strcat(op1, "h");
-
   op2[0] = 0;
 
   return 1;
@@ -152,6 +152,7 @@ wod_dec_w_ldi16(const uint8_t* args, char* const op1, char* const op2)
 {
   int8_str_conv(op1, args[1]);
   int8_str_conv(op1 + 2, args[0]);
+
   strcat(op1, "h");
   op2[0] = 0;
 
@@ -165,6 +166,7 @@ wod_dec_w_ldi32(const uint8_t* args, char* const op1,  char* const op2)
   int8_str_conv(op1 + 2, args[2]);
   int8_str_conv(op1 + 4, args[1]);
   int8_str_conv(op1 + 6, args[0]);
+
   strcat(op1, "h");
   op2[0] = 0;
 
@@ -182,6 +184,7 @@ wod_dec_w_ldi64(const uint8_t* pinArgs, char* const op1, char* const op2)
   int8_str_conv(op1 + 10, pinArgs[2]);
   int8_str_conv(op1 + 12, pinArgs[1]);
   int8_str_conv(op1 + 14, pinArgs[0]);
+
   strcat(op1, "h");
   op2[0] = 0;
 
@@ -290,15 +293,15 @@ wod_dec_w_ldrr(const uint8_t* args, char* const op1, char* const op2)
 {
   char t_str[MAX_RREAL_LENGTH];
 
-  int64_t int_part  = load_le_int64(args);
+  int64_t int_part = load_le_int64(args);
   int64_t frac_part = load_le_int64(args + sizeof(uint64_t));
 
   if ((int_part < 0) || (frac_part < 0))
-    {
-      int_part  = -int_part;
-      frac_part = -frac_part;
-      strcpy(op1, "-");
-    }
+  {
+    int_part = -int_part;
+    frac_part = -frac_part;
+    strcpy(op1, "-");
+  }
   else
     strcpy(op1, "");
 
@@ -309,9 +312,9 @@ wod_dec_w_ldrr(const uint8_t* args, char* const op1, char* const op2)
   return(sizeof(int64_t) + sizeof(uint64_t));
 }
 
-static FDECODE_OPCODE wod_dec_w_ldt  = wod_dec_w_ldi32;
-const FDECODE_OPCODE  wod_dec_w_ldbt = wod_dec_w_ldnull;
-const FDECODE_OPCODE  wod_dec_w_ldbf = wod_dec_w_ldnull;
+static const FDECODE_OPCODE wod_dec_w_ldt = wod_dec_w_ldi32;
+static const FDECODE_OPCODE wod_dec_w_ldbt = wod_dec_w_ldnull;
+static const FDECODE_OPCODE wod_dec_w_ldbf = wod_dec_w_ldnull;
 
 static uint_t
 wod_dec_w_ldlo8(const uint8_t* args, char* const op1, char* const op2)
