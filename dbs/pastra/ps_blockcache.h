@@ -30,26 +30,20 @@
 #include <string.h>
 
 #include "whais.h"
-
 #include "utils/wthread.h"
+
 
 namespace whais {
 namespace pastra  {
 
+
 class IBlocksManager
 {
 public:
+  virtual ~IBlocksManager() = default;
 
-  virtual ~IBlocksManager();
-
-
-  virtual void StoreItems(uint64_t           firstItem,
-                           uint_t             itemsCount,
-                           const uint8_t*     from) = 0;
-
-  virtual void RetrieveItems(uint64_t    firstItem,
-                              uint_t      itemsCount,
-                              uint8_t*    to) = 0;
+  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* from) = 0;
+  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* to) = 0;
 };
 
 
@@ -64,51 +58,26 @@ public:
     assert(data != NULL);
   }
 
-  bool IsDirty() const
-  {
-    return(mFlags & BLOCK_ENTRY_DIRTY) != 0;
-  }
+  bool IsDirty() const { return (mFlags & BLOCK_ENTRY_DIRTY) != 0; }
+  bool IsInUse() const { return mReferenceCount > 0; }
+  void MarkDirty() { mFlags |= BLOCK_ENTRY_DIRTY; }
+  void MarkClean() { mFlags &= ~BLOCK_ENTRY_DIRTY; }
+  uint8_t* Data() { return mData; }
 
-  bool IsInUse() const
-  {
-    return mReferenceCount > 0;
-  }
-
-  void MarkDirty()
-  {
-    mFlags |= BLOCK_ENTRY_DIRTY;
-  }
-
-  void MarkClean()
-  {
-    mFlags &= ~BLOCK_ENTRY_DIRTY;
-  }
-
-  void RegisterUser()
-  {
-    wh_atomic_fetch_inc32(_RC(int32_t*, &mReferenceCount));
-  }
-
+  void RegisterUser() { wh_atomic_fetch_inc32(_RC(int32_t*, &mReferenceCount)); }
   void ReleaseUser()
   {
     assert( mReferenceCount > 0);
-
     wh_atomic_fetch_dec32(_RC(int32_t*, &mReferenceCount));
   }
 
-  uint8_t* Data()
-  {
-    return mData;
-  }
-
 private:
-  uint8_t* const    mData;
-  uint32_t          mReferenceCount;
-  uint32_t          mFlags;
+  uint8_t* const   mData;
+  uint32_t         mReferenceCount;
+  uint32_t         mFlags;
 
   static const uint32_t BLOCK_ENTRY_DIRTY = 0x00000001;
 };
-
 
 
 class StoredItem
@@ -128,10 +97,7 @@ public:
     mBlockEntry->RegisterUser();
   }
 
-  ~StoredItem()
-  {
-    mBlockEntry->ReleaseUser();
-  }
+  ~StoredItem() { mBlockEntry->ReleaseUser(); }
 
   StoredItem& operator= (const StoredItem& src)
   {
@@ -142,7 +108,7 @@ public:
     mBlockEntry->ReleaseUser();
 
     _CC(BlockEntry*&, mBlockEntry) = src.mBlockEntry;
-    _CC(uint_t&,      mItemOffset) = src.mItemOffset;
+    _CC(uint_t&, mItemOffset) = src.mItemOffset;
 
     return *this;
   }
@@ -153,16 +119,13 @@ public:
     return mBlockEntry->Data() + mItemOffset;
   }
 
-  const uint8_t* GetDataForRead() const
-  {
-    return mBlockEntry->Data() + mItemOffset;
-  }
+  const uint8_t* GetDataForRead() const { return mBlockEntry->Data() + mItemOffset; }
 
 protected:
-  BlockEntry* const mBlockEntry;
-  const uint_t      mItemOffset;
-};
 
+  BlockEntry* const   mBlockEntry;
+  const uint_t        mItemOffset;
+};
 
 
 class BlockCache
@@ -171,28 +134,25 @@ public:
   BlockCache();
   ~BlockCache();
 
-  void Init(IBlocksManager&      blocksMgr,
-             const uint_t         itemSize,
-             const uint_t         blockSize,
-             const uint_t         maxCachedBlocks,
-             const bool           nonPersitentData);
+  void Init(IBlocksManager&   blocksMgr,
+            const uint_t      itemSize,
+            const uint_t      blockSize,
+            const uint_t      maxCachedBlocks,
+            const bool        nonPersitentData);
 
   void Flush();
-
   void FlushItem(const uint64_t item);
-
   void RefreshItem(const uint64_t item);
-
   StoredItem RetriveItem(const uint64_t item);
 
 private:
-  IBlocksManager*  mManager;
+  IBlocksManager  *mManager;
   uint_t           mItemSize;
   uint_t           mBlockSize;
   uint_t           mMaxCachedBlocks;
   bool             mSkipFlush;
 
-  std::map<uint64_t, class BlockEntry> mCachedBlocks;
+  std::map<uint64_t, BlockEntry> mCachedBlocks;
 };
 
 

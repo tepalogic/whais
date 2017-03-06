@@ -37,11 +37,12 @@ typedef uint32_t NODE_INDEX;
 
 class Serializer
 {
-private:
-  Serializer();
-  ~Serializer();
+  Serializer() = delete;
+  ~Serializer() = delete;
 
 public:
+  using VALUE_VALIDATOR = bool (*)(const uint8_t* const);
+
   static void Store(uint8_t* const dest, const DBool& value);
   static void Store(uint8_t* const dest, const DChar& value);
   static void Store(uint8_t* const dest, const DDate& value);
@@ -97,9 +98,9 @@ public:
       store_le_int32(row, _RC(uint8_t*, to));
 
     else
-      {
-        assert(false);
-      }
+    {
+      assert(false);
+    }
   }
 
   static NODE_INDEX LoadNode(const NODE_INDEX* const from)
@@ -141,11 +142,11 @@ public:
   {
     try
     {
-        const int16_t year  = load_le_int16(buffer);
-        const uint8_t month = buffer[2];
-        const uint8_t day   = buffer[3];
+      const int16_t year = load_le_int16(buffer);
+      const uint8_t month = buffer[2];
+      const uint8_t day = buffer[3];
 
-        DDate(year, month, day);
+      DDate(year, month, day);
     }
     catch(...)
     {
@@ -159,14 +160,14 @@ public:
   {
     try
     {
-        const int16_t year    = load_le_int16(buffer);
-        const uint8_t month   = buffer[2];
-        const uint8_t day     = buffer[3];
-        const uint8_t hours   = buffer[4];
-        const uint8_t mins    = buffer[5];
-        const uint8_t secs    = buffer[6];
+      const int16_t year = load_le_int16(buffer);
+      const uint8_t month = buffer[2];
+      const uint8_t day = buffer[3];
+      const uint8_t hours = buffer[4];
+      const uint8_t mins = buffer[5];
+      const uint8_t secs = buffer[6];
 
-        DDateTime(year, month, day, hours, mins, secs);
+      DDateTime(year, month, day, hours, mins, secs);
     }
     catch(...)
     {
@@ -180,15 +181,15 @@ public:
   {
     try
     {
-        const int32_t usecs    = load_le_int32(buffer);
-        const int16_t year     = load_le_int16(buffer + sizeof(uint32_t));
-        const uint8_t month    = buffer[6];
-        const uint8_t day      = buffer[7];
-        const uint8_t hours    = buffer[8];
-        const uint8_t mins     = buffer[9];
-        const uint8_t secs     = buffer[10];
+      const int32_t usecs = load_le_int32(buffer);
+      const int16_t year = load_le_int16(buffer + sizeof(uint32_t));
+      const uint8_t month = buffer[6];
+      const uint8_t day = buffer[7];
+      const uint8_t hours = buffer[8];
+      const uint8_t mins = buffer[9];
+      const uint8_t secs = buffer[10];
 
-        DHiresTime(year, month, day, hours, mins, secs, usecs);
+      DHiresTime(year, month, day, hours, mins, secs, usecs);
     }
     catch(...)
     {
@@ -200,7 +201,7 @@ public:
 
   static bool ValidateDRealBuffer(const uint8_t* const buffer)
   {
-    const uint_t integerSize    = 5;
+    const uint_t integerSize = 5;
     const uint_t fractionalSize = 3;
 
     int64_t temp = 0;
@@ -219,16 +220,16 @@ public:
     if (fractional & 0x800000)
       fractional |= ~_SC(int64_t, 0xFFFFFF);
 
-    if ((integer < 0)
-        && ((fractional <= -DBS_REAL_PREC) || (0 < fractional)))
-      {
-        return false;
-      }
-    else if ((integer > 0)
-             && ((fractional < 0) || (DBS_REAL_PREC <= fractional)))
-      {
-        return false;
-      }
+    if (integer < 0
+        && (fractional <= -DBS_REAL_PREC || 0 < fractional))
+    {
+      return false;
+    }
+    else if (integer > 0
+             && (fractional < 0 || DBS_REAL_PREC <= fractional))
+    {
+      return false;
+    }
 
     return true;
   }
@@ -236,7 +237,7 @@ public:
 
   static bool ValidateDRichRealBuffer(const uint8_t* const buffer)
   {
-    const uint_t integerSize    = 8;
+    const uint_t integerSize = 8;
     const uint_t fractionalSize = 6;
 
     int64_t integer = load_le_int64(buffer);
@@ -249,16 +250,16 @@ public:
     if (fractional & 0x800000000000)
       fractional |= ~_SC(int64_t, 0xFFFFFFFFFFFF);
 
-    if ((integer < 0)
-        && ((fractional <= -DBS_RICHREAL_PREC) || (0 < fractional)))
-      {
-        return false;
-      }
-    else if ((integer > 0)
-             && ((fractional < 0) || (DBS_RICHREAL_PREC <= fractional)))
-      {
-        return false;
-      }
+    if (integer < 0
+        && (fractional <= -DBS_RICHREAL_PREC || 0 < fractional))
+    {
+      return false;
+    }
+    else if (integer > 0
+            && (fractional < 0 || DBS_RICHREAL_PREC <= fractional))
+    {
+      return false;
+    }
 
     assert((fractional < 0) || (fractional < DBS_RICHREAL_PREC));
     assert((fractional > 0) || (fractional > -DBS_RICHREAL_PREC));
@@ -267,10 +268,7 @@ public:
   }
 
 
-  typedef bool(*VALUE_VALIDATOR) (const uint8_t* const);
-
   static VALUE_VALIDATOR SelectValidator(const DBS_FIELD_TYPE type);
-
 
   static const int MAX_VALUE_RAW_SIZE = 0x20;
 };

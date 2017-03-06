@@ -29,28 +29,22 @@
 
 using namespace whais;
 
-DBSException::DBSException(const uint32_t  code,
-                            const char*     file,
-                            uint32_t        line,
-                            const char*     fmtMsg,
+DBSException::DBSException(const uint32_t   code,
+                           const char      *file,
+                           uint32_t         line,
+                           const char      *fmtMsg,
                             ...)
   : Exception(code, file, line)
 {
   if (fmtMsg != NULL)
-    {
-      va_list vl;
+  {
+    va_list vl;
 
-      va_start(vl, fmtMsg);
-      this->Message(fmtMsg, vl);
-      va_end(vl);
-    }
+    va_start(vl, fmtMsg);
+    this->Message(fmtMsg, vl);
+    va_end(vl);
+  }
 }
-
-
-DBSException::~DBSException()
-{
-}
-
 
 Exception*
 DBSException::Clone() const
@@ -58,13 +52,11 @@ DBSException::Clone() const
   return new DBSException(*this);
 }
 
-
 EXCEPTION_TYPE
 DBSException::Type() const
 {
   return DBS_EXCEPTION;
 }
-
 
 const char*
 DBSException::Description() const

@@ -25,22 +25,26 @@
 #ifndef PS_ARRAYSTRATEGY_H_
 #define PS_ARRAYSTRATEGY_H_
 
-#include "whais.h"
 
+#include "whais.h"
 #include "ps_container.h"
 #include "ps_varstorage.h"
 #include "ps_serializer.h"
 
-namespace whais {
 
+namespace whais {
 namespace pastra {
+
 
 //Just forward class declarations
 class TemporalArray;
 class RowFieldArray;
 class NullArray;
 class PrototypeTable;
-}
+
+
+} //namespace pastra
+
 
 class IArrayStrategy
 {
@@ -48,27 +52,27 @@ class IArrayStrategy
   friend class pastra::PrototypeTable;
 
 public:
-  virtual ~IArrayStrategy();
+  virtual ~IArrayStrategy() = default;
+  IArrayStrategy(const IArrayStrategy&) = delete;
+  IArrayStrategy& operator= (const IArrayStrategy&) = delete;
 
   uint64_t Count();
   DBS_BASIC_TYPE Type();
 
-  uint_t          Get(const uint64_t index, uint8_t* const dest);
+  uint_t Get(const uint64_t index, uint8_t* const dest);
   IArrayStrategy* Set(const DBS_BASIC_TYPE type,
-                       const uint8_t* const rawValue,
-                       const uint64_t       index);
+                      const uint8_t* const rawValue,
+                      const uint64_t       index);
   IArrayStrategy* Add(const DBS_BASIC_TYPE type,
-                       const uint8_t* const rawValue,
-                       uint64_t* const      outIndex);
-
+                      const uint8_t* const rawValue,
+                      uint64_t* const      outIndex);
   IArrayStrategy* Remove(const uint64_t index);
-
   IArrayStrategy* Sort(const bool reverse);
 
   IArrayStrategy*  MakeMirrorCopy();
   IArrayStrategy*  MakeClone();
 
-  virtual void  ReleaseReference();
+  virtual void ReleaseReference();
 
   virtual pastra::TemporalContainer& GetTemporalContainer();
   virtual pastra::VariableSizeStore& GetRowStorage();
@@ -85,14 +89,12 @@ public:
       assert(mArray.mElementRawSize > 0);
     }
 
-    const TE operator[] (const uint64_t index) const
+    const TE operator[](const uint64_t index) const
     {
       assert(index < mArray.mElementsCount);
 
       uint8_t rawValue[pastra::Serializer::MAX_VALUE_RAW_SIZE];
-      mArray.RawRead(index * mArray.mElementRawSize,
-                      mArray.mElementRawSize,
-                      rawValue);
+      mArray.RawRead(index * mArray.mElementRawSize, mArray.mElementRawSize, rawValue);
 
       TE result;
       pastra::Serializer::Load(rawValue, &result);
@@ -105,77 +107,45 @@ public:
       uint8_t rawValue1[pastra::Serializer::MAX_VALUE_RAW_SIZE];
       uint8_t rawValue2[pastra::Serializer::MAX_VALUE_RAW_SIZE];
 
-      mArray.RawRead(pos1 * mArray.mElementRawSize,
-                      mArray.mElementRawSize,
-                      rawValue1);
-      mArray.RawRead(pos2 * mArray.mElementRawSize,
-                      mArray.mElementRawSize,
-                      rawValue2);
+      mArray.RawRead(pos1 * mArray.mElementRawSize, mArray.mElementRawSize, rawValue1);
+      mArray.RawRead(pos2 * mArray.mElementRawSize, mArray.mElementRawSize, rawValue2);
 
-      mArray.RawWrite(pos2 * mArray.mElementRawSize,
-                       mArray.mElementRawSize,
-                       rawValue1);
-      mArray.RawWrite(pos1 * mArray.mElementRawSize,
-                       mArray.mElementRawSize,
-                       rawValue2);
+      mArray.RawWrite(pos2 * mArray.mElementRawSize, mArray.mElementRawSize, rawValue1);
+      mArray.RawWrite(pos1 * mArray.mElementRawSize, mArray.mElementRawSize, rawValue2);
     }
 
-    uint64_t Count() const
-    {
-      return mArray.mElementsCount;
-    }
+    uint64_t Count() const { return mArray.mElementsCount; }
 
-    void Pivot(const int64_t index)
-    {
-      mPivot = this->operator[] (index);
-    }
-
-    const TE& Pivot() const
-    {
-      return mPivot;
-    }
+    void Pivot(const int64_t index) { mPivot = this->operator[] (index); }
+    const TE& Pivot() const { return mPivot; }
 
   private:
-    IArrayStrategy&     mArray;
-    TE                  mPivot;
+    IArrayStrategy&   mArray;
+    TE                mPivot;
   };
 
 protected:
   IArrayStrategy(const DBS_BASIC_TYPE elemsType);
 
-
   virtual uint32_t ReferenceCount() const;
   virtual uint32_t MirrorsCount() const;
-
   virtual IArrayStrategy* Clone();
-
-  virtual void RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer) = 0;
-  virtual void RawWrite(const uint64_t         offset,
-                         const uint64_t         size,
-                         const uint8_t* const   buffer) = 0;
+  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer) = 0;
+  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer) = 0;
   virtual void ColapseRaw(const uint64_t offset, const uint64_t count) = 0;
   virtual uint64_t RawSize() const = 0;
 
-  uint64_t              mElementsCount;
-  uint_t                mMirrorsCount;
-  uint_t                mCopyReferences;
-  const DBS_BASIC_TYPE  mElementsType;
-  uint_t                mElementRawSize;
-  Lock                  mLock;
-
-private:
-  IArrayStrategy(const IArrayStrategy&);
-  IArrayStrategy& operator= (const IArrayStrategy&);
+  uint64_t               mElementsCount;
+  uint_t                 mMirrorsCount;
+  uint_t                 mCopyReferences;
+  const DBS_BASIC_TYPE   mElementsType;
+  uint_t                 mElementRawSize;
+  Lock                   mLock;
 };
-
-
 
 
 namespace pastra
 {
-
 
 
 class NullArray : public IArrayStrategy
@@ -183,24 +153,17 @@ class NullArray : public IArrayStrategy
 public:
   NullArray(const DBS_BASIC_TYPE elemsType);
 
-  static NullArray& GetSingletoneInstace(const DBS_BASIC_TYPE type);
-  virtual void  ReleaseReference();
+  virtual void ReleaseReference();
 
+  static NullArray& GetSingletoneInstace(const DBS_BASIC_TYPE type);
 protected:
   virtual uint32_t ReferenceCount() const;
   virtual uint32_t MirrorsCount() const;
-
-  virtual void RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer);
-  virtual void RawWrite(const uint64_t         offset,
-                         const uint64_t         size,
-                         const uint8_t* const   buffer);
+  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
+  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
   virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
   virtual uint64_t RawSize() const;
 };
-
-
 
 class TemporalArray : public IArrayStrategy
 {
@@ -208,25 +171,20 @@ class TemporalArray : public IArrayStrategy
 
 public:
   TemporalArray(const DBS_BASIC_TYPE elemsType);
+  TemporalArray(const TemporalArray&) = delete;
+  TemporalArray& operator= (const TemporalArray&) = delete;
 
 protected:
   virtual ~TemporalArray();
 
-  virtual void RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer);
-  virtual void RawWrite(const uint64_t         offset,
-                         const uint64_t         size,
-                         const uint8_t* const   buffer);
+  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
+  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
   virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
   virtual uint64_t RawSize() const;
 
   virtual pastra::TemporalContainer& GetTemporalContainer();
 
 private:
-  TemporalArray(const TemporalArray&);
-  TemporalArray& operator= (const TemporalArray&);
-
   TemporalContainer mStorage;
 };
 
@@ -236,19 +194,18 @@ class RowFieldArray : public IArrayStrategy
   friend class PrototypeTable;
 
 public:
-  RowFieldArray(VariableSizeStore&       storage,
-                 const uint64_t           firstRecordEntry,
-                 const DBS_FIELD_TYPE     type);
+  RowFieldArray(VariableSizeStore& storage,
+                const uint64_t firstRecordEntry,
+                const DBS_FIELD_TYPE type);
+
+  RowFieldArray(const RowFieldArray&) = delete;
+  RowFieldArray& operator= (const RowFieldArray&) = delete;
 
 protected:
   ~RowFieldArray();
 
-  virtual void RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer);
-  virtual void RawWrite(const uint64_t         offset,
-                         const uint64_t         size,
-                         const uint8_t* const   buffer);
+  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
+  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
   virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
   virtual uint64_t RawSize() const;
 
@@ -256,9 +213,6 @@ protected:
   virtual pastra::VariableSizeStore& GetRowStorage();
 
 private:
-  RowFieldArray(const RowFieldArray&);
-  RowFieldArray& operator= (const RowFieldArray&);
-
   uint64_t             mFirstRecordEntry;
   VariableSizeStore&   mStorage;
   TemporalContainer    mTempStorage;
@@ -266,8 +220,9 @@ private:
   static const uint_t METADATA_SIZE = sizeof(uint64_t);
 };
 
+
 } //namespace pastra
 } //namespace whais
 
-#endif /* PS_ARRAYSTRATEGY_H_ */
 
+#endif /* PS_ARRAYSTRATEGY_H_ */

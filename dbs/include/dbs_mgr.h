@@ -31,18 +31,26 @@
 #include "dbs_table.h"
 
 
-
 namespace whais {
 
 
+enum FIX_ERROR_CALLBACK_TYPE {
+  STEP_INFO  = 1,
+  INFORMATION,
+  FIX_INFO,
+  FIX_QUESTION,
+  CONFIRMATION_QUESTION,
+  OPTIMISE_QUESTION,
+  CRITICAL
+};
 
-static const uint64_t DEFAULT_MAX_FILE_SIZE           = 2147483648ul; //2GB
-static const uint32_t DEFAULT_TABLE_CACHE_BLK_SIZE    = 16384u;       //16KB
-static const uint32_t DEFAULT_TABLE_CACHE_BLK_COUNT   = 1024u;
-static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_SIZE  = 16384u;       //16KB
-static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_COUNT = 1024u;
-static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE      = 512u;
 
+static const uint64_t DEFAULT_MAX_FILE_SIZE             = 2147483648ul; //2GB
+static const uint32_t DEFAULT_TABLE_CACHE_BLK_SIZE      = 16384u;       //16KB
+static const uint32_t DEFAULT_TABLE_CACHE_BLK_COUNT     = 1024u;
+static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_SIZE    = 16384u;       //16KB
+static const uint32_t DEFAULT_VLSTORE_CACHE_BLK_COUNT   = 1024u;
+static const uint32_t DEFAULT_VLVALUE_CACHE_SIZE        = 512u;
 
 
 class DBS_SHL IDBSHandler
@@ -51,25 +59,19 @@ public:
   virtual ~IDBSHandler() {}
 
   virtual TABLE_INDEX PersistentTablesCount() = 0;
-
   virtual ITable& RetrievePersistentTable(const TABLE_INDEX index) = 0;
-
   virtual ITable& RetrievePersistentTable(const char* const name) = 0;
-
   virtual void AddTable(const char* const   name,
-                         const FIELD_INDEX   fieldsCount,
-                         DBSFieldDescriptor* inoutFields) = 0;
+                        const FIELD_INDEX   fieldsCount,
+                        DBSFieldDescriptor* inoutFields) = 0;
   virtual void DeleteTable(const char* const name) = 0;
-
   virtual void SyncAllTablesContent() = 0;
   virtual void SyncTableContent(const TABLE_INDEX index) = 0;
   virtual void NotifyDatabaseUpdate() = 0;
-
   virtual ITable& CreateTempTable(const FIELD_INDEX   fieldsCount,
-                                   DBSFieldDescriptor* inoutFields) = 0;
+                                  DBSFieldDescriptor* inoutFields) = 0;
 
   virtual void ReleaseTable(ITable&) = 0;
-
   virtual const char* TableName(const TABLE_INDEX index) = 0;
 
 };
@@ -90,7 +92,6 @@ struct DBSSettings
 
   std::string   mWorkDir;
   std::string   mTempDir;
-
   uint64_t      mMaxFileSize;
   uint32_t      mTableCacheBlkSize;
   uint32_t      mTableCacheBlkCount;
@@ -100,49 +101,35 @@ struct DBSSettings
 };
 
 
-enum FIX_ERROR_CALLBACK_TYPE {
-  STEP_INFO  = 1,
-  INFORMATION,
-  FIX_INFO,
-  FIX_QUESTION,
-  CONFIRMATION_QUESTION,
-  OPTIMISE_QUESTION,
-  CRITICAL
-};
-
 typedef bool(*FIX_ERROR_CALLBACK) (const FIX_ERROR_CALLBACK_TYPE type,
-                                    const char* const             format,
-                                    ... );
+                                   const char* const             format,
+                                   ... );
 
 DBS_SHL void
 DBSInit(const DBSSettings& setup);
 
-
 DBS_SHL void
 DBSShoutdown();
-
 
 DBS_SHL const DBSSettings&
 DBSGetSeettings();
 
-
 DBS_SHL void
 DBSCreateDatabase(const char* const name,
-                   const char*       path = NULL);
-
+                  const char*       path = NULL);
 
 DBS_SHL bool
 DBSValidateDatabase(const char* const name,
-                     const char*       path = NULL);
+                    const char*       path = NULL);
 
 DBS_SHL bool
 DBSRepairDatabase(const char* const            name,
-                   const char*                  path        = NULL,
-                   FIX_ERROR_CALLBACK           fixCallback = NULL);
+                  const char*                  path        = NULL,
+                  FIX_ERROR_CALLBACK           fixCallback = NULL);
 
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase(const char* const name,
-                     const char*       path = NULL);
+                    const char*       path = NULL);
 
 DBS_SHL void
 DBSReleaseDatabase(IDBSHandler& hnd);
@@ -150,13 +137,13 @@ DBSReleaseDatabase(IDBSHandler& hnd);
 
 DBS_SHL void
 DBSRemoveDatabase(const char* const     name,
-                   const char* const     path = NULL);
-
+                  const char* const     path = NULL);
 
 DBS_SHL const char*
 DescribeDbsEngineVersion();
 
+
 } //namespace whais
 
-#endif /* DBS_MGR_H_ */
 
+#endif /* DBS_MGR_H_ */

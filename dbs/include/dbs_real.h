@@ -29,14 +29,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <limits>
 
 #include "whais.h"
-
 #include "utils/we_int128.h"
 
 
 namespace whais {
 
-static const int64_t DBS_REAL_PREC      = 1000000ull;         //6 decimals
-static const int64_t DBS_RICHREAL_PREC  = 100000000000000ull; //14 decimals
+
+static const int64_t DBS_REAL_PREC       = 1000000ull;         //6 decimals
+static const int64_t DBS_RICHREAL_PREC   = 100000000000000ull; //14 decimals
 
 template <typename TI, typename TF, const int64_t PRECISION>
 class DBSReal
@@ -48,9 +48,7 @@ public:
   {
   }
 
-  DBSReal(const int64_t integer,
-           const int64_t fractional,
-           const int64_t precision)
+  DBSReal(const int64_t integer, const int64_t fractional, const int64_t precision)
   {
     assert((integer >= 0) || (fractional <= 0));
     assert((integer <= 0) || (fractional >= 0));
@@ -71,21 +69,9 @@ public:
   {
   }
 
-  DBSReal(const long double value)
-  {
-    build(value);
-  }
-
-  DBSReal(const double value)
-  {
-    build(value);
-  }
-
-  DBSReal(const float value)
-  {
-    build(value);
-  }
-
+  DBSReal(const long double value) { build(value); }
+  DBSReal(const double value) { build(value); }
+  DBSReal(const float value) { build(value); }
   DBSReal(const WE_I128& value)
     : mIntPart(toInt64(value)),
       mFracPart(0)
@@ -93,7 +79,7 @@ public:
   }
 
   DBSReal
-  operator+ (const DBSReal& op) const
+  operator+(const DBSReal& op) const
   {
     DBSReal result;
 
@@ -101,30 +87,30 @@ public:
     result.mFracPart = this->mFracPart + op.mFracPart;
 
     if (result.mFracPart < 0)
-      {
-        result.mFracPart  = -result.mFracPart;
+    {
+      result.mFracPart = -result.mFracPart;
 
-        result.mIntPart  -= result.mFracPart / PRECISION;
-        result.mFracPart %= PRECISION;
+      result.mIntPart -= result.mFracPart / PRECISION;
+      result.mFracPart %= PRECISION;
 
-        result.mFracPart  = -result.mFracPart;
-      }
+      result.mFracPart = -result.mFracPart;
+    }
     else
-      {
-        result.mIntPart  += result.mFracPart / PRECISION;
-        result.mFracPart %= PRECISION;
-      }
+    {
+      result.mIntPart += result.mFracPart / PRECISION;
+      result.mFracPart %= PRECISION;
+    }
 
-    if ((result.mIntPart < 0) && (result.mFracPart > 0))
-      {
-        result.mIntPart++;
-        result.mFracPart = -PRECISION + result.mFracPart;
-      }
-    else if ((result.mIntPart > 0) && (result.mFracPart < 0))
-      {
-        result.mIntPart--;
-        result.mFracPart = PRECISION + result.mFracPart;
-      }
+    if (result.mIntPart < 0 && result.mFracPart > 0)
+    {
+      result.mIntPart++;
+      result.mFracPart = -PRECISION + result.mFracPart;
+    }
+    else if (result.mIntPart > 0 && result.mFracPart < 0)
+    {
+      result.mIntPart--;
+      result.mFracPart = PRECISION + result.mFracPart;
+    }
 
     assert((result.mIntPart >= 0) || (result.mFracPart <= 0));
     assert((result.mIntPart <= 0) || (result.mFracPart >= 0));
@@ -133,7 +119,7 @@ public:
   }
 
   DBSReal
-  operator- () const
+  operator-() const
   {
     DBSReal result(*this);
 
@@ -146,14 +132,10 @@ public:
     return result;
   }
 
-  DBSReal
-  operator- (const DBSReal& op) const
-  {
-    return *this + (-op);
-  }
+  DBSReal operator-(const DBSReal& op) const { return *this + (-op); }
 
   DBSReal
-  operator* (const DBSReal& op) const
+  operator*(const DBSReal& op) const
   {
     DBSReal op1 = *this;
     DBSReal op2 = op;
@@ -167,23 +149,22 @@ public:
     if (op2.mIntPart < 0)
       op2neg = true, op2 = -op2;
 
-    WE_I128  temp;
-    DBSReal  result;
+    WE_I128 temp;
+    DBSReal result;
 
-    temp             = WE_I128(op1.mIntPart) * op2.mIntPart;
-    result.mIntPart  = toInt64(temp);
+    temp = WE_I128(op1.mIntPart) * op2.mIntPart;
+    result.mIntPart = toInt64(temp);
 
-    temp = WE_I128(op1.mIntPart) * op2.mFracPart +
-             WE_I128(op2.mIntPart) * op1.mFracPart;
+    temp = WE_I128(op1.mIntPart) * op2.mFracPart + WE_I128(op2.mIntPart) * op1.mFracPart;
 
-    result.mIntPart  += toInt64(temp / PRECISION);
-    result.mFracPart  = toInt64(temp % PRECISION);
+    result.mIntPart += toInt64(temp / PRECISION);
+    result.mFracPart = toInt64(temp % PRECISION);
 
-    temp  = WE_I128(op1.mFracPart) * op2.mFracPart;
+    temp = WE_I128(op1.mFracPart) * op2.mFracPart;
     temp /= PRECISION;
 
     result.mFracPart += toInt64(temp);
-    result.mIntPart  += result.mFracPart / PRECISION;
+    result.mIntPart += result.mFracPart / PRECISION;
     result.mFracPart %= PRECISION;
 
     if (op1neg ^ op2neg)
@@ -195,17 +176,14 @@ public:
   DBSReal
   operator/ (const DBSReal& op) const
   {
-    WE_I128        op1;
-    WE_I128        op2;
-    bool           op1neg  = false;
-    bool           op2neg  = false;
+    WE_I128 op1 = (WE_I128(this->mIntPart) * PRECISION) + this->mFracPart;
+    WE_I128 op2 = (WE_I128(op.mIntPart) * PRECISION) + op.mFracPart;
 
-    op1 = (WE_I128(this->mIntPart) * PRECISION) + this->mFracPart;
-    op2 = (WE_I128(op.mIntPart) * PRECISION) + op.mFracPart;
-
+    bool op1neg = false;
     if (op1 < 0)
       op1neg = true, op1 = -op1;
 
+    bool op2neg = false;
     if (op2 < 0)
       op2neg = true, op2 = -op2;
 
@@ -213,15 +191,15 @@ public:
 
     op1 %= op2;
     for (int64_t i = 1; i < PRECISION; i *= 10)
-      {
-        result.mFracPart *= 10;
-        op1 *= 10;
+    {
+      result.mFracPart *= 10;
+      op1 *= 10;
 
-        assert(toInt64(op1 / op2) < 10);
+      assert(toInt64(op1 / op2) < 10);
 
-        result.mFracPart += toInt64(op1 / op2);
-        op1 %= op2;
-      }
+      result.mFracPart += toInt64(op1 / op2);
+      op1 %= op2;
+    }
 
     if (op1neg ^ op2neg)
       return -result;
@@ -231,95 +209,38 @@ public:
 
 
   bool
-  operator== (const DBSReal& op) const
+  operator==(const DBSReal& op) const
   {
-    return(this->mIntPart == op.mIntPart)
-            && (this->mFracPart == op.mFracPart);
-  }
-
-  bool
-  operator!= (const DBSReal& op) const
-  {
-    return ! (*this == op);
+    return (this->mIntPart == op.mIntPart) && (this->mFracPart == op.mFracPart);
   }
 
   bool
   operator< (const DBSReal& op) const
   {
-    return(this->mIntPart < op.mIntPart)
-            || ((this->mIntPart == op.mIntPart)
-                && (this->mFracPart < op.mFracPart));
+    return  (this->mIntPart < op.mIntPart)
+            || (this->mIntPart == op.mIntPart && this->mFracPart < op.mFracPart);
   }
 
-  bool
-  operator<= (const DBSReal& op) const
-  {
-    return(*this == op) || (*this < op);
-  }
+  bool operator!=(const DBSReal& op) const { return ! (*this == op); }
+  bool operator<= (const DBSReal& op) const { return *this == op || *this < op; }
+  bool operator> (const DBSReal* op) const { return ! (*this <= op); }
+  bool operator>= (const DBSReal* op) const { return ! (*this < op); }
+  const DBSReal& operator+= (const DBSReal& op) { return *this = *this + op; }
+  const DBSReal& operator-= (const DBSReal& op) { return *this = *this - op; }
+  const DBSReal& operator/= (const DBSReal& op) { return *this = *this / op; }
+  const DBSReal& operator%= (const DBSReal& op) { return *this = *this % op; }
 
-  bool
-  operator> (const DBSReal* op) const
-  {
-    return ! (*this <= op);
-  }
-
-  bool
-  operator>= (const DBSReal* op) const
-  {
-    return ! (*this < op);
-  }
-
-  const DBSReal&
-  operator+= (const DBSReal& op)
-  {
-    return *this = *this + op;
-  }
-
-  const DBSReal&
-  operator-= (const DBSReal& op)
-  {
-    return *this = *this - op;
-  }
-
-  const DBSReal&
-  operator/= (const DBSReal& op)
-  {
-    return *this = *this / op;
-  }
-
-  const DBSReal&
-  operator%= (const DBSReal& op)
-  {
-    return *this = *this % op;
-  }
-
-  int64_t Integer() const
-  {
-    return mIntPart;
-  }
-
-  int64_t
-  Fractional() const
-  {
-    return mFracPart;
-  }
-
-  int64_t
-  Precision() const
-  {
-    return PRECISION;
-  }
+  int64_t Integer() const { return mIntPart; }
+  int64_t Fractional() const { return mFracPart; }
+  constexpr int64_t Precision() const { return PRECISION; }
 
 private:
-  void build(const int64_t interger,
-              const int64_t fractional,
-              const int64_t precision)
+  void build(const int64_t interger, const int64_t fractional, const int64_t precision)
   {
-    mIntPart  = interger;
+    mIntPart = interger;
     mFracPart = fractional;
 
     const bool fracNegative = fractional < 0;
-
     if (fracNegative)
       mFracPart = -mFracPart;
 
@@ -335,8 +256,8 @@ private:
 
   void build(const long double value)
   {
-    int64_t integer    = value;
-    int64_t fractional = - ((integer - value) * PRECISION);
+    int64_t integer = value;
+    int64_t fractional = -((integer - value) * PRECISION);
 
     build(integer, fractional, PRECISION);
   }
@@ -396,6 +317,8 @@ toInt64(const DBS_RICHREAL_T& value)
   return value.Integer();
 }
 
+
 } //namespace whais
+
 
 #endif /* DBS_REAL_H_ */

@@ -104,13 +104,13 @@ void*
 operator new(std::size_t size, const char* file, uint_t line);
 
 void*
-operator new[] (std::size_t size);
+operator new[](std::size_t size);
 
 void*
-operator new[] (std::size_t size, const std::nothrow_t&) noexcept;
+operator new[](std::size_t size, const std::nothrow_t&) noexcept;
 
 void*
-operator new[] (std::size_t size, const char* file, uint_t line);
+operator new[](std::size_t size, const char* file, uint_t line);
 
 void
 operator delete(void* ptr) noexcept;
@@ -119,10 +119,10 @@ void
 operator delete(void* ptr, const char*, uint_t);
 
 void
-operator delete[] (void* ptr) noexcept;
+operator delete[](void* ptr) noexcept;
 
 void
-operator delete[] (void* ptr, const char*, uint_t );
+operator delete[](void* ptr, const char*, uint_t );
 
 
 template <class T> static inline void
@@ -152,10 +152,10 @@ _placement_new(void* place)
 #include "custom/include/test/test_fmw.h"
 
 
-#define shared_make(T,...)       std::shared_ptr<T>(new T(__VA_ARGS__))
-#define shared_array_make(T,s)   std::shared_ptr<T>(new T[(s)])
-#define unique_make(T,...)       std::unique_ptr<T>(new T(__VA_ARGS__))
-#define unique_array_make(T,s)   std::unique_ptr<T>(new T[(s)])
+#define shared_make(T,...)       (new T(__VA_ARGS__))
+#define shared_array_make(T,s)   (new T[(s)])
+#define unique_make(T,...)       (new T(__VA_ARGS__))
+#define unique_array_make(T,s)   (new T[(s)])
 
 class WMemoryTracker
 {

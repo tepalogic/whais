@@ -32,112 +32,89 @@ namespace whais {
 namespace pastra {
 
 
-
 bool
-prototype_fix_table(DbsHandler&                  dbs,
-                     const std::string&           name,
-                     FIX_ERROR_CALLBACK           fixCallback);
+prototype_fix_table(DbsHandler&          dbs,
+                    const std::string&   name,
+                    FIX_ERROR_CALLBACK   fixCallback);
 
 
 class PersistentTable : public PrototypeTable
 {
 public:
   PersistentTable(DbsHandler& dbs, const std::string& name);
-
-  PersistentTable(DbsHandler&                     dbs,
-                   const std::string&              name,
-                   const DBSFieldDescriptor* const fields,
-                   const uint_t                    fieldsCount);
-
+  PersistentTable(DbsHandler&                       dbs,
+                  const std::string&                name,
+                  const DBSFieldDescriptor* const   inoutFields,
+                  const uint_t                      fieldsCount);
   PersistentTable(const PrototypeTable& prototype);
-
   virtual ~PersistentTable();
 
   void RemoveFromDatabase();
 
   virtual bool IsTemporal() const;
-
   virtual ITable& Spawn() const;
-
   virtual void FlushEpilog();
+
+public:
+  static bool ValidateTable(const std::string& path, const std::string& name);
+  static bool RepairTable(DbsHandler&          dbs,
+                          const std::string&   name,
+                          const std::string&   path,
+                          FIX_ERROR_CALLBACK   fixCallback);
 
 protected:
   virtual void MakeHeaderPersistent();
-
   virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field);
-
   virtual IDataContainer& RowsContainer();
-
   virtual IDataContainer& TableContainer();
-
   virtual VariableSizeStore& VSStore();
 
-  const DBSSettings&           mDbsSettings;
-  uint64_t                     mMaxFileSize;
-  uint64_t                     mVSDataSize;
-  std::string                  mFileNamePrefix;
-  std::unique_ptr<FileContainer> mTableData;
-  std::unique_ptr<FileContainer> mRowsData;
-  VariableSizeStore*           mVSData;
-  bool                         mRemoved;
+  const DBSSettings&               mDbsSettings;
+  uint64_t                         mMaxFileSize;
+  uint64_t                         mVSDataSize;
+  std::string                      mFileNamePrefix;
+  std::unique_ptr<FileContainer>   mTableData;
+  std::unique_ptr<FileContainer>   mRowsData;
+  VariableSizeStore               *mVSData;
+  bool                             mRemoved;
 
 private:
   void InitFromFile(const std::string& tableName);
-
   void InitIndexedFields();
-
   void InitVariableStorages();
-
   void CheckTableValues(FIX_ERROR_CALLBACK fixCallback);
-
-public:
-  static bool ValidateTable(const std::string&         path,
-                             const std::string&         name);
-
-  static bool RepairTable(DbsHandler&                 dbs,
-                           const std::string&          name,
-                           const std::string&          path,
-                           FIX_ERROR_CALLBACK          fixCallback);
 };
-
 
 
 class TemporalTable : public PrototypeTable
 {
 public:
 
-  TemporalTable(DbsHandler&                     dbs,
-                 const DBSFieldDescriptor* const fields,
-                 const FIELD_INDEX               fieldsCount);
+  TemporalTable(DbsHandler&                       dbs,
+                const DBSFieldDescriptor* const   inoutFields,
+                const FIELD_INDEX                 fieldsCount);
   TemporalTable(const PrototypeTable& protoype);
-
   virtual ~TemporalTable();
 
   virtual bool IsTemporal() const;
-
   virtual ITable& Spawn() const;
-
   virtual void FlushEpilog();
 
 protected:
-
   virtual void MakeHeaderPersistent();
-
   virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field);
-
   virtual IDataContainer& RowsContainer();
-
   virtual IDataContainer& TableContainer();
-
   virtual VariableSizeStore& VSStore();
 
-  std::unique_ptr<TemporalContainer>  mTableData;
-  std::unique_ptr<TemporalContainer>  mRowsData;
-  VariableSizeStore*                mVSData;
+  std::unique_ptr<TemporalContainer>   mTableData;
+  std::unique_ptr<TemporalContainer>   mRowsData;
+  VariableSizeStore*                   mVSData;
 };
+
 
 } //namespa pastra
 } //namespa whais
 
-#endif  /* PS_TABLE_H_ */
 
+#endif  /* PS_TABLE_H_ */

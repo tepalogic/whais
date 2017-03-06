@@ -172,12 +172,12 @@ private:
 #pragma warning(disable: 4251)
   //Ignore this warning at the STL unique_ptr does not
   //have any static memebers
-  std::unique_ptr<uint8_t>  mTypeInfo;
-  std::unique_ptr<uint8_t>  mSymbols;
-  std::unique_ptr<uint8_t>  mConstArea;
-  std::unique_ptr<uint8_t>  mGlobals;
-  std::unique_ptr<uint8_t>  mProcs;
-  std::unique_ptr<uint8_t*> mProcData;
+  std::unique_ptr<uint8_t[]>  mTypeInfo;
+  std::unique_ptr<uint8_t[]>  mSymbols;
+  std::unique_ptr<uint8_t[]>  mConstArea;
+  std::unique_ptr<uint8_t[]>  mGlobals;
+  std::unique_ptr<uint8_t[]>  mProcs;
+  std::unique_ptr<uint8_t*[]> mProcData;
 #pragma warning(default: 4251)
 };
 

@@ -33,6 +33,7 @@
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_types.h"
 
+
 namespace whais {
 namespace pastra {
 
@@ -46,81 +47,53 @@ struct DbsManager;
 class DbsHandler : public IDBSHandler
 {
 public:
-  DbsHandler(const DBSSettings&    settings,
-              const std::string&    directory,
-              const std::string&    name);
-
-  DbsHandler(const DbsHandler&     source);
+  DbsHandler(const DBSSettings& settings, const std::string& directory, const std::string& name);
+  DbsHandler(const DbsHandler& source);
 
   virtual ~DbsHandler();
 
   virtual TABLE_INDEX PersistentTablesCount();
-
   virtual ITable& RetrievePersistentTable(const TABLE_INDEX index);
-
   virtual ITable& RetrievePersistentTable(const char* const name);
-
   virtual void ReleaseTable(ITable&);
 
-  virtual void AddTable(const char* const      name,
-                         const FIELD_INDEX      fieldsCount,
-                         DBSFieldDescriptor*    inoutFields);
-
+  virtual void AddTable(const char* const          name,
+                       const FIELD_INDEX           fieldsCount,
+                       DBSFieldDescriptor* const   inoutFields);
   virtual void DeleteTable(const char* const name);
-
   virtual void SyncAllTablesContent();
   virtual void SyncTableContent(const TABLE_INDEX index);
   virtual void NotifyDatabaseUpdate();
 
-  virtual ITable& CreateTempTable(const FIELD_INDEX   fieldsCount,
-                                   DBSFieldDescriptor* inoutFields);
-
+  virtual ITable& CreateTempTable(const FIELD_INDEX fieldsCount, DBSFieldDescriptor* inoutFields);
   virtual const char* TableName(const TABLE_INDEX index);
 
   void Discard();
-
   void RemoveFromStorage();
 
-  const std::string& WorkingDir() const
-  {
-    return mDbsLocationDir;
-  }
-
-  const std::string& TemporalDir() const
-  {
-    return mGlbSettings.mTempDir;
-  }
-
-  uint64_t MaxFileSize() const
-  {
-    return mGlbSettings.mMaxFileSize;
-  }
+  const std::string& WorkingDir() const { return mDbsLocationDir; }
+  const std::string& TemporalDir() const { return mGlbSettings.mTempDir; }
+  uint64_t MaxFileSize() const { return mGlbSettings.mMaxFileSize; }
+  const DBSSettings& Settings() const { return mGlbSettings; }
 
   bool HasUnreleasedTables();
-
   void RegisterTableSpawn();
 
-  const DBSSettings& Settings() const
-  {
-    return mGlbSettings;
-  }
 
 private:
-
-  typedef std::map<std::string, PersistentTable*> TABLES;
+  using TABLES = std::map<std::string, PersistentTable*>;
 
   void SyncToFile();
 
-  const DBSSettings&      mGlbSettings;
-  Lock                    mSync;
-  const std::string       mDbsLocationDir;
-  const std::string       mFileName;
-  File                    mFile;
-  TABLES                  mTables;
-  int                     mCreatedTemporalTables;
-  bool                    mNeedsSync;
+  const DBSSettings&   mGlbSettings;
+  Lock                 mSync;
+  const std::string    mDbsLocationDir;
+  const std::string    mFileName;
+  File                 mFile;
+  TABLES               mTables;
+  int                  mCreatedTemporalTables;
+  bool                 mNeedsSync;
 };
-
 
 
 struct DbsElement
@@ -136,29 +109,24 @@ struct DbsElement
 };
 
 
-
 struct DbsManager
 {
-  typedef std::map<std::string, DbsElement> DATABASES_MAP;
+  using DATABASES_MAP = std::map<std::string, DbsElement>;
 
   DbsManager(const DBSSettings& settings)
-    : mSync(),
-      mDBSSettings(settings),
-      mDatabases()
+    : mDBSSettings(settings)
   {
-    if ((mDBSSettings.mWorkDir.length() == 0)
-        || (mDBSSettings.mTempDir.length() == 0)
-        || (mDBSSettings.mTableCacheBlkSize == 0)
-        || (mDBSSettings.mTableCacheBlkCount == 0)
-        || (mDBSSettings.mVLStoreCacheBlkSize == 0)
-        || (mDBSSettings.mVLStoreCacheBlkCount == 0)
-        || (mDBSSettings.mVLValueCacheSize == 0))
-      {
-        throw DBSException(
-            _EXTRA(DBSException::BAD_PARAMETERS),
-            "Cannot create a database manager with the specified parameters."
-                           );
-      }
+    if (mDBSSettings.mWorkDir.length() == 0
+        || mDBSSettings.mTempDir.length() == 0
+        || mDBSSettings.mTableCacheBlkSize == 0
+        || mDBSSettings.mTableCacheBlkCount == 0
+        || mDBSSettings.mVLStoreCacheBlkSize == 0
+        || mDBSSettings.mVLStoreCacheBlkCount == 0
+        || mDBSSettings.mVLValueCacheSize == 0)
+    {
+      throw DBSException(_EXTRA(DBSException::BAD_PARAMETERS),
+          "Cannot create a database manager with the specified parameters.");
+    }
     NormalizeFilePath(mDBSSettings.mWorkDir, true);
     NormalizeFilePath(mDBSSettings.mTempDir, true);
   }
@@ -172,5 +140,5 @@ struct DbsManager
 } //namespace pastra
 } //namespace whais
 
-#endif                                /* PS_DBSMGR_H_ */
 
+#endif                                /* PS_DBSMGR_H_ */

@@ -77,7 +77,6 @@ struct DBSFieldDescriptor field_descs[] = {
     {"real", T_REAL, false},
     {"richreal", T_RICHREAL, false},
 
-
     {"text", T_TEXT, false},
 
     {"array_bool", T_BOOL, true},

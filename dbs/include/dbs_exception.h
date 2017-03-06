@@ -27,18 +27,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whais.h"
 
+
 namespace whais
 {
+
 
 class DBS_SHL DBSException : public Exception
 {
 public:
   DBSException(const uint32_t  code,
-                const char*     file,
-                uint32_t        line,
-                const char*     fmtMsg = NULL,
-                ...);
-  virtual ~DBSException();
+               const char     *file,
+               uint32_t        line,
+               const char     *fmtMsg = NULL,
+               ...);
+  virtual ~DBSException() = default;
 
   enum ExceptionCodes
   {
@@ -81,12 +83,12 @@ public:
   };
 
   virtual Exception* Clone() const;
-
   virtual EXCEPTION_TYPE Type() const;
-
   virtual const char* Description() const;
 };
 
+
 } //namespace whais
+
 
 #endif /* DBS_EXCEPTION_H_ */

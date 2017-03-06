@@ -29,18 +29,13 @@
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_types.h"
 #include "dbs/dbs_exception.h"
-
 #include "ps_arraystrategy.h"
-
-
 
 
 using namespace std;
 
 
-
 namespace whais {
-
 
 
 IArrayStrategy::IArrayStrategy(const DBS_FIELD_TYPE elemsType)
@@ -58,12 +53,6 @@ IArrayStrategy::IArrayStrategy(const DBS_FIELD_TYPE elemsType)
   }
 }
 
-
-IArrayStrategy::~IArrayStrategy()
-{
-}
-
-
 uint64_t
 IArrayStrategy::Count()
 {
@@ -72,7 +61,6 @@ IArrayStrategy::Count()
 
   return mElementsCount;
 }
-
 
 DBS_BASIC_TYPE
 IArrayStrategy::Type()
@@ -84,8 +72,7 @@ IArrayStrategy::Type()
 }
 
 uint_t
-IArrayStrategy::Get(const uint64_t index,
-                     uint8_t* const dest)
+IArrayStrategy::Get(const uint64_t index, uint8_t* const dest)
 {
   LockRAII<Lock> _l(mLock);
 
@@ -101,9 +88,7 @@ IArrayStrategy::Get(const uint64_t index,
 }
 
 IArrayStrategy*
-IArrayStrategy::Set(const DBS_BASIC_TYPE type,
-                     const uint8_t* const rawValue,
-                     const uint64_t       index)
+IArrayStrategy::Set(const DBS_BASIC_TYPE type, const uint8_t* const rawValue, const uint64_t index)
 {
   LockRAII<Lock> _l(mLock);
 
@@ -114,29 +99,27 @@ IArrayStrategy::Set(const DBS_BASIC_TYPE type,
   IArrayStrategy* r = this;
 
   if (type != mElementsType)
-    {
-      if ((mElementsType != T_UNDETERMINED) && (index > 0))
-        throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
+  {
+    if ((mElementsType != T_UNDETERMINED) && (index > 0))
+      throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-      array.reset(new pastra::TemporalArray(type));
-      r = array.get();
-    }
+    array.reset(new pastra::TemporalArray(type));
+    r = array.get();
+  }
   else if (index > mElementsCount)
     throw DBSException(_EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   if (r->ReferenceCount() > 1)
-    {
-      array.reset(r->Clone());
-      r = array.get();
+  {
+    array.reset(r->Clone());
+    r = array.get();
 
-      assert(r->mElementsCount == mElementsCount);
-      assert(r->mElementRawSize == mElementRawSize);
-      assert(r->mElementsType == mElementsType);
-    }
+    assert(r->mElementsCount == mElementsCount);
+    assert(r->mElementRawSize == mElementRawSize);
+    assert(r->mElementsType == mElementsType);
+  }
 
-  r->RawWrite(index * r->mElementRawSize,
-                    r->mElementRawSize,
-                    rawValue);
+  r->RawWrite(index * r->mElementRawSize, r->mElementRawSize, rawValue);
 
   if (index == r->mElementsCount)
     r->mElementsCount++;
@@ -148,11 +131,10 @@ IArrayStrategy::Set(const DBS_BASIC_TYPE type,
   return r;
 }
 
-
 IArrayStrategy*
 IArrayStrategy::Add(const DBS_BASIC_TYPE type,
-                     const uint8_t* const rawValue,
-                     uint64_t* const      outIndex)
+                    const uint8_t* const rawValue,
+                    uint64_t* const outIndex)
 {
   LockRAII<Lock> _l(mLock);
 
@@ -165,27 +147,25 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
   assert((T_UNKNOWN < type) && (type < T_TEXT));
 
   if (type != mElementsType)
-    {
-      if (mElementsType != T_UNDETERMINED)
-        throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
+  {
+    if (mElementsType != T_UNDETERMINED)
+      throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-      array.reset(new pastra::TemporalArray(type));
-      r = array.get();
-    }
+    array.reset(new pastra::TemporalArray(type));
+    r = array.get();
+  }
 
   if (r->ReferenceCount() > 1)
-    {
-      array.reset(r->Clone());
-      r = array.get();
+  {
+    array.reset(r->Clone());
+    r = array.get();
 
-      assert(r->mElementsCount == mElementsCount);
-      assert(r->mElementRawSize == mElementRawSize);
-      assert(r->mElementsType == mElementsType);
-    }
+    assert(r->mElementsCount == mElementsCount);
+    assert(r->mElementRawSize == mElementRawSize);
+    assert(r->mElementsType == mElementsType);
+  }
 
-  r->RawWrite(r->mElementsCount * r->mElementRawSize,
-                    r->mElementRawSize,
-                    rawValue);
+  r->RawWrite(r->mElementsCount * r->mElementRawSize, r->mElementRawSize, rawValue);
   *outIndex = r->mElementsCount++;
 
   assert(r->RawSize() % r->mElementsCount == 0);
@@ -195,7 +175,6 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
 
   return r;
 }
-
 
 IArrayStrategy*
 IArrayStrategy::Remove(const uint64_t index)
@@ -212,12 +191,12 @@ IArrayStrategy::Remove(const uint64_t index)
     return this;
 
   if (ReferenceCount() == 1)
-    {
-      ColapseRaw(mElementRawSize * index, mElementRawSize);
-      --mElementsCount;
+  {
+    ColapseRaw(mElementRawSize * index, mElementRawSize);
+    --mElementsCount;
 
-      return this;
-    }
+    return this;
+  }
 
   std::unique_ptr<IArrayStrategy> r(new pastra::TemporalArray(mElementsType));
 
@@ -227,27 +206,26 @@ IArrayStrategy::Remove(const uint64_t index)
   uint64_t offset = 0;
   uint8_t buffer[256];
   while (offset < mElementRawSize * index)
-    {
-      uint_t chunkSize = MIN( sizeof buffer, mElementRawSize * index);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, mElementRawSize * index);
 
-      RawRead(offset, chunkSize, buffer);
-      r->RawWrite(offset, chunkSize, buffer);
+    RawRead(offset, chunkSize, buffer);
+    r->RawWrite(offset, chunkSize, buffer);
 
-      offset += chunkSize;
-    }
+    offset += chunkSize;
+  }
 
   assert(offset == mElementRawSize * index);
 
   offset += mElementRawSize;
   while (offset < mElementRawSize * mElementsCount)
-    {
-      uint_t chunkSize = MIN(sizeof buffer,
-                              mElementRawSize * mElementsCount - offset);
-      RawRead(offset, chunkSize, buffer);
-      r->RawWrite(offset - mElementRawSize, chunkSize, buffer);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, mElementRawSize * mElementsCount - offset);
+    RawRead(offset, chunkSize, buffer);
+    r->RawWrite(offset - mElementRawSize, chunkSize, buffer);
 
-      offset += chunkSize;
-    }
+    offset += chunkSize;
+  }
 
   assert(offset == mElementRawSize * mElementsCount);
 
@@ -255,8 +233,6 @@ IArrayStrategy::Remove(const uint64_t index)
 
   return r.release();
 }
-
-
 
 IArrayStrategy*
 IArrayStrategy::Sort(const bool reverse)
@@ -275,166 +251,122 @@ IArrayStrategy::Sort(const bool reverse)
   assert((T_UNKNOWN < mElementsType) && (mElementsType < T_TEXT));
 
   if (r->ReferenceCount() > 1)
-    {
-      array.reset(r->Clone());
-      r = array.get();
-
-      assert(r->mElementsCount == mElementsCount);
-      assert(r->mElementRawSize == mElementRawSize);
-      assert(r->mElementsType == mElementsType);
-    }
-
-
-  switch(mElementsType)
   {
-    case T_BOOL:
-      {
-        ArrayContainer<DBool> temp(*r);
-        quick_sort<DBool, ArrayContainer<DBool> > (0,
-                                                   mElementsCount - 1,
-                                                   reverse,
-                                                   temp);
-      }
+    array.reset(r->Clone());
+    r = array.get();
+
+    assert(r->mElementsCount == mElementsCount);
+    assert(r->mElementRawSize == mElementRawSize);
+    assert(r->mElementsType == mElementsType);
+  }
+
+
+  switch (mElementsType)
+  {
+  case T_BOOL:
+  {
+    ArrayContainer<DBool> temp(*r);
+    quick_sort<DBool, ArrayContainer<DBool> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_CHAR:
-     {
-        ArrayContainer<DChar> temp(*r);
-        quick_sort<DChar, ArrayContainer<DChar> > (0,
-                                                   mElementsCount - 1,
-                                                   reverse,
-                                                   temp);
-      }
+  {
+    ArrayContainer<DChar> temp(*r);
+    quick_sort<DChar, ArrayContainer<DChar> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_DATE:
-     {
-        ArrayContainer<DDate> temp(*r);
-        quick_sort<DDate, ArrayContainer<DDate> > (0,
-                                                   mElementsCount - 1,
-                                                   reverse,
-                                                   temp);
-      }
+  {
+    ArrayContainer<DDate> temp(*r);
+    quick_sort<DDate, ArrayContainer<DDate> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_DATETIME:
-     {
-        ArrayContainer<DDateTime> temp(*r);
-        quick_sort<DDateTime, ArrayContainer<DDateTime> > (0,
-                                                           mElementsCount - 1,
-                                                           reverse,
-                                                           temp);
-      }
+  {
+    ArrayContainer<DDateTime> temp(*r);
+    quick_sort<DDateTime, ArrayContainer<DDateTime> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_HIRESTIME:
-     {
-        ArrayContainer<DHiresTime> temp(*r);
-        quick_sort<DHiresTime, ArrayContainer<DHiresTime> > (0,
-                                                             mElementsCount - 1,
-                                                             reverse,
-                                                             temp);
-      }
+  {
+    ArrayContainer<DHiresTime> temp(*r);
+    quick_sort<DHiresTime, ArrayContainer<DHiresTime> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_UINT8:
-     {
-        ArrayContainer<DUInt8> temp(*r);
-        quick_sort<DUInt8, ArrayContainer<DUInt8> > (0,
-                                                     mElementsCount - 1,
-                                                     reverse,
-                                                     temp);
-      }
+  {
+    ArrayContainer<DUInt8> temp(*r);
+    quick_sort<DUInt8, ArrayContainer<DUInt8> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_UINT16:
-     {
-        ArrayContainer<DUInt16> temp(*r);
-        quick_sort<DUInt16, ArrayContainer<DUInt16> > (0,
-                                                       mElementsCount - 1,
-                                                       reverse,
-                                                       temp);
-      }
+  {
+    ArrayContainer<DUInt16> temp(*r);
+    quick_sort<DUInt16, ArrayContainer<DUInt16> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_UINT32:
-     {
-        ArrayContainer<DUInt32> temp(*r);
-        quick_sort<DUInt32, ArrayContainer<DUInt32> > (0,
-                                                       mElementsCount - 1,
-                                                       reverse,
-                                                       temp);
-      }
+  {
+    ArrayContainer<DUInt32> temp(*r);
+    quick_sort<DUInt32, ArrayContainer<DUInt32> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_UINT64:
-     {
-        ArrayContainer<DUInt64> temp(*r);
-        quick_sort<DUInt64, ArrayContainer<DUInt64> > (0,
-                                                       mElementsCount - 1,
-                                                       reverse,
-                                                       temp);
-      }
+  {
+    ArrayContainer<DUInt64> temp(*r);
+    quick_sort<DUInt64, ArrayContainer<DUInt64> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_REAL:
-     {
-        ArrayContainer<DReal> temp(*r);
-        quick_sort<DReal, ArrayContainer<DReal> > (0,
-                                                   mElementsCount - 1,
-                                                   reverse,
-                                                   temp);
-      }
+  {
+    ArrayContainer<DReal> temp(*r);
+    quick_sort<DReal, ArrayContainer<DReal> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_RICHREAL:
-     {
-        ArrayContainer<DRichReal> temp(*r);
-        quick_sort<DRichReal, ArrayContainer<DRichReal> > (0,
-                                                           mElementsCount - 1,
-                                                           reverse,
-                                                           temp);
-      }
+  {
+    ArrayContainer<DRichReal> temp(*r);
+    quick_sort<DRichReal, ArrayContainer<DRichReal> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_INT8:
-     {
-        ArrayContainer<DInt8> temp(*r);
-        quick_sort<DInt8, ArrayContainer<DInt8> > (0,
-                                                   mElementsCount - 1,
-                                                   reverse,
-                                                   temp);
-      }
+  {
+    ArrayContainer<DInt8> temp(*r);
+    quick_sort<DInt8, ArrayContainer<DInt8> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_INT16:
-     {
-        ArrayContainer<DInt16> temp(*r);
-        quick_sort<DInt16, ArrayContainer<DInt16> > (0,
-                                                     mElementsCount - 1,
-                                                     reverse,
-                                                     temp);
-      }
+  {
+    ArrayContainer<DInt16> temp(*r);
+    quick_sort<DInt16, ArrayContainer<DInt16> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
 
   case T_INT32:
-     {
-        ArrayContainer<DInt32> temp(*r);
-        quick_sort<DInt32, ArrayContainer<DInt32> > (0,
-                                                     mElementsCount - 1,
-                                                     reverse,
-                                                     temp);
-      }
+  {
+    ArrayContainer<DInt32> temp(*r);
+    quick_sort<DInt32, ArrayContainer<DInt32> >(0, mElementsCount - 1, reverse,
+        temp);
+  }
     break;
 
   case T_INT64:
-     {
-        ArrayContainer<DInt64> temp(*r);
-        quick_sort<DInt64, ArrayContainer<DInt64> > (0,
-                                                     mElementsCount - 1,
-                                                     reverse,
-                                                     temp);
-      }
+  {
+    ArrayContainer<DInt64> temp(*r);
+    quick_sort<DInt64, ArrayContainer<DInt64> >(0, mElementsCount - 1, reverse, temp);
+  }
     break;
   default:
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
@@ -443,7 +375,6 @@ IArrayStrategy::Sort(const bool reverse)
   array.release();
   return r;
 }
-
 
 void
 IArrayStrategy::ReleaseReference()
@@ -460,10 +391,10 @@ IArrayStrategy::ReleaseReference()
     --mCopyReferences;
 
   if (ReferenceCount() == 0)
-    {
-      _l.Release();
-      delete this;
-    }
+  {
+    _l.Release();
+    delete this;
+  }
 }
 
 
@@ -507,15 +438,14 @@ IArrayStrategy::MakeClone()
   assert(ReferenceCount() > 0);
 
   if (MirrorsCount() > 0)
-    {
-      ++mMirrorsCount;
-      return this;
-    }
+  {
+    ++mMirrorsCount;
+    return this;
+  }
 
   ++mCopyReferences;
   return this;
 }
-
 
 IArrayStrategy*
 IArrayStrategy::Clone()
@@ -528,15 +458,15 @@ IArrayStrategy::Clone()
   uint64_t offset = 0;
   uint8_t buffer[256];
   while (offset < mElementRawSize * mElementsCount)
-   {
-     uint_t chunkSize = MIN(sizeof buffer,
-                             mElementRawSize * mElementsCount - offset);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, mElementRawSize * mElementsCount - offset);
 
-     RawRead(offset, chunkSize, buffer);
-     r->RawWrite(offset, chunkSize, buffer);
+    RawRead(offset, chunkSize, buffer);
+    r->RawWrite(offset, chunkSize, buffer);
 
-     offset += chunkSize;
-   }
+    offset += chunkSize;
+  }
+
   assert(offset == mElementRawSize * mElementsCount);
 
   r->mElementsCount = mElementsCount;
@@ -550,7 +480,6 @@ IArrayStrategy::GetTemporalContainer()
   throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
-
 pastra::VariableSizeStore&
 IArrayStrategy::GetRowStorage()
 {
@@ -561,19 +490,16 @@ IArrayStrategy::GetRowStorage()
 namespace pastra {
 
 
-
 NullArray::NullArray(const DBS_FIELD_TYPE elemsType)
   : IArrayStrategy(elemsType)
 {
 }
-
 
 void
 NullArray::ReleaseReference()
 {
   return ;
 }
-
 
 uint32_t
 NullArray::ReferenceCount() const
@@ -587,26 +513,19 @@ NullArray::MirrorsCount() const
   return 0;
 }
 
-
 void
-NullArray::RawRead(const uint64_t      offset,
-                    const uint64_t      size,
-                    uint8_t* const      buffer)
+NullArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer)
 {
   if ((offset != 0) || (size != 0))
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
-
 void
-NullArray::RawWrite(const uint64_t           offset,
-                     const uint64_t           size,
-                     const uint8_t* const     buffer)
+NullArray::RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer)
 {
   if ((offset != 0) || (size != 0))
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
-
 
 void
 NullArray::ColapseRaw(const uint64_t offset, const uint64_t count)
@@ -615,13 +534,11 @@ NullArray::ColapseRaw(const uint64_t offset, const uint64_t count)
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
-
 uint64_t
 NullArray::RawSize() const
 {
   return 0;
 }
-
 
 NullArray&
 NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
@@ -705,24 +622,19 @@ NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
 }
 
 
-
 TemporalArray::TemporalArray(const DBS_FIELD_TYPE type)
   : IArrayStrategy(type),
     mStorage()
 {
 }
 
-
 TemporalArray::~TemporalArray()
 {
   assert(mCopyReferences == 0);
 }
 
-
 void
-TemporalArray::RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer)
+TemporalArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer)
 {
   mStorage.Read(offset, size, buffer);
 }
@@ -760,7 +672,6 @@ TemporalArray::RawSize() const
   return mElementRawSize * mElementsCount;
 }
 
-
 TemporalContainer&
 TemporalArray::GetTemporalContainer()
 {
@@ -768,10 +679,9 @@ TemporalArray::GetTemporalContainer()
 }
 
 
-
-RowFieldArray::RowFieldArray(VariableSizeStore&    storage,
-                              const uint64_t        firstRecordEntry,
-                              const DBS_FIELD_TYPE  type)
+RowFieldArray::RowFieldArray(VariableSizeStore&     storage,
+                             const uint64_t         firstRecordEntry,
+                             const DBS_FIELD_TYPE   type)
   : IArrayStrategy(type),
     mFirstRecordEntry(firstRecordEntry),
     mStorage(storage)
@@ -797,59 +707,46 @@ RowFieldArray::RowFieldArray(VariableSizeStore&    storage,
 RowFieldArray::~RowFieldArray()
 {
   if (mFirstRecordEntry > 0)
-    {
-      mStorage.DecrementRecordRef(mFirstRecordEntry);
-      //mStorage.Flush();
-      mStorage.ReleaseReference();
-    }
+  {
+    mStorage.DecrementRecordRef(mFirstRecordEntry);
+    //mStorage.Flush();
+    mStorage.ReleaseReference();
+  }
 }
 
 
-
-
 void
-RowFieldArray::RawRead(const uint64_t    offset,
-                        const uint64_t    size,
-                        uint8_t* const    buffer)
+RowFieldArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer)
 {
   if (mFirstRecordEntry > 0)
-    {
-      mStorage.GetRecord(mFirstRecordEntry,
-                          offset + METADATA_SIZE,
-                          size,
-                          buffer);
-      return ;
-    }
-
+  {
+    mStorage.GetRecord(mFirstRecordEntry, offset + METADATA_SIZE, size, buffer);
+    return;
+  }
   mTempStorage.Read(offset, size, buffer);
 }
 
 
 void
-RowFieldArray::RawWrite(const uint64_t       offset,
-                         const uint64_t       size,
-                         const uint8_t* const buffer)
+RowFieldArray::RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer)
 {
   if (mFirstRecordEntry == 0)
-    {
-      mTempStorage.Write(offset, size, buffer);
-      return ;
-    }
+  {
+    mTempStorage.Write(offset, size, buffer);
+    return;
+  }
 
   uint8_t tbuffer[256];
   uint64_t coff = 0;
   while (coff < mElementsCount * mElementRawSize)
-    {
-      uint_t chunkSize = MIN(sizeof buffer,
-                              mElementsCount * mElementRawSize - coff);
-      mStorage.GetRecord(mFirstRecordEntry,
-                          coff + METADATA_SIZE,
-                          chunkSize,
-                          tbuffer);
-      mTempStorage.Write(coff, chunkSize, tbuffer);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, mElementsCount * mElementRawSize - coff);
 
-      coff += chunkSize;
-    }
+    mStorage.GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, tbuffer);
+    mTempStorage.Write(coff, chunkSize, tbuffer);
+
+    coff += chunkSize;
+  }
 
   assert(coff == mElementsCount * mElementRawSize);
 
@@ -861,46 +758,38 @@ RowFieldArray::RawWrite(const uint64_t       offset,
   mTempStorage.Write(offset, size, buffer);
 }
 
-
 void
 RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 {
 
   if (mFirstRecordEntry == 0)
-    {
-      mTempStorage.Colapse(offset, count);
-      return ;
-    }
+  {
+    mTempStorage.Colapse(offset, count);
+    return;
+  }
 
   uint8_t buffer[256];
   uint64_t coff = 0;
   while (coff < offset)
-    {
-      uint_t chunkSize = MIN(sizeof buffer, offset - coff);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, offset - coff);
 
-      mStorage.GetRecord(mFirstRecordEntry,
-                          coff + METADATA_SIZE,
-                          chunkSize,
-                          buffer);
-      mTempStorage.Write(coff, chunkSize, buffer);
+    mStorage.GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, buffer);
+    mTempStorage.Write(coff, chunkSize, buffer);
 
-      coff += chunkSize;
-    }
+    coff += chunkSize;
+  }
 
   assert(coff == offset);
 
   while (coff + count < mElementsCount * mElementRawSize)
-    {
-      uint_t chunkSize = MIN(sizeof buffer,
-                              mElementsCount * mElementRawSize - coff - count);
-      mStorage.GetRecord(mFirstRecordEntry,
-                          coff + count + METADATA_SIZE,
-                          chunkSize,
-                          buffer);
-      mTempStorage.Write(coff, chunkSize, buffer);
+  {
+    uint_t chunkSize = MIN(sizeof buffer, mElementsCount * mElementRawSize - coff - count);
+    mStorage.GetRecord(mFirstRecordEntry, coff + count + METADATA_SIZE, chunkSize, buffer);
+    mTempStorage.Write(coff, chunkSize, buffer);
 
-      coff += chunkSize;
-    }
+    coff += chunkSize;
+  }
 
   assert(coff + count == mElementsCount * mElementRawSize);
 
@@ -910,20 +799,17 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
   mStorage.ReleaseReference();
 }
 
-
 uint64_t
 RowFieldArray::RawSize() const
 {
   return mElementsCount * mElementRawSize;
 }
 
-
 TemporalContainer&
 RowFieldArray::GetTemporalContainer()
 {
   return mTempStorage;
 }
-
 
 VariableSizeStore&
 RowFieldArray::GetRowStorage()
@@ -932,8 +818,5 @@ RowFieldArray::GetRowStorage()
 }
 
 
-
-
 } //namespace pastra
 } //namespace whais
-

@@ -34,7 +34,6 @@
 #include "utils/wsort.h"
 #include "utils/wunicode.h"
 #include "utils/wthread.h"
-
 #include "ps_textstrategy.h"
 #include "ps_arraystrategy.h"
 #include "ps_serializer.h"
@@ -44,11 +43,11 @@ using namespace std;
 using namespace whais;
 using namespace pastra;
 
+
 static const uint_t  MAX_VALUE_RAW_STORAGE = Serializer::MAX_VALUE_RAW_SIZE;
 static const uint_t  MNTH_DAYS[]           = MNTH_DAYS_A;
 
 static const UTF8_CU_COUNTER _cuCache;
-
 
 
 static bool
@@ -61,26 +60,25 @@ is_valid_date(const int year, const uint_t month, const uint_t day)
     return false;
 
   if (month == 2)
-    {
-      const bool leapYear = is_leap_year(year);
+  {
+    const bool leapYear = is_leap_year(year);
 
-      if (day > (leapYear ? MNTH_DAYS[1] + 1 : MNTH_DAYS[1]))
-        return false;
-    }
+    if (day > (leapYear ? MNTH_DAYS[1] + 1 : MNTH_DAYS[1]))
+    return false;
+  }
   else if (day > MNTH_DAYS [month - 1])
     return false;
 
   return true;
 }
 
-
 static bool
-is_valid_datetime(const int          year,
-                   const uint_t       month,
-                   const uint_t       day,
-                   const uint_t       hour,
-                   const uint_t       min,
-                   const uint_t       sec)
+is_valid_datetime(const int year,
+                  const uint_t month,
+                  const uint_t day,
+                  const uint_t hour,
+                  const uint_t min,
+                  const uint_t sec)
 {
   if (is_valid_date(year, month, day) == false)
     return false;
@@ -94,18 +92,18 @@ is_valid_datetime(const int          year,
 
 static bool
 is_valid_hiresdate(const int       year,
-                    const uint_t    month,
-                    const uint_t    day,
-                    const uint_t    hour,
-                    const uint_t    min,
-                    const uint_t    sec,
-                    const uint_t    microsec)
+                   const uint_t    month,
+                   const uint_t    day,
+                   const uint_t    hour,
+                   const uint_t    min,
+                   const uint_t    sec,
+                   const uint_t    microsec)
 {
   if (is_valid_datetime(year, month, day, hour, min, sec) == false)
     return false;
 
   else if (microsec > 999999)
-      return false;
+    return false;
 
   return true;
 }
@@ -153,9 +151,9 @@ DDate::DDate(const int32_t year, const uint8_t month, const uint8_t day)
 {
   if ((mIsNull == false)
       && ! is_valid_date(year, month, day))
-    {
-      throw DBSException(_EXTRA(DBSException::INVALID_DATE));
-    }
+  {
+    throw DBSException(_EXTRA(DBSException::INVALID_DATE));
+  }
 }
 
 
@@ -184,16 +182,16 @@ DDate::Prev() const
   uint8_t  day  = mDay;
 
   if (--day == 0)
-    {
-      if (--mnth == 0)
-          --year, mnth = 12;
+  {
+    if (--mnth == 0)
+      --year, mnth = 12;
 
-      if ((mnth == 2) && is_leap_year(year))
-        day = MNTH_DAYS[mnth - 1] + 1;
+    if ((mnth == 2) && is_leap_year(year))
+      day = MNTH_DAYS[mnth - 1] + 1;
 
-      else
-        day = MNTH_DAYS[mnth - 1];
-    }
+    else
+      day = MNTH_DAYS[mnth - 1];
+  }
 
   return DDate(year, mnth, day);
 }
@@ -215,12 +213,12 @@ DDate::Next() const
     mnthDays++;
 
   if (++day > mnthDays)
-    {
-      day = 1;
+  {
+    day = 1;
 
-      if (++mnth > 12)
-          ++year, mnth = 1;
-    }
+    if (++mnth > 12)
+      ++year, mnth = 1;
+  }
 
   return DDate(year, mnth, day);
 }
@@ -228,11 +226,11 @@ DDate::Next() const
 
 
 DDateTime::DDateTime(const int32_t     year,
-                      const uint8_t     month,
-                      const uint8_t     day,
-                      const uint8_t     hour,
-                      const uint8_t     minutes,
-                      const uint8_t     seconds)
+                     const uint8_t     month,
+                     const uint8_t     day,
+                     const uint8_t     hour,
+                     const uint8_t     minutes,
+                     const uint8_t     seconds)
   : mYear(year),
     mMonth(month),
     mDay(day),
@@ -243,9 +241,9 @@ DDateTime::DDateTime(const int32_t     year,
 {
   if ((mIsNull == false)
        && ! is_valid_datetime(year, month, day, hour, minutes, seconds))
-    {
-      throw DBSException(_EXTRA(DBSException::INVALID_DATETIME));
-    }
+  {
+    throw DBSException(_EXTRA(DBSException::INVALID_DATETIME));
+  }
 }
 
 
@@ -277,28 +275,28 @@ DDateTime::Prev() const
   uint8_t  secs  = mSeconds;
 
   if (secs-- == 0)
+  {
+    secs = 59;
+    if (mins-- == 0)
     {
-      secs = 59;
-      if (mins-- == 0)
+      mins = 59;
+      if (hour-- == 0)
+      {
+        hour = 23;
+        if (--day == 0)
         {
-          mins = 59;
-          if (hour-- == 0)
-            {
-              hour = 23;
-              if (--day == 0)
-                {
-                  if (--mnth == 0)
-                      --year, mnth = 12;
+          if (--mnth == 0)
+            --year, mnth = 12;
 
-                  if ((mnth == 2) && is_leap_year(year))
-                    day = MNTH_DAYS[mnth - 1] + 1;
+          if ((mnth == 2) && is_leap_year(year))
+            day = MNTH_DAYS[mnth - 1] + 1;
 
-                  else
-                    day = MNTH_DAYS[mnth - 1];
-                }
-            }
+          else
+            day = MNTH_DAYS[mnth - 1];
         }
+      }
     }
+  }
 
   return DDateTime(year, mnth, day, hour, mins, secs);
 }
@@ -318,29 +316,29 @@ DDateTime::Next() const
   uint8_t  secs  = mSeconds;
 
   if (++secs > 59)
+  {
+    secs = 0;
+    if (++mins > 59)
     {
-      secs = 0;
-      if (++mins > 59)
+      mins = 0;
+      if (++hour > 23)
+      {
+        hour = 0;
+
+        uint8_t mnthDays = MNTH_DAYS[mnth - 1];
+        if ((mnth == 2) && is_leap_year(year))
+          mnthDays++;
+
+        if (++day > mnthDays)
         {
-          mins = 0;
-          if (++hour > 23)
-            {
-              hour = 0;
+          day = 1;
 
-              uint8_t mnthDays = MNTH_DAYS[mnth - 1];
-              if ((mnth == 2) && is_leap_year(year))
-                mnthDays++;
-
-              if (++day > mnthDays)
-                {
-                  day = 1;
-
-                  if (++mnth > 12)
-                      ++year, mnth = 1;
-                }
-            }
+          if (++mnth > 12)
+            ++year, mnth = 1;
         }
+      }
     }
+  }
 
   return DDateTime(year, mnth, day, hour, mins, secs);
 }
@@ -348,12 +346,12 @@ DDateTime::Next() const
 
 
 DHiresTime::DHiresTime(const int32_t    year,
-                        const uint8_t    month,
-                        const uint8_t    day,
-                        const uint8_t    hour,
-                        const uint8_t    minutes,
-                        const uint8_t    seconds,
-                        const uint32_t   microsec)
+                       const uint8_t    month,
+                       const uint8_t    day,
+                       const uint8_t    hour,
+                       const uint8_t    minutes,
+                       const uint8_t    seconds,
+                       const uint32_t   microsec)
   : mMicrosec(microsec),
     mYear(year),
     mMonth(month),
@@ -363,19 +361,12 @@ DHiresTime::DHiresTime(const int32_t    year,
     mSeconds(seconds),
     mIsNull(false)
 {
-  if ((mIsNull == false)
-      && ! is_valid_hiresdate(year,
-                               month,
-                               day,
-                               hour,
-                               minutes,
-                               seconds,
-                               microsec))
-    {
-      throw DBSException(_EXTRA(DBSException::INVALID_DATETIME));
-    }
+  if (mIsNull == false
+      && ! is_valid_hiresdate(year, month, day, hour, minutes, seconds, microsec))
+  {
+    throw DBSException(_EXTRA(DBSException::INVALID_DATETIME));
+  }
 }
-
 
 DHiresTime
 DHiresTime::Min()
@@ -383,57 +374,55 @@ DHiresTime::Min()
   return DHiresTime(-32768, 1, 1, 0, 0, 0, 0);
 }
 
-
 DHiresTime
 DHiresTime::Max()
 {
   return DHiresTime(32767, 12, 31, 23, 59, 59, 999999);
 }
 
-
 DHiresTime
 DHiresTime::Prev() const
 {
-  if (mIsNull || (*this == Min()))
-    {
-      return DHiresTime();
-    }
+  if (mIsNull || ( *this == Min()))
+  {
+    return DHiresTime();
+  }
 
-  uint16_t year  = mYear;
-  uint8_t  mnth  = mMonth;
-  uint8_t  day   = mDay;
-  uint8_t  hour  = mHour;
-  uint8_t  mins  = mMinutes;
-  uint8_t  secs  = mSeconds;
+  uint16_t year = mYear;
+  uint8_t mnth = mMonth;
+  uint8_t day = mDay;
+  uint8_t hour = mHour;
+  uint8_t mins = mMinutes;
+  uint8_t secs = mSeconds;
   uint32_t usecs = mMicrosec;
 
   if (usecs-- == 0)
+  {
+    usecs = 999999;
+    if (secs-- == 0)
     {
-      usecs = 999999;
-      if (secs-- == 0)
+      secs = 59;
+      if (mins-- == 0)
+      {
+        mins = 59;
+        if (hour-- == 0)
         {
-          secs = 59;
-          if (mins-- == 0)
-            {
-              mins = 59;
-              if (hour-- == 0)
-                {
-                  hour = 23;
-                  if (--day == 0)
-                    {
-                      if (--mnth == 0)
-                          --year, mnth = 12;
+          hour = 23;
+          if (--day == 0)
+          {
+            if (--mnth == 0)
+              --year, mnth = 12;
 
-                      if ((mnth == 2) && is_leap_year(year))
-                        day = MNTH_DAYS[mnth - 1] + 1;
+            if ((mnth == 2) && is_leap_year(year))
+              day = MNTH_DAYS[mnth - 1] + 1;
 
-                      else
-                        day = MNTH_DAYS[mnth - 1];
-                    }
-                }
-            }
+            else
+              day = MNTH_DAYS[mnth - 1];
+          }
         }
+      }
     }
+  }
 
   return DHiresTime(year, mnth, day, hour, mins, secs, usecs);
 }
@@ -442,45 +431,45 @@ DHiresTime::Prev() const
 DHiresTime
 DHiresTime::Next() const
 {
-  if (mIsNull || (*this == Max()))
+  if (mIsNull || ( *this == Max()))
     return DHiresTime();
 
-  uint16_t year  = mYear;
-  uint8_t  mnth  = mMonth;
-  uint8_t  day   = mDay;
-  uint8_t  hour  = mHour;
-  uint8_t  mins  = mMinutes;
-  uint8_t  secs  = mSeconds;
+  uint16_t year = mYear;
+  uint8_t mnth = mMonth;
+  uint8_t day = mDay;
+  uint8_t hour = mHour;
+  uint8_t mins = mMinutes;
+  uint8_t secs = mSeconds;
   uint32_t usecs = mMicrosec;
 
   if (++usecs > 999999)
+  {
+    usecs = 0;
+    if (++secs > 59)
     {
-      usecs = 0;
-      if (++secs > 59)
+      secs = 0;
+      if (++mins > 59)
+      {
+        mins = 0;
+        if (++hour > 23)
         {
-          secs = 0;
-          if (++mins > 59)
-            {
-              mins = 0;
-              if (++hour > 23)
-                {
-                  hour = 0;
+          hour = 0;
 
-                  uint8_t  mnthDays = MNTH_DAYS[mnth - 1];
-                  if ((mnth == 2) && is_leap_year(year))
-                    mnthDays++;
+          uint8_t mnthDays = MNTH_DAYS[mnth - 1];
+          if ((mnth == 2) && is_leap_year(year))
+            mnthDays++;
 
-                  if (++day > mnthDays)
-                    {
-                      day = 1;
+          if (++day > mnthDays)
+          {
+            day = 1;
 
-                      if (++mnth > 12)
-                          ++year, mnth = 1;
-                    }
-                }
-            }
+            if (++mnth > 12)
+              ++year, mnth = 1;
+          }
         }
+      }
     }
+  }
 
   return DHiresTime(year, mnth, day, hour, mins, secs, usecs);
 }
@@ -691,10 +680,10 @@ DText::Append(const DChar& ch)
   ITextStrategy* const newText = s.Append(ch.mValue);
 
   if (newText != &s)
-    {
-      t.Release();
-      ReplaceStrategy(newText);
-    }
+  {
+    t.Release();
+    ReplaceStrategy(newText);
+  }
 }
 
 
@@ -711,10 +700,10 @@ DText::Append(const DText& text)
   ITextStrategy* const newText = s.Append(src);
   src.Release();
   if (newText != &s)
-    {
-      t.Release();
-      ReplaceStrategy(newText);
-    }
+  {
+    t.Release();
+    ReplaceStrategy(newText);
+  }
 }
 
 
@@ -734,18 +723,18 @@ DText::CharAt(const uint64_t index, const DChar& ch)
   ITextStrategy* const newText = s.UpdateCharAt(ch.mValue, index);
 
   if (newText != &s)
-    {
-      t.Release();
-      ReplaceStrategy(newText);
-    }
+  {
+    t.Release();
+    ReplaceStrategy(newText);
+  }
 }
 
 
 DUInt64
 DText::FindInText(const DText&      text,
-                   const bool        ignoreCase,
-                   const uint64_t    fromCh,
-                   const uint64_t    toCh)
+                  const bool        ignoreCase,
+                  const uint64_t    fromCh,
+                  const uint64_t    toCh)
 {
   StrategyRAII    s = GetStrategyRAII();
   ITextStrategy&  t = s;
@@ -756,9 +745,9 @@ DText::FindInText(const DText&      text,
 
 DUInt64
 DText::FindSubstring(const DText&      substr,
-                      const bool        ignoreCase,
-                      const uint64_t    fromCh,
-                      const uint64_t    toCh)
+                     const bool        ignoreCase,
+                     const uint64_t    fromCh,
+                     const uint64_t    toCh)
 {
   return _CC(DText&, substr).FindInText( *this, ignoreCase, fromCh, toCh);
 }
@@ -766,22 +755,21 @@ DText::FindSubstring(const DText&      substr,
 
 DText
 DText::ReplaceSubstring(const DText&    substr,
-                         const DText&    newSubstr,
-                         const bool      ignoreCase,
-                         const uint64_t  fromCh,
-                         const uint64_t  toCh)
+                        const DText&    newSubstr,
+                        const bool      ignoreCase,
+                        const uint64_t  fromCh,
+                        const uint64_t  toCh)
 {
   StrategyRAII    s = substr.GetStrategyRAII();
   ITextStrategy&  t = s;
 
   ITextStrategy* const result = t.Replace(GetStrategyRAII(),
-                                           newSubstr.GetStrategyRAII(),
-                                           fromCh,
-                                           toCh,
-                                           ignoreCase);
+                                          newSubstr.GetStrategyRAII(),
+                                          fromCh,
+                                          toCh,
+                                          ignoreCase);
   return DText(*result);
 }
-
 
 DText
 DText::LowerCase() const
@@ -789,46 +777,43 @@ DText::LowerCase() const
   return DText(*_SC(ITextStrategy&, GetStrategyRAII()).ToCase(true));
 }
 
-
 DText
 DText::UpperCase() const
 {
   return DText(*_SC(ITextStrategy&, GetStrategyRAII()).ToCase(false));
 }
 
-
 void
 DText::MakeMirror(DText& inoutText)
 {
   if (this == &inoutText)
-    return ;
+    return;
 
-  StrategyRAII    s = GetStrategyRAII();
-  ITextStrategy&  t = s;
+  StrategyRAII s = GetStrategyRAII();
+  ITextStrategy& t = s;
 
-  StrategyRAII    s2 = inoutText.GetStrategyRAII();
-  ITextStrategy&  t2 = s2;
+  StrategyRAII s2 = inoutText.GetStrategyRAII();
+  ITextStrategy& t2 = s2;
 
-  if ((&t != &NullText::GetSingletoneInstace())
-      && (&t == &t2))
-    {
-      return ;
-    }
+  if (( &t != &NullText::GetSingletoneInstace()) && ( &t == &t2))
+  {
+    return;
+  }
 
   ITextStrategy* const newText = t.MakeMirrorCopy();
 
   if (newText != &t)
-    {
-      s.Release();
-      ReplaceStrategy(newText);
-    }
+  {
+    s.Release();
+    ReplaceStrategy(newText);
+  }
   s.Release();
 
   if (newText != &t2)
-    {
-      s2.Release();
-      inoutText.ReplaceStrategy(newText);
-    }
+  {
+    s2.Release();
+    inoutText.ReplaceStrategy(newText);
+  }
 }
 
 
@@ -868,19 +853,18 @@ DText::ReplaceStrategy(ITextStrategy* const strategy)
   LockRAII<SpinLock> _l(mLock);
 
   do
+  {
+    if (mTextRefs == 0)
     {
-      if (mTextRefs == 0)
-        {
-          mText->ReleaseReference();
-          mText = strategy;
-          return ;
-        }
-
-      _l.Release();
-      wh_yield();
-      _l.Acquire();
+      mText->ReleaseReference();
+      mText = strategy;
+      return;
     }
-  while (true);
+
+    _l.Release();
+    wh_yield();
+    _l.Acquire();
+  } while (true);
 }
 
 
@@ -905,37 +889,37 @@ DText::CompareTo(const DText& second) const
 
 
 template <class T> void
-wh_array_init(const T* const       array,
-               const uint64_t       count,
-               IArrayStrategy* volatile *     outStrategy)
+wh_array_init(const T* const array,
+              const uint64_t count,
+              IArrayStrategy* volatile * outStrategy)
 {
   if (count == 0)
-    {
-      assert(array == NULL);
+  {
+    assert(array == NULL);
 
-      *outStrategy = &NullArray::GetSingletoneInstace(array[0].DBSType());
+    *outStrategy = &NullArray::GetSingletoneInstace(array[0].DBSType());
 
-      return;
-    }
+    return;
+  }
   else if (array == NULL)
     throw DBSException(_EXTRA(DBSException::BAD_PARAMETERS));
 
   unique_ptr<IArrayStrategy> s(new TemporalArray(array[0].DBSType()));
 
   for (uint64_t index = 0; index < count; ++index)
-    {
-      uint64_t dummy;
+  {
+    uint64_t dummy;
 
-      if (array[index].IsNull())
-        continue;
+    if (array[index].IsNull())
+      continue;
 
-      uint8_t rawValue [MAX_VALUE_RAW_STORAGE];
+    uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
 
-      assert(sizeof rawValue <= Serializer::Size(array[0].DBSType(), false));
+    assert(sizeof rawValue <= Serializer::Size(array[0].DBSType(), false));
 
-      Serializer::Store(rawValue, array[index]);
-      s->Add(array[index].DBSType(), rawValue, &dummy);
-    }
+    Serializer::Store(rawValue, array[index]);
+    s->Add(array[index].DBSType(), rawValue, &dummy);
+  }
 
   *outStrategy = s.release();
 }
@@ -1093,7 +1077,6 @@ DArray::~DArray()
   mArray->ReleaseReference();
 }
 
-
 DArray &
 DArray::operator= (const DArray& source)
 {
@@ -1130,27 +1113,24 @@ template <class T> inline uint64_t
 add_array_element(const T& value, DArray& array)
 {
   uint64_t result;
-  uint8_t  rawValue[MAX_VALUE_RAW_STORAGE];
+  uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
 
   assert(Serializer::Size(value.DBSType(), false) <= sizeof rawValue);
 
   Serializer::Store(rawValue, value);
 
   DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy&      s = a;
+  IArrayStrategy& s = a;
 
-  IArrayStrategy* const newArray = s.Add(value.DBSType(),
-                                          rawValue,
-                                          &result);
+  IArrayStrategy* const newArray = s.Add(value.DBSType(), rawValue, &result);
   if (newArray != &s)
-    {
-      a.Release();
-      array.ReplaceStrategy(newArray);
-    }
+  {
+    a.Release();
+    array.ReplaceStrategy(newArray);
+  }
 
   return result;
 }
-
 
 uint64_t
 DArray::Add(const DBool& value)
@@ -1158,13 +1138,11 @@ DArray::Add(const DBool& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DChar& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DDate& value)
@@ -1172,13 +1150,11 @@ DArray::Add(const DDate& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DDateTime& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DHiresTime& value)
@@ -1186,13 +1162,11 @@ DArray::Add(const DHiresTime& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DUInt8& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DUInt16& value)
@@ -1207,13 +1181,11 @@ DArray::Add(const DUInt32& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DUInt64& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DReal& value)
@@ -1221,13 +1193,11 @@ DArray::Add(const DReal& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DRichReal& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DInt8& value)
@@ -1235,13 +1205,11 @@ DArray::Add(const DInt8& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DInt16& value)
 {
   return add_array_element(value, *this);
 }
-
 
 uint64_t
 DArray::Add(const DInt32& value)
@@ -1249,33 +1217,28 @@ DArray::Add(const DInt32& value)
   return add_array_element(value, *this);
 }
 
-
 uint64_t
 DArray::Add(const DInt64& value)
 {
   return add_array_element(value, *this);
 }
 
-
 template <class T> void
-get_array_element(const DArray&          array,
-                   const uint64_t         index,
-                   T&                     outElement)
+get_array_element(const DArray& array, const uint64_t index, T& outElement)
 {
   DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy&      s = a;
+  IArrayStrategy& s = a;
 
-  uint8_t      rawValue[MAX_VALUE_RAW_STORAGE];
+  uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
   const uint_t elSize = s.Get(index, rawValue);
   if (elSize == 0)
-    {
-      outElement = T();
-      return ;
-    }
+  {
+    outElement = T();
+    return;
+  }
 
   Serializer::Load(rawValue, &outElement);
 }
-
 
 void
 DArray::Get(const uint64_t index, DBool& outValue) const
@@ -1283,13 +1246,11 @@ DArray::Get(const uint64_t index, DBool& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DChar& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DDate& outValue) const
@@ -1297,13 +1258,11 @@ DArray::Get(const uint64_t index, DDate& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DDateTime& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DHiresTime& outValue) const
@@ -1311,13 +1270,11 @@ DArray::Get(const uint64_t index, DHiresTime& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DUInt8& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DUInt16& outValue) const
@@ -1325,13 +1282,11 @@ DArray::Get(const uint64_t index, DUInt16& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DUInt32& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DUInt64& outValue) const
@@ -1339,13 +1294,11 @@ DArray::Get(const uint64_t index, DUInt64& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DReal& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DRichReal& outValue) const
@@ -1353,13 +1306,11 @@ DArray::Get(const uint64_t index, DRichReal& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DInt8& outValue) const
 {
   get_array_element(*this, index, outValue);
 }
-
 
 void
 DArray::Get(const uint64_t index, DInt16& outValue) const
@@ -1374,7 +1325,6 @@ DArray::Get(const uint64_t index, DInt32& outValue) const
   get_array_element(*this, index, outValue);
 }
 
-
 void
 DArray::Get(const uint64_t index, DInt64& outValue) const
 {
@@ -1383,33 +1333,29 @@ DArray::Get(const uint64_t index, DInt64& outValue) const
 
 
 template<class T> inline void
-set_array_element(const T&          value,
-                   const uint64_t    index,
-                   DArray&           array)
+set_array_element(const T& value, const uint64_t index, DArray& array)
 {
   if (value.IsNull())
-    {
-      array.Remove(index);
-      return ;
-    }
+  {
+    array.Remove(index);
+    return;
+  }
 
-  uint8_t  rawValue[MAX_VALUE_RAW_STORAGE];
+  uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
 
   assert(Serializer::Size(value.DBSType(), false) <= sizeof rawValue);
 
   Serializer::Store(rawValue, value);
 
   DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy&      s = a;
+  IArrayStrategy& s = a;
 
-  IArrayStrategy* const newArray = s.Set(value.DBSType(),
-                                          rawValue,
-                                          index);
+  IArrayStrategy* const newArray = s.Set(value.DBSType(), rawValue, index);
   if (newArray != &s)
-    {
-      a.Release();
-      array.ReplaceStrategy(newArray);
-    }
+  {
+    a.Release();
+    array.ReplaceStrategy(newArray);
+  }
 }
 
 
@@ -1522,14 +1468,14 @@ void
 DArray::Remove(const uint64_t index)
 {
   DArray::StrategyRAII a = GetStrategyRAII();
-  IArrayStrategy&      s = a;
+  IArrayStrategy& s = a;
 
   IArrayStrategy* const newArray = s.Remove(index);
   if (newArray != &s)
-    {
-      a.Release();
-      ReplaceStrategy(newArray);
-    }
+  {
+    a.Release();
+    ReplaceStrategy(newArray);
+  }
 }
 
 
@@ -1538,14 +1484,14 @@ DArray::Sort(bool reverse)
 {
 
   DArray::StrategyRAII a = GetStrategyRAII();
-  IArrayStrategy&      s = a;
+  IArrayStrategy& s = a;
 
   IArrayStrategy* const newArray = s.Sort(reverse);
   if (newArray != &s)
-    {
-      a.Release();
-      ReplaceStrategy(newArray);
-    }
+  {
+    a.Release();
+    ReplaceStrategy(newArray);
+  }
 }
 
 
@@ -1553,37 +1499,34 @@ void
 DArray::MakeMirror(DArray& inoutArray) const
 {
   if (this == &inoutArray)
-    return ;
+    return;
 
-  StrategyRAII    s = GetStrategyRAII();
+  StrategyRAII s = GetStrategyRAII();
   IArrayStrategy& t = s;
 
-  StrategyRAII    s2 = inoutArray.GetStrategyRAII();
+  StrategyRAII s2 = inoutArray.GetStrategyRAII();
   IArrayStrategy& t2 = s2;
 
-
-  if ((&t != &NullArray::GetSingletoneInstace(t.Type()))
-      && (&t == &t2))
-    {
-      return ;
-    }
+  if (( &t != &NullArray::GetSingletoneInstace(t.Type())) && ( &t == &t2))
+  {
+    return;
+  }
 
   IArrayStrategy* const newArray = t.MakeMirrorCopy();
 
   if (newArray != &t)
-    {
-      s.Release();
-      _CC(DArray&, *this).ReplaceStrategy(newArray);
-    }
+  {
+    s.Release();
+    _CC(DArray&, *this).ReplaceStrategy(newArray);
+  }
   s.Release();
 
   if (newArray != &t2)
-    {
-      s2.Release();
-      inoutArray.ReplaceStrategy(newArray);
-    }
+  {
+    s2.Release();
+    inoutArray.ReplaceStrategy(newArray);
+  }
 }
-
 
 IArrayStrategy&
 DArray::GetStrategy()
@@ -1594,13 +1537,11 @@ DArray::GetStrategy()
   return *mArray;
 }
 
-
 DArray::StrategyRAII
 DArray::GetStrategyRAII() const
 {
   return StrategyRAII( _CC(DArray&, *this));
 }
-
 
 void
 DArray::ReleaseStrategy()
@@ -1612,7 +1553,6 @@ DArray::ReleaseStrategy()
   --mArrayRefs;
 }
 
-
 void
 DArray::ReplaceStrategy(IArrayStrategy* const strategy)
 {
@@ -1622,19 +1562,17 @@ DArray::ReplaceStrategy(IArrayStrategy* const strategy)
   LockRAII<SpinLock> _l(mLock);
 
   do
+  {
+    if (mArrayRefs == 0)
     {
-      if (mArrayRefs == 0)
-        {
-          mArray->ReleaseReference();
-          mArray = strategy;
-          return ;
-        }
-
-      _l.Release();
-      wh_yield();
-      _l.Acquire();
+      mArray->ReleaseReference();
+      mArray = strategy;
+      return;
     }
-  while (true);
+
+    _l.Release();
+    wh_yield();
+    _l.Acquire();
+
+  } while (true);
 }
-
-

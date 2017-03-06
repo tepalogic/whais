@@ -24,19 +24,18 @@
 
 #include "ps_btree_fields.h"
 
+
 using namespace std;
 
 namespace whais {
 namespace pastra {
 
 
-FieldIndexNodeManager::FieldIndexNodeManager(
-                    unique_ptr<IDataContainer>& container,
-                    const uint_t              nodeSize,
-                    const uint_t              maxCacheMem,
-                    const DBS_FIELD_TYPE      fieldType,
-                    const bool                create
-                                           )
+FieldIndexNodeManager::FieldIndexNodeManager(unique_ptr<IDataContainer>&   container,
+                                             const uint_t                  nodeSize,
+                                             const uint_t                  maxCacheMem,
+                                             const DBS_FIELD_TYPE          fieldType,
+                                             const bool                    create)
   : mNodeSize(nodeSize),
     mMaxCachedMem(maxCacheMem),
     mRootNode(NIL_NODE),
@@ -75,34 +74,33 @@ FieldIndexNodeManager::IndexRawSize() const
 }
 
 NODE_INDEX
-FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent,
-                                    const KEY_INDEX parentKey)
+FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent, const KEY_INDEX parentKey)
 {
   NODE_INDEX nodeIndex = mFirstFreeNode;
 
   if (nodeIndex != NIL_NODE)
-    {
-      BTreeNodeRAII freeNode(RetrieveNode(nodeIndex));
+  {
+    BTreeNodeRAII freeNode(RetrieveNode(nodeIndex));
 
-      mFirstFreeNode = freeNode->Next();
+    mFirstFreeNode = freeNode->Next();
 
-      UpdateContainer();
-    }
+    UpdateContainer();
+  }
   else
-    {
-      assert(mContainer->Size() % NodeRawSize() == 0);
+  {
+    assert(mContainer->Size() % NodeRawSize() == 0);
 
-      nodeIndex = mContainer->Size() / NodeRawSize();
-    }
+    nodeIndex = mContainer->Size() / NodeRawSize();
+  }
 
   if (parent != NIL_NODE)
-    {
-      BTreeNodeRAII parentNode(RetrieveNode(parent));
+  {
+    BTreeNodeRAII parentNode(RetrieveNode(parent));
 
-      parentNode->SetNodeOfKey(parentKey, nodeIndex);
+    parentNode->SetNodeOfKey(parentKey, nodeIndex);
 
-      assert(parentNode->IsLeaf() == false);
-    }
+    assert(parentNode->IsLeaf() == false);
+  }
 
   assert(nodeIndex > 0);
   assert(nodeIndex != mFirstFreeNode);
@@ -127,17 +125,17 @@ NODE_INDEX
 FieldIndexNodeManager::RootNodeId()
 {
   if (mRootNode == NIL_NODE)
-    {
-      BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
+  {
+    BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
 
-      rootNode->Next(NIL_NODE);
-      rootNode->Prev(NIL_NODE);
-      rootNode->KeysCount(0);
-      rootNode->Leaf(true);
-      rootNode->InsertKey(rootNode->SentinelKey());
+    rootNode->Next(NIL_NODE);
+    rootNode->Prev(NIL_NODE);
+    rootNode->KeysCount(0);
+    rootNode->Leaf(true);
+    rootNode->InsertKey(rootNode->SentinelKey());
 
-      RootNodeId(rootNode->NodeId());
-    }
+    RootNodeId(rootNode->NodeId());
+  }
 
   return mRootNode;
 }
@@ -169,18 +167,15 @@ FieldIndexNodeManager::LoadNode(const NODE_INDEX nodeId)
   assert(mContainer->Size() % NodeRawSize() == 0);
 
   if (mContainer->Size() > nodeId * NodeRawSize())
-    {
-      mContainer->Read(nodeId * NodeRawSize(), NodeRawSize(),
-          node->RawData());
-    }
-  else
-    {
-      assert(mContainer->Size() == nodeId * NodeRawSize());
+    mContainer->Read(nodeId * NodeRawSize(), NodeRawSize(), node->RawData());
 
-      //Reserve the required space
-      mContainer->Write(nodeId * NodeRawSize(), NodeRawSize(),
-          node->RawData());
-    }
+  else
+  {
+    assert(mContainer->Size() == nodeId * NodeRawSize());
+
+    //Reserve the required space
+    mContainer->Write(nodeId * NodeRawSize(), NodeRawSize(), node->RawData());
+  }
 
   node->MarkClean();
   assert(node->NodeId() == nodeId);
@@ -198,8 +193,7 @@ FieldIndexNodeManager::SaveNode(IBTreeNode* const node)
   if (node->IsDirty() == false)
     return;
 
-  mContainer->Write(node->NodeId() * NodeRawSize(), NodeRawSize(),
-      node->RawData());
+  mContainer->Write(node->NodeId() * NodeRawSize(), NodeRawSize(), node->RawData());
 
   node->MarkClean();
 }
@@ -312,6 +306,6 @@ FieldIndexNodeManager::NodeFactory(const NODE_INDEX nodeId)
   return result;
 }
 
+
 } //namespace pastra
 } //namespace whais
-
