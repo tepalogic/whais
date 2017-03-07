@@ -648,7 +648,7 @@ public:
   {
     if (mCurrentRoot == NIL_NODE)
     {
-      BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
+      auto rootNode = RetrieveNode(AllocateNode(NIL_NODE, 0));
 
       rootNode->Next(NIL_NODE);
       rootNode->Prev(NIL_NODE);
@@ -674,9 +674,9 @@ private:
     return 0;
   }
 
-  virtual IBTreeNode* LoadNode(const NODE_INDEX nodeId)
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId)
   {
-    unique_ptr<TableRmNode> node(unique_make(TableRmNode, *this, nodeId));
+    std::shared_ptr<IBTreeNode> node(shared_make(TableRmNode, *this, nodeId));
 
     if (nodeId < mContainer.Size() / NodeRawSize())
       mContainer.Read(nodeId * NodeRawSize(), NodeRawSize(), node->RawData());
@@ -691,7 +691,7 @@ private:
     node->MarkClean();
     assert(node->NodeId() == nodeId);
 
-    return node.release();
+    return node;
   }
 
   virtual void SaveNode(IBTreeNode* const node)

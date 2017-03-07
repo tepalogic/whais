@@ -166,16 +166,15 @@ IBTreeNodeManager::~IBTreeNodeManager()
 {
   for (auto& node : mNodesKeeper)
   {
-    assert (node.second.mRefsCount == 0);
-
-    delete node.second.mNode;
+    assert ( ! node.second.IsUsed());
+//    delete node.second.mNode;
   }
 }
 
 void
 IBTreeNodeManager::Split(NODE_INDEX parentId, const NODE_INDEX nodeId)
 {
-  BTreeNodeRAII node(RetrieveNode(nodeId));
+  auto node = RetrieveNode(nodeId);
 
   if (node->NeedsSpliting() == false)
     return;
@@ -186,8 +185,7 @@ IBTreeNodeManager::Split(NODE_INDEX parentId, const NODE_INDEX nodeId)
     assert(node->CompareKey(node->SentinelKey(), 0) == 0);
 
     parentId = AllocateNode(NIL_NODE, 0);
-
-    BTreeNodeRAII parentNode(RetrieveNode(parentId));
+    auto parentNode = RetrieveNode(parentId);
 
     parentNode->Leaf(false);
     parentNode->KeysCount(0);
@@ -218,11 +216,11 @@ IBTreeNodeManager::Join(const NODE_INDEX parentId, const NODE_INDEX nodeId)
   {
     assert(nodeId != RootNodeId());
 
-    BTreeNodeRAII parentNode(RetrieveNode(parentId));
+    auto parentNode = RetrieveNode(parentId);
 
     assert(parentNode->IsLeaf() == false);
 
-    BTreeNodeRAII node(RetrieveNode(nodeId));
+    auto node = RetrieveNode(nodeId);
 
     const KEY_INDEX keyIndex = node->GetParentKeyIndex(*parentNode);
 
@@ -254,7 +252,7 @@ IBTreeNodeManager::Join(const NODE_INDEX parentId, const NODE_INDEX nodeId)
 }
 
 
-IBTreeNode*
+std::shared_ptr<IBTreeNode>
 IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
 {
   assert(nodeId != NIL_NODE);
@@ -264,20 +262,15 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
 
   if (it == mNodesKeeper.end())
   {
-    unique_ptr<IBTreeNode> node(LoadNode(nodeId));
-    pair<NODE_INDEX, CachedData> cachedNode(nodeId, CachedData(node.get()));
+    pair<NODE_INDEX, CachedData> cachedNode(nodeId, CachedData(LoadNode(nodeId)));
     mNodesKeeper.insert(cachedNode);
-    node.release();
 
     it = mNodesKeeper.find(nodeId);
 
     assert(it != mNodesKeeper.end());
   }
 
-  it->second.mRefsCount++;
-
-  IBTreeNode* const result = it->second.mNode;
-
+  shared_ptr<IBTreeNode> result = it->second.mNode;
   if (mNodesKeeper.size() > MaxCachedNodes())
   {
     it = mNodesKeeper.begin();
@@ -285,12 +278,9 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
     {
       assert(it->second.mNode->NodeId() == it->first);
 
-      if ((it->second.mRefsCount == 0) && (it->first != RootNodeId()))
+      if ( ! it->second.IsUsed() && it->first != RootNodeId())
       {
-        SaveNode(it->second.mNode);
-
-        delete it->second.mNode;
-
+        SaveNode(it->second.mNode.get());
         mNodesKeeper.erase(it++);
       }
       else
@@ -298,8 +288,8 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
     }
   }
 
-  assert(mNodesKeeper.find(nodeId)->second.mRefsCount > 0);
-  assert(mNodesKeeper.find(nodeId)->second.mNode == result);
+  assert(mNodesKeeper.find(nodeId)->second.IsUsed());
+  assert(mNodesKeeper.find(nodeId)->second.mNode.get() == result.get());
   assert(result->NodeId() == nodeId);
 
   return result;
@@ -312,9 +302,7 @@ IBTreeNodeManager::ReleaseNode(const NODE_INDEX nodeId)
   auto it = mNodesKeeper.find(nodeId);
 
   assert(it != mNodesKeeper.end());
-  assert(it->second.mRefsCount > 0);
-
-  it->second.mRefsCount--;
+  assert(it->second.IsUsed());
 }
 
 void
@@ -324,7 +312,7 @@ IBTreeNodeManager::FlushNodes()
 
   for (auto& node : mNodesKeeper)
   {
-    SaveNode(node.second.mNode);
+    SaveNode(node.second.mNode.get());
     node.second.mNode->MarkClean();
   }
 }
@@ -341,7 +329,7 @@ BTree::FindBiggerOrEqual(const IBTreeKey& key, NODE_INDEX* outNode, KEY_INDEX* o
 {
   *outNode = mNodesManager.RootNodeId();
 
-  BTreeNodeRAII node(mNodesManager.RetrieveNode(*outNode));
+  auto node = mNodesManager.RetrieveNode(*outNode);
 
   do
   {
@@ -383,7 +371,7 @@ void BTree::InsertKey(const IBTreeKey& key, NODE_INDEX* outNode, KEY_INDEX* outK
 void
 BTree::RemoveKey(const IBTreeKey& key)
 {
-  BTreeNodeRAII node(mNodesManager.RetrieveNode(mNodesManager.RootNodeId()));
+  auto node = mNodesManager.RetrieveNode(mNodesManager.RootNodeId());
 
   RecursiveDeleteNodeKey(*node, key);
 
@@ -405,7 +393,7 @@ BTree::RecursiveInsertNodeKey(const NODE_INDEX   parentId,
                               NODE_INDEX*        outNode,
                               KEY_INDEX*         outKeyIndex)
 {
-  BTreeNodeRAII node(mNodesManager.RetrieveNode(nodeId));
+  auto node = mNodesManager.RetrieveNode(nodeId);
 
   if (node->NeedsSpliting())
   {
@@ -474,7 +462,7 @@ BTree::RecursiveDeleteNodeKey(IBTreeNode& node, const IBTreeKey& key)
   else
   {
     const NODE_INDEX childNodeId = node.NodeIdOfKey(keyIndex);
-    BTreeNodeRAII childNode(mNodesManager.RetrieveNode(childNodeId));
+    auto childNode = mNodesManager.RetrieveNode(childNodeId);
 
     if (childNode->NeedsJoining())
     {

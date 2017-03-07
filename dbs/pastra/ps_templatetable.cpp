@@ -337,9 +337,8 @@ PrototypeTable::GetReusableRow(const bool forceAdd)
   }
   else
   {
-    BTreeNodeRAII keyNode(RetrieveNode(node));
-
-    TableRmNode* const node = _SC(TableRmNode *, &( *keyNode));
+    auto keyNode = RetrieveNode(node);
+    TableRmNode* const node = _SC(TableRmNode*, keyNode.get());
 
     assert(keyNode->IsLeaf());
     assert(keyIndex < keyNode->KeysCount());
@@ -367,9 +366,8 @@ PrototypeTable::ReusableRowsCount()
 
   else do
   {
-    BTreeNodeRAII keyNode(RetrieveNode(nodeId));
-
-    TableRmNode* const node = _SC(TableRmNode*, &( *keyNode));
+    auto keyNode = RetrieveNode(nodeId);
+    TableRmNode* const node = _SC(TableRmNode*, keyNode.get());
 
     result += node->KeysCount();
     nodeId = node->Next();
@@ -715,7 +713,7 @@ NODE_INDEX PrototypeTable::AllocateNode(const NODE_INDEX parent, const KEY_INDEX
 
   if (nodeIndex != NIL_NODE)
   {
-    BTreeNodeRAII freeNode(RetrieveNode(nodeIndex));
+    auto freeNode = RetrieveNode(nodeIndex);
 
     mUnallocatedHead = freeNode->Next();
     MakeHeaderPersistent();
@@ -729,7 +727,7 @@ NODE_INDEX PrototypeTable::AllocateNode(const NODE_INDEX parent, const KEY_INDEX
 
   if (parent != NIL_NODE)
   {
-    BTreeNodeRAII parentNode(RetrieveNode(parent));
+    auto parentNode = RetrieveNode(parent);
     parentNode->SetNodeOfKey(parentKey, nodeIndex);
 
     assert(parentNode->IsLeaf() == false);
@@ -744,7 +742,7 @@ PrototypeTable::FreeNode(const NODE_INDEX nodeId)
 {
   assert(mRowModified);
 
-  BTreeNodeRAII node(RetrieveNode(nodeId));
+  auto node = RetrieveNode(nodeId);
 
   node->MarkAsRemoved();
   node->Next(mUnallocatedHead);
@@ -760,7 +758,7 @@ PrototypeTable::RootNodeId()
 {
   if (mRootNode == NIL_NODE)
   {
-    BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
+    auto rootNode = RetrieveNode(AllocateNode(NIL_NODE, 0));
 
     rootNode->Next(NIL_NODE);
     rootNode->Prev(NIL_NODE);
@@ -791,10 +789,10 @@ PrototypeTable::MaxCachedNodes()
 }
 
 
-IBTreeNode*
+shared_ptr<IBTreeNode>
 PrototypeTable::LoadNode(const NODE_INDEX nodeId)
 {
-  unique_ptr<TableRmNode> node(new TableRmNode( *this, nodeId));
+  shared_ptr<IBTreeNode> node(shared_make(TableRmNode, *this, nodeId));
 
   assert(TableContainer().Size() % NodeRawSize() == 0);
 
@@ -814,7 +812,7 @@ PrototypeTable::LoadNode(const NODE_INDEX nodeId)
   node->MarkClean();
   assert(node->NodeId() == nodeId);
 
-  return node.release();
+  return node;
 }
 
 
@@ -2415,7 +2413,7 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
     if ( !fieldIndexTree.FindBiggerOrEqual(firstKey, &nodeId, &keyIndex))
       goto force_return;
 
-    BTreeNodeRAII currentNode(nodeMgr->RetrieveNode(nodeId));
+    auto currentNode = nodeMgr->RetrieveNode(nodeId);
 
     assert(keyIndex < currentNode->KeysCount());
 
@@ -2686,13 +2684,13 @@ TableRmNode::Split( const NODE_INDEX parentId)
   const auto rows = _RC(const ROW_INDEX*, DataForRead());
   const KEY_INDEX splitKey = KeysCount() / 2;
 
-  BTreeNodeRAII parentNode(mNodesMgr.RetrieveNode(parentId));
+  auto parentNode = mNodesMgr.RetrieveNode(parentId);
 
   const TableRmKey key(Serializer::LoadRow(rows + splitKey));
   const KEY_INDEX insertionPos = parentNode->InsertKey(key);
   const NODE_INDEX allocatedNodeId = mNodesMgr.AllocateNode(parentId, insertionPos);
 
-  BTreeNodeRAII allocatedNode(mNodesMgr.RetrieveNode(allocatedNodeId));
+  auto allocatedNode = mNodesMgr.RetrieveNode(allocatedNodeId);
 
   allocatedNode->Leaf(IsLeaf());
   allocatedNode->MarkAsUsed();
@@ -2724,7 +2722,7 @@ TableRmNode::Split( const NODE_INDEX parentId)
   Prev(allocatedNodeId);
   if (allocatedNode->Prev() != NIL_NODE)
   {
-    BTreeNodeRAII prevNode(mNodesMgr.RetrieveNode(allocatedNode->Prev()));
+    auto prevNode = mNodesMgr.RetrieveNode(allocatedNode->Prev());
     prevNode->Next(allocatedNodeId);
   }
 }
@@ -2742,9 +2740,9 @@ TableRmNode::Join(const bool toRight)
   {
     assert(Next() != NIL_NODE);
 
-    BTreeNodeRAII next(mNodesMgr.RetrieveNode(Next()));
+    auto next = mNodesMgr.RetrieveNode(Next());
 
-    const auto nextNode = _SC(TableRmNode*, &( *next));
+    const auto nextNode = _SC(TableRmNode*, next.get());
     const auto destRows = _RC(ROW_INDEX*, nextNode->DataForWrite());
 
     for (uint_t index = 0; index < KeysCount(); ++index)
@@ -2769,18 +2767,15 @@ TableRmNode::Join(const bool toRight)
     nextNode->Prev(Prev());
 
     if (Prev() != NIL_NODE)
-    {
-      BTreeNodeRAII prevNode(mNodesMgr.RetrieveNode(Prev()));
-      prevNode->Next(Next());
-    }
+      mNodesMgr.RetrieveNode(Prev())->Next(Next());
   }
   else
   {
     assert(Prev() != NIL_NODE);
 
-    BTreeNodeRAII prev(mNodesMgr.RetrieveNode(Prev()));
+    auto prev(mNodesMgr.RetrieveNode(Prev()));
 
-    const auto prevNode = _SC(TableRmNode*, &( *prev));
+    const auto prevNode = _SC(TableRmNode*, prev.get());
     const auto srcRows = _RC(ROW_INDEX*, prevNode->DataForWrite());
 
     for (uint_t index = 0; index < prevNode->KeysCount(); ++index)
@@ -2804,10 +2799,7 @@ TableRmNode::Join(const bool toRight)
     KeysCount(KeysCount() + prevNode->KeysCount());
     Prev(prevNode->Prev());
     if (Prev() != NIL_NODE)
-    {
-      BTreeNodeRAII prevNode(mNodesMgr.RetrieveNode(Prev()));
-      prevNode->Next(NodeId());
-    }
+      mNodesMgr.RetrieveNode(Prev())->Next(NodeId());
   }
 }
 

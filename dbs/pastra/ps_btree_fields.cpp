@@ -80,8 +80,7 @@ FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent, const KEY_INDEX par
 
   if (nodeIndex != NIL_NODE)
   {
-    BTreeNodeRAII freeNode(RetrieveNode(nodeIndex));
-
+    auto freeNode = RetrieveNode(nodeIndex);
     mFirstFreeNode = freeNode->Next();
 
     UpdateContainer();
@@ -95,7 +94,7 @@ FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent, const KEY_INDEX par
 
   if (parent != NIL_NODE)
   {
-    BTreeNodeRAII parentNode(RetrieveNode(parent));
+    auto parentNode = RetrieveNode(parent);
 
     parentNode->SetNodeOfKey(parentKey, nodeIndex);
 
@@ -111,7 +110,7 @@ FieldIndexNodeManager::AllocateNode(const NODE_INDEX parent, const KEY_INDEX par
 void
 FieldIndexNodeManager::FreeNode(const NODE_INDEX nodeId)
 {
-  BTreeNodeRAII node(RetrieveNode(nodeId));
+  auto node = RetrieveNode(nodeId);
 
   node->MarkAsRemoved();
   node->Next(mFirstFreeNode);
@@ -126,7 +125,7 @@ FieldIndexNodeManager::RootNodeId()
 {
   if (mRootNode == NIL_NODE)
   {
-    BTreeNodeRAII rootNode(RetrieveNode(AllocateNode(NIL_NODE, 0)));
+    auto rootNode = RetrieveNode(AllocateNode(NIL_NODE, 0));
 
     rootNode->Next(NIL_NODE);
     rootNode->Prev(NIL_NODE);
@@ -157,12 +156,12 @@ FieldIndexNodeManager::MaxCachedNodes()
   return mMaxCachedMem / mNodeSize;
 }
 
-IBTreeNode*
+std::shared_ptr<IBTreeNode>
 FieldIndexNodeManager::LoadNode(const NODE_INDEX nodeId)
 {
   assert(nodeId > 0);
 
-  unique_ptr<IBTreeNode> node(NodeFactory(nodeId));
+  std::shared_ptr<IBTreeNode> node(NodeFactory(nodeId));
 
   assert(mContainer->Size() % NodeRawSize() == 0);
 
@@ -180,7 +179,7 @@ FieldIndexNodeManager::LoadNode(const NODE_INDEX nodeId)
   node->MarkClean();
   assert(node->NodeId() == nodeId);
 
-  return node.release();
+  return node;
 }
 
 void

@@ -272,11 +272,11 @@ public:
     const KEY_INDEX splitKeyIndex = KeysCount() / 2;
     const T_BTreeKey<DBS_T> splitKey = GetKey(splitKeyIndex);
 
-    BTreeNodeRAII parentNode(mNodesMgr.RetrieveNode(parent));
+    auto parentNode = mNodesMgr.RetrieveNode(parent);
 
     const KEY_INDEX insertPosition = parentNode->InsertKey(splitKey);
     const NODE_INDEX allocatedNodeId = mNodesMgr.AllocateNode(parent, insertPosition);
-    BTreeNodeRAII allocatedNode(mNodesMgr.RetrieveNode(allocatedNodeId));
+    auto allocatedNode = mNodesMgr.RetrieveNode(allocatedNodeId);
 
     allocatedNode->Leaf(IsLeaf());
     allocatedNode->MarkAsUsed();
@@ -312,10 +312,7 @@ public:
     allocatedNode->Prev(Prev());
     Prev(allocatedNodeId);
     if (allocatedNode->Prev() != NIL_NODE)
-    {
-      BTreeNodeRAII prevNode(mNodesMgr.RetrieveNode(allocatedNode->Prev()));
-      prevNode->Next(allocatedNodeId);
-    }
+      mNodesMgr.RetrieveNode(allocatedNode->Prev())->Next(allocatedNodeId);
   }
 
   virtual void Join(const bool toRight)
@@ -324,7 +321,7 @@ public:
     {
       assert(Next() != NIL_NODE);
 
-      BTreeNodeRAII next(mNodesMgr.RetrieveNode(Next()));
+      auto next = mNodesMgr.RetrieveNode(Next());
 
       DBS_BTreeNode* const nextNode = _SC(DBS_BTreeNode*, &(*next));
       const KEY_INDEX oldKeysCount = nextNode->KeysCount();
@@ -345,10 +342,7 @@ public:
 
       nextNode->Prev(Prev());
       if (Prev() != NIL_NODE)
-      {
-        BTreeNodeRAII prev(mNodesMgr.RetrieveNode(Prev()));
-        prev->Next(Next());
-      }
+        mNodesMgr.RetrieveNode(Prev())->Next(Next());
 
       assert(nextNode->NullKeysCount() <= nextNode->KeysCount());
       assert(nextNode->KeysCount() <= nextNode->DBS_BTreeNode::KeysPerNode());
@@ -357,9 +351,9 @@ public:
     {
       assert(Prev() != NIL_NODE);
 
-      BTreeNodeRAII prev(mNodesMgr.RetrieveNode(Prev()));
+      auto prev = mNodesMgr.RetrieveNode(Prev());
 
-      DBS_BTreeNode* const prevNode = _SC(DBS_BTreeNode*, &(*prev));
+      DBS_BTreeNode* const prevNode = _SC(DBS_BTreeNode*, prev.get());
       const KEY_INDEX oldKeysCount = KeysCount();
 
       KeysCount(oldKeysCount + prevNode->KeysCount());
@@ -376,11 +370,7 @@ public:
 
       Prev(prev->Prev());
       if (Prev() != NIL_NODE)
-      {
-        BTreeNodeRAII prev(mNodesMgr.RetrieveNode(Prev()));
-
-        prev->Next(NodeId());
-      }
+        mNodesMgr.RetrieveNode(Prev())->Next(NodeId());
 
       assert(NullKeysCount() <= KeysCount());
       assert(KeysCount() <= DBS_BTreeNode::KeysPerNode());
@@ -529,7 +519,7 @@ public:
 
 protected:
   virtual uint_t MaxCachedNodes();
-  virtual IBTreeNode* LoadNode(const NODE_INDEX nodeId);
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId);
   virtual void SaveNode(IBTreeNode* const nodeId);
 
   void InitContainer();

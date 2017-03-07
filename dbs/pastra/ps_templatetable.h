@@ -446,7 +446,7 @@ private:
   void ReleaseIndexField(FieldDescriptor* const field);
 
   virtual uint_t MaxCachedNodes();
-  virtual IBTreeNode* LoadNode(const NODE_INDEX nodeId);
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId);
   virtual void SaveNode(IBTreeNode* const node);
 
 };

@@ -111,7 +111,7 @@ public:
 
 
   bool FindBiggerOrEqual(const IBTreeKey& key, KEY_INDEX* const outIndex) const;
-  void   Release();
+  void Release();
 
 protected:
   struct NodeHeader
@@ -137,6 +137,7 @@ private:
 };
 
 
+#if 0
 class BTreeNodeRAII
 {
 public:
@@ -162,9 +163,9 @@ public:
   operator IBTreeNode*() { return mTreeNode; }
 
 private:
-  IBTreeNode  *mTreeNode;
+  std::mTreeNode;
 };
-
+#endif
 
 
 class IBTreeNodeManager
@@ -176,7 +177,7 @@ public:
   void Split(NODE_INDEX parentId, const NODE_INDEX nodeId);
   void Join(const NODE_INDEX parentId, const NODE_INDEX nodeId);
 
-  IBTreeNode* RetrieveNode(const NODE_INDEX nodeId);
+  std::shared_ptr<IBTreeNode> RetrieveNode(const NODE_INDEX nodeId);
   void ReleaseNode(const NODE_INDEX nodeId);
   void ReleaseNode(IBTreeNode* const node) { ReleaseNode(node->NodeId()); }
   void FlushNodes();
@@ -191,19 +192,21 @@ public:
 protected:
   struct CachedData
   {
-    CachedData(IBTreeNode* const node)
-      : mNode(node),
-        mRefsCount(0)
+    using NodePtr = std::shared_ptr<IBTreeNode>;
+
+    CachedData(NodePtr node)
+      : mNode(node)
     {
     }
 
-    IBTreeNode  *mNode;
-    uint_t       mRefsCount;
+    bool IsUsed() const { return mNode.use_count() > 1; }
+
+    NodePtr mNode;
   };
 
 
   virtual uint_t MaxCachedNodes() = 0;
-  virtual IBTreeNode* LoadNode(const NODE_INDEX nodeId) = 0;
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId) = 0;
   virtual void SaveNode(IBTreeNode* const node) = 0;
 
 
