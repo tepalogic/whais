@@ -155,7 +155,7 @@ class TemporalText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  TemporalText(const uint8_t* const utf8Str = NULL, const uint64_t unitsCount = ~0);
+  TemporalText(const uint8_t* const utf8Str = nullptr, const uint64_t unitsCount = ~0);
 
   virtual TemporalContainer& GetTemporalContainer();
 

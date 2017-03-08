@@ -63,7 +63,7 @@ public:
   WFileContainerException(const uint32_t   code,
                           const char*      file,
                           uint32_t         line,
-                          const char      *fmtMsg = NULL,
+                          const char      *fmtMsg = nullptr,
                           ...);
 
   virtual Exception* Clone() const;

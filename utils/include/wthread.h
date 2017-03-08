@@ -256,7 +256,7 @@ public:
   LockException(const uint32_t    code,
                  const char*       file,
                  uint32_t          line,
-                 const char*       fmtMsg = NULL,
+                 const char*       fmtMsg = nullptr,
                  ...);
 
   virtual Exception* Clone() const;
@@ -292,12 +292,12 @@ public:
     mUnkExceptSignaled = false;
 
     delete mException;
-    mException = NULL;
+    mException = nullptr;
   }
 
   bool HasExceptionPending()
   {
-    return(mUnkExceptSignaled || (mException != NULL));
+    return(mUnkExceptSignaled || (mException != nullptr));
   }
 
 private:
@@ -325,7 +325,7 @@ public:
   ThreadException(const uint32_t    code,
                    const char*       file,
                    uint32_t          line,
-                   const char*       fmtMsg = NULL,
+                   const char*       fmtMsg = nullptr,
                    ...);
 
 

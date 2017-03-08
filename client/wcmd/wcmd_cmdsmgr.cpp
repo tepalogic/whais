@@ -104,7 +104,7 @@ decode_basic_type(const uint16_t type)
     assert(false);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 
@@ -166,7 +166,7 @@ cmdHelp(const string& cmdLine, ENTRY_CMD_CONTEXT)
       return false;
     }
   const CmdEntry *const entry = FindCmdEntry(token.c_str());
-  if (entry == NULL)
+  if (entry == nullptr)
     {
       cout << "Unknown command '" << token << "'.\n";
       return false;
@@ -216,7 +216,7 @@ InitCmdManager()
   entry.mDesc         = descHelp;
   entry.mExtendedDesc = descExtHelp;
   entry.mCmd          = cmdHelp;
-  entry.mContext      = NULL;
+  entry.mContext      = nullptr;
   entry.mShowStatus   = false;
 
   RegisterCommand(entry);
@@ -226,7 +226,7 @@ InitCmdManager()
   entry.mDesc         = descEcho;
   entry.mExtendedDesc = descExtEcho;
   entry.mCmd          = cmdEcho;
-  entry.mContext      = NULL;
+  entry.mContext      = nullptr;
   entry.mShowStatus   = false;
 
   RegisterCommand(entry);
@@ -236,9 +236,9 @@ InitCmdManager()
 void
 RegisterCommand(const CmdEntry& entry)
 {
-  assert(entry.mName != NULL);
-  assert(entry.mDesc != NULL);
-  assert(entry.mExtendedDesc != NULL);
+  assert(entry.mName != nullptr);
+  assert(entry.mDesc != nullptr);
+  assert(entry.mExtendedDesc != nullptr);
 
   pair<string, CmdEntry> cmdEntry(entry.mName, entry);
 
@@ -250,7 +250,7 @@ const CmdEntry*
 FindCmdEntry(const char* const name)
 {
   const string command = name;
-  CmdEntry*    entry    = NULL;
+  CmdEntry*    entry    = nullptr;
 
   map<string, CmdEntry>::iterator it = sCommands.find(command);
   if (it != sCommands.end())

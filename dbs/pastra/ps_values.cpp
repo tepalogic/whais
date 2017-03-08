@@ -563,7 +563,7 @@ DText::DText(const char* text)
     mTextRefs(0)
 
 {
-  if ((text != NULL) && (text[0] != 0))
+  if ((text != nullptr) && (text[0] != 0))
     mText = new TemporalText(_RC(const uint8_t*, text));
 }
 
@@ -573,7 +573,7 @@ DText::DText(const uint8_t *utf8Src, uint_t unitsCount)
     mTextRefs(0)
 
 {
-  if ((utf8Src != NULL) && (utf8Src[0] != 0) && (unitsCount > 0))
+  if ((utf8Src != nullptr) && (utf8Src[0] != 0) && (unitsCount > 0))
     mText = new TemporalText(utf8Src, unitsCount);
 }
 
@@ -586,7 +586,7 @@ DText::DText(ITextStrategy& text)
 
 
 DText::DText(const DText& source)
-  : mText(NULL),
+  : mText(nullptr),
     mTextRefs(0)
 {
   StrategyRAII s = source.GetStrategyRAII();
@@ -847,7 +847,7 @@ DText::ReleaseStrategy()
 void
 DText::ReplaceStrategy(ITextStrategy* const strategy)
 {
-  assert(strategy != NULL);
+  assert(strategy != nullptr);
   assert(mText != strategy);
 
   LockRAII<SpinLock> _l(mLock);
@@ -895,13 +895,13 @@ wh_array_init(const T* const array,
 {
   if (count == 0)
   {
-    assert(array == NULL);
+    assert(array == nullptr);
 
     *outStrategy = &NullArray::GetSingletoneInstace(array[0].DBSType());
 
     return;
   }
-  else if (array == NULL)
+  else if (array == nullptr)
     throw DBSException(_EXTRA(DBSException::BAD_PARAMETERS));
 
   unique_ptr<IArrayStrategy> s(new TemporalArray(array[0].DBSType()));
@@ -933,7 +933,7 @@ DArray::DArray()
 
 
 DArray::DArray(const DBool* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -941,7 +941,7 @@ DArray::DArray(const DBool* const array, const uint64_t count)
 
 
 DArray::DArray(const DChar* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -949,7 +949,7 @@ DArray::DArray(const DChar* const array, const uint64_t count)
 
 
 DArray::DArray(const DDate* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -957,7 +957,7 @@ DArray::DArray(const DDate* const array, const uint64_t count)
 
 
 DArray::DArray(const DDateTime* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -965,7 +965,7 @@ DArray::DArray(const DDateTime* const array, const uint64_t count)
 
 
 DArray::DArray(const DHiresTime* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -973,7 +973,7 @@ DArray::DArray(const DHiresTime* const array, const uint64_t count)
 
 
 DArray::DArray(const DUInt8* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -981,7 +981,7 @@ DArray::DArray(const DUInt8* const array, const uint64_t count)
 
 
 DArray::DArray(const DUInt16* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -989,7 +989,7 @@ DArray::DArray(const DUInt16* const array, const uint64_t count)
 
 
 DArray::DArray(const DUInt32* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -997,7 +997,7 @@ DArray::DArray(const DUInt32* const array, const uint64_t count)
 
 
 DArray::DArray(const DUInt64* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1005,7 +1005,7 @@ DArray::DArray(const DUInt64* const array, const uint64_t count)
 
 
 DArray::DArray(const DReal* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1013,7 +1013,7 @@ DArray::DArray(const DReal* const array, const uint64_t count)
 
 
 DArray::DArray(const DRichReal* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1021,7 +1021,7 @@ DArray::DArray(const DRichReal* const array, const uint64_t count)
 
 
 DArray::DArray(const DInt8* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1029,7 +1029,7 @@ DArray::DArray(const DInt8* const array, const uint64_t count)
 
 
 DArray::DArray(const DInt16* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1037,7 +1037,7 @@ DArray::DArray(const DInt16* const array, const uint64_t count)
 
 
 DArray::DArray(const DInt32* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1045,7 +1045,7 @@ DArray::DArray(const DInt32* const array, const uint64_t count)
 
 
 DArray::DArray(const DInt64* const array, const uint64_t count)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   wh_array_init(array, count, &mArray);
@@ -1060,7 +1060,7 @@ DArray::DArray(IArrayStrategy& array)
 
 
 DArray::DArray(const DArray& source)
-  : mArray(NULL),
+  : mArray(nullptr),
     mArrayRefs(0)
 {
   StrategyRAII s = source.GetStrategyRAII();
@@ -1556,7 +1556,7 @@ DArray::ReleaseStrategy()
 void
 DArray::ReplaceStrategy(IArrayStrategy* const strategy)
 {
-  assert(strategy != NULL);
+  assert(strategy != nullptr);
   assert(mArray != strategy);
 
   LockRAII<SpinLock> _l(mLock);

@@ -23,11 +23,11 @@ bool test_bool_array()
 {
   std::cout << "Testing T_BOOL array... ";
   bool result = true;
-  DArray anotherArray((DBool *)NULL);
+  DArray anotherArray((DBool *)nullptr);
 
   if (result)
     {
-      DArray nullArray((DBool *)NULL);
+      DArray nullArray((DBool *)nullptr);
       if (! nullArray.IsNull())
         result = false;
 
@@ -85,7 +85,7 @@ test_integers_array(const char* type)
 
   uint64_t elementsCount = 0;
   T nullValue;
-  DArray testArray((T *)NULL);
+  DArray testArray((T *)nullptr);
 
   for (uint64_t index = 1; index < 10000; index += 13)
     {
@@ -146,7 +146,7 @@ test_dates_array()
   uint_t day = 1;
   uint_t month = 1;
 
-  DArray testArray((DDate *)NULL);
+  DArray testArray((DDate *)nullptr);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -211,7 +211,7 @@ test_datetimes_array()
   uint_t mins = 3;
   uint_t sec = 3;
 
-  DArray testArray((DDateTime *)NULL);
+  DArray testArray((DDateTime *)nullptr);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -287,7 +287,7 @@ test_hiresdate_array()
   uint_t sec = 3;
   uint32_t msec = 4;
 
-  DArray testArray((DHiresTime *)NULL);
+  DArray testArray((DHiresTime *)nullptr);
 
   for (uint64_t elementsCount = 0; elementsCount < 500;  elementsCount++)
     {
@@ -360,8 +360,8 @@ test_array_mirroring()
   std::cout << "Testing array mirroring ...";
   bool result = true;
 
-  DArray array1((DUInt32*)NULL);
-  DArray array2((DUInt32*)NULL);
+  DArray array1((DUInt32*)nullptr);
+  DArray array2((DUInt32*)nullptr);
 
   array1.Add(DUInt32(firstVals[0]));
   array1.Add(DUInt32(firstVals[1]));
@@ -490,7 +490,7 @@ test_array_mirroring()
        }
     }
 
-  DArray array3((DUInt32*) NULL);
+  DArray array3((DUInt32*) nullptr);
   array3 = array1;
 
   for (uint_t index = 0; result && (index < array1.Count()); ++index)

@@ -30,7 +30,7 @@ static const char sProgramName[] = "Whais";
 static const char sProgramDesc[] = "A database server daemon.";
 
 static const char* sConfigFile = "/etc/whais.conf";
-static const char* sPidFile    = NULL;
+static const char* sPidFile    = nullptr;
 
 static bool sDbsInited         = false;
 static bool sInterpreterInited = false;
@@ -50,10 +50,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mSession != NULL)
+          if (dbsIterator->mSession != nullptr)
             {
               ReleaseInstance(*(dbsIterator->mSession));
-              dbsIterator->mSession = NULL;
+              dbsIterator->mSession = nullptr;
             }
 
           ostringstream logEntry;
@@ -77,10 +77,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mDbs != NULL)
+          if (dbsIterator->mDbs != nullptr)
             DBSReleaseDatabase(*(dbsIterator->mDbs));
 
-          if (dbsIterator->mLogger != NULL)
+          if (dbsIterator->mLogger != nullptr)
             {
               dbsIterator->mLogger->Log(LT_INFO, "Database context ended!");
               delete dbsIterator->mLogger;
@@ -116,10 +116,10 @@ set_signals()
   action.sa_flags     = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
- if (sigaction(SIGINT, &action, NULL) < 0)
+ if (sigaction(SIGINT, &action, nullptr) < 0)
    return false;
 
- if (sigaction(SIGTERM, &action, NULL) < 0)
+ if (sigaction(SIGTERM, &action, nullptr) < 0)
    return false;
 
  return true;
@@ -287,7 +287,7 @@ boot_server()
       }
 
     syslog(LOG_INFO, "All databases loaded!");
-    if (sPidFile != NULL)
+    if (sPidFile != nullptr)
       {
         ofstream pidFile(sPidFile, ios_base::out | ios_base::trunc);
         pidFile << _SC(uint_t, getpid()) << endl;

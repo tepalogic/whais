@@ -116,20 +116,20 @@ DBSGetSeettings();
 
 DBS_SHL void
 DBSCreateDatabase(const char* const name,
-                  const char*       path = NULL);
+                  const char*       path = nullptr);
 
 DBS_SHL bool
 DBSValidateDatabase(const char* const name,
-                    const char*       path = NULL);
+                    const char*       path = nullptr);
 
 DBS_SHL bool
 DBSRepairDatabase(const char* const            name,
-                  const char*                  path        = NULL,
-                  FIX_ERROR_CALLBACK           fixCallback = NULL);
+                  const char*                  path        = nullptr,
+                  FIX_ERROR_CALLBACK           fixCallback = nullptr);
 
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase(const char* const name,
-                    const char*       path = NULL);
+                    const char*       path = nullptr);
 
 DBS_SHL void
 DBSReleaseDatabase(IDBSHandler& hnd);
@@ -137,7 +137,7 @@ DBSReleaseDatabase(IDBSHandler& hnd);
 
 DBS_SHL void
 DBSRemoveDatabase(const char* const     name,
-                  const char* const     path = NULL);
+                  const char* const     path = nullptr);
 
 DBS_SHL const char*
 DescribeDbsEngineVersion();

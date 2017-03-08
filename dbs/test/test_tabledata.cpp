@@ -274,7 +274,7 @@ type_to_text(uint_t type)
       return "UINT64";
     }
   assert(0);
-  return NULL;
+  return nullptr;
 }
 
 
@@ -531,7 +531,7 @@ add_vectors_values_to_table(ITable& table, std::vector<T> &testVect)
 
   for (uint_t rowIndex = 0; rowIndex < testVect.size(); ++rowIndex)
     {
-      DArray valueArray(_SC(T*, NULL));
+      DArray valueArray(_SC(T*, nullptr));
 
       if (rowIndex == table.AllocatedRows())
         table.AddRow();
@@ -551,7 +551,7 @@ test_vector_values_table(ITable& table, uint_t fieldIndex, std::vector<T> &testV
   for (uint_t rowIndex = 0; rowIndex < table.AllocatedRows(); ++rowIndex)
     {
 
-      DArray testArray(_SC(T*, NULL));
+      DArray testArray(_SC(T*, nullptr));
       table.Get(rowIndex, fieldIndex, testArray);
 
       if (testVect[rowIndex].IsNull())

@@ -81,7 +81,7 @@ tc_settup_connection(int              argc,
         }
     }
 
-  if (host == NULL)
+  if (host == nullptr)
     {
       cout << "No host name supplied!\n";
       print_usage(argv[0]);
@@ -169,7 +169,7 @@ decode_basic_type(const uint16_t type)
     assert(false);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 

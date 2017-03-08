@@ -158,7 +158,7 @@ test_procedures(WH_CONNECTION hnd, vector<ProcedureDescription> procs)
     }
   vector<bool> foundProcs(procsCount, false);
 
-  const char* name = NULL;
+  const char* name = nullptr;
   uint_t i = 0;
   while (i < 9999999)
     {
@@ -168,7 +168,7 @@ test_procedures(WH_CONNECTION hnd, vector<ProcedureDescription> procs)
           return false;
         }
 
-      if (name == NULL)
+      if (name == nullptr)
         break;
 
       size_t index;
@@ -202,7 +202,7 @@ test_procedures(WH_CONNECTION hnd, vector<ProcedureDescription> procs)
           cout << "Error encountered during procedure fetch end condition.\n";
           return false;
         }
-      else if (name != NULL)
+      else if (name != nullptr)
         {
           cout << "Invalid procedure name end condition ...\n";
           return false;
@@ -33907,7 +33907,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   vector<ProcedureDescription> procs;
 

@@ -62,14 +62,14 @@ insert_a_string(WH_CONNECTION        hnd,
                          temp) != WCS_OK)
           || (bulk && (WFlush(hnd) != WCS_OK)))
         {
-          return NULL;
+          return nullptr;
         }
 
       strcat(result, temp);
     }
 
   if (WFlush(hnd) != WCS_OK)
-    return NULL;
+    return nullptr;
 
   return result;
 }
@@ -88,7 +88,7 @@ test_simple_text(WH_CONNECTION hnd)
 
   cout << "Testing text simple updates ... ";
 
-  if ((WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_TEXT, 0, nullptr) != WCS_OK)
       || (WFlush(hnd) != WCS_OK))
     {
       goto test_simple_text_fail;
@@ -127,7 +127,7 @@ test_simple_text(WH_CONNECTION hnd)
 
   delete [] ref;
 
-  if (WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+  if (WPushValue(hnd, WHC_TYPE_TEXT, 0, nullptr) != WCS_OK)
     goto test_simple_text_fail;
 
   ref = insert_a_string(hnd, WIGNORE_FIELD, WIGNORE_OFF, true);
@@ -274,9 +274,9 @@ test_for_errors(WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue(hnd, WHC_TYPE_TEXT | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_TEXT | WHC_TYPE_ARRAY_MASK, 0, nullptr) != WCS_OK)
       || (WFlush(hnd) != WCS_OP_NOTSUPP)
-      || (WPushValue(hnd, WHC_TYPE_TEXT, 0, NULL) != WCS_OK)
+      || (WPushValue(hnd, WHC_TYPE_TEXT, 0, nullptr) != WCS_OK)
       || (WFlush(hnd) != WCS_OK)
       || (WValueRowsCount(hnd, &count) != WCS_TYPE_MISMATCH)
       || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
@@ -294,9 +294,9 @@ test_for_errors(WH_CONNECTION hnd)
   if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
       || (WFlush(hnd) != WCS_OK)
       || (WFlush(hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, nullptr) != WCS_INVALID_ARGS)
       || (WValueRowsCount(hnd, &count) != WCS_OK)
       || (count != 0)
       || (WValueTextLength(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, &count) != WCS_INVALID_FIELD)
@@ -338,7 +338,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION hnd        = NULL;
+  WH_CONNECTION hnd        = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

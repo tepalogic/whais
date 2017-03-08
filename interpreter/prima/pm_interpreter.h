@@ -84,18 +84,18 @@ using NameSpaceHolder=std::shared_ptr<NameSpace>;
 class NameSpaceHolder
 {
 public:
-  explicit NameSpaceHolder(NameSpace* space = NULL)
+  explicit NameSpaceHolder(NameSpace* space = nullptr)
     : mSpace(space),
       mRefsCount(0)
   {
-    assert(mSpace != NULL);
+    assert(mSpace != nullptr);
   }
 
   NameSpaceHolder(const NameSpaceHolder& source)
     : mSpace(source.mSpace),
       mRefsCount(source.mRefsCount)
   {
-    _CC(NameSpace*&, source.mSpace)      = NULL;
+    _CC(NameSpace*&, source.mSpace)      = nullptr;
     _CC(uint64_t&,   source.mRefsCount)  = 0;
   }
 
@@ -103,7 +103,7 @@ public:
   {
     assert(mRefsCount == 0);
 
-    if (mSpace != NULL)
+    if (mSpace != nullptr)
       {
         IDBSHandler& dbsHandler = mSpace->GetDBSHandler();
 

@@ -38,7 +38,7 @@ test_for_no_args(IDBSHandler& rDbs)
 
   try
   {
-    rDbs.AddTable("test_dummy", 10, NULL);
+    rDbs.AddTable("test_dummy", 10, nullptr);
   }
   catch(DBSException& e)
   {

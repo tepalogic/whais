@@ -70,7 +70,7 @@ fill_table_with_values(ITable& table,
   bool result = true;
   DReal prev;
 
-  table.CreateIndex(0, NULL, NULL);
+  table.CreateIndex(0, nullptr, nullptr);
   std::cout << "Filling table with " << rowCount << " rows.\n";
 
   wh_rnd_set_seed(seed);
@@ -146,7 +146,7 @@ bool
 fill_table_with_first_nulls(ITable& table, const uint32_t rowCount)
 {
   bool result = true;
-  std::cout << "Set NULL values for the first " << rowCount << " rows!" << std::endl;
+  std::cout << "Set nullptr values for the first " << rowCount << " rows!" << std::endl;
 
   DReal nullValue;
 
@@ -338,7 +338,7 @@ main(int argc, char **argv)
   handler.AddTable("t_test_tab", sizeof field_desc / sizeof(field_desc[0]), field_desc);
 
   {
-    DArray tableValues(_SC(DReal*, NULL));
+    DArray tableValues(_SC(DReal*, nullptr));
     {
       ITable& table = handler.RetrievePersistentTable(tb_name);
 

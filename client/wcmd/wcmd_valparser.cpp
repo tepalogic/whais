@@ -69,7 +69,7 @@ bool parse_defined_values(const char*       src,
       *outSrcSize = sizeof NON_NULL_VALUE - 1;
       *outValue   = T::Min();
 
-      if (outValue2 == NULL)
+      if (outValue2 == nullptr)
         return false;
 
       *outValue2  = T::Max();
@@ -101,14 +101,14 @@ ParseFieldValue(ostream* const  os,
                  const bool      apostrophe,
                  size_t* const   outSrcSize,
                  T* const        outValue,
-                 T* const        outValue2 = NULL)
+                 T* const        outValue2 = nullptr)
 {
   uint_t offset = 0;
 
   if (parse_defined_values(src, outSrcSize, outValue, outValue2))
     return true;
 
-  if (outValue2 != NULL)
+  if (outValue2 != nullptr)
     *outValue2 = T();
 
   if (apostrophe && (src[offset++] != '\''))
@@ -151,7 +151,7 @@ ParseFieldValue<DChar> (ostream* const  os,
   if (parse_defined_values(src, outSrcSize, outValue, outValue2))
     return true;
 
-  if (outValue2 != NULL)
+  if (outValue2 != nullptr)
     *outValue2 = DChar();
 
   const bool specialChar = src[offset] == '\"';
@@ -282,7 +282,7 @@ ParseFieldSpecifier(ostream* const              os,
 
 ParseFieldSpecifier_msg_err:
 
-  if (os != NULL)
+  if (os != nullptr)
     *os << "Invalid selector values for field '" << fieldName <<"'.\n";
 
   return false;
@@ -292,7 +292,7 @@ ParseFieldSpecifier_msg_err:
 static void*
 allocate_value_range(const uint_t fieldType)
 {
-  void* result = NULL;
+  void* result = nullptr;
 
   switch(fieldType)
     {
@@ -555,7 +555,7 @@ parse_rows_selection(ostream* const     os,
   return true;
 
 invalid_row_spec:
-  if (os != NULL)
+  if (os != nullptr)
     *os << "The rows are not properly specified.\n";
 
   return false;
@@ -585,14 +585,14 @@ parse_field_values_selection(ostream* const              os,
 
   if (fd.isArray)
     {
-      if (os != NULL)
+      if (os != nullptr)
         *os << "Array type fields are not supported in value selections.\n";
 
       return false;
     }
   else if (fd.type == T_TEXT)
     {
-      if (os != NULL)
+      if (os != nullptr)
         *os << "Text type fields are not supported in value selections.\n";
 
       return false;
@@ -601,14 +601,14 @@ parse_field_values_selection(ostream* const              os,
   outRowsRange->mFieldType = fd.type;
   outRowsRange->mRange     = allocate_value_range(fd.type);
 
-  assert(outRowsRange->mRange != NULL);
+  assert(outRowsRange->mRange != nullptr);
 
   if (str[offset] == '=')
     ++offset;
 
   if ((str[offset] == 0) || isspace(str[offset]))
     {
-      if (os != NULL)
+      if (os != nullptr)
         *os << "Field values are missing or are not properly specified.\n";
 
       return false;
@@ -848,7 +848,7 @@ ParseRowsSelectionClause(ostream* const    os,
         }
 
       outRowsSelection.mSearchedValue.push_back(sel);
-      sel.mRange = NULL;  //Manually release the ownership!
+      sel.mRange = nullptr;  //Manually release the ownership!
 
       offset += temp;
     }
@@ -864,7 +864,7 @@ FieldValuesSelection::FieldValuesSelection()
   : mFieldId(0),
     mFieldType(T_UNKNOWN),
     mSearchNull(false),
-    mRange(NULL)
+    mRange(nullptr)
 {
 }
 
@@ -910,7 +910,7 @@ ParseFieldUpdateValues(ostream* const              os,
 
   if (str[offset] == 0 )
     {
-      if (os != NULL)
+      if (os != nullptr)
         *os << "Field values have not been specified.\n";
 
       return false;
@@ -925,7 +925,7 @@ ParseFieldUpdateValues(ostream* const              os,
 
       if (str[offset] == 0)
         {
-          if (os != NULL)
+          if (os != nullptr)
             *os << "Field update value not properly specified.\n";
 
           return false;

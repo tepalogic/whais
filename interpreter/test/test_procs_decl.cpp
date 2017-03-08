@@ -208,12 +208,12 @@ find_field_desc(const char* name,
       if (strcmp(fields[index].field_name, name) == 0)
         {
           if (fields[index].field_visited)
-            return NULL;
+            return nullptr;
           else
             return &fields[index];
         }
     }
-  return NULL;
+  return nullptr;
 }
 
 ProcDesc*
@@ -226,12 +226,12 @@ find_proc_desc(const char* name,
       if (strcmp(procs[index].name, name) == 0)
         {
           if (procs[index].desc_visited)
-            return NULL;
+            return nullptr;
           else
             return &procs[index];
         }
     }
-  return NULL;
+  return nullptr;
 }
 
 bool
@@ -255,7 +255,7 @@ test_fields_are_ok(ISession&          session,
       const uint_t type = session.ProcedurePameterFieldType(procName,
                                                              paramId,
                                                              index);
-      if (field == NULL)
+      if (field == nullptr)
         return FALSE;
       else if (type != field->field_type)
         return FALSE;
@@ -344,7 +344,7 @@ test_procedures(ISession&     session,
       ProcDesc* desc = find_proc_desc(session.ProcedureName(index),
                                        procedures,
                                        procsCount);
-      if ((desc == NULL) || (desc->desc_visited))
+      if ((desc == nullptr) || (desc->desc_visited))
         return false;
       else if ((session.ProcedureParametersCount(desc->name) != desc->param_count)
                || (session.ProcedureParametersCount(index) != desc->param_count)
@@ -423,7 +423,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& adminSession = GetInstance(NULL);
+    ISession& adminSession = GetInstance(nullptr);
     ISession& userSession  = GetInstance(test_db1);
 
     success = true;

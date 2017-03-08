@@ -149,10 +149,10 @@ set_signals()
   action.sa_flags     = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
- if (sigaction(SIGINT, &action, NULL) < 0)
+ if (sigaction(SIGINT, &action, nullptr) < 0)
    return false;
 
- if (sigaction(SIGTERM, &action, NULL) < 0)
+ if (sigaction(SIGTERM, &action, nullptr) < 0)
    return false;
 
  return true;
@@ -191,7 +191,7 @@ PrintWrongUsage(const char* const arg)
 {
   displayBanner(cout, sProgramName, WVER_MAJ, WVER_MIN);
 
-  if (arg != NULL)
+  if (arg != nullptr)
     cerr << "Cannot handle argument '" << arg << "' correctly. Use --help!\n";
 
   else
@@ -227,7 +227,7 @@ ExecuteCommandLine(const string& cmdLine)
   const string    command = CmdLineNextToken(normalizeCmd, pos);
   const CmdEntry* cmd     = FindCmdEntry(command.c_str());
 
-  if (cmd == NULL)
+  if (cmd == nullptr)
     {
       cerr << "Invalid command '" << command << "'." <<  endl;
       return false;
@@ -503,8 +503,8 @@ main(const int argc, char *argv[])
   bool          showLogo            = true;
   bool          showLicense         = false;
   bool          genHeader           = false;
-  const char*   scriptFile          = NULL;
-  const char*   cmdScript           = NULL;
+  const char*   scriptFile          = nullptr;
+  const char*   cmdScript           = nullptr;
   string        dbDirectory;
 
   if (! whs_init())
@@ -516,7 +516,7 @@ main(const int argc, char *argv[])
 
   if (argc == currentArg)
     {
-      PrintWrongUsage(NULL);
+      PrintWrongUsage(nullptr);
       return EINVAL;
     }
 
@@ -854,7 +854,7 @@ main(const int argc, char *argv[])
 
               try
                 {
-                  WH_CONNECTION conHdl = NULL;
+                  WH_CONNECTION conHdl = nullptr;
                   uint32_t cs = WConnect(GetRemoteHostName().c_str(),
                                           GetConnectionPort().c_str(),
                                           GetWorkingDB().c_str(),
@@ -902,12 +902,12 @@ main(const int argc, char *argv[])
             PrintExternalDeclarations(cout);
             result = 0;
           }
-        else if (scriptFile != NULL)
+        else if (scriptFile != nullptr)
           {
             ifstream script(scriptFile, ios_base::in | ios_base::binary);
             result = ExecuteInteractively(script);
           }
-        else if (cmdScript != NULL)
+        else if (cmdScript != nullptr)
           {
             istringstream script(cmdScript);
             result = ExecuteInteractively(script);

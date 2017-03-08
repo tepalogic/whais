@@ -66,7 +66,7 @@ void
 test_array_with_dates(void *)
 {
   std::cout << "Testing array sort with dates ...\n";
-  DArray array(_SC(DDate*, NULL));
+  DArray array(_SC(DDate*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_date());
@@ -94,7 +94,7 @@ void
 test_array_with_datetimes(void *)
 {
   std::cout << "Testing array sort with datetimes ...\n";
-  DArray array(_SC(DDateTime*, NULL));
+  DArray array(_SC(DDateTime*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_datetime());
@@ -122,7 +122,7 @@ void
 test_array_with_hirestimes(void *)
 {
   std::cout << "Testing array sort with hirestimes ...\n";
-  DArray array(_SC(DHiresTime*, NULL));
+  DArray array(_SC(DHiresTime*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_hirestime());
@@ -150,7 +150,7 @@ void
 test_array_with_int8(void *)
 {
   std::cout << "Testing array sort with int8 ...\n";
-  DArray array(_SC(DUInt8*, NULL));
+  DArray array(_SC(DUInt8*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(DUInt8( wh_rnd() & 0xFF));
@@ -179,7 +179,7 @@ void
 test_array_with_dates_r(void *)
 {
   std::cout << "Testing array reverse sort with dates ...\n";
-  DArray array(_SC(DDate*, NULL));
+  DArray array(_SC(DDate*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_date());
@@ -208,7 +208,7 @@ void
 test_array_with_datetimes_r(void *)
 {
   std::cout << "Testing array reverse sort with datetimes ...\n";
-  DArray array(_SC(DDateTime*, NULL));
+  DArray array(_SC(DDateTime*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_datetime());
@@ -236,7 +236,7 @@ void
 test_array_with_hirestimes_r(void *)
 {
   std::cout << "Testing array reverse sort with hirestimes ...\n";
-  DArray array(_SC(DHiresTime*, NULL));
+  DArray array(_SC(DHiresTime*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(get_random_hirestime());
@@ -265,7 +265,7 @@ void
 test_array_with_int8_r(void *)
 {
   std::cout << "Testing array reverse sort with int8 ...\n";
-  DArray array(_SC(DUInt8*, NULL));
+  DArray array(_SC(DUInt8*, nullptr));
 
   for (uint_t index = 0; index < _elemsCount; ++index)
     array.Add(DUInt8(wh_rnd() & 0xFF));
@@ -305,14 +305,14 @@ main(int argc, char** argv)
   {
     Thread th[8];
 
-    th[0].Run(test_array_with_dates, NULL);
-    th[1].Run(test_array_with_datetimes, NULL);
-    th[2].Run(test_array_with_hirestimes, NULL);
-    th[3].Run(test_array_with_dates_r, NULL);
-    th[4].Run(test_array_with_datetimes_r, NULL);
-    th[5].Run(test_array_with_hirestimes_r, NULL);
-    th[6].Run(test_array_with_int8, NULL);
-    th[7].Run(test_array_with_int8_r, NULL);
+    th[0].Run(test_array_with_dates, nullptr);
+    th[1].Run(test_array_with_datetimes, nullptr);
+    th[2].Run(test_array_with_hirestimes, nullptr);
+    th[3].Run(test_array_with_dates_r, nullptr);
+    th[4].Run(test_array_with_datetimes_r, nullptr);
+    th[5].Run(test_array_with_hirestimes_r, nullptr);
+    th[6].Run(test_array_with_int8, nullptr);
+    th[7].Run(test_array_with_int8_r, nullptr);
 
     th[0].WaitToEnd(true);
     th[1].WaitToEnd(true);

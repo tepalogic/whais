@@ -23,7 +23,7 @@ struct TableFieldDesc
 {
 #if 0
   TableFieldDesc()
-    : field_name(NULL),
+    : field_name(nullptr),
       field_type(0),
       desc_visited(false)
   {
@@ -188,7 +188,7 @@ find_glb_desc(const char* const glb_name,
         return &glb_desc[i];
     }
 
-  return NULL;
+  return nullptr;
 }
 
 static TableFieldDesc*
@@ -201,13 +201,13 @@ find_field_desc(const char* const   name,
       if (strcmp(name, fields[index].field_name) == 0)
         {
           if (fields[index].desc_visited)
-            return NULL;
+            return nullptr;
           else
             return &fields[index];
         }
     }
 
-  return NULL;
+  return nullptr;
 }
 
 static bool
@@ -284,7 +284,7 @@ bool test_globals(ISession&     session,
       const char* glb_name = (char*)session.GlobalValueName(glb_i);
       GlobalDescs*  glb = find_glb_desc(glb_name, glb_desc, glbs_count);
 
-      if ((glb == NULL) || (glb->desc_visited == true))
+      if ((glb == nullptr) || (glb->desc_visited == true))
         return false;
       else
         glb->desc_visited = true;
@@ -363,7 +363,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& adminSession = GetInstance(NULL);
+    ISession& adminSession = GetInstance(nullptr);
     ISession& userSession  = GetInstance(test_db1);
 
     success = true;

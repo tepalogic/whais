@@ -51,7 +51,7 @@ ConnectionException::ConnectionException(const uint32_t  code,
                                           ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
     {
       va_list vl;
 
@@ -79,7 +79,7 @@ ConnectionException::Type() const
 const char*
 ConnectionException::Description() const
 {
-  return NULL;
+  return nullptr;
 }
 
 
@@ -102,7 +102,7 @@ ClientConnection::ClientConnection(UserHandler&            client,
   if (mCipher != FRAME_ENCTYPE_PLAIN)
     mDataSize -= mDataSize % sizeof(uint64_t);
 
-  mUserHandler.mDesc = NULL;
+  mUserHandler.mDesc = nullptr;
   const uint16_t authFrameLen = FRAME_HDR_SIZE + FRAME_AUTH_SIZE;
 
   assert(authFrameLen <= MIN_FRAME_SIZE);
@@ -184,7 +184,7 @@ ClientConnection::ClientConnection(UserHandler&            client,
         }
     }
 
-  if (mUserHandler.mDesc == NULL)
+  if (mUserHandler.mDesc == nullptr)
     {
       throw ConnectionException(_EXTRA(0),
                                  "Failed to retrieve database '%s'.",

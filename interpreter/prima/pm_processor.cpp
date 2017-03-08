@@ -209,7 +209,7 @@ op_func_ldt(ProcedureCall& call, int64_t& offset)
   const uint32_t textOff = load_le_int32(data);
   const uint8_t* text    = call.GetUnit().GetConstData(textOff);
 
-  assert(text != NULL);
+  assert(text != nullptr);
 
   DText value(text);
 
@@ -474,7 +474,7 @@ op_func_stud(ProcedureCall& call, int64_t& offset)
   else if (IS_FIELD(srcType))
     {
       TableReference* const temp = src.IsNull() ?
-                                    NULL :
+                                    nullptr :
                                     &src.GetTableReference();
 
       const uint_t      type        = src.GetType();
@@ -1633,7 +1633,7 @@ typedef void(*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
 
 
 static OP_FUNC operations[] = {
-                                NULL,
+                                nullptr,
                                 op_func_ldnull,
                                 op_func_ldc,
                                 op_func_ldi8,
@@ -1822,13 +1822,13 @@ ProcedureCall::ProcedureCall(Session&                  session,
     mSession(session),
     mStack(stack),
     mCode(mProcedure.mNativeCode
-           ? NULL
-           : procedure.mProcMgr->Code(procedure, NULL)),
+           ? nullptr
+           : procedure.mProcMgr->Code(procedure, nullptr)),
     mStackBegin(stack.Size() - procedure.mArgsCount),
     mCodePos(0),
     mAquiredSync(NO_INDEX)
 {
-  if (mProcedure.mNativeCode != NULL)
+  if (mProcedure.mNativeCode != nullptr)
     {
       const WLIB_STATUS status = procedure.mNativeCode(stack, session);
       if (status != WOP_OK)

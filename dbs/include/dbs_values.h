@@ -1361,7 +1361,7 @@ class ITextStrategy;
 class DBS_SHL DText
 {
 public:
-  explicit DText(const char* text = NULL);
+  explicit DText(const char* text = nullptr);
   explicit DText(const uint8_t* utf8Src, const uint_t unitsCount = ~0x0);
   explicit DText(ITextStrategy& text);
 
@@ -1412,19 +1412,19 @@ public:
   public:
     StrategyRAII(DText& source)
       : mText(source),
-        mStrategy(NULL)
+        mStrategy(nullptr)
     {
     }
 
     ~StrategyRAII()
     {
-      if (mStrategy != NULL)
+      if (mStrategy != nullptr)
         mText.ReleaseStrategy();
     }
 
     operator ITextStrategy&()
     {
-      if (mStrategy == NULL)
+      if (mStrategy == nullptr)
         mStrategy = &mText.GetStrategy();
 
       return *mStrategy;
@@ -1432,9 +1432,9 @@ public:
 
     void Release()
     {
-      if (mStrategy != NULL)
+      if (mStrategy != nullptr)
       {
-        mStrategy = NULL;
+        mStrategy = nullptr;
         mText.ReleaseStrategy();
       }
     }
@@ -1559,19 +1559,19 @@ public:
   public:
     StrategyRAII(DArray& source) :
         mArray(source),
-        mStrategy(NULL)
+        mStrategy(nullptr)
     {
     }
 
     ~StrategyRAII()
     {
-      if (mStrategy != NULL)
+      if (mStrategy != nullptr)
         mArray.ReleaseStrategy();
     }
 
     operator IArrayStrategy&()
     {
-      if (mStrategy == NULL)
+      if (mStrategy == nullptr)
         mStrategy = &mArray.GetStrategy();
 
       return *mStrategy;
@@ -1579,9 +1579,9 @@ public:
 
     void Release()
     {
-      if (mStrategy != NULL)
+      if (mStrategy != nullptr)
       {
-        mStrategy = NULL;
+        mStrategy = nullptr;
         mArray.ReleaseStrategy();
       }
     }

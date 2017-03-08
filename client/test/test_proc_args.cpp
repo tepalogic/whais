@@ -113,7 +113,7 @@ check_field_entry(FieldEntry*   fields,
                    const char* fieldName,
                    uint_t        fieldType)
 {
-  FieldEntry*  entry = NULL;
+  FieldEntry*  entry = nullptr;
 
   for (uint_t i = 0; i < fieldsCount; ++i)
     {
@@ -122,7 +122,7 @@ check_field_entry(FieldEntry*   fields,
         break;
     }
 
-  if ((entry == NULL)
+  if ((entry == nullptr)
       || (entry->type != fieldType))
     {
       return false;
@@ -455,32 +455,32 @@ test_for_errors(WH_CONNECTION hnd)
   const char* procName  = "two_field_table_return_proc_no_args_This_is_a_long_variable_name_suffix_coz_I_need_to_trigger_an_odd_behavior_001_good";
 
   cout << "Testing against error conditions ... ";
-  if ((WProcParamsCount(NULL, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamsCount(NULL, procName, &paramsCount) != WCS_INVALID_ARGS)
-      || (WProcParamsCount(hnd, procName, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamsCount(hnd, NULL, &paramsCount) != WCS_INVALID_ARGS))
+  if ((WProcParamsCount(nullptr, nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamsCount(nullptr, procName, &paramsCount) != WCS_INVALID_ARGS)
+      || (WProcParamsCount(hnd, procName, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamsCount(hnd, nullptr, &paramsCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamType(NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamType(NULL, procName, 0, &type) != WCS_INVALID_ARGS)
-      || (WProcParamType(hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamType(hnd, NULL, 0, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamType(nullptr, nullptr, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamType(nullptr, procName, 0, &type) != WCS_INVALID_ARGS)
+      || (WProcParamType(hnd, procName, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamType(hnd, nullptr, 0, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamFieldCount(NULL, NULL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount(NULL, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount(hnd, procName, 0, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamFieldCount(hnd, NULL, 0, &fieldCount) != WCS_INVALID_ARGS))
+  else if ((WProcParamFieldCount(nullptr, nullptr, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount(nullptr, procName, 0, &fieldCount) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount(hnd, procName, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamFieldCount(hnd, nullptr, 0, &fieldCount) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WProcParamField(NULL, NULL, 0, 0, NULL, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamField(NULL, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
-      || (WProcParamField(hnd, procName, 0, 0, NULL, &type) != WCS_INVALID_ARGS)
-      || (WProcParamField(hnd, procName, 0, 0, &fieldName, NULL) != WCS_INVALID_ARGS)
-      || (WProcParamField(hnd, NULL, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
+  else if ((WProcParamField(nullptr, nullptr, 0, 0, nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamField(nullptr, procName, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField(hnd, procName, 0, 0, nullptr, &type) != WCS_INVALID_ARGS)
+      || (WProcParamField(hnd, procName, 0, 0, &fieldName, nullptr) != WCS_INVALID_ARGS)
+      || (WProcParamField(hnd, nullptr, 0, 0, &fieldName, &type) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -514,7 +514,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

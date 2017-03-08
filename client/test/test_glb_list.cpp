@@ -121,7 +121,7 @@ test_global_name_match(const char* glb_name)
 static bool
 test_global_values_list(WH_CONNECTION hnd)
 {
-  const char* recvGlbName = NULL;
+  const char* recvGlbName = nullptr;
   const uint_t  glbsCount = sizeof(no_fileds_types)/sizeof(no_fileds_types[0]);
 
   uint_t globalsCount;
@@ -139,7 +139,7 @@ test_global_values_list(WH_CONNECTION hnd)
     {
       if (WFetchGlobal(hnd, &recvGlbName) != WCS_OK)
         goto test_global_values_list_error;
-      else if ((recvGlbName != NULL)
+      else if ((recvGlbName != nullptr)
                && ! test_global_name_match(recvGlbName))
         {
           goto test_global_values_list_error;
@@ -147,7 +147,7 @@ test_global_values_list(WH_CONNECTION hnd)
 
       ++index; //Only good for conditional breakpoints.
     }
-  while (recvGlbName != NULL);
+  while (recvGlbName != nullptr);
 
   for (index = 0; index < glbsCount; ++index)
     {
@@ -171,9 +171,9 @@ test_for_errors(WH_CONNECTION hnd)
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WStartGlobalsList(NULL, &glbsCount) != WCS_INVALID_ARGS)
-      || (WStartGlobalsList(hnd, NULL) != WCS_INVALID_ARGS)
-      || (WStartGlobalsList(NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartGlobalsList(nullptr, &glbsCount) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList(hnd, nullptr) != WCS_INVALID_ARGS)
+      || (WStartGlobalsList(nullptr, nullptr) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -181,9 +181,9 @@ test_for_errors(WH_CONNECTION hnd)
     goto test_for_errors_fail;
   else if (WStartGlobalsList(hnd, &glbsCount) != WCS_OK)
     goto test_for_errors_fail;
-  else if ((WFetchGlobal(NULL, NULL) != WCS_INVALID_ARGS)
-            || (WFetchGlobal(NULL, &nameFetched) != WCS_INVALID_ARGS)
-            || (WFetchGlobal(hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchGlobal(nullptr, nullptr) != WCS_INVALID_ARGS)
+            || (WFetchGlobal(nullptr, &nameFetched) != WCS_INVALID_ARGS)
+            || (WFetchGlobal(hnd, nullptr) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -221,7 +221,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

@@ -43,7 +43,7 @@ static string        sWorkingDirectory(whf_current_dir());
 static string        sDBName;
 static VERBOSE_LEVEL sVerbLevel       = VL_ERROR;
 static uint64_t      sMaxFileSize     = 0x80000000; //default: 2GB
-static IDBSHandler*  sDBSHnd          = NULL;
+static IDBSHandler*  sDBSHnd          = nullptr;
 static string        sRemoteHost;
 static string        sConnectPort;
 static string        sPassword;
@@ -234,7 +234,7 @@ SetDbsHandler(IDBSHandler& dbs)
 IDBSHandler&
 GetDBSHandler()
 {
-  assert(sDBSHnd != NULL);
+  assert(sDBSHnd != nullptr);
   assert(! IsOnlineDatabase());
 
   return *sDBSHnd;

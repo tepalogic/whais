@@ -446,7 +446,7 @@ get_table_field_name(const uint_t fieldType)
         return _fields[i].name;
     }
 
-  return NULL;
+  return nullptr;
 }
 
 
@@ -455,7 +455,7 @@ check_table_description(WH_CONNECTION hnd)
 {
   uint_t type, fcount;
 
-  const char* fieldName = NULL;
+  const char* fieldName = nullptr;
   uint_t        fieldType = 0;
 
   if ((WDescribeStackTop(hnd, &type) != WCS_OK)
@@ -477,7 +477,7 @@ check_table_description(WH_CONNECTION hnd)
     }
 
   if ((WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
-      || (fieldName != NULL)
+      || (fieldName != nullptr)
       || (fieldType != WHC_TYPE_NOTSET))
     {
       return false;
@@ -493,7 +493,7 @@ check_table_value(WH_CONNECTION      hnd,
                    const bool           extraCheck)
 {
   const char* const fieldName = get_table_field_name(_values[index].type);
-  const char*       tabVal    = NULL;
+  const char*       tabVal    = nullptr;
   const uint64_t      row       = index / _fieldsCount;
 
   if (extraCheck)
@@ -664,9 +664,9 @@ test_for_errors(WH_CONNECTION hnd)
   if ((WPushValue(hnd, WHC_TYPE_TABLE_MASK, _fieldsCount, _fields) != WCS_OK)
       || (WFlush(hnd) != WCS_OK)
       || (WFlush(hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, nullptr) != WCS_INVALID_ARGS)
       || (WValueRowsCount(hnd, &count) != WCS_OK)
       || (count != 0)
       || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
@@ -710,7 +710,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION hnd        = NULL;
+  WH_CONNECTION hnd        = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

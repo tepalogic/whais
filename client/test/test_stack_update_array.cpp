@@ -299,7 +299,7 @@ fill_array_entries_step(WH_CONNECTION hnd)
       if ((WPushValue(hnd,
                        _values[i].type | WHC_TYPE_ARRAY_MASK,
                        0,
-                       NULL) != WCS_OK)
+                       nullptr) != WCS_OK)
           || (WFlush(hnd) != WCS_OK))
         {
           return false;
@@ -332,7 +332,7 @@ fill_array_entries_bulk(WH_CONNECTION hnd)
       if (WPushValue(hnd,
                            _values[i].type | WHC_TYPE_ARRAY_MASK,
                            0,
-                           NULL) != WCS_OK)
+                           nullptr) != WCS_OK)
         {
           return false;
         }
@@ -399,7 +399,7 @@ check_array_entry(WH_CONNECTION hnd, const int index)
                        WIGNORE_ROW,
                        pEntry->elementsCount,
                        WIGNORE_OFF,
-                       NULL) != WCS_INVALID_ARGS))
+                       nullptr) != WCS_INVALID_ARGS))
     {
       return false;
     }
@@ -472,12 +472,12 @@ test_for_errors(WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue(hnd, WHC_TYPE_BOOL | WHC_TYPE_ARRAY_MASK, 0, NULL) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_BOOL | WHC_TYPE_ARRAY_MASK, 0, nullptr) != WCS_OK)
       || (WFlush(hnd) != WCS_OK)
       || (WFlush(hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, nullptr) != WCS_INVALID_ARGS)
       || (WValueRowsCount(hnd, &count) != WCS_TYPE_MISMATCH)
       || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_OK)
       || (count != 0)
@@ -525,7 +525,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION hnd        = NULL;
+  WH_CONNECTION hnd        = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

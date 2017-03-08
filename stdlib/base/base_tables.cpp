@@ -68,7 +68,7 @@ public:
 
     public:
       Value()
-        : mContainer( NULL),
+        : mContainer( nullptr),
           mRow( 0)
         {
         }
@@ -82,10 +82,10 @@ public:
 
       bool operator< (const Value& val) const
         {
-          if ((mContainer == NULL) && (val.mContainer != NULL))
+          if ((mContainer == nullptr) && (val.mContainer != nullptr))
             return true;
 
-          else if (val.mContainer == NULL)
+          else if (val.mContainer == nullptr)
             return false;
 
           assert( val.mContainer == mContainer);
@@ -109,7 +109,7 @@ public:
 
       bool operator== (const Value& val) const
         {
-          if ((mContainer == NULL) && (val.mContainer == NULL))
+          if ((mContainer == nullptr) && (val.mContainer == nullptr))
               return true;
 
           else if (mContainer != val.mContainer)
@@ -547,7 +547,7 @@ proc_table_fields_count( SessionStack& stack, ISession&)
 
   ITable* const table = &op.GetTable();
 
-  if (table == NULL)
+  if (table == nullptr)
     throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
   DUInt64 result( table->FieldsCount());
@@ -607,7 +607,7 @@ proc_table_field_name( SessionStack& stack, ISession&)
                 sizeof fieldName
                             );
     }
-  else if (table == NULL)
+  else if (table == nullptr)
     throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
 
   field.RawRead( 0, field.RawSize(), fieldName);

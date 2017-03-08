@@ -216,7 +216,7 @@ get_text_lower( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_utf8_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DBool*, NULL));
+  DArray      source( _SC(DBool*, nullptr));
   DText       result;
 
   stack[stack.Size() - 1].Operand().GetValue( source);
@@ -271,7 +271,7 @@ static WLIB_STATUS
 store_utf8_text( SessionStack& stack, ISession&)
 {
   DText      source;
-  DArray     result( _SC(DUInt8*, NULL));
+  DArray     result( _SC(DUInt8*, nullptr));
 
   stack[stack.Size() - 1].Operand().GetValue( source);
   stack.Pop(1);
@@ -297,7 +297,7 @@ static WLIB_STATUS
 store_utf16_text( SessionStack& stack, ISession&)
 {
   DText      source;
-  DArray     result( _SC(DUInt16*, NULL));
+  DArray     result( _SC(DUInt16*, nullptr));
 
   stack[stack.Size() - 1].Operand().GetValue( source);
   stack.Pop(1);
@@ -334,7 +334,7 @@ store_utf16_text( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_utf16_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DUInt16*, NULL));
+  DArray      source( _SC(DUInt16*, nullptr));
   DText       result;
 
   stack[stack.Size() - 1].Operand().GetValue( source);
@@ -389,7 +389,7 @@ static WLIB_STATUS
 store_achar_text( SessionStack& stack, ISession&)
 {
   DText      source;
-  DArray     result( _SC(DChar*, NULL));
+  DArray     result( _SC(DChar*, nullptr));
 
   stack[stack.Size() - 1].Operand().GetValue( source);
   stack.Pop(1);
@@ -406,7 +406,7 @@ store_achar_text( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_achar_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DChar*, NULL));
+  DArray      source( _SC(DChar*, nullptr));
   DText       result;
 
   stack[stack.Size() - 1].Operand().GetValue( source);

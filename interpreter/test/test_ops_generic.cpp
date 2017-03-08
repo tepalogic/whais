@@ -184,7 +184,7 @@ test_op_cts(Session& session)
                                                  sizeof cts_proc - 1);
 
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DInt8 op(-10);
@@ -214,7 +214,7 @@ test_op_inull(Session& session)
   const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, inull_proc),
                                                  sizeof inull_proc - 1);
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DDate op;
@@ -248,7 +248,7 @@ test_op_nnull(Session& session)
   const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, nnull_proc),
                                                  sizeof nnull_proc - 1);
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DDate op;
@@ -455,7 +455,7 @@ test_op_jfc(Session& session)
                                                  sizeof field_proc - 1);
 
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DBool op(false);
@@ -514,7 +514,7 @@ test_op_jtc(Session& session)
                                                  sizeof field_proc - 1);
 
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DBool op(true);
@@ -573,7 +573,7 @@ test_op_jf(Session& session)
   const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DBool op(false);
@@ -631,7 +631,7 @@ test_op_jt(Session& session)
   const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DBool op(true);
@@ -690,7 +690,7 @@ test_op_jmp(Session& session)
   const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, field_proc),
                                                  sizeof field_proc - 1);
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   DBool op(true);
@@ -801,7 +801,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& commonSession = GetInstance(NULL);
+    ISession& commonSession = GetInstance(nullptr);
 
     CompiledBufferUnit callBuf(callTestProgram,
                                  sizeof callTestProgram,

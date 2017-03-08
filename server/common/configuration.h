@@ -104,9 +104,9 @@ struct DBSDescriptors
       mDbsDirectory(),
       mObjectLibs(),
       mNativeLibs(),
-      mDbs(NULL),
-      mSession(NULL),
-      mLogger(NULL),
+      mDbs(nullptr),
+      mSession(nullptr),
+      mLogger(nullptr),
       mLastFlushTick(0)
   {
   }

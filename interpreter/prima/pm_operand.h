@@ -1715,7 +1715,7 @@ class FieldOperand : public BaseOperand
 {
 public:
   FieldOperand(const uint32_t fieldType = T_UNDETERMINED)
-    : mTableRef(NULL),
+    : mTableRef(nullptr),
       mField(~0),
       mFieldType(fieldType)
   {

@@ -132,9 +132,9 @@ SpinLock::Release()
 
 
 Thread::Thread()
-  : mRoutine(NULL),
-    mRoutineArgs(NULL),
-    mException(NULL),
+  : mRoutine(nullptr),
+    mRoutineArgs(nullptr),
+    mException(nullptr),
     mThread(0),
     mEnded(0),
     mUnkExceptSignaled(false),
@@ -242,7 +242,7 @@ Thread::ThrowPendingException()
       throw ThreadException(_EXTRA(WOP_UNKNOW));
     }
 
-  if (mException != NULL)
+  if (mException != nullptr)
     {
       Exception* clone = mException->Clone();
       DiscardException();

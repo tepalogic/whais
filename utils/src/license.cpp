@@ -71,7 +71,7 @@ displayLicenseInformation(std::ostream&     os,
                            const char* const programDescription)
 {
   os << programName;
-  if (programDescription != NULL)
+  if (programDescription != nullptr)
     os << " - " << programDescription;
 
   os <<

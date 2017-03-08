@@ -35,10 +35,10 @@ test_dbs_creation()
 
   bool result = false;
 
-  DBSCreateDatabase(testDbName_2, NULL);
+  DBSCreateDatabase(testDbName_2, nullptr);
   try
   {
-      DBSCreateDatabase(testDbName_2, NULL);
+      DBSCreateDatabase(testDbName_2, nullptr);
 
       cout << "Should not be possible to create a database with same name.";
 
@@ -49,7 +49,7 @@ test_dbs_creation()
       result = true;
   }
 
-  DBSRemoveDatabase(testDbName_2, NULL);
+  DBSRemoveDatabase(testDbName_2, nullptr);
 
   cout << (result  ? " OK\n" : " (FAIL)\n");
 
@@ -99,7 +99,7 @@ test_table_addition(IDBSHandler& hnd)
 
    cout << "Test table management ... ";
 
-   IDBSHandler& hnd = DBSRetrieveDatabase(testDbName_1, NULL);
+   IDBSHandler& hnd = DBSRetrieveDatabase(testDbName_1, nullptr);
    ITable& tbl      = hnd.RetrievePersistentTable(testTableName);
    ITable& t_tbl    = hnd.CreateTempTable(sizeof field_descs / sizeof field_descs[0],
                                            field_descs);
@@ -165,7 +165,7 @@ main(int argc, char** argv)
   DBSInit(DBSSettings());
   DBSCreateDatabase(testDbName_1);
 
-  IDBSHandler& hnd = DBSRetrieveDatabase(testDbName_1, NULL);
+  IDBSHandler& hnd = DBSRetrieveDatabase(testDbName_1, nullptr);
 
   success &= test_dbs_creation();
   success &= test_table_addition(hnd);

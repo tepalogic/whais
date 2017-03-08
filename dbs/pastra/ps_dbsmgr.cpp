@@ -137,7 +137,7 @@ DbsHandler::DbsHandler(const DBSSettings&   settings,
   buffer += PS_DBS_HEADER_SIZE;
   while (tablesCount-- > 0)
   {
-    mTables.insert(pair<string, PersistentTable*>(_RC(char*, buffer), _RC(PersistentTable*, NULL)));
+    mTables.insert(pair<string, PersistentTable*>(_RC(char*, buffer), nullptr));
     buffer += strlen(_RC(char*, buffer)) + 1;
   }
 }
@@ -187,7 +187,7 @@ DbsHandler::RetrievePersistentTable(const TABLE_INDEX index)
     ++it;
   }
 
-  if (it->second == NULL)
+  if (it->second == nullptr)
     it->second = new PersistentTable(*this, it->first);
 
   else
@@ -209,7 +209,7 @@ DbsHandler::RetrievePersistentTable(const char* const name)
   if (it == mTables.end())
     throw DBSException(_EXTRA(DBSException::TABLE_NOT_FUND), "Cannot retrieve table '%s'.", name);
 
-  if (it->second == NULL)
+  if (it->second == nullptr)
     it->second = new PersistentTable(*this, it->first);
 
   else
@@ -229,14 +229,14 @@ DbsHandler::AddTable(const char* const           name,
 {
   LockRAII<Lock> syncHolder(mSync);
 
-  if (name == NULL
-      || inoutFields == NULL
+  if (name == nullptr
+      || inoutFields == nullptr
       || fieldsCount == 0)
   {
     throw DBSException(_EXTRA(DBSException::INVALID_PARAMETERS),
                         "Cannot create persistent table '%s' with %u fields.",
-                        (name == NULL) ? "(no name)" : name,
-                        (inoutFields == NULL) ? 0 : fieldsCount);
+                        (name == nullptr) ? "(no name)" : name,
+                        (inoutFields == nullptr) ? 0 : fieldsCount);
   }
 
   const string tableName(name);
@@ -262,7 +262,7 @@ DbsHandler::AddTable(const char* const           name,
   assert(it != mTables.end());
 
   delete it->second;
-  it->second = NULL;
+  it->second = nullptr;
 }
 
 
@@ -295,7 +295,7 @@ DbsHandler::ReleaseTable(ITable& hndTable)
     if (&hndTable == _SC(ITable*, it->second))
     {
       delete it->second;
-      it->second = NULL;
+      it->second = nullptr;
 
       return;
     }
@@ -342,7 +342,7 @@ DbsHandler::DeleteTable(const char* const name)
                        name);
   }
 
-  if (it->second == NULL)
+  if (it->second == nullptr)
     it->second = new PersistentTable(*this, it->first);
 
   PersistentTable* const table = it->second;
@@ -403,7 +403,7 @@ DbsHandler::SyncTableContent(const TABLE_INDEX index)
     ++it;
   }
 
-  if (it->second != NULL)
+  if (it->second != nullptr)
     it->second->Flush();
 }
 
@@ -486,7 +486,7 @@ DbsHandler::HasUnreleasedTables()
 {
   for (TABLES::iterator it = mTables.begin(); it != mTables.end(); ++it)
     {
-      if (it->second != NULL)
+      if (it->second != nullptr)
         return true;
     }
 
@@ -508,8 +508,8 @@ DbsHandler::RemoveFromStorage()
 
   for (TABLES::iterator it = mTables.begin(); it != mTables.end(); ++it)
     {
-      assert(it->first.c_str() != NULL);
-      assert(it->second == NULL);
+      assert(it->first.c_str() != nullptr);
+      assert(it->second == nullptr);
 
       unique_ptr<PersistentTable> table(unique_make(PersistentTable, *this, it->first));
 
@@ -529,30 +529,30 @@ using namespace pastra;
 DBS_SHL void
 DBSInit(const DBSSettings& settings)
 {
-  if (dbsMgrs_.get() != NULL)
+  if (dbsMgrs_.get() != nullptr)
   {
     throw DBSException(_EXTRA(DBSException::ALREADY_INITED),
                        "DBS framework was already initialized.");
   }
-  dbsMgrs_.reset(unique_make(DbsManager, settings));
+  dbsMgrs_ = unique_make(DbsManager, settings);
 }
 
 
 DBS_SHL void
 DBSShoutdown()
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
   //~DbsManager() will be called automatically!
-  dbsMgrs_.reset(NULL);
+  dbsMgrs_.reset(nullptr);
 }
 
 
 DBS_SHL const DBSSettings&
 DBSGetSeettings()
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
   {
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
   }
@@ -564,10 +564,10 @@ DBSGetSeettings()
 DBS_SHL void
 DBSCreateDatabase(const char* const name, const char* path)
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
-  if (path == NULL)
+  if (path == nullptr)
     path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
   const string fileName = string(path) + name + DBS_FILE_EXT;
@@ -591,7 +591,7 @@ DBSCreateDatabase(const char* const name, const char* path)
 DBS_SHL bool
 DBSValidateDatabase(const char* const name, const char* path)
 {
-  if (path == NULL)
+  if (path == nullptr)
     path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
   const string fileName = string(path) + name + DBS_FILE_EXT;
@@ -643,7 +643,7 @@ DBSValidateDatabase(const char* const name, const char* path)
 DBS_SHL bool
 DBSRepairDatabase(const char* const name, const char* path, FIX_ERROR_CALLBACK fixCallback)
 {
-  if (path == NULL)
+  if (path == nullptr)
     path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
   const string fileName = string(path) + name + DBS_FILE_EXT;
@@ -732,7 +732,7 @@ DBSRepairDatabase(const char* const name, const char* path, FIX_ERROR_CALLBACK f
 DBS_SHL IDBSHandler&
 DBSRetrieveDatabase(const char* const name, const char* path)
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
   LockRAII<Lock> syncHolder(dbsMgrs_->mSync);
@@ -741,7 +741,7 @@ DBSRetrieveDatabase(const char* const name, const char* path)
   auto it = dbses.find(name);
   if (it == dbses.end())
   {
-    if (path == NULL)
+    if (path == nullptr)
       path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
     dbses.insert(pair<string, DbsElement>(name,
@@ -762,7 +762,7 @@ DBSRetrieveDatabase(const char* const name, const char* path)
 DBS_SHL void
 DBSReleaseDatabase(IDBSHandler& hnd)
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
   LockRAII<Lock> syncHolder(dbsMgrs_->mSync);
@@ -809,7 +809,7 @@ DBSReleaseDatabase(IDBSHandler& hnd)
 DBS_SHL  void
 DBSRemoveDatabase(const char* const name, const char* path)
 {
-  if (dbsMgrs_.get() == NULL)
+  if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
   //Acquire the DBS's manager lock!
@@ -819,7 +819,7 @@ DBSRemoveDatabase(const char* const name, const char* path)
   auto it = dbses.find(name);
   if (it == dbses.end())
   {
-    if (path == NULL)
+    if (path == nullptr)
       path = dbsMgrs_->mDBSSettings.mWorkDir.c_str();
 
     dbses.insert(pair<string, DbsElement>(name,

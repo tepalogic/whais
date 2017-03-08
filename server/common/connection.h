@@ -45,7 +45,7 @@ using namespace whais;
 struct UserHandler
 {
   UserHandler()
-    : mDesc(NULL),
+    : mDesc(nullptr),
       mLastReqTick(0),
       mThread(),
       mSocket(INVALID_SOCKET),
@@ -71,7 +71,7 @@ public:
   ConnectionException(const uint32_t  code,
                        const char*     file,
                        uint32_t        line,
-                       const char*     fmtMsg = NULL,
+                       const char*     fmtMsg = nullptr,
                        ...);
 
   virtual Exception* Clone() const;
@@ -102,7 +102,7 @@ public:
 
   const DBSDescriptors& Dbs()
   {
-    assert(mUserHandler.mDesc != NULL);
+    assert(mUserHandler.mDesc != nullptr);
 
     return *mUserHandler.mDesc;
   }

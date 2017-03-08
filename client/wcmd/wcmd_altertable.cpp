@@ -418,7 +418,7 @@ TableAlterRules::TableAlterRules(IDBSHandler&               dbs,
   for (size_t f = 0; f < mSrcFields.size(); ++f)
     {
       mDstFields.push_back(mSrcFields[f]);
-      mDstFields[f].name = NULL;
+      mDstFields[f].name = nullptr;
 
       mDstFields[f].name = new char[strlen(mSrcFields[f].name) + 1];
       strcpy(_CC(char*&, mDstFields[f].name), mSrcFields[f].name);
@@ -440,7 +440,7 @@ TableAlterRules::TableAlterRules(IDBSHandler&  dbs,
   for (size_t f = 0; f < mSrcFields.size(); ++f)
     {
       mDstFields.push_back(mSrcFields[f]);
-      mDstFields[f].name = NULL;
+      mDstFields[f].name = nullptr;
 
       mDstFields[f].name = new char[strlen(mSrcFields[f].name) + 1];
       strcpy(_CC(char*&, mDstFields[f].name), mSrcFields[f].name);
@@ -454,7 +454,7 @@ TableAlterRules::~TableAlterRules()
   for (size_t f = 0; f < mDstFields.size(); ++f)
     delete [] mDstFields[f].name;
 
-  if (mTable != NULL)
+  if (mTable != nullptr)
     mDbs.ReleaseTable(*mTable);
 }
 
@@ -470,7 +470,7 @@ TableAlterRules::DropField(const string& field)
         continue;
 
       delete [] mDstFields[f].name;
-      mDstFields[f].name = NULL;
+      mDstFields[f].name = nullptr;
 
       mDstFields.erase(mDstFields.begin() + f);
 
@@ -536,7 +536,7 @@ TableAlterRules::RenameField(const std::string& oldName,
         continue;
 
       delete [] mDstFields[f].name;
-      mDstFields[f].name = NULL;
+      mDstFields[f].name = nullptr;
 
       mDstFields[f].name = new char[newName.length() + 1];
       strcpy(_CC(char*&, mDstFields[f].name), newName.c_str());
@@ -585,7 +585,7 @@ TableAlterRules::CommitToTable(const string&           newTableName,
                                 const Range<ROW_INDEX>& selectedRows)
 
 {
-  ITable* table = NULL;
+  ITable* table = nullptr;
   vector<DBSFieldDescriptor> dummy = mDstFields;
 
   assert(mSrcFields.size() <= mDstFields.size());
@@ -599,7 +599,7 @@ TableAlterRules::CommitToTable(const string&           newTableName,
   }
   catch(...)
   {
-      if (table != NULL)
+      if (table != nullptr)
         mDbs.ReleaseTable(*table);
 
       mDbs.DeleteTable(newTableName.c_str());
@@ -673,7 +673,7 @@ TableAlterRules::Commit()
   assert(mTableName.length() > 0);
 
   vector<DBSFieldDescriptor> dummy = mDstFields;
-  ITable* table = NULL;
+  ITable* table = nullptr;
   Range<ROW_INDEX> allRows;
 
   allRows.Join(Interval<ROW_INDEX> (0, mTable->AllocatedRows()));
@@ -692,7 +692,7 @@ TableAlterRules::Commit()
   }
   catch(...)
   {
-      assert(table == NULL);
+      assert(table == nullptr);
 
       mDbs.DeleteTable(temporalTableName);
       throw ;
@@ -703,7 +703,7 @@ TableAlterRules::Commit()
       CommitToTable(*table, allRows);
 
       mDbs.ReleaseTable(*mTable);
-      mTable = NULL;
+      mTable = nullptr;
       mDbs.SyncAllTablesContent();
       mDbs.DeleteTable(mTableName.c_str());
 
@@ -711,19 +711,19 @@ TableAlterRules::Commit()
       allRows.Join(Interval<ROW_INDEX> (0, table->AllocatedRows()));
 
       TableAlterRules copyBack(mDbs, *table);
-      table = NULL;
+      table = nullptr;
       copyBack.CommitToTable(mTableName, allRows);
   }
   catch(...)
   {
-      if (table != NULL)
+      if (table != nullptr)
         mDbs.ReleaseTable(*table);
 
       mDbs.DeleteTable(temporalTableName);
       throw ;
   }
 
-  if (table != NULL)
+  if (table != nullptr)
     mDbs.ReleaseTable(*table);
 
   mDbs.DeleteTable(temporalTableName);

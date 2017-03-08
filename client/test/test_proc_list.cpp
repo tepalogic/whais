@@ -126,7 +126,7 @@ test_proc_name_match(const char* proc_name)
 static bool
 test_procedures_list(WH_CONNECTION hnd)
 {
-  const char* recvGlbName = NULL;
+  const char* recvGlbName = nullptr;
   const uint_t  procsCount = sizeof(_procedures)/sizeof(_procedures[0]);
 
   uint_t globalsCount;
@@ -144,7 +144,7 @@ test_procedures_list(WH_CONNECTION hnd)
     {
       if (WFetchProcedure(hnd, &recvGlbName) != WCS_OK)
         goto test_procedures_list_error;
-      else if ((recvGlbName != NULL)
+      else if ((recvGlbName != nullptr)
                && ! test_proc_name_match(recvGlbName))
         {
           goto test_procedures_list_error;
@@ -152,7 +152,7 @@ test_procedures_list(WH_CONNECTION hnd)
 
       ++index; //Only good for conditional breakpoints.
     }
-  while (recvGlbName != NULL);
+  while (recvGlbName != nullptr);
 
   for (index = 0; index < procsCount; ++index)
     {
@@ -176,20 +176,20 @@ test_for_errors(WH_CONNECTION hnd)
   const char*   nameFetched;
 
   cout << "Testing against error conditions ... ";
-  if ((WStartProceduresList(NULL, &procsCount) != WCS_INVALID_ARGS)
-      || (WStartProceduresList(NULL, NULL) != WCS_INVALID_ARGS))
+  if ((WStartProceduresList(nullptr, &procsCount) != WCS_INVALID_ARGS)
+      || (WStartProceduresList(nullptr, nullptr) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
   else if (WFetchProcedure(hnd, &nameFetched) != WCS_INVALID_ARGS)
     goto test_for_errors_fail;
 
-  else if (WStartProceduresList(hnd, NULL) != WCS_OK)
+  else if (WStartProceduresList(hnd, nullptr) != WCS_OK)
     goto test_for_errors_fail;
 
-  else if ((WFetchProcedure(NULL, NULL) != WCS_INVALID_ARGS)
-           || (WFetchProcedure(NULL, &nameFetched) != WCS_INVALID_ARGS)
-           || (WFetchProcedure(hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WFetchProcedure(nullptr, nullptr) != WCS_INVALID_ARGS)
+           || (WFetchProcedure(nullptr, &nameFetched) != WCS_INVALID_ARGS)
+           || (WFetchProcedure(hnd, nullptr) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -227,7 +227,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

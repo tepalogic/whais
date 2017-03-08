@@ -458,7 +458,7 @@ cmdTableAdd(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 
   do
     {
-      DBSFieldDescriptor desc = {NULL, };
+      DBSFieldDescriptor desc = {nullptr, };
 
       //The field name
 
@@ -514,7 +514,7 @@ cmdTableCopy(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t                     linePos  = 0;
   string                     token    = CmdLineNextToken(cmdLine, linePos);
   const  VERBOSE_LEVEL       level    = GetVerbosityLevel();
-  ITable*                    srcTable = NULL;
+  ITable*                    srcTable = nullptr;
   bool                       result   = true;
   RowsSelection              rows;
   string                     tableName;
@@ -597,7 +597,7 @@ cmdTableCopy(const string& cmdLine, ENTRY_CMD_CONTEXT context)
     print_match_statistic(cout, *srcTable, rows.mRows, matchBegin, matchEnd);
 
     dbs.ReleaseTable(*srcTable);
-    srcTable = NULL;
+    srcTable = nullptr;
 
     TableAlterRules copyRules(dbs, tableName, selectedFields);
     for (size_t i = 0; i < selectedFields.size(); ++i)
@@ -611,7 +611,7 @@ cmdTableCopy(const string& cmdLine, ENTRY_CMD_CONTEXT context)
       result = false;
   }
 
-  if (srcTable != NULL)
+  if (srcTable != nullptr)
     dbs.ReleaseTable(*srcTable);
 
   return result;
@@ -620,7 +620,7 @@ invalid_args:
 
   cerr << "Invalid command arguments.\n";
 
-  if (srcTable != NULL)
+  if (srcTable != nullptr)
     dbs.ReleaseTable(*srcTable);
 
   return false;
@@ -770,7 +770,7 @@ cmdTableAddIndex(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken(cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel();
-  ITable*              table   = NULL;
+  ITable*              table   = nullptr;
   bool                 result  = true;
 
   assert(token == "index");
@@ -816,7 +816,7 @@ cmdTableAddIndex(const string& cmdLine, ENTRY_CMD_CONTEXT context)
                 cout << endl;
               }
             else
-              table->CreateIndex(field, NULL, NULL);
+              table->CreateIndex(field, nullptr, nullptr);
           }
       }
       catch(const Exception& e)
@@ -855,7 +855,7 @@ cmdTableRmIndex(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken(cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel();
-  ITable*              table   = NULL;
+  ITable*              table   = nullptr;
   bool                 result  = true;
 
   assert(token == "rmindex");
@@ -1156,7 +1156,7 @@ cmdRowsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t               linePos = 0;
   string               token   = CmdLineNextToken(cmdLine, linePos);
   const  VERBOSE_LEVEL level   = GetVerbosityLevel();
-  ITable*              table   = NULL;
+  ITable*              table   = nullptr;
 
   assert(token == "rows");
 
@@ -1170,7 +1170,7 @@ cmdRowsMgm(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   }
   catch(const Exception& e)
   {
-    assert(table == NULL);
+    assert(table == nullptr);
 
     if (level >= VL_INFO)
       cerr << "Failed to open table: " << token << endl;

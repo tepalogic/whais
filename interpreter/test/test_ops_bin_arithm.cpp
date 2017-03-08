@@ -101,7 +101,7 @@ test_op_addXX(Session& session,
                                                 );
 
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -143,7 +143,7 @@ test_op_addt(Session& session,
                                                 );
 
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -186,7 +186,7 @@ test_op_subXX(Session& session,
                                               sizeof procName - 1
                                                 );
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -227,7 +227,7 @@ test_op_mulXX(Session& session,
                                               sizeof procName - 1
                                                 );
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
 
   SessionStack stack;
 
@@ -269,7 +269,7 @@ test_op_divXX(Session& session,
                                               sizeof procName - 1
                                                 );
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -310,7 +310,7 @@ test_op_mod(Session& session,
                                               sizeof procName - 1
                                                 );
   const Procedure& proc   = session.GetProcedure(procId);
-  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, NULL));
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
 
   uint8_t opSize = 0;
@@ -352,7 +352,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& commonSession = GetInstance(NULL);
+    ISession& commonSession = GetInstance(nullptr);
 
     CompiledBufferUnit dummy(dummyProgram,
                                sizeof dummyProgram,

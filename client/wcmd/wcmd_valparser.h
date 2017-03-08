@@ -88,7 +88,7 @@ struct FieldValuesSelection
       mSearchNull(src.mSearchNull),
       mRange(src.mRange)
     {
-      _CC(void*&, src.mRange) = NULL;
+      _CC(void*&, src.mRange) = nullptr;
     }
 
   FieldValuesSelection& operator= (const FieldValuesSelection& src)

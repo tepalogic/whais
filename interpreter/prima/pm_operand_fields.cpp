@@ -106,7 +106,7 @@ TableOperand::CopyTableOp(const TableOperand& source)
 TableReference&
 TableOperand::GetTableReference()
 {
-  assert(mTableRef != NULL);
+  assert(mTableRef != nullptr);
 
   if ( ! mChangeable)
     {
@@ -196,7 +196,7 @@ FieldOperand::operator= (const FieldOperand& source)
           throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
         }
 
-      if (mTableRef != NULL)
+      if (mTableRef != nullptr)
         mTableRef->DecrementRefCount();
 
       mField     = source.mField;
@@ -213,7 +213,7 @@ FieldOperand::operator= (const FieldOperand& source)
 bool
 FieldOperand::IsNull() const
 {
-  return mTableRef == NULL;
+  return mTableRef == nullptr;
 }
 
 
@@ -246,7 +246,7 @@ StackValue
 FieldOperand::GetValueAt(const uint64_t index)
 {
 
-  if ((mFieldType == T_UNKNOWN) || (mTableRef == NULL))
+  if ((mFieldType == T_UNKNOWN) || (mTableRef == nullptr))
     throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
 
   if (IS_ARRAY(mFieldType))
@@ -357,7 +357,7 @@ FieldOperand::CopyFieldOp(const FieldOperand& source)
 TableReference&
 FieldOperand::GetTableReference()
 {
-  assert(mTableRef != NULL);
+  assert(mTableRef != nullptr);
   assert(IsNull() == false);
 
   return *mTableRef;

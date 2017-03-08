@@ -48,7 +48,7 @@ public:
   explicit InterException(const uint32_t  code,
                            const char*     file,
                            uint32_t        line,
-                           const char*     fmtMsg = NULL,
+                           const char*     fmtMsg = nullptr,
                            ...);
   virtual Exception* Clone() const;
 
@@ -190,11 +190,11 @@ protected:
 
 
 INTERP_SHL void
-InitInterpreter(const char* adminDbsDir = NULL);
+InitInterpreter(const char* adminDbsDir = nullptr);
 
 
 INTERP_SHL ISession&
-GetInstance(const char* name, Logger* log = NULL);
+GetInstance(const char* name, Logger* log = nullptr);
 
 
 INTERP_SHL void

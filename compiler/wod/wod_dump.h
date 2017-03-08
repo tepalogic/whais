@@ -46,11 +46,11 @@ public:
   DumpException(const uint32_t  code,
                 const char     *file,
                 uint32_t        line,
-                const char     *fmtMsg = NULL,
+                const char     *fmtMsg = nullptr,
                 ...)
     : Exception(code, file, line)
   {
-    if (fmtMsg != NULL)
+    if (fmtMsg != nullptr)
     {
       va_list vl;
 

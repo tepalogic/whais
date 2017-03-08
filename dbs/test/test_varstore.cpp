@@ -210,7 +210,7 @@ bool test_record_update()
     if (result)
       {
 
-        firstEntries[0] = storage.AddRecord(NULL, 0);
+        firstEntries[0] = storage.AddRecord(nullptr, 0);
         init_pattern(pattern1, sizeof pattern1, 58);
         storage.UpdateRecord(firstEntries[0], 0, sizeof pattern1, pattern1);
 

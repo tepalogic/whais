@@ -122,63 +122,63 @@ cmd_push_stack(ClientConnection& conn, uint_t* const inoutDataOff)
           switch(type)
           {
             case WHC_TYPE_BOOL:
-              stack.Push(DArray(_SC(DBool*, NULL)));
+              stack.Push(DArray(_SC(DBool*, nullptr)));
               break;
 
             case WHC_TYPE_CHAR:
-              stack.Push(DArray(_SC(DChar*, NULL)));
+              stack.Push(DArray(_SC(DChar*, nullptr)));
               break;
 
             case WHC_TYPE_DATE:
-              stack.Push(DArray(_SC(DDate*, NULL)));
+              stack.Push(DArray(_SC(DDate*, nullptr)));
               break;
 
             case WHC_TYPE_DATETIME:
-              stack.Push(DArray(_SC(DDateTime*, NULL)));
+              stack.Push(DArray(_SC(DDateTime*, nullptr)));
               break;
 
             case WHC_TYPE_HIRESTIME:
-              stack.Push(DArray(_SC(DHiresTime*, NULL)));
+              stack.Push(DArray(_SC(DHiresTime*, nullptr)));
               break;
 
             case WHC_TYPE_INT8:
-              stack.Push(DArray(_SC(DInt8*, NULL)));
+              stack.Push(DArray(_SC(DInt8*, nullptr)));
               break;
 
             case WHC_TYPE_INT16:
-              stack.Push(DArray(_SC(DInt16*, NULL)));
+              stack.Push(DArray(_SC(DInt16*, nullptr)));
               break;
 
             case WHC_TYPE_INT32:
-              stack.Push(DArray(_SC(DInt32*, NULL)));
+              stack.Push(DArray(_SC(DInt32*, nullptr)));
               break;
 
             case WHC_TYPE_INT64:
-              stack.Push(DArray(_SC(DInt64*, NULL)));
+              stack.Push(DArray(_SC(DInt64*, nullptr)));
               break;
 
             case WHC_TYPE_UINT8:
-              stack.Push(DArray(_SC(DUInt8*, NULL)));
+              stack.Push(DArray(_SC(DUInt8*, nullptr)));
               break;
 
             case WHC_TYPE_UINT16:
-              stack.Push(DArray(_SC(DUInt16*, NULL)));
+              stack.Push(DArray(_SC(DUInt16*, nullptr)));
               break;
 
             case WHC_TYPE_UINT32:
-              stack.Push(DArray(_SC(DUInt32*, NULL)));
+              stack.Push(DArray(_SC(DUInt32*, nullptr)));
               break;
 
             case WHC_TYPE_UINT64:
-              stack.Push(DArray(_SC(DUInt64*, NULL)));
+              stack.Push(DArray(_SC(DUInt64*, nullptr)));
               break;
 
             case WHC_TYPE_REAL:
-              stack.Push(DArray(_SC(DReal*, NULL)));
+              stack.Push(DArray(_SC(DReal*, nullptr)));
               break;
 
             case WHC_TYPE_RICHREAL:
-              stack.Push(DArray(_SC(DRichReal*, NULL)));
+              stack.Push(DArray(_SC(DRichReal*, nullptr)));
               break;
 
             case WHC_TYPE_TEXT:

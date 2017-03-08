@@ -584,7 +584,7 @@ VariableSizeStore::AddRecord(const uint8_t* buffer, const uint64_t size)
 
   if ((resultEntry != 0) && (size > 0))
   {
-    assert(buffer != NULL);
+    assert(buffer != nullptr);
 
     UpdateRecord(resultEntry, 0, size, buffer);
   }
@@ -989,7 +989,7 @@ VariableSizeStore::Size() const
 {
   LockRAII<Lock> sync(_CC(Lock&, mSync));
 
-  if (mEntriesContainer.get() == NULL)
+  if (mEntriesContainer.get() == nullptr)
     return 0;
 
   return mEntriesContainer->Size();
@@ -1204,7 +1204,7 @@ VariableSizeStore::AddToFreeList(const uint64_t entryId)
 
   //Just to have a valid initialization
   StoredItem neighborCachedItem = cachedItem;
-  StoreEntry* neighborEntry = NULL;
+  StoreEntry* neighborEntry = nullptr;
 
   assert(entry > 0);
   assert(entry->IsDeleted() == false);

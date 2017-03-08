@@ -51,7 +51,7 @@ ProcedureManager::AddProcedure(const uint8_t* const  name,
 {
   assert(GetProcedure(name, nameLength) == INVALID_ENTRY);
   assert(localsCount > 0);
-  assert(code != NULL);
+  assert(code != nullptr);
   assert(argsCount < localsCount);
 
   Procedure entry;
@@ -68,7 +68,7 @@ ProcedureManager::AddProcedure(const uint8_t* const  name,
   entry.mCodeSize    = codeSize;
   entry.mUnit        = unit;
   entry.mProcMgr     = this;
-  entry.mNativeCode  = (unit == NULL) ? _RC(WLIB_PROCEDURE, code) : NULL;
+  entry.mNativeCode  = (unit == nullptr) ? _RC(WLIB_PROCEDURE, code) : nullptr;
 
   const uint32_t result = mProcsEntrys.size();
 
@@ -191,7 +191,7 @@ ProcedureManager::Code(const Procedure&      proc,
 {
   assert(proc.mProcMgr == this);
 
-  if (outCodeSize != NULL)
+  if (outCodeSize != nullptr)
     *outCodeSize = proc.mCodeSize;
 
   return &mDefinitions[proc.mCodeIndex];

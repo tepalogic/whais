@@ -150,7 +150,7 @@ cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos   = 0;
   string              token     = CmdLineNextToken(cmdLine, linePos);
   string              globals;
-  WH_CONNECTION       conHdl    = NULL;
+  WH_CONNECTION       conHdl    = nullptr;
   uint_t              glbsCount = 0;
   uint_t              glbsSel   = 0;
   const VERBOSE_LEVEL level     = GetVerbosityLevel();
@@ -197,18 +197,18 @@ cmdGlobalList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   while ((cs == WCS_OK)
           && (glbIt-- > 0))
     {
-      const char* glbName = NULL;
+      const char* glbName = nullptr;
       cs = WFetchGlobal(conHdl, &glbName);
       if ((cs != WCS_OK) && (level < VL_DEBUG))
         cout << "Fetching global value name has failed.\n";
 
-      assert(glbName != NULL);
+      assert(glbName != nullptr);
 
       if (subStrs.size() > 0)
         {
           for (size_t i = 0; i < subStrs.size(); ++i)
             {
-              if (strstr(glbName, subStrs[i].c_str()) != NULL)
+              if (strstr(glbName, subStrs[i].c_str()) != nullptr)
                 {
                   globals += ' ';
                   globals += glbName;
@@ -325,7 +325,7 @@ cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   size_t              linePos     = 0;
   string              token       = CmdLineNextToken(cmdLine, linePos);
   string              procedures;
-  WH_CONNECTION       conHdl      = NULL;
+  WH_CONNECTION       conHdl      = nullptr;
   uint_t              procsCount  = 0;
   uint_t              procsSelect = 0;
   const VERBOSE_LEVEL level       = GetVerbosityLevel();
@@ -374,18 +374,18 @@ cmdProcList(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   while ((cs == WCS_OK)
           && (procIt-- > 0))
     {
-      const char* procName = NULL;
+      const char* procName = nullptr;
       cs = WFetchProcedure(conHdl, &procName);
       if ((cs != WCS_OK) && (level < VL_DEBUG))
         cout << "Fetching procedure name has failed.\n";
 
-      assert(procName != NULL);
+      assert(procName != nullptr);
 
       if (subStrs.size() > 0)
         {
           for (size_t i = 0; i < subStrs.size(); ++i)
             {
-              if (strstr(procName, subStrs[i].c_str()) != NULL)
+              if (strstr(procName, subStrs[i].c_str()) != nullptr)
                 {
                   procedures += ' ';
                   procedures += procName;
@@ -542,7 +542,7 @@ static const char pingShowDescExt[] =
 static bool
 cmdPing(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  WH_CONNECTION conHdl = NULL;
+  WH_CONNECTION conHdl = nullptr;
   WTICKS        ticks  = wh_msec_ticks();
   uint32_t      cs     = WConnect(GetRemoteHostName().c_str(),
                                    GetConnectionPort().c_str(),
@@ -587,8 +587,8 @@ static const char greetShowDescExt[] =
 static bool
 cmdGreet(const string& cmdLine, ENTRY_CMD_CONTEXT context)
 {
-  const char*   servAns = NULL;
-  WH_CONNECTION conHdl  = NULL;
+  const char*   servAns = nullptr;
+  WH_CONNECTION conHdl  = nullptr;
   uint32_t      cs      = WConnect(GetRemoteHostName().c_str(),
                                     GetConnectionPort().c_str(),
                                     GetWorkingDB().c_str(),
@@ -611,7 +611,7 @@ cmd_greet_exit:
     }
   else
     {
-      assert(servAns != NULL);
+      assert(servAns != nullptr);
 
       if (strlen(servAns) == 0)
         cout << "No answer from server.\n";

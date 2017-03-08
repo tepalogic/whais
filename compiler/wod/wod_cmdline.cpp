@@ -48,7 +48,7 @@ areStrsEqual(const char* str1, const char* str2)
 CmdLineParser::CmdLineParser(int argc, char ** argv)
   : mArgCount(argc),
     mArgs(argv),
-    mSourceFile(NULL),
+    mSourceFile(nullptr),
     mOutStream(&cout),
     mShowHelp(false),
     mShowLogo(false),
@@ -102,7 +102,7 @@ CmdLineParser::Parse()
     }
     else if ((mArgs[index][0] != '-') && (mArgs[index][0] != '\\'))
     {
-      if ((void *) mSourceFile != NULL)
+      if ((void *) mSourceFile != nullptr)
         throw CmdLineException(_EXTRA(0), "The input file was already specified.");
 
       mSourceFile = mArgs[index++];
@@ -129,10 +129,10 @@ CmdLineParser::CheckArguments()
   }
   else if (mShowLicense)
   {
-    displayLicenseInformation(cout, sProgramName, NULL);
+    displayLicenseInformation(cout, sProgramName, nullptr);
     exit(0);
   }
-  else if (mSourceFile == NULL)
+  else if (mSourceFile == nullptr)
     throw CmdLineException(_EXTRA(0), "The input file was not specified.");
 }
 
@@ -160,7 +160,7 @@ CmdLineException::CmdLineException(const uint32_t   code,
                                    ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
   {
     va_list vl;
 

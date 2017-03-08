@@ -39,7 +39,7 @@ public:
   SocketException(const uint32_t code,
                    const char*    file,
                    uint32_t       line,
-                   const char*    fmMsg = NULL,
+                   const char*    fmMsg = nullptr,
                    ...);
 
   virtual Exception* Clone() const;

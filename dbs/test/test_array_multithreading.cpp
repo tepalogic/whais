@@ -341,13 +341,13 @@ main(int argc, char** argv)
 
     Thread th[7];
 
-    th[0].Run(reset_array_variables, NULL);
-    th[1].Run(test_array_remove, NULL);
-    th[2].Run(test_array_set, NULL);
-    th[3].Run(test_array_add, NULL);
-    th[4].Run(test_array_get, NULL);
-    th[5].Run(test_array_sort, NULL);
-    th[6].Run(test_mirror, NULL);
+    th[0].Run(reset_array_variables, nullptr);
+    th[1].Run(test_array_remove, nullptr);
+    th[2].Run(test_array_set, nullptr);
+    th[3].Run(test_array_add, nullptr);
+    th[4].Run(test_array_get, nullptr);
+    th[5].Run(test_array_sort, nullptr);
+    th[6].Run(test_mirror, nullptr);
 
     th[1].WaitToEnd(true);
     th[2].WaitToEnd(true);

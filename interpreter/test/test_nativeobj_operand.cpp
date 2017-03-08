@@ -30,7 +30,7 @@ public:
   virtual ~TestNativeObj()
   {
     if ((mRegistered != 0)
-        || (mChunkMemory != NULL))
+        || (mChunkMemory != nullptr))
       {
         assert(FALSE);
         *(volatile char*)0 = 0; //Hopefully will trigger a crash!
@@ -40,7 +40,7 @@ public:
   virtual void RegisterUser()
   {
     ++mRegistered;
-    if (mChunkMemory == NULL)
+    if (mChunkMemory == nullptr)
       throw "Where is the memory!";
   }
 
@@ -53,7 +53,7 @@ public:
       {
         delete [] mChunkMemory;
 
-        mChunkMemory = NULL;
+        mChunkMemory = nullptr;
       }
   }
 
@@ -220,7 +220,7 @@ test_array_value_stored(const T&       val1,
   if ((v1 != v2) || (v1 != val2))
     return false;
 
-  temp = DArray(_SC(T*, NULL));
+  temp = DArray(_SC(T*, nullptr));
   op.SetValue(temp);
 
   if ((op.GetType() != type) || ! op.IsNull())
@@ -281,7 +281,7 @@ test_table_value(IDBSHandler&            dbsHnd,
                   const DBS_FIELD_TYPE    val2Type)
 {
 
-  ITable*               refTable = NULL;
+  ITable*               refTable = nullptr;
   NativeObjectOperand   nativeOp;
 
     {
@@ -297,7 +297,7 @@ test_table_value(IDBSHandler&            dbsHnd,
 
       refTable = &dbsHnd.CreateTempTable(2, fd);
 
-      if (refTable == NULL)
+      if (refTable == nullptr)
         return false;
 
       //This op should take the table ownership!
@@ -337,7 +337,7 @@ test_table_value(IDBSHandler&            dbsHnd,
       op.GetTable().Get(0, 0, v2);
 
       if ((v1 != v2) || (v1 != val1))
-        return NULL;
+        return false;
 
       op.GetTable().Set(1, 1, val2);
     }
@@ -415,7 +415,7 @@ test_field_value(IDBSHandler&            dbsHnd,
   FieldOperand          op1, op2;
   NativeObjectOperand   nativeOp;
 
-  ITable* refTable = NULL;
+  ITable* refTable = nullptr;
 
     {
       DBSFieldDescriptor fd[2];
@@ -430,7 +430,7 @@ test_field_value(IDBSHandler&            dbsHnd,
 
       refTable = &dbsHnd.CreateTempTable(2, fd);
 
-      if (refTable == NULL)
+      if (refTable == nullptr)
         return false;
 
       //This op should take the table ownership!
@@ -634,7 +634,7 @@ test_native_obj()
       return false;
     }
 
-  op2.NativeObject(NULL);
+  op2.NativeObject(nullptr);
 
   if ((t.RegisterCount() != 2)
       || ! op2.IsNull())

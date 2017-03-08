@@ -411,7 +411,7 @@ wod_dump_code(const uint8_t  *code,
 
   while (currPos < codeSize)
   {
-    if (prefix != NULL)
+    if (prefix != nullptr)
     {
       output << prefix << "+";
       output << setw(4) << setfill('0') << right << currPos;

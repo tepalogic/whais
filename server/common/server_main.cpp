@@ -42,10 +42,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mSession != NULL)
+          if (dbsIterator->mSession != nullptr)
             {
               ReleaseInstance(*(dbsIterator->mSession));
-              dbsIterator->mSession = NULL;
+              dbsIterator->mSession = nullptr;
             }
 
           ostringstream logEntry;
@@ -67,10 +67,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mDbs != NULL)
+          if (dbsIterator->mDbs != nullptr)
             DBSReleaseDatabase(*(dbsIterator->mDbs));
 
-          if (dbsIterator->mLogger != NULL)
+          if (dbsIterator->mLogger != nullptr)
             {
               dbsIterator->mLogger->Log(LT_INFO, "Database context ended!");
               delete dbsIterator->mLogger;
@@ -109,10 +109,10 @@ set_signals()
   action.sa_flags     = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
- if (sigaction(SIGINT, &action, NULL) < 0)
+ if (sigaction(SIGINT, &action, nullptr) < 0)
    return false;
 
- if (sigaction(SIGTERM, &action, NULL) < 0)
+ if (sigaction(SIGTERM, &action, nullptr) < 0)
    return false;
 
  return true;

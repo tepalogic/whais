@@ -54,7 +54,7 @@ public:
 
   const Unit& GetUnit() const
   {
-    assert(mProcedure.mUnit != NULL);
+    assert(mProcedure.mUnit != nullptr);
 
     return *mProcedure.mUnit;
   }

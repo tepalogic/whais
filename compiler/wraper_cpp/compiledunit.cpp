@@ -43,19 +43,19 @@ CompiledBufferUnit::CompiledBufferUnit(const uint8_t      *buffer,
                                        uint_t              bufferSize,
                                        WH_MESSENGER        messenger,
                                        WH_MESSENGER_CTXT   messengerContext)
-  : mHandler(NULL)
+  : mHandler(nullptr)
 {
   mHandler = wh_compiler_load(_RC(const char*, buffer),
                               bufferSize,
                               messenger,
                               messengerContext);
-  if (mHandler == NULL)
+  if (mHandler == nullptr)
     throw FunctionalUnitException(_EXTRA(0), "Buffer could not be compiled.");
 }
 
 CompiledBufferUnit::~CompiledBufferUnit()
 {
-  if (mHandler != NULL)
+  if (mHandler != nullptr)
     wh_compiler_discard(mHandler);
 }
 
@@ -71,7 +71,7 @@ CompiledBufferUnit::TypeAreaSize()
 const uint8_t*
 CompiledBufferUnit::RetriveTypeArea()
 {
-  const uint8_t *typePool = NULL;
+  const uint8_t *typePool = nullptr;
 
   wh_unit_type_descriptors(mHandler, &typePool);
 
@@ -90,7 +90,7 @@ CompiledBufferUnit::ConstsAreaSize()
 const uint8_t*
 CompiledBufferUnit::RetrieveConstArea()
 {
-  const uint8_t* constArea = NULL;
+  const uint8_t* constArea = nullptr;
 
   wh_unit_constants(mHandler, &constArea);
 
@@ -112,7 +112,7 @@ CompiledBufferUnit::ProceduresCount()
 uint_t
 CompiledBufferUnit::GlobalNameLength(const uint_t id)
 {
-  WCompilerGlobalDesc globalDesc = {NULL, };
+  WCompilerGlobalDesc globalDesc = {nullptr, };
 
   if ( ! wh_unit_global(mHandler, id, &globalDesc))
   {
@@ -253,7 +253,7 @@ CompiledBufferUnit::GetProcReturnTypeOff(const uint_t id)
 {
   WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get(mHandler, id);
 
-  if (hProc == NULL)
+  if (hProc == nullptr)
     throw FunctionalUnitException(_EXTRA(0), "Could not obtain procedure(index: '%u') handle.", id);
 
   const uint8_t* temp;
@@ -317,7 +317,7 @@ CompiledBufferUnit::GetProcLocalTypeOff(uint_t procId, uint_t localId)
 
   WH_COMPILED_UNIT_PROC hProc = wh_unit_procedure_get(mHandler, procId);
 
-  if (hProc == NULL)
+  if (hProc == nullptr)
   {
     throw FunctionalUnitException(_EXTRA(0),
                                   "Could not obtain procedure(index: '%u') handle.",
@@ -327,7 +327,7 @@ CompiledBufferUnit::GetProcLocalTypeOff(uint_t procId, uint_t localId)
   localType = wh_procedure_local_type(mHandler, hProc, localId);
   wh_unit_procedure_release(mHandler, hProc);
 
-  if (localType == NULL)
+  if (localType == nullptr)
   {
     throw FunctionalUnitException(_EXTRA(0),
                                   "Cannot obtain the procedure's local value description "
@@ -363,10 +363,10 @@ CompiledFileUnit::CompiledFileUnit(const char* file)
   ProcessHeader();
 
 //  mProcData.reset(new uint8_t*[mProcsCount]);
-  mProcData.reset(unique_array_make(uint8_t*, mProcsCount));
+  mProcData = unique_array_make(uint8_t*, mProcsCount);
 
   for (uint_t count = 0; count < mProcsCount; ++count)
-    mProcData.get()[count] = NULL;
+    mProcData.get()[count] = nullptr;
 
 }
 
@@ -399,28 +399,28 @@ CompiledFileUnit::ProcessHeader()
   temp32 = load_le_int32(t_buffer + WHC_TYPEINFO_START_OFF);
   mTypeAreaSize = load_le_int32(t_buffer + WHC_TYPEINFO_SIZE_OFF);
 
-  mTypeInfo.reset(unique_array_make(uint8_t, mTypeAreaSize));
+  mTypeInfo = unique_array_make(uint8_t, mTypeAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mTypeInfo.get(), mTypeAreaSize);
 
   temp32 = load_le_int32(t_buffer + WHC_SYMTABLE_START_OFF);
   mSymbolsSize = load_le_int32(t_buffer + WHC_SYMTABLE_SIZE_OFF);
 
-  mSymbols.reset(unique_array_make(uint8_t, mSymbolsSize));
+  mSymbols = unique_array_make(uint8_t, mSymbolsSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mSymbols.get(), mSymbolsSize);
 
   temp32 = load_le_int32(t_buffer + WHC_CONSTAREA_START_OFF);
   mConstAreaSize = load_le_int32(t_buffer + WHC_CONSTAREA_SIZE_OFF);
 
-  mConstArea.reset(unique_array_make(uint8_t, mConstAreaSize));
+  mConstArea = unique_array_make(uint8_t, mConstAreaSize);
   mFile.Seek(temp32, WH_SEEK_BEGIN);
   mFile.Read(mConstArea.get(), mConstAreaSize);
 
   temp32 = mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE + mProcsCount * WHC_PROC_ENTRY_SIZE;
 
-  mGlobals.reset(unique_array_make(uint8_t, mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE));
-  mProcs.reset(unique_array_make(uint8_t, mProcsCount * WHC_PROC_ENTRY_SIZE));
+  mGlobals = unique_array_make(uint8_t, mGlobalsCount * WHC_GLOBAL_ENTRY_SIZE);
+  mProcs = unique_array_make(uint8_t, mProcsCount * WHC_PROC_ENTRY_SIZE);
 
   mFile.Seek((-1 * _SC(int64_t, temp32)), WH_SEEK_END);
   mFile.Read(mGlobals.get(), mGlobalsCount * WHC_GLOBS_COUNT_OFF);
@@ -433,7 +433,7 @@ CompiledFileUnit::LoadProcInMemory(const uint_t id)
 {
   assert(id < mProcsCount);
 
-  if (mProcData.get()[id] != NULL)
+  if (mProcData.get()[id] != nullptr)
     return;
 
   const uint8_t* proc     = mProcs.get() + (id * WHC_PROC_ENTRY_SIZE);
@@ -753,7 +753,7 @@ FunctionalUnitException::FunctionalUnitException(const uint32_t   code,
                                                  ...)
   : Exception(code, file, line)
 {
-    if (fmtMsg != NULL)
+    if (fmtMsg != nullptr)
     {
       va_list vl;
 

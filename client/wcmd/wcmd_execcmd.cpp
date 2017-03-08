@@ -129,7 +129,7 @@ update_stack_value(const WH_CONNECTION         hnd,
                     const char* const           value)
 {
   /* When the values was created on the stack,
-   * it already has value set to NULL. We need a was to specify NULL values
+   * it already has value set to nullptr. We need a was to specify nullptr values
    * so don't pass this connector because it will treated as an error. */
   if (strcmp(value, NULL_VALUE) == 0)
     return WCS_OK;
@@ -876,7 +876,7 @@ handle_procedure_parameters(WH_CONNECTION   hnd,
             }
           else if (line[inoutLineOff] == '{')
             {
-              wcs = WPushValue(hnd, type | WHC_TYPE_ARRAY_MASK, 0, NULL);
+              wcs = WPushValue(hnd, type | WHC_TYPE_ARRAY_MASK, 0, nullptr);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
@@ -894,7 +894,7 @@ handle_procedure_parameters(WH_CONNECTION   hnd,
             }
           else if (line[inoutLineOff] == '\'')
             {
-              wcs = WPushValue(hnd, type, 0, NULL);
+              wcs = WPushValue(hnd, type, 0, nullptr);
               if (wcs != WCS_OK)
                 goto proc_param_connector_error;
 
@@ -966,10 +966,7 @@ fetch_execution_simple_result(WH_CONNECTION         hnd,
           assert(cpLen > 0);
           assert(cpLen == strlen(retValue));
 
-          Utf8Translator::Write(_RC(uint8_t*, temp),
-                                 sizeof temp,
-                                 true,
-                                 whais::DChar(cp));
+          Utf8Translator::Write(_RC(uint8_t*, temp), sizeof temp, true, whais::DChar(cp));
           cout << '\'' << temp << '\'';
         }
       else
@@ -989,12 +986,7 @@ fetch_execution_simple_result(WH_CONNECTION         hnd,
           cout << '\'';
           while (offset < length)
             {
-              wcs = WValueEntry(hnd,
-                                 field,
-                                 row,
-                                 WIGNORE_OFF,
-                                 offset,
-                                 &retValue);
+              wcs = WValueEntry(hnd, field, row, WIGNORE_OFF, offset, &retValue);
               if (wcs != WCS_OK)
                 goto fetch_result_fail;
 
@@ -1268,7 +1260,7 @@ fetch_execution_result(WH_CONNECTION hnd)
 
           fields.push_back(fieldName);
 
-          fd.name = NULL;
+          fd.name = nullptr;
           fd.type = fieldType;
 
           fieldsDescriptors.push_back(fd);
@@ -1349,7 +1341,7 @@ cmdExec(const string& cmdLine, ENTRY_CMD_CONTEXT context)
   const VERBOSE_LEVEL level    = GetVerbosityLevel();
   size_t              linePos  = 0;
   string              token    = CmdLineNextToken(cmdLine, linePos);
-  WH_CONNECTION       conHdl   = NULL;
+  WH_CONNECTION       conHdl   = nullptr;
   bool                result   = false;
 
   WTICKS paramTicks, execTicks, fetchTicks;

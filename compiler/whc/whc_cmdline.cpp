@@ -162,7 +162,7 @@ CmdLineParser::Parse()
 void
 CmdLineParser::AddInclusionPaths(const char* const paths)
 {
-  assert(paths != NULL);
+  assert(paths != nullptr);
 
   const char *currentPath = paths;
   const char *nextPath    = currentPath;
@@ -170,7 +170,7 @@ CmdLineParser::AddInclusionPaths(const char* const paths)
   while (nextPath && (*nextPath != 0))
   {
     nextPath = strpbrk(currentPath, ";");
-    if (nextPath == NULL)
+    if (nextPath == nullptr)
     {
       string path(currentPath);
       mInclusionPaths.push_back(NormalizeFilePath(path, true));
@@ -226,7 +226,7 @@ CmdLineParser::CheckArguments()
   }
 
   const char* const defaultIncDirs = getenv("WHAIS_INC");
-  if (defaultIncDirs != NULL)
+  if (defaultIncDirs != nullptr)
     AddInclusionPaths(defaultIncDirs);
 
   char temp[64];
@@ -302,7 +302,7 @@ CmdLineException::CmdLineException(const uint32_t   code,
                                    ... )
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
   {
     va_list vl;
 

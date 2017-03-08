@@ -79,7 +79,7 @@ repair_callback(const FIX_ERROR_CALLBACK_TYPE type,
                  const char* const             format,
                  ... )
 {
-  const char* question = NULL;
+  const char* question = nullptr;
 
   bool  result   = true;
 
@@ -87,7 +87,7 @@ repair_callback(const FIX_ERROR_CALLBACK_TYPE type,
     {
   case STEP_INFO:
     cout << std::endl;
-    if (format == NULL)
+    if (format == nullptr)
       return true;
 
     break;
@@ -172,7 +172,7 @@ check_database_for_errors(const bool allAnswersYes, const bool userRequest)
 
   const char* const dbName = GetWorkingDB().c_str();
 
-  if ( ! DBSRepairDatabase(dbName, NULL, repair_callback))
+  if ( ! DBSRepairDatabase(dbName, nullptr, repair_callback))
     return -1;
 
   return 0;

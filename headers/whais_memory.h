@@ -67,14 +67,14 @@ extern "C"
 
 void*
 custom_trace_mem_alloc(size_t          size,
-                        const char*     file,
-                        uint_t          line);
+                       const char*     file,
+                       uint_t          line);
 
 void*
 custom_trace_mem_realloc(void*           oldPtr,
-                          size_t          newSize,
-                          const char*     file,
-                          uint_t          line);
+                         size_t          newSize,
+                         const char*     file,
+                         uint_t          line);
 
 void
 custom_trace_mem_free(void*              ptr,
@@ -94,6 +94,24 @@ void custom_mem_free(void* ptr);
 } /* extern "C" */
 
 
+#ifdef CXX_CUSTOM_MEMORY_ALLOCATOR
+#ifdef ENABLE_MEMORY_TRACE
+
+void*
+operator new(std::size_t size, const char* file, uint_t line);
+
+void*
+operator new[](std::size_t size, const char* file, uint_t line);
+
+void
+operator delete(void* ptr, const char*, uint_t);
+
+void
+operator delete[](void* ptr, const char*, uint_t );
+
+#endif /* ENABLE_MEMORY_TRACE */
+
+
 void*
 operator new(std::size_t size);
 
@@ -101,28 +119,19 @@ void*
 operator new(std::size_t size, const std::nothrow_t&) noexcept;
 
 void*
-operator new(std::size_t size, const char* file, uint_t line);
-
-void*
 operator new[](std::size_t size);
 
 void*
 operator new[](std::size_t size, const std::nothrow_t&) noexcept;
 
-void*
-operator new[](std::size_t size, const char* file, uint_t line);
-
 void
 operator delete(void* ptr) noexcept;
 
 void
-operator delete(void* ptr, const char*, uint_t);
-
-void
 operator delete[](void* ptr) noexcept;
 
-void
-operator delete[](void* ptr, const char*, uint_t );
+
+#endif /* CXX_CUSTOM_MEMORY_ALLOCATOR */
 
 
 template <class T> static inline void
@@ -146,16 +155,18 @@ _placement_new(void* place)
 
 #ifdef ENABLE_MEMORY_TRACE
 
+#ifdef CXX_CUSTOM_MEMORY_ALLOCATOR
 #define new new(__FILE__, __LINE__)
+#endif
 
 #include <iostream>
 #include "custom/include/test/test_fmw.h"
 
 
-#define shared_make(T,...)       (new T(__VA_ARGS__))
-#define shared_array_make(T,s)   (new T[(s)])
-#define unique_make(T,...)       (new T(__VA_ARGS__))
-#define unique_array_make(T,s)   (new T[(s)])
+#define shared_make(T,...)       std::shared_ptr<T>(new T(__VA_ARGS__))
+#define shared_array_make(T,s)   std::shared_ptr<T[]>(new T[(s)])
+#define unique_make(T,...)       std::unique_ptr<T>(new T(__VA_ARGS__))
+#define unique_array_make(T,s)   std::unique_ptr<T[]>(new T[(s)])
 
 class WMemoryTracker
 {
@@ -241,7 +252,7 @@ static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;
 #define shared_make(T,...)       std::make_shared<T>(__VA_ARGS__)
 #define shared_array_make(T,s)   std::make_shared<T>((std::size_t)(s))
 #define unique_make(T,...)       std::make_unique<T>(__VA_ARGS__)
-#define unique_array_make(T,s)   std::make_unique<T>((std::size_t)(s))
+#define unique_array_make(T,s)   std::make_unique<T[]>((std::size_t)(s))
 #endif /* ENABLE_MEMORY_TRACE */
 
 #endif /*  __cplusplus */

@@ -32,7 +32,7 @@ namespace whais {
 namespace pastra {
 
 BlockCache::BlockCache()
-  : mManager(NULL),
+  : mManager(nullptr),
     mItemSize(0),
     mBlockSize(0),
     mMaxCachedBlocks(0),

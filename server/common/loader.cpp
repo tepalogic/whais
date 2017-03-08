@@ -75,7 +75,7 @@ LoadDatabase(FileLogger& log, DBSDescriptors& inoutDesc)
                                          dbsLogger.get());
     }
   else
-    inoutDesc.mSession = &GetInstance(NULL, dbsLogger.get());
+    inoutDesc.mSession = &GetInstance(nullptr, dbsLogger.get());
 
   temp = inoutDesc.mStackCount;
   if ( ! inoutDesc.mSession->NotifyEvent(ISession::MAX_STACK_COUNT, &temp))

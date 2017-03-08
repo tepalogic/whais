@@ -1167,7 +1167,7 @@ test_step_update(WH_CONNECTION hnd)
 
       unsigned long long rowsCount, elemesCount;
 
-      if ((WPushValue(hnd, _values[i].type, 0, NULL) != WCS_OK)
+      if ((WPushValue(hnd, _values[i].type, 0, nullptr) != WCS_OK)
           || (WFlush(hnd) != WCS_OK))
         {
           goto test_step_update_err;
@@ -1186,7 +1186,7 @@ test_step_update(WH_CONNECTION hnd)
           || (WValueEntry(hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, WIGNORE_OFF, &value) != WCS_INVALID_ROW)
           || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, WIGNORE_OFF, &value) != WCS_TYPE_MISMATCH)
           || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, 0, &value) != WCS_TYPE_MISMATCH)
-          || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, WIGNORE_OFF, NULL) != WCS_INVALID_ARGS))
+          || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, WIGNORE_OFF, nullptr) != WCS_INVALID_ARGS))
         {
           goto test_step_update_err;
         }
@@ -1216,7 +1216,7 @@ test_step_update(WH_CONNECTION hnd)
           || (WValueEntry(hnd, WIGNORE_FIELD, 0, WIGNORE_OFF, WIGNORE_OFF, &value) != WCS_INVALID_ROW)
           || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, 0, WIGNORE_OFF, &value) != WCS_TYPE_MISMATCH)
           || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, 0, &value) != WCS_TYPE_MISMATCH)
-          || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, WIGNORE_OFF, NULL) != WCS_INVALID_ARGS))
+          || (WValueEntry(hnd, WIGNORE_FIELD, WIGNORE_ROW, WIGNORE_OFF, WIGNORE_OFF, nullptr) != WCS_INVALID_ARGS))
         {
           goto test_step_update_err;
         }
@@ -1244,7 +1244,7 @@ test_bulk_update(WH_CONNECTION hnd)
 
   for (uint_t i = 0; i < _valuesCount; ++i)
     {
-      if ((WPushValue(hnd, _values[i].type, 0, NULL) != WCS_OK)
+      if ((WPushValue(hnd, _values[i].type, 0, nullptr) != WCS_OK)
           || (WUpdateValue(hnd,
                             _values[i].type,
                             WIGNORE_FIELD,
@@ -1300,12 +1300,12 @@ test_for_errors(WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue(hnd, WHC_TYPE_BOOL, 0, NULL) != WCS_OK)
+  if ((WPushValue(hnd, WHC_TYPE_BOOL, 0, nullptr) != WCS_OK)
       || (WFlush(hnd) != WCS_OK)
       || (WFlush(hnd) != WCS_OK) //Just for fun!
-      || (WValueRowsCount(NULL, NULL) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(NULL, &count) != WCS_INVALID_ARGS)
-      || (WValueRowsCount(hnd, NULL) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, nullptr) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(nullptr, &count) != WCS_INVALID_ARGS)
+      || (WValueRowsCount(hnd, nullptr) != WCS_INVALID_ARGS)
       || (WValueRowsCount(hnd, &count) != WCS_TYPE_MISMATCH)
       || (WValueArraySize(hnd, WIGNORE_FIELD, WIGNORE_ROW, &count) != WCS_TYPE_MISMATCH)
       || (WValueArraySize(hnd, "some_f", WIGNORE_ROW, &count) != WCS_INVALID_FIELD)
@@ -1349,7 +1349,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION hnd        = NULL;
+  WH_CONNECTION hnd        = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

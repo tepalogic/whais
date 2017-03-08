@@ -77,7 +77,7 @@ struct _ProcStatementSpec
 
 struct Statement
 {
-  struct Statement     *parent;     /* NULL for global statement */
+  struct Statement     *parent;     /* nullptr for global statement */
   uint_t                localsUsed; /* Count of local values of this statement. */
   enum STATEMENT_TYPE   type;
   struct WArray         decls;      /* Holds the local variables declared in this statement */

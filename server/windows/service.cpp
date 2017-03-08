@@ -47,8 +47,8 @@ svc_report_info(const char* text, const bool isError)
   static DWORD eventIndex;
   const char* lpszStrings[2];
 
-  HANDLE hEventSource = RegisterEventSource(NULL, sServiceName);
-  if (NULL != hEventSource)
+  HANDLE hEventSource = RegisterEventSource(nullptr, sServiceName);
+  if (nullptr != hEventSource)
     {
       lpszStrings[0] = sServiceName;
       lpszStrings[1] = text;
@@ -57,11 +57,11 @@ svc_report_info(const char* text, const bool isError)
                    EVENTLOG_ERROR_TYPE,
                    0,
                    (isError ? 0xC0000000 : 0) | eventIndex++,
-                   NULL,
+                   nullptr,
                    2,
                    0,
                    lpszStrings,
-                   NULL);
+                   nullptr);
 
       DeregisterEventSource(hEventSource);
     }
@@ -74,8 +74,8 @@ svc_report_api_fail(const char* func)
   const char* lpszStrings[2];
   char        buffer[80];
 
-  HANDLE hEventSource = RegisterEventSource(NULL, sServiceName);
-  if (NULL != hEventSource)
+  HANDLE hEventSource = RegisterEventSource(nullptr, sServiceName);
+  if (nullptr != hEventSource)
     {
       snprintf(buffer,
                 sizeof buffer,
@@ -90,11 +90,11 @@ svc_report_api_fail(const char* func)
                    EVENTLOG_ERROR_TYPE,
                    0,
                    0xC0000000,
-                   NULL,
+                   nullptr,
                    2,
                    0,
                    lpszStrings,
-                   NULL);
+                   nullptr);
 
       DeregisterEventSource(hEventSource);
     }
@@ -145,10 +145,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mSession != NULL)
+          if (dbsIterator->mSession != nullptr)
             {
               ReleaseInstance(*(dbsIterator->mSession));
-              dbsIterator->mSession = NULL;
+              dbsIterator->mSession = nullptr;
             }
 
           ostringstream logEntry;
@@ -171,10 +171,10 @@ clean_frameworks(FileLogger& log)
            dbsIterator != databases.rend();
            ++dbsIterator)
         {
-          if (dbsIterator->mDbs != NULL)
+          if (dbsIterator->mDbs != nullptr)
             DBSReleaseDatabase(*(dbsIterator->mDbs));
 
-          if (dbsIterator->mLogger != NULL)
+          if (dbsIterator->mLogger != nullptr)
             {
               dbsIterator->mLogger->Log(LT_INFO, "Database context ended!");
               delete dbsIterator->mLogger;
@@ -196,8 +196,8 @@ clean_frameworks(FileLogger& log)
 static bool
 boot_server(const char* configFile, ostream& errOut)
 {
-  unique_ptr<ifstream>   config(NULL);
-  unique_ptr<FileLogger> glbLog(NULL);
+  unique_ptr<ifstream>   config(nullptr);
+  unique_ptr<FileLogger> glbLog(nullptr);
 
   config.reset(new ifstream(configFile,
                               ios_base::in | ios_base::binary));
@@ -429,7 +429,7 @@ install_service(const char* configFile)
   HKEY hKey;
   char path[MAX_PATH];
 
-  if (GetFullPathName(configFile, sizeof path, path, NULL) == 0)
+  if (GetFullPathName(configFile, sizeof path, path, nullptr) == 0)
     {
       cerr << "GetFullPathName failed(" << GetLastError() << ").\n";
       return false;
@@ -438,12 +438,12 @@ install_service(const char* configFile)
   LONG errCode = RegCreateKeyEx(HKEY_LOCAL_MACHINE,
                                  sSubKeyName,
                                  0,
-                                 NULL,
+                                 nullptr,
                                  REG_OPTION_NON_VOLATILE,
                                  KEY_ALL_ACCESS | KEY_WOW64_64KEY,
-                                 NULL,
+                                 nullptr,
                                  &hKey,
-                                 NULL);
+                                 nullptr);
   if (errCode != ERROR_SUCCESS)
     {
       cerr << "RegCreateKeyEx failed(" << errCode << ").\n";
@@ -466,14 +466,14 @@ install_service(const char* configFile)
 
   RegCloseKey(hKey);
 
-  if (!GetModuleFileName(NULL, path, MAX_PATH))
+  if (!GetModuleFileName(nullptr, path, MAX_PATH))
     {
       cerr << "GetModuleFileName failed(" << GetLastError() << ").\n";
       return false;
     }
 
-  SC_HANDLE schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-  if (schSCManager == NULL)
+  SC_HANDLE schSCManager = OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
+  if (schSCManager == nullptr)
     {
       cerr << "OpenSCManager failed(" << GetLastError() << ").\n";
       return false;
@@ -487,12 +487,12 @@ install_service(const char* configFile)
                                         SERVICE_AUTO_START,
                                         SERVICE_ERROR_NORMAL,
                                         path,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL,
-                                        NULL);
-  if (schService == NULL)
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr);
+  if (schService == nullptr)
     {
       cerr << "CreateService failed(" << GetLastError() << ").\n";
       CloseServiceHandle(schSCManager);
@@ -516,15 +516,15 @@ remove_sevice()
   SC_HANDLE schService;
   SERVICE_STATUS srvStatus = {0, };
 
-  schSCManager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-  if (schSCManager == NULL)
+  schSCManager = OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
+  if (schSCManager == nullptr)
     {
       cerr << "OpenSCManager failed(" << GetLastError() << ").\n";
       return false;
     }
 
   schService = OpenService(schSCManager, sServiceName, SERVICE_ALL_ACCESS);
-  if (schService == NULL)
+  if (schService == nullptr)
     {
       cerr << "OpenService failed(" << GetLastError() << ").\n";
 
@@ -621,7 +621,7 @@ whais_main(DWORD argc, LPTSTR *argv )
 {
   char path[MAX_PATH] = {0, };
 
-  if ( ! GetModuleFileName(NULL, path, MAX_PATH))
+  if ( ! GetModuleFileName(nullptr, path, MAX_PATH))
     {
       svc_report_api_fail("GetModuleFileName");
       return ;
@@ -671,10 +671,10 @@ whais_main(DWORD argc, LPTSTR *argv )
     }
 
   errCode = RegGetValue(hKey,
-                         NULL,
+                         nullptr,
                          sConfigValue,
                          RRF_RT_REG_SZ,
-                         NULL,
+                         nullptr,
                          path,
                          &configFileLen);
   if (errCode != ERROR_SUCCESS)
@@ -704,7 +704,7 @@ main(int argc, char** argv)
 {
   bool registerSrv       = false;
   bool removeSrv         = false;
-  const char* configFile = NULL;
+  const char* configFile = nullptr;
 
   for (int i = 1; i < argc; ++i)
     {
@@ -741,7 +741,7 @@ main(int argc, char** argv)
               "Use '" << argv[0] << " /h' for help.\n";
       return EINVAL;
     }
-  else if (registerSrv & (configFile == NULL))
+  else if (registerSrv & (configFile == nullptr))
     {
       cerr << "A configuration file has to be provided to register the service "
               "register the service to use it.";
@@ -781,7 +781,7 @@ main(int argc, char** argv)
   SERVICE_TABLE_ENTRY dispatchTable[] =
   {
     { sServiceName, (LPSERVICE_MAIN_FUNCTION) whais_main },
-    { NULL, NULL }
+    { nullptr, nullptr }
   };
 
   StartServiceCtrlDispatcher(dispatchTable);

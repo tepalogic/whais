@@ -150,7 +150,7 @@ test_nulliness()
       storage.RegisterReference();
       storage.MarkForRemoval();
 
-      uint64_t allocated_entry = storage.AddRecord(NULL, 0);
+      uint64_t allocated_entry = storage.AddRecord(nullptr, 0);
 
       DText textVarRaw(*(new RowFieldText(storage, allocated_entry, 0)));
 

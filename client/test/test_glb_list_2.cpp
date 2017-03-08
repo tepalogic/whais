@@ -61,7 +61,7 @@ check_type(const WH_CONNECTION          hnd,
           return false;
         }
 
-      if (fieldName == NULL)
+      if (fieldName == nullptr)
         {
           for (int dummy = 0; dummy < 1024; ++dummy)
             {
@@ -70,7 +70,7 @@ check_type(const WH_CONNECTION          hnd,
                   cout << "Error encountered during the field fetch end condition.\n";
                   return false;
                 }
-              else if (fieldName != NULL)
+              else if (fieldName != nullptr)
                 {
                   cout << "Invalid field fetch end condition ...\n";
                   return false;
@@ -127,7 +127,7 @@ test_global_variables(WH_CONNECTION hnd, vector<string> glbNames, vector<string>
     }
   vector<bool> foundGlbs(glbsCount, false);
 
-  const char* name = NULL;
+  const char* name = nullptr;
   uint_t i = 0;
   while (i < 9999999)
     {
@@ -137,7 +137,7 @@ test_global_variables(WH_CONNECTION hnd, vector<string> glbNames, vector<string>
           return false;
         }
 
-      if (name == NULL)
+      if (name == nullptr)
         break;
 
       size_t index;
@@ -171,7 +171,7 @@ test_global_variables(WH_CONNECTION hnd, vector<string> glbNames, vector<string>
           cout << "Error encountered during global fetch end condition.\n";
           return false;
         }
-      else if (name != NULL)
+      else if (name != nullptr)
         {
           cout << "Invalid global name end condition ...\n";
           return false;
@@ -2291,7 +2291,7 @@ setup_database(const string& db, vector<string>& glbNames, vector<string>& glbTy
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   vector<string> glbNames;
   vector<string> glbTypes;

@@ -427,16 +427,16 @@ main(int argc, char** argv)
 
     Thread th[10];
 
-    th[0].Run(reset_text_variables, NULL);
-    th[1].Run(test_append_char, NULL);
-    th[2].Run(test_append_text, NULL);
-    th[3].Run(test_mirror, NULL);
-    th[4].Run(test_to_lower, NULL);
-    th[5].Run(test_to_upper, NULL);
-    th[6].Run(test_update_char, NULL);
-    th[7].Run(test_find_in_text, NULL);
-    th[8].Run(test_find_subtext, NULL);
-    th[9].Run(test_compare, NULL);
+    th[0].Run(reset_text_variables, nullptr);
+    th[1].Run(test_append_char, nullptr);
+    th[2].Run(test_append_text, nullptr);
+    th[3].Run(test_mirror, nullptr);
+    th[4].Run(test_to_lower, nullptr);
+    th[5].Run(test_to_upper, nullptr);
+    th[6].Run(test_update_char, nullptr);
+    th[7].Run(test_find_in_text, nullptr);
+    th[8].Run(test_find_subtext, nullptr);
+    th[9].Run(test_compare, nullptr);
 
     th[1].WaitToEnd(true);
     th[2].WaitToEnd(true);

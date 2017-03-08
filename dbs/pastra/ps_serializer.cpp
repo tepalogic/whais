@@ -524,7 +524,7 @@ Serializer::SelectValidator(const DBS_FIELD_TYPE itemType)
     assert(false);
   }
 
-  return NULL;
+  return nullptr;
 }
 
 

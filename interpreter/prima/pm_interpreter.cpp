@@ -69,7 +69,7 @@ InitInterpreter(const char* adminDbsDir)
 INTERP_SHL ISession&
 GetInstance(const char* name, Logger* log)
 {
-  if (log == NULL)
+  if (log == nullptr)
     log = &NULL_LOGGER;
 
   LockRAII<Lock> syncHolder(gSync);
@@ -77,7 +77,7 @@ GetInstance(const char* name, Logger* log)
   if (gmNameSpaces.size() == 0)
     throw InterException(_EXTRA(InterException::NOT_INITED));
 
-  if (name == NULL)
+  if (name == nullptr)
     name = gDBSName;
 
   else if (strcmp(name, gDBSName) == 0)
@@ -212,7 +212,7 @@ Session::~Session()
       WLIB_END_LIB_FUNC end = _RC(WLIB_END_LIB_FUNC,
                                    wh_shl_symbol(*it, WSTDLIB_END_FUNC));
 
-      if (end != NULL)
+      if (end != nullptr)
         end();
 
       wh_shl_release(*it);
@@ -244,7 +244,7 @@ Session::LoadCompiledUnit(WIFunctionalUnit& unit)
                                                      nameLength,
                                                      typeDesc,
                                                      external,
-                                                     NULL);
+                                                     nullptr);
         unitMgr.SetGlobalIndex(unitIndex, glbIt, glbIndex);
       }
 
@@ -317,7 +317,7 @@ Session::LoadSharedLib(WH_SHLIB shl)
   mNativeLibs.push_back(shl);
 
 
-  if (wh_shl_symbol(shl, WSTDLIB_END_FUNC) == NULL)
+  if (wh_shl_symbol(shl, WSTDLIB_END_FUNC) == nullptr)
     {
       ostringstream logEntry;
 
@@ -328,7 +328,7 @@ Session::LoadSharedLib(WH_SHLIB shl)
 
   WLIB_START_LIB_FUNC start = _RC(WLIB_START_LIB_FUNC,
                                    wh_shl_symbol(shl, WSTDLIB_START_FUNC));
-  if (start == NULL)
+  if (start == nullptr)
     {
       ostringstream logEntry;
 
@@ -345,7 +345,7 @@ Session::LoadSharedLib(WH_SHLIB shl)
 
   WLIB_DESC_LIB_FUNC describe = _RC(WLIB_DESC_LIB_FUNC,
                                      wh_shl_symbol(shl, WSTDLIB_DESC_FUNC));
-  if (describe == NULL)
+  if (describe == nullptr)
     {
       ostringstream logEntry;
 
@@ -358,7 +358,7 @@ Session::LoadSharedLib(WH_SHLIB shl)
     }
 
   const WLIB_DESCRIPTION* const lib = describe();
-  if (lib == NULL)
+  if (lib == nullptr)
     {
       mLog.Log(LT_ERROR, "The shared lib doesn't provide its content.");
 
@@ -369,11 +369,11 @@ Session::LoadSharedLib(WH_SHLIB shl)
   TypeManager& typeMgr = mPrivateNames->GetTypeManager();
   for (uint_t procIt = 0; procIt < lib->procsCount; ++procIt)
     {
-      if (lib->procsDescriptions[procIt] == NULL)
+      if (lib->procsDescriptions[procIt] == nullptr)
         {
           assert(false);
 
-          mLog.Log(LT_WARNING, "Found a NULL procedure description!");
+          mLog.Log(LT_WARNING, "Found a nullptr procedure description!");
 
           continue;
         }
@@ -419,7 +419,7 @@ Session::LoadSharedLib(WH_SHLIB shl)
                        _RC(const uint8_t*, proc.code),
                        0,
                        false,
-                       NULL);
+                       nullptr);
     }
 
   return true;
@@ -718,7 +718,7 @@ Session::NotifyEvent(const uint_t     event,
     }
   else if (event == ISession::MAX_STACK_COUNT)
     {
-      if (extra == NULL)
+      if (extra == nullptr)
         {
           log.Log(LT_ERROR,
                    "Could not set the maximum stack size, "

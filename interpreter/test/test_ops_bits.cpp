@@ -255,7 +255,7 @@ main()
     const DBool  val1_b(true), val2_b(false);
     const DInt64 val1_i(11), val2_i(23);
 
-    ISession& commonSession = GetInstance(NULL);
+    ISession& commonSession = GetInstance(nullptr);
 
     CompiledBufferUnit callBuf(callTestProgram,
                                  sizeof callTestProgram,

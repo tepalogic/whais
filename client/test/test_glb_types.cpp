@@ -228,7 +228,7 @@ test_complete_field_global(WH_CONNECTION hnd)
     }
 
   if ((WValueFetchField(hnd, &fieldName, &type) != WCS_OK)
-      || (fieldName != NULL)
+      || (fieldName != nullptr)
       || (type != WHC_TYPE_NOTSET)
       || (WValueFetchField(hnd, &fieldName, &type) != WCS_OK))
     {
@@ -270,7 +270,7 @@ test_one_field_global(WH_CONNECTION hnd)
     }
 
   if ((WValueFetchField(hnd, &fieldName, &type) != WCS_OK)
-      || (fieldName != NULL)
+      || (fieldName != nullptr)
       || (type != WHC_TYPE_NOTSET)
       || (WValueFetchField(hnd, &fieldName, &type) != WCS_OK))
     {
@@ -299,20 +299,20 @@ test_for_errors(WH_CONNECTION hnd)
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeGlobal(NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WDescribeGlobal(hnd, one_field_table, NULL) != WCS_INVALID_ARGS)
-           || (WDescribeGlobal(hnd, NULL, &type) != WCS_INVALID_ARGS))
+  else if ((WDescribeGlobal(nullptr, nullptr, nullptr) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal(hnd, one_field_table, nullptr) != WCS_INVALID_ARGS)
+           || (WDescribeGlobal(hnd, nullptr, &type) != WCS_INVALID_ARGS))
 
     {
       goto test_for_errors_fail;
     }
   else if ((WDescribeGlobal(hnd, one_field_table, &type) != WCS_OK)
-           || (WValueFieldsCount(NULL, NULL) != WCS_INVALID_ARGS)
-           || (WValueFieldsCount(hnd, NULL) != WCS_INVALID_ARGS)
-           || (WValueFetchField(NULL, NULL, NULL) != WCS_INVALID_ARGS)
-           || (WValueFetchField(NULL, &nameFetched, &type) != WCS_INVALID_ARGS)
-           || (WValueFetchField(hnd, NULL, &type) != WCS_INVALID_ARGS)
-           || (WValueFetchField(hnd, &nameFetched, NULL) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount(nullptr, nullptr) != WCS_INVALID_ARGS)
+           || (WValueFieldsCount(hnd, nullptr) != WCS_INVALID_ARGS)
+           || (WValueFetchField(nullptr, nullptr, nullptr) != WCS_INVALID_ARGS)
+           || (WValueFetchField(nullptr, &nameFetched, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField(hnd, nullptr, &type) != WCS_INVALID_ARGS)
+           || (WValueFetchField(hnd, &nameFetched, nullptr) != WCS_INVALID_ARGS)
            || (WValueFetchField(hnd, &nameFetched, &type) != WCS_OK)
            || (WValueFieldsCount(hnd, &fieldsCount) != WCS_OK))
     {
@@ -348,7 +348,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION       hnd = NULL;
+  WH_CONNECTION       hnd = nullptr;
 
   bool success = tc_settup_connection(argc, argv, &hnd);
 

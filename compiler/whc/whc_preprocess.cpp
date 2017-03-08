@@ -282,7 +282,7 @@ add_file_to_deps(const string&         file,
 static string
 get_tag_value(const string& line, const char* const tag)
 {
-  assert(strstr(line.c_str(), tag) != NULL);
+  assert(strstr(line.c_str(), tag) != nullptr);
 
   size_t from = strstr(line.c_str(), tag) - line.c_str() + strlen(tag);
 
@@ -484,7 +484,7 @@ preprocess_directives(const string&                    file,
       getline(includedSource, line);
       process_line_tags(file, lineIndex, tagPairs, line);
 
-      if (((occurence = strstr(line.c_str(), cmdDefined)) != NULL)
+      if (((occurence = strstr(line.c_str(), cmdDefined)) != nullptr)
           && check_preprocess_tag(line.c_str(), cmdDefined, occurence))
         {
           size_t inoutOffset = 0;
@@ -532,7 +532,7 @@ preprocess_directives(const string&                    file,
           sourceCode << line << endl;
           ++lineIndex;
         }
-      else if (((occurence = strstr(line.c_str(), cmdUndefine)) != NULL)
+      else if (((occurence = strstr(line.c_str(), cmdUndefine)) != nullptr)
                && check_preprocess_tag(line.c_str(), cmdUndefine, occurence))
         {
           string tags;
@@ -560,7 +560,7 @@ preprocess_directives(const string&                    file,
           sourceCode << line << endl;
           ++lineIndex;
         }
-      else if (((occurence = strstr(line.c_str(), cmdInclude)) != NULL)
+      else if (((occurence = strstr(line.c_str(), cmdInclude)) != nullptr)
                && check_preprocess_tag(line.c_str(), cmdInclude, occurence))
         {
           string includeName = get_tag_value(line, cmdInclude);
@@ -605,10 +605,10 @@ preprocess_directives(const string&                    file,
 
           string guardValue;
           bool ignoreInclusion = false;
-          if (guard != NULL)
+          if (guard != nullptr)
             {
               if (strstr(guard + strlen(cmdGuard),
-                          cmdGuard) != NULL)
+                          cmdGuard) != nullptr)
                 {
                   print_err_multiple_guard_entries(codeMarks,
                                                     sourceCode.str(),
@@ -709,10 +709,10 @@ preprocess_source(const string&                  sourceFile,
 
   vector<string> includedGuards;
   const char* const guard = strstr(fileContent.c_str(), cmdGuard);
-  if (guard != NULL)
+  if (guard != nullptr)
     {
       if (strstr(guard + strlen(cmdGuard),
-                  cmdGuard) != NULL)
+                  cmdGuard) != nullptr)
         {
           print_err_multiple_guard_entries(codeMarks,
                                             sourceCode.str(),

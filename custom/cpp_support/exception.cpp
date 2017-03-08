@@ -121,7 +121,7 @@ Exception::Message(const char* fmtMsg, va_list vl)
 void
 Exception::Message(const char* fmtMsg, ... )
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
     {
       va_list vl;
 
@@ -157,7 +157,7 @@ FileException::FileException(const uint32_t    code,
                               ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
     {
       va_list vl;
 
@@ -197,7 +197,7 @@ LockException::LockException(const uint32_t    code,
                               ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
     {
       va_list vl;
 
@@ -237,7 +237,7 @@ ThreadException::ThreadException(const uint32_t    code,
                                   ... )
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
     {
       va_list vl;
 
@@ -278,7 +278,7 @@ SocketException::SocketException(const uint32_t        code,
                                   ...)
   : Exception(code, file, line)
 {
-    if (fmtMsg != NULL)
+    if (fmtMsg != nullptr)
       {
         va_list vl;
 

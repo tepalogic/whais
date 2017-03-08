@@ -86,7 +86,7 @@ test_table_index(void *)
               refTable->RemoveIndex(f);
           }
         else if ((wh_rnd() & 1) == 0)
-          refTable->CreateIndex(f, NULL, NULL);
+          refTable->CreateIndex(f, nullptr, nullptr);
 
         if (wh_rnd() & 1)
           wh_yield();
@@ -341,12 +341,12 @@ main(int argc, char** argv)
 
     Thread th[6];
 
-    th[0].Run(test_table_rows, NULL);
-    th[1].Run(test_table_index, NULL);
-    th[2].Run(test_table_test_rows_array, NULL);
-    th[3].Run(test_table_test_rows_text, NULL);
-    th[4].Run(test_table_test_rows_basic, NULL);
-    th[5].Run(test_table_sort, NULL);
+    th[0].Run(test_table_rows, nullptr);
+    th[1].Run(test_table_index, nullptr);
+    th[2].Run(test_table_test_rows_array, nullptr);
+    th[3].Run(test_table_test_rows_text, nullptr);
+    th[4].Run(test_table_test_rows_basic, nullptr);
+    th[5].Run(test_table_sort, nullptr);
 
     th[0].WaitToEnd(true);
     th[1].WaitToEnd(true);
@@ -367,12 +367,12 @@ main(int argc, char** argv)
         refTable = &handler.RetrievePersistentTable("t_test_table");
         testEnd  = false;
 
-        th[0].Run(test_table_rows, NULL);
-        th[1].Run(test_table_index, NULL);
-        th[2].Run(test_table_test_rows_array, NULL);
-        th[3].Run(test_table_test_rows_text, NULL);
-        th[4].Run(test_table_test_rows_basic, NULL);
-        th[5].Run(test_table_sort, NULL);
+        th[0].Run(test_table_rows, nullptr);
+        th[1].Run(test_table_index, nullptr);
+        th[2].Run(test_table_test_rows_array, nullptr);
+        th[3].Run(test_table_test_rows_text, nullptr);
+        th[4].Run(test_table_test_rows_basic, nullptr);
+        th[5].Run(test_table_sort, nullptr);
 
         th[0].WaitToEnd(true);
         th[1].WaitToEnd(true);

@@ -233,7 +233,7 @@ FieldIndexNodeManager::InitFromContainer()
 IBTreeNode *
 FieldIndexNodeManager::NodeFactory(const NODE_INDEX nodeId)
 {
-  IBTreeNode* result = NULL;
+  IBTreeNode* result = nullptr;
 
   switch(mFieldType)
     {
@@ -301,7 +301,7 @@ FieldIndexNodeManager::NodeFactory(const NODE_INDEX nodeId)
     assert(false);
     }
 
-  assert(result != NULL);
+  assert(result != nullptr);
   return result;
 }
 

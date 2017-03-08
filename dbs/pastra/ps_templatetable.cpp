@@ -213,7 +213,7 @@ PrototypeTable::AddRow(const bool skipThreadSafety)
 
   for (uint_t f = 0; f < mvIndexNodeMgrs.size(); f++)
   {
-    if (mvIndexNodeMgrs[f] == NULL)
+    if (mvIndexNodeMgrs[f] == nullptr)
       continue;
 
     const FieldDescriptor& fd = GetFieldDescriptorInternal(f);
@@ -490,7 +490,7 @@ PrototypeTable::CreateIndex(const FIELD_INDEX field,
                             CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
                             CreateIndexCallbackContext* const cbContext)
 {
-  if ((cbFunc == NULL) && (cbContext != NULL))
+  if ((cbFunc == nullptr) && (cbContext != nullptr))
     throw DBSException(_EXTRA(DBSException::INVALID_PARAMETERS));
 
   if (field >= mFieldsCount)
@@ -505,7 +505,7 @@ PrototypeTable::CreateIndex(const FIELD_INDEX field,
 
   assert(mvIndexNodeMgrs.size() == mFieldsCount);
 
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     throw DBSException(_EXTRA(DBSException::FIELD_INDEXED));
 
   FieldDescriptor& desc = GetFieldDescriptorInternal(field);
@@ -596,9 +596,9 @@ PrototypeTable::CreateIndex(const FIELD_INDEX field,
       assert(false);
     }
 
-    if (cbFunc != NULL)
+    if (cbFunc != nullptr)
     {
-      if (cbContext != NULL)
+      if (cbContext != nullptr)
       {
         cbContext->mRowsCount = mRowsCount;
         cbContext->mRowIndex = row;
@@ -612,7 +612,7 @@ PrototypeTable::CreateIndex(const FIELD_INDEX field,
 
   MakeHeaderPersistent();
 
-  assert(mvIndexNodeMgrs[field] == NULL);
+  assert(mvIndexNodeMgrs[field] == nullptr);
 
   mvIndexNodeMgrs[field] = nodeMgr.release();
 }
@@ -635,7 +635,7 @@ PrototypeTable::RemoveIndex(const FIELD_INDEX field)
 
   FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
-  if (mvIndexNodeMgrs[field] == NULL)
+  if (mvIndexNodeMgrs[field] == nullptr)
     throw DBSException(_EXTRA(DBSException::FIELD_NOT_INDEXED));
 
   AcquireFieldIndex( &desc);
@@ -648,7 +648,7 @@ PrototypeTable::RemoveIndex(const FIELD_INDEX field)
   unique_ptr<FieldIndexNodeManager> fieldMgr(mvIndexNodeMgrs[field]);
   fieldMgr->MarkForRemoval();
 
-  mvIndexNodeMgrs[field] = NULL;
+  mvIndexNodeMgrs[field] = nullptr;
   ReleaseIndexField( &desc);
 
   MakeHeaderPersistent();
@@ -670,7 +670,7 @@ PrototypeTable::IsIndexed(const FIELD_INDEX field) const
 
   assert(mvIndexNodeMgrs.size() == mFieldsCount);
 
-  return mvIndexNodeMgrs[field] != NULL;
+  return mvIndexNodeMgrs[field] != nullptr;
 }
 
 
@@ -993,7 +993,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
   }
 
   //Update the field index if it exists
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
   {
     NODE_INDEX dummyNode;
     KEY_INDEX dummyKey;
@@ -1581,63 +1581,63 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
     switch (GET_BASIC_TYPE(desc.Type()))
     {
     case T_BOOL:
-      outValue = DArray(_SC(DBool *, NULL));
+      outValue = DArray(_SC(DBool *, nullptr));
       break;
 
     case T_CHAR:
-      outValue = DArray(_SC(DChar *, NULL));
+      outValue = DArray(_SC(DChar *, nullptr));
       break;
 
     case T_DATE:
-      outValue = DArray(_SC(DDate *, NULL));
+      outValue = DArray(_SC(DDate *, nullptr));
       break;
 
     case T_DATETIME:
-      outValue = DArray(_SC(DDateTime *, NULL));
+      outValue = DArray(_SC(DDateTime *, nullptr));
       break;
 
     case T_HIRESTIME:
-      outValue = DArray(_SC(DHiresTime *, NULL));
+      outValue = DArray(_SC(DHiresTime *, nullptr));
       break;
 
     case T_UINT8:
-      outValue = DArray(_SC(DUInt8 *, NULL));
+      outValue = DArray(_SC(DUInt8 *, nullptr));
       break;
 
     case T_UINT16:
-      outValue = DArray(_SC(DUInt16 *, NULL));
+      outValue = DArray(_SC(DUInt16 *, nullptr));
       break;
 
     case T_UINT32:
-      outValue = DArray(_SC(DUInt32 *, NULL));
+      outValue = DArray(_SC(DUInt32 *, nullptr));
       break;
 
     case T_UINT64:
-      outValue = DArray(_SC(DUInt64 *, NULL));
+      outValue = DArray(_SC(DUInt64 *, nullptr));
       break;
 
     case T_REAL:
-      outValue = DArray(_SC(DReal *, NULL));
+      outValue = DArray(_SC(DReal *, nullptr));
       break;
 
     case T_RICHREAL:
-      outValue = DArray(_SC(DRichReal *, NULL));
+      outValue = DArray(_SC(DRichReal *, nullptr));
       break;
 
     case T_INT8:
-      outValue = DArray(_SC(DInt8 *, NULL));
+      outValue = DArray(_SC(DInt8 *, nullptr));
       break;
 
     case T_INT16:
-      outValue = DArray(_SC(DInt16 *, NULL));
+      outValue = DArray(_SC(DInt16 *, nullptr));
       break;
 
     case T_INT32:
-      outValue = DArray(_SC(DInt32 *, NULL));
+      outValue = DArray(_SC(DInt32 *, nullptr));
       break;
 
     case T_INT64:
-      outValue = DArray(_SC(DInt64 *, NULL));
+      outValue = DArray(_SC(DInt64 *, nullptr));
       break;
 
     default:
@@ -2171,7 +2171,7 @@ PrototypeTable::MatchRows(const DBool&       min,
                           const ROW_INDEX    toRow,
                           const FIELD_INDEX  field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2185,7 +2185,7 @@ PrototypeTable::MatchRows(const DChar&         min,
                            const ROW_INDEX      toRow,
                            const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2199,7 +2199,7 @@ PrototypeTable::MatchRows(const DDate&         min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2213,7 +2213,7 @@ PrototypeTable::MatchRows(const DDateTime&     min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2227,7 +2227,7 @@ PrototypeTable::MatchRows(const DHiresTime&     min,
                           const ROW_INDEX       toRow,
                           const FIELD_INDEX     field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2241,7 +2241,7 @@ PrototypeTable::MatchRows(const DUInt8&        min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2255,7 +2255,7 @@ PrototypeTable::MatchRows(const DUInt16&       min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2269,7 +2269,7 @@ PrototypeTable::MatchRows(const DUInt32&       min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2283,7 +2283,7 @@ PrototypeTable::MatchRows(const DUInt64&       min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2297,7 +2297,7 @@ PrototypeTable::MatchRows(const DInt8&         min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2311,7 +2311,7 @@ PrototypeTable::MatchRows(const DInt16&        min,
                           const ROW_INDEX      toRow,
                           const FIELD_INDEX    field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2325,7 +2325,7 @@ PrototypeTable::MatchRows(const DInt32&       min,
                           const ROW_INDEX     toRow,
                           const FIELD_INDEX   field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2339,7 +2339,7 @@ PrototypeTable::MatchRows(const DInt64&       min,
                           const ROW_INDEX     toRow,
                           const FIELD_INDEX   field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2353,7 +2353,7 @@ PrototypeTable::MatchRows(const DReal&        min,
                           const ROW_INDEX     toRow,
                           const FIELD_INDEX   field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2367,7 +2367,7 @@ PrototypeTable::MatchRows(const DRichReal&    min,
                           const ROW_INDEX     toRow,
                           const FIELD_INDEX   field)
 {
-  if (mvIndexNodeMgrs[field] != NULL)
+  if (mvIndexNodeMgrs[field] != nullptr)
     return MatchRowsWithIndex(min, max, fromRow, toRow, field);
 
   return MatchRowsNoIndex(min, max, fromRow, toRow, field);
@@ -2402,7 +2402,7 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
   const T_BTreeKey<T> firstKey(min, fromRow);
   const T_BTreeKey<T> lastKey(max, toRow);
 
-  assert(nodeMgr != NULL);
+  assert(nodeMgr != nullptr);
 
   AcquireFieldIndex( &desc);
 
@@ -2512,7 +2512,7 @@ PrototypeTable::FlushInternal()
 
   for (int field = 0; field < mFieldsCount; ++field)
   {
-    if (mvIndexNodeMgrs[field] == NULL)
+    if (mvIndexNodeMgrs[field] == nullptr)
       continue;
 
     FieldDescriptor& fd = GetFieldDescriptorInternal(field);

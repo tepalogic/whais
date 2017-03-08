@@ -5,6 +5,8 @@ ifeq ($(FLAVOR),release)
 OPTIMISE?=speed
 ASSERTS?=no
 DEBUGINFO?=no
+MEMORY_TRACE?=no
+CXX_CUSTOM_MEMORY_ALLOCATOR?=no
 endif
 
 VERBOSE?=no
@@ -31,13 +33,19 @@ INCLUDES+=./ ./headers
 
 ifeq ($(BUILD_TESTS),yes)
 DEFINES+=BUILD_TESTS=1
-MEMORY_TRACE?=yes
+MEMORY_TRACE=yes
 EXTRA_LIBS=yes
+CXX_CUSTOM_MEMORY_ALLOCATOR?=yes
 endif
 
 ifeq ($(MEMORY_TRACE),yes)
 DEFINES+=ENABLE_MEMORY_TRACE=1
 endif
+
+ifeq ($(CXX_CUSTOM_MEMORY_ALLOCATOR),yes)
+DEFINES+=CXX_CUSTOM_MEMORY_ALLOCATOR=1
+endif
+
 
 include ./makesys/arch/$(ARCH).mk
 include ./makesys/defs.mk

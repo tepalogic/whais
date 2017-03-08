@@ -35,7 +35,7 @@ class auto_array
 {
 public:
   auto_array()
-    : mpT(NULL),
+    : mpT(nullptr),
       mSize(0)
   {
   }
@@ -98,7 +98,7 @@ public:
       {
         delete [] mpT;
 
-        mpT   = NULL;
+        mpT   = nullptr;
         mSize = 0;
 
         return mpT;
@@ -127,7 +127,7 @@ public:
 
   T* Reset(const unsigned int newSize)
   {
-    T* const pNewArray = ((newSize == 0) ? NULL : new T[newSize]);
+    T* const pNewArray = ((newSize == 0) ? nullptr : new T[newSize]);
     try
     {
         delete [] mpT;

@@ -39,7 +39,7 @@ namespace whais {
 
 
 ITextStrategy::ITextStrategy(uint32_t charsCount)
-  : mMatcher(NULL),
+  : mMatcher(nullptr),
     mCachedCharsCount(charsCount),
     mCachedCharIndex(0),
     mCachedCharIndexOffset(0),
@@ -477,7 +477,7 @@ ITextStrategy::AppendU(const uint32_t ch)
   if (result == this)
   {
     delete mMatcher;
-    mMatcher = NULL;
+    mMatcher = nullptr;
   }
 
   keeper.release();
@@ -535,7 +535,7 @@ ITextStrategy::AppendU(ITextStrategy& text)
   if (result == this)
   {
     delete mMatcher;
-    mMatcher = NULL;
+    mMatcher = nullptr;
   }
 
   keeper.release();
@@ -609,7 +609,7 @@ ITextStrategy::AppendU(ITextStrategy& text, const uint64_t utf8OffFrom, const ui
   if (result == this)
   {
     delete mMatcher;
-    mMatcher = NULL;
+    mMatcher = nullptr;
   }
 
   keeper.release();
@@ -753,7 +753,7 @@ ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
   if (result == this)
   {
     delete mMatcher;
-    mMatcher = NULL;
+    mMatcher = nullptr;
   }
 
   keeper.release();
@@ -772,7 +772,7 @@ ITextStrategy::FindMatch(ITextStrategy& text,
   if ((mCachedCharsCount == 0) || (toCh <= fromCh) || (toCh - fromCh < mCachedCharsCount))
     return DUInt64();
 
-  if (mMatcher == NULL)
+  if (mMatcher == nullptr)
     mMatcher = new pastra::StringMatcher( *this);
 
   const int64_t res = mMatcher->FindMatch(text, fromCh, toCh, ignoreCase);
@@ -808,7 +808,7 @@ ITextStrategy::Replace(ITextStrategy&   text,
   const uint64_t subStrSize = Utf8CountU();
   std::unique_ptr<ITextStrategy> result(new pastra::TemporalText());
 
-  if (mMatcher == NULL)
+  if (mMatcher == nullptr)
     mMatcher = new pastra::StringMatcher( *this);
 
   int64_t lastMatchPos = 0;
@@ -858,7 +858,7 @@ ITextStrategy::WriteUtf8(const uint64_t offset,
   LockRAII<Lock> _l(mLock);
 
   delete mMatcher;
-  mMatcher = NULL;
+  mMatcher = nullptr;
 
   return WriteUtf8U(offset, count, buffer);
 }
@@ -1052,7 +1052,7 @@ NullText::GetSingletoneInstace()
 
 TemporalText::TemporalText(const uint8_t* const utf8Str, const uint64_t unitsCount)
 {
-  if (utf8Str == NULL)
+  if (utf8Str == nullptr)
     return;
 
   const uint64_t bytesCount = get_utf8_string_length(utf8Str, unitsCount, &mCachedCharsCount);
@@ -1258,7 +1258,7 @@ RowFieldText::GetRowStorage()
 
 
 StringMatcher::StringMatcher(ITextStrategy& pattern)
-  : mText(NULL),
+  : mText(nullptr),
     mPattern(pattern),
     mPatternSize(min<uint64_t> (pattern.Utf8CountU(), MAX_PATTERN_SIZE)),
     mIgnoreCase(false),

@@ -441,7 +441,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& commonSession = GetInstance(NULL);
+    ISession& commonSession = GetInstance(nullptr);
     success = true;
 
     success = success && load_units(commonSession);

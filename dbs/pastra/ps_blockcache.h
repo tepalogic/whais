@@ -55,7 +55,7 @@ public:
       mReferenceCount(0),
       mFlags(0)
   {
-    assert(data != NULL);
+    assert(data != nullptr);
   }
 
   bool IsDirty() const { return (mFlags & BLOCK_ENTRY_DIRTY) != 0; }

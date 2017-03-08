@@ -221,7 +221,7 @@ TypeManager::CreateGlobalValue(uint8_t*    inoutTypeDesc,
 
   if ((spec.Type() > T_UNKNOWN) && (spec.Type() < T_UNDETERMINED))
     {
-      assert(persitentTable == NULL);
+      assert(persitentTable == nullptr);
 
       switch(spec.Type())
       {
@@ -279,58 +279,58 @@ TypeManager::CreateGlobalValue(uint8_t*    inoutTypeDesc,
     }
   else if (IS_ARRAY(spec.Type()))
     {
-      assert(persitentTable == NULL);
+      assert(persitentTable == nullptr);
 
       switch(GET_BASIC_TYPE(spec.Type()))
       {
       case T_BOOL:
-        return GlobalValue(ArrayOperand( DArray((DBool*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DBool*) nullptr)));
 
       case T_CHAR:
-        return GlobalValue(ArrayOperand( DArray((DChar*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DChar*) nullptr)));
 
       case T_DATE:
-        return GlobalValue(ArrayOperand( DArray((DDate*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DDate*) nullptr)));
 
       case T_DATETIME:
-        return GlobalValue(ArrayOperand( DArray((DDateTime*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DDateTime*) nullptr)));
 
       case T_HIRESTIME:
-        return GlobalValue(ArrayOperand( DArray((DHiresTime*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DHiresTime*) nullptr)));
 
       case T_INT8:
-        return GlobalValue(ArrayOperand( DArray((DInt8*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DInt8*) nullptr)));
 
       case T_INT16:
-        return GlobalValue(ArrayOperand( DArray((DInt16*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DInt16*) nullptr)));
 
       case T_INT32:
-        return GlobalValue(ArrayOperand( DArray((DInt32*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DInt32*) nullptr)));
 
       case T_INT64:
-        return GlobalValue(ArrayOperand( DArray((DInt64*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DInt64*) nullptr)));
 
       case T_UINT8:
-        return GlobalValue(ArrayOperand( DArray((DUInt8*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DUInt8*) nullptr)));
 
       case T_UINT16:
-        return GlobalValue(ArrayOperand( DArray((DUInt16*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DUInt16*) nullptr)));
 
       case T_UINT32:
-        return GlobalValue(ArrayOperand( DArray((DUInt32*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DUInt32*) nullptr)));
 
       case T_UINT64:
-        return GlobalValue(ArrayOperand( DArray((DUInt64*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DUInt64*) nullptr)));
 
       case T_REAL:
-        return GlobalValue(ArrayOperand( DArray((DReal*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DReal*) nullptr)));
 
       case T_RICHREAL:
-        return GlobalValue(ArrayOperand( DArray((DRichReal*) NULL)));
+        return GlobalValue(ArrayOperand( DArray((DRichReal*) nullptr)));
 
       case T_TEXT:
         throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                              NULL);
+                              nullptr);
 
       case T_UNDETERMINED:
         return GlobalValue(ArrayOperand( DArray()));
@@ -341,20 +341,20 @@ TypeManager::CreateGlobalValue(uint8_t*    inoutTypeDesc,
     }
   else if (IS_FIELD(spec.Type()))
     {
-      assert(persitentTable == NULL);
+      assert(persitentTable == nullptr);
 
       const uint16_t type = GET_FIELD_TYPE(spec.Type());
       if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
         {
           throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                                NULL);
+                                nullptr);
         }
 
       return GlobalValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));
     }
   else if (IS_TABLE(spec.Type()))
     {
-      if (persitentTable == NULL)
+      if (persitentTable == nullptr)
         {
           ITable& table = create_non_persistent_table(
                                              mNameSpace.GetDBSHandler(),
@@ -449,53 +449,53 @@ TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
       switch(GET_BASIC_TYPE(spec.Type()))
       {
       case T_BOOL:
-        return StackValue(ArrayOperand( DArray((DBool*) NULL)));
+        return StackValue(ArrayOperand( DArray((DBool*) nullptr)));
 
       case T_CHAR:
-        return StackValue(ArrayOperand( DArray((DChar*) NULL)));
+        return StackValue(ArrayOperand( DArray((DChar*) nullptr)));
 
       case T_DATE:
-        return StackValue(ArrayOperand( DArray((DDate*) NULL)));
+        return StackValue(ArrayOperand( DArray((DDate*) nullptr)));
 
       case T_DATETIME:
-        return StackValue(ArrayOperand( DArray((DDateTime*) NULL)));
+        return StackValue(ArrayOperand( DArray((DDateTime*) nullptr)));
 
       case T_HIRESTIME:
-        return StackValue(ArrayOperand( DArray((DHiresTime*) NULL)));
+        return StackValue(ArrayOperand( DArray((DHiresTime*) nullptr)));
 
       case T_INT8:
-        return StackValue(ArrayOperand( DArray((DInt8*) NULL)));
+        return StackValue(ArrayOperand( DArray((DInt8*) nullptr)));
 
       case T_INT16:
-        return StackValue(ArrayOperand( DArray((DInt16*) NULL)));
+        return StackValue(ArrayOperand( DArray((DInt16*) nullptr)));
 
       case T_INT32:
-        return StackValue(ArrayOperand( DArray((DInt32*) NULL)));
+        return StackValue(ArrayOperand( DArray((DInt32*) nullptr)));
 
       case T_INT64:
-        return StackValue(ArrayOperand( DArray((DInt64*) NULL)));
+        return StackValue(ArrayOperand( DArray((DInt64*) nullptr)));
 
       case T_UINT8:
-        return StackValue(ArrayOperand( DArray((DUInt8*) NULL)));
+        return StackValue(ArrayOperand( DArray((DUInt8*) nullptr)));
 
       case T_UINT16:
-        return StackValue(ArrayOperand( DArray((DUInt16*) NULL)));
+        return StackValue(ArrayOperand( DArray((DUInt16*) nullptr)));
 
       case T_UINT32:
-        return StackValue(ArrayOperand( DArray((DUInt32*) NULL)));
+        return StackValue(ArrayOperand( DArray((DUInt32*) nullptr)));
 
       case T_UINT64:
-        return StackValue(ArrayOperand( DArray((DUInt64*) NULL)));
+        return StackValue(ArrayOperand( DArray((DUInt64*) nullptr)));
 
       case T_REAL:
-        return StackValue(ArrayOperand( DArray((DReal*) NULL)));
+        return StackValue(ArrayOperand( DArray((DReal*) nullptr)));
 
       case T_RICHREAL:
-        return StackValue(ArrayOperand( DArray((DRichReal*) NULL)));
+        return StackValue(ArrayOperand( DArray((DRichReal*) nullptr)));
 
       case T_TEXT:
         throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                              NULL);
+                              nullptr);
 
       case T_UNDETERMINED:
         //Just a default
@@ -511,7 +511,7 @@ TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
       if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
         {
           throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                                NULL);
+                                nullptr);
         }
 
       return StackValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));

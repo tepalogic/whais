@@ -105,7 +105,7 @@ wlib_describe()
   if (sgInited)
     return &sgLibraryDescription;
 
-  return NULL;
+  return nullptr;
 }
 
 

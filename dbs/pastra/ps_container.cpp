@@ -73,7 +73,7 @@ DataContainerException::DataContainerException(const uint32_t      code,
                                                ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
   {
     va_list vl;
 
@@ -90,9 +90,9 @@ WFileContainerException::WFileContainerException(const uint32_t   code,
                                                  uint32_t         line,
                                                  const char      *fmtMsg,
                                                  ...)
-  : DataContainerException(code, file, line, NULL)
+  : DataContainerException(code, file, line, nullptr)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
   {
     va_list vl;
 
@@ -487,7 +487,7 @@ TemporalContainer::Write(uint64_t to, uint64_t size, const uint8_t* buffer)
       to += toWrite, buffer += toWrite, size -= toWrite;
       mDirtyCache_1 = true;
     }
-    else if (mCache_2.get() != NULL
+    else if (mCache_2.get() != nullptr
             && (mCacheStartPos_2 <= to && to < (mCacheStartPos_2 + mCacheSize)))
     {
       assert(mCacheStartPos_1 != mCacheStartPos_2);
@@ -533,7 +533,7 @@ TemporalContainer::Read(uint64_t from, uint64_t size, uint8_t* buffer)
 
       from += toRead, buffer += toRead, size -= toRead;
     }
-    else if (mCache_2.get() != NULL
+    else if (mCache_2.get() != nullptr
              && (mCacheStartPos_2 <= from && from < mCacheEndPos_2))
     {
       const uint_t toRead = MIN(size, mCacheEndPos_2 - from);
@@ -563,8 +563,8 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
                                      _SC(long, containerSize));
     }
 
-  if (mFileContainer.get() == NULL
-      && mCache_2.get() != NULL)
+  if (mFileContainer.get() == nullptr
+      && mCache_2.get() != nullptr)
   {
     assert(mCacheStartPos_1 == 0);
     assert(mCacheEndPos_1 == mCacheSize);
@@ -596,13 +596,13 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
       mCacheEndPos_1 = mCacheEndPos_2;
 
       mCacheStartPos_2 = mCacheEndPos_2 = 0;
-      mCache_2.reset(NULL);
+      mCache_2.reset(nullptr);
       mCache1LastUsed = true;
     }
   }
-  else if (mFileContainer.get() != NULL)
+  else if (mFileContainer.get() != nullptr)
   {
-    assert(mCache_2.get() != NULL);
+    assert(mCache_2.get() != nullptr);
 
     if (mDirtyCache_1)
     {
@@ -630,12 +630,12 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
     mCacheEndPos_1 -= (to - from);
   }
 
-  if (mFileContainer.get() != NULL
+  if (mFileContainer.get() != nullptr
       && mFileContainer->Size() <= (2 * mCacheSize))
   {
     if (mFileContainer->Size() > mCacheSize)
     {
-      assert(mCache_2.get() != NULL);
+      assert(mCache_2.get() != nullptr);
 
       mCacheStartPos_2 = mCacheSize;
       mCacheEndPos_2 = mFileContainer->Size();
@@ -643,13 +643,13 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
       mFileContainer->Read(mCacheStartPos_2, mCacheEndPos_2 - mCacheStartPos_2, mCache_2.get());
       mDirtyCache_2 = false;
     }
-    else if (mCache_2.get() != NULL)
+    else if (mCache_2.get() != nullptr)
     {
       mCacheStartPos_2 = mCacheEndPos_2 = 0;
       mDirtyCache_2 = false;
       mCache1LastUsed = true;
 
-      mCache_2.reset(NULL);
+      mCache_2.reset(nullptr);
     }
 
     mCacheStartPos_1 = 0;
@@ -658,12 +658,12 @@ TemporalContainer::Colapse(uint64_t from, uint64_t to)
     mFileContainer->Read(mCacheStartPos_1, mCacheEndPos_1 - mCacheStartPos_1, mCache_1.get());
     mDirtyCache_1 = false;
 
-    mFileContainer.reset(NULL);
+    mFileContainer.reset(nullptr);
   }
-  else if (mFileContainer.get() != NULL)
+  else if (mFileContainer.get() != nullptr)
   {
     /* Refill both cache buffers. */
-    assert(mCache_2.get() != NULL);
+    assert(mCache_2.get() != nullptr);
 
     assert(mDirtyCache_1 == false);
     assert(mDirtyCache_2 == false);
@@ -695,7 +695,7 @@ TemporalContainer::MarkForRemoval()
 void
 TemporalContainer::Flush()
 {
-  if (mFileContainer.get() != NULL)
+  if (mFileContainer.get() != nullptr)
     mFileContainer->Flush();
 }
 
@@ -708,9 +708,9 @@ TemporalContainer::Size() const
   assert(mCacheStartPos_1 <= mCacheEndPos_1);
   assert(mCacheStartPos_2 <= mCacheEndPos_2);
 
-  if (mFileContainer.get() != NULL)
+  if (mFileContainer.get() != nullptr)
   {
-    assert(mCache_2.get() != NULL);
+    assert(mCache_2.get() != nullptr);
     assert(mCacheStartPos_1 != mCacheStartPos_2);
     assert((mCacheEndPos_1 != mCacheEndPos_2)
             || (mCacheEndPos_2 == mCacheStartPos_2));
@@ -718,7 +718,7 @@ TemporalContainer::Size() const
     const uint64_t temp = max(mCacheEndPos_1, mCacheEndPos_2);
     return max(temp, mFileContainer->Size());
   }
-  else if (mCache_2.get() != NULL)
+  else if (mCache_2.get() != nullptr)
   {
     assert(mCacheStartPos_1  == 0);
     assert(mCacheEndPos_1    == mCacheSize);
@@ -746,12 +746,12 @@ TemporalContainer::FillCache(uint64_t position)
   if (mCacheStartPos_1 == position)
     return;
 
-  else if (mCache_2.get() != NULL && mCacheStartPos_2 == position)
+  else if (mCache_2.get() != nullptr && mCacheStartPos_2 == position)
     return;
 
-  else if (mCache_2.get() == NULL && position == mCacheSize)
+  else if (mCache_2.get() == nullptr && position == mCacheSize)
   {
-    assert(mFileContainer.get() == NULL);
+    assert(mFileContainer.get() == nullptr);
 
     mCache_2.reset(new uint8_t[mCacheSize]);
     mCacheStartPos_2 = mCacheEndPos_2 = mCacheSize;
@@ -762,7 +762,7 @@ TemporalContainer::FillCache(uint64_t position)
     return;
   }
 
-  if (mFileContainer.get() == NULL)
+  if (mFileContainer.get() == nullptr)
   {
     const uint64_t currentId = wh_atomic_fetch_inc64(_RC(int64_t*, &smTemporalsCount));
 

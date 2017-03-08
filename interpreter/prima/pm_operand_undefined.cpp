@@ -41,7 +41,7 @@ namespace prima {
 NativeObjectOperand::NativeObjectOperand()
   : mType(T_UNDETERMINED)
 {
-  mNativeValue = NULL;
+  mNativeValue = nullptr;
 }
 
 
@@ -251,7 +251,7 @@ NativeObjectOperand::Initialise()
     }
   else if (IS_TABLE(mType))
     {
-      assert(mTableValue != NULL);
+      assert(mTableValue != nullptr);
 
       mTableValue->IncrementRefCount();
     }
@@ -301,7 +301,7 @@ NativeObjectOperand::Cleanup()
     }
   else if (IS_TABLE(mType))
     {
-      assert(mTableValue != NULL);
+      assert(mTableValue != nullptr);
 
       mTableValue->DecrementRefCount();
     }
@@ -347,13 +347,13 @@ bool
 NativeObjectOperand::IsNull() const
 {
   if (mType == T_UNDETERMINED)
-    return mNativeValue == NULL;
+    return mNativeValue == nullptr;
 
   else if (IS_TABLE(mType))
     return mTableValue->GetTable().AllocatedRows() == 0;
 
   else if (IS_FIELD(mType))
-    return mFieldValue.mTableRef == NULL;
+    return mFieldValue.mTableRef == nullptr;
 
   else if (IS_ARRAY(mType))
     {
@@ -861,7 +861,7 @@ NativeObjectOperand::GetTable()
 void
 NativeObjectOperand::NativeObject(INativeObject* const object)
 {
-  if (object == NULL)
+  if (object == nullptr)
     *this = NativeObjectOperand();
 
   else
@@ -890,7 +890,7 @@ NativeObjectOperand::NativeObject()
   else if (IsNull())
     throw InterException(_EXTRA(InterException::NATIVE_NULL_DEREFERENCE));
 
-  assert(mNativeValue != NULL);
+  assert(mNativeValue != nullptr);
 
   return *mNativeValue;
 }

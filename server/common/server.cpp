@@ -52,8 +52,8 @@ class Listener
 {
 public:
   Listener()
-    : mInterface(NULL),
-      mPort(NULL),
+    : mInterface(nullptr),
+      mPort(nullptr),
       mListenThread(),
       mSocket(INVALID_SOCKET),
       mUsersPool(GetAdminSettings().mMaxConnections)
@@ -109,7 +109,7 @@ public:
         if ((mUsersPool[c].mEndConnection) || (mUsersPool[c].mLastReqTick == 0))
           continue;
 
-        if (mUsersPool[c].mDesc == NULL)
+        if (mUsersPool[c].mDesc == nullptr)
           {
             if ((msecTicks - mUsersPool[c].mLastReqTick) <
                 _SC(uint_t, GetAdminSettings().mAuthTMO))
@@ -160,7 +160,7 @@ client_handler_routine(void* args)
   client->mLastReqTick   = 0;
   client->mEndConnection = false;
 
-  assert(sDbsDescriptors != NULL);
+  assert(sDbsDescriptors != nullptr);
 
   try
   {
@@ -218,7 +218,7 @@ client_handler_routine(void* args)
   }
   catch(SocketException& e)
   {
-      assert(e.Description() != NULL);
+      assert(e.Description() != nullptr);
 
       ostringstream logEntry;
 
@@ -234,7 +234,7 @@ client_handler_routine(void* args)
   }
   catch(ConnectionException& e)
   {
-      if (client->mDesc != NULL)
+      if (client->mDesc != nullptr)
         client->mDesc->mLogger->Log(LT_ERROR, e.Message());
 
       else
@@ -375,7 +375,7 @@ ticks_routine()
 
   LockRAII<Lock> holder(sClosingLock);
 
-  if (sListeners != NULL)
+  if (sListeners != nullptr)
     {
       for (uint_t i = 0; i < sListeners->Size(); ++i)
         (*sListeners)[i].Close();
@@ -389,7 +389,7 @@ listener_routine(void* args)
 
   assert(listener->mUsersPool.Size() > 0);
   assert(listener->mListenThread.HasExceptionPending() == false);
-  assert(listener->mPort != NULL);
+  assert(listener->mPort != nullptr);
 
   try
   {
@@ -397,7 +397,7 @@ listener_routine(void* args)
         ostringstream logEntry;
 
         logEntry << "Listening ";
-        logEntry << ((listener->mInterface == NULL) ?
+        logEntry << ((listener->mInterface == nullptr) ?
                        "*" :
                        listener->mInterface);
         logEntry << '@' << listener->mPort << ".";
@@ -432,7 +432,7 @@ listener_routine(void* args)
         {
             if (sAcceptUsersConnections)
               {
-                assert(e.Description() != NULL);
+                assert(e.Description() != nullptr);
                 ostringstream logEntry;
 
                 logEntry << "Description:\n" << e.Description() << endl;
@@ -452,7 +452,7 @@ listener_routine(void* args)
   }
   catch(Exception& e)
   {
-      assert(e.Description() != NULL);
+      assert(e.Description() != nullptr);
 
       ostringstream logEntry;
 
@@ -516,7 +516,7 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
       Listener* const listener = &listeners[index];
 
       listener->mInterface = (server.mListens[index].mInterface.empty())
-                              ? NULL
+                              ? nullptr
                               : server.mListens[index].mInterface.c_str();
       listener->mPort = server.mListens[index].mService.c_str();
       if ( ! listener->mListenThread.Run(listener_routine, listener))
@@ -533,7 +533,7 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
   log.Log(LT_DEBUG, "Ticks routine has stopped.");
 
   LockRAII<Lock> holder(sClosingLock);
-  sListeners = NULL;
+  sListeners = nullptr;
   holder.Release();
 
   for (uint_t index = 0; index < listeners.Size(); ++index)
@@ -548,7 +548,7 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
 void
 StopServer()
 {
-  if ((sListeners == NULL)
+  if ((sListeners == nullptr)
       || sServerStopped)
     {
       return ;
@@ -563,7 +563,7 @@ StopServer()
   sServerStopped          = true;
 
   for (size_t i = 0; i < sDbsDescriptors->size(); i++)
-    (*sDbsDescriptors)[i].mSession->NotifyEvent(ISession::SERVER_STOPED, NULL);
+    (*sDbsDescriptors)[i].mSession->NotifyEvent(ISession::SERVER_STOPED, nullptr);
 }
 
 #ifdef ENABLE_MEMORY_TRACE

@@ -83,7 +83,7 @@ public:
   CmdLineException(const uint32_t      code,
                    const char*         file,
                    const uint32_t      line,
-                   const char*         fmtMsg = NULL,
+                   const char*         fmtMsg = nullptr,
                    ... );
 
   virtual Exception* Clone() const;

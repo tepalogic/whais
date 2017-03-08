@@ -1512,21 +1512,21 @@ add_table_value_tab1(ITable& table, const ROW_INDEX rowsCount)
 
   cout << "Filling a table with " << rowsCount << "..." << endl;
 
-  table.CreateIndex(table.RetrieveField("bool"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("char"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("date"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("datetime"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("hirestime"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("int8"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("int16"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("int32"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("int64"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("uint8"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("uint16"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("uint32"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("uint64"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("real"), NULL, NULL);
-  table.CreateIndex(table.RetrieveField("richreal"), NULL, NULL);
+  table.CreateIndex(table.RetrieveField("bool"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("char"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("date"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("datetime"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("hirestime"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("int8"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("int16"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("int32"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("int64"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("uint8"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("uint16"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("uint32"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("uint64"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("real"), nullptr, nullptr);
+  table.CreateIndex(table.RetrieveField("richreal"), nullptr, nullptr);
 
   for (ROW_INDEX row = 0; result && (row < rowsCount); ++row)
     {
@@ -1685,7 +1685,7 @@ repair_data_base(const bool broken)
   if (broken && valid)
     return false;
 
-  return DBSRepairDatabase(db_name, NULL, repair_callback);
+  return DBSRepairDatabase(db_name, nullptr, repair_callback);
 }
 
 

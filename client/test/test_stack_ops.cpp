@@ -164,7 +164,7 @@ test_stack_bulk_update(WH_CONNECTION hnd)
 
   for (uint_t i = 0; i < simpleTypesSize; ++i)
     {
-      if (WPushValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+      if (WPushValue(hnd, simpleTypes[i], 0, nullptr) != WCS_OK)
         goto test_stack_bulk_update_err;
     }
 
@@ -230,7 +230,7 @@ test_stack_step_update(WH_CONNECTION hnd)
       uint_t    type;
       uint_t    fieldsCount;
 
-      if ((WPushValue(hnd, simpleTypes[i], 0, NULL) != WCS_OK)
+      if ((WPushValue(hnd, simpleTypes[i], 0, nullptr) != WCS_OK)
           || (WFlush(hnd) != WCS_OK))
         {
           goto test_stack_step_update_err;
@@ -274,18 +274,18 @@ test_for_errors(WH_CONNECTION hnd)
 
   cout << "Testing against error conditions ... ";
 
-  if ((WPushValue(NULL, WHC_TYPE_REAL, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushValue(hnd, WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
-      || (WPushValue(hnd, WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, 0, NULL) != WCS_INVALID_ARGS)
+  if ((WPushValue(nullptr, WHC_TYPE_REAL, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_ARRAY_MASK | WHC_TYPE_NOTSET, 0, nullptr) != WCS_INVALID_ARGS)
+      || (WPushValue(hnd, WHC_TYPE_FIELD_MASK | WHC_TYPE_NOTSET, 0, nullptr) != WCS_INVALID_ARGS)
       || (WPushValue(hnd, WHC_TYPE_TABLE_MASK , 0, tableFields) != WCS_INVALID_ARGS)
       || (WPushValue(hnd, WHC_TYPE_TABLE_MASK, 1, &invalid1) != WCS_INVALID_ARGS)
       || (WPushValue(hnd, WHC_TYPE_TABLE_MASK, 1, &invalid2) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
-  else if ((WDescribeStackTop(NULL, NULL) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop(NULL, &type) != WCS_INVALID_ARGS)
-            || (WDescribeStackTop(hnd, NULL) != WCS_INVALID_ARGS))
+  else if ((WDescribeStackTop(nullptr, nullptr) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop(nullptr, &type) != WCS_INVALID_ARGS)
+            || (WDescribeStackTop(hnd, nullptr) != WCS_INVALID_ARGS))
     {
       goto test_for_errors_fail;
     }
@@ -319,7 +319,7 @@ DefaultUserPassword()
 int
 main(int argc, const char** argv)
 {
-  WH_CONNECTION hnd        = NULL;
+  WH_CONNECTION hnd        = nullptr;
 
 
   bool success = tc_settup_connection(argc, argv, &hnd);

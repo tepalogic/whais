@@ -22,9 +22,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
+
+
 #include <cstdlib>
 
 #include "whais.h"
+
 
 #ifndef ENABLE_MEMORY_TRACE
 extern "C"
@@ -37,8 +40,7 @@ custom_mem_alloc(size_t size)
 }
 
 void*
-custom_mem_realloc(void*     oldPtr,
-                    size_t    newSize)
+custom_mem_realloc(void* oldPtr, size_t newSize)
 {
   return realloc(oldPtr, newSize);
 }
@@ -50,8 +52,11 @@ custom_mem_free(void* ptr)
 }
 
 }; /* extern "C" */
+
 #endif /* ENABLE_MEMORY_TRACE */
 
+
+#ifdef CXX_CUSTOM_MEMORY_ALLOCATOR
 #undef new
 
 void*
@@ -60,10 +65,10 @@ operator new(std::size_t size)
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, nullptr, 0);
 #endif
 
-  if (ptr == NULL)
+  if (ptr == nullptr)
     throw std::bad_alloc();
   return ptr;
 }
@@ -74,7 +79,7 @@ operator new(std::size_t size, const std::nothrow_t&) noexcept
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, nullptr, 0);
 #endif
 
   return ptr;
@@ -91,7 +96,7 @@ operator new(std::size_t size, const char* file, uint_t line)
   void *ptr = custom_trace_mem_alloc(size, file, line);
 #endif
 
-  if (ptr == NULL)
+  if (ptr == nullptr)
     throw std::bad_alloc();
   return ptr;
 }
@@ -103,10 +108,10 @@ operator new [] (std::size_t size)
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, nullptr, 0);
 #endif
 
-  if (ptr == NULL)
+  if (ptr == nullptr)
     throw std::bad_alloc();
   return ptr;
 }
@@ -117,7 +122,7 @@ operator new[] (std::size_t size, const std::nothrow_t&) noexcept
 #ifndef ENABLE_MEMORY_TRACE
   void *ptr = custom_mem_alloc(size);
 #else
-  void *ptr = custom_trace_mem_alloc(size, NULL, 0);
+  void *ptr = custom_trace_mem_alloc(size, nullptr, 0);
 #endif
 
   return ptr;
@@ -134,7 +139,7 @@ operator new [] (std::size_t size, const char* file, uint_t line)
   void *ptr = custom_trace_mem_alloc(size, file, line);
 #endif
 
-  if (ptr == NULL)
+  if (ptr == nullptr)
     throw std::bad_alloc();
   return ptr;
 }
@@ -143,44 +148,45 @@ operator new [] (std::size_t size, const char* file, uint_t line)
 void
 operator delete(void* ptr) noexcept
 {
-  if (ptr != NULL)
+  if (ptr != nullptr)
 #ifndef ENABLE_MEMORY_TRACE
     custom_mem_free(ptr);
 #else
-  custom_trace_mem_free(ptr, NULL, 0);
+  custom_trace_mem_free(ptr, nullptr, 0);
 #endif
 }
 
 void
 operator delete(void* ptr, const char*, uint_t)
 {
-  if (ptr != NULL)
+  if (ptr != nullptr)
 #ifndef ENABLE_MEMORY_TRACE
     custom_mem_free(ptr);
 #else
-  custom_trace_mem_free(ptr, NULL, 0);
+  custom_trace_mem_free(ptr, nullptr, 0);
 #endif
 }
 
 void
 operator delete[] (void* ptr) noexcept
 {
-  if (ptr != NULL)
+  if (ptr != nullptr)
 #ifndef ENABLE_MEMORY_TRACE
     custom_mem_free(ptr);
 #else
-  custom_trace_mem_free(ptr, NULL, 0);
+  custom_trace_mem_free(ptr, nullptr, 0);
 #endif
 }
 
 void
 operator delete[] (void* ptr, const char*, uint_t )
 {
-  if (ptr != NULL)
+  if (ptr != nullptr)
 #ifndef ENABLE_MEMORY_TRACE
     custom_mem_free(ptr);
 #else
-    custom_trace_mem_free(ptr, NULL, 0);
+    custom_trace_mem_free(ptr, nullptr, 0);
 #endif
 }
 
+#endif /* CXX_CUSTOM_MEMORY_ALLOCATOR */

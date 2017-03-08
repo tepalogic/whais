@@ -371,7 +371,7 @@ test_array_read_value(DArray array, const DBS_T testVal)
   ArrayOperand arrayOp(array);
   NullOperand nullOp;
   StackValue sv(nullOp);
-  IOperand* pOp = NULL;
+  IOperand* pOp = nullptr;
 
   for (uint_t index = 0;
        (index < array.Count()) && result;

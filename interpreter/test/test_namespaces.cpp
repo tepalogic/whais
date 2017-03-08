@@ -396,7 +396,7 @@ main()
   InitInterpreter();
 
   {
-    ISession& commonSession = GetInstance(NULL);
+    ISession& commonSession = GetInstance(nullptr);
     ISession& db1Session    = GetInstance(test_db1);
     ISession& db2Session    = GetInstance(test_db2);
 

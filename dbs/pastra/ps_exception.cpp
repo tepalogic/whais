@@ -36,7 +36,7 @@ DBSException::DBSException(const uint32_t   code,
                             ...)
   : Exception(code, file, line)
 {
-  if (fmtMsg != NULL)
+  if (fmtMsg != nullptr)
   {
     va_list vl;
 
