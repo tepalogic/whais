@@ -31,12 +31,8 @@
 
 using namespace std;
 
-
-
-
 namespace whais {
 namespace prima {
-
 
 
 void
@@ -47,7 +43,6 @@ Unit::SetGlobalId(const uint32_t index, const uint32_t id)
 
   _RC(uint32_t*, mUnitData)[index] = id;
 }
-
 
 void
 Unit::SetProcedureId(const uint32_t index, const uint32_t id)
@@ -68,7 +63,6 @@ Unit::GetGlobalId(const uint32_t index) const
   return _RC(const uint32_t*, mUnitData)[index];
 }
 
-
 uint32_t
 Unit::GetProcedureId(const uint32_t index) const
 {
@@ -77,7 +71,6 @@ Unit::GetProcedureId(const uint32_t index) const
 
   return _RC(const uint32_t*, mUnitData)[mGlbsCount + index];
 }
-
 
 const uint8_t*
 Unit::GetConstData(const uint32_t offset) const
@@ -93,35 +86,32 @@ Unit::GetConstData(const uint32_t offset) const
 }
 
 
-
-
 UnitsManager::~UnitsManager()
 {
   for (uint32_t index = 0; index < mUnits.size(); ++index)
     delete [] _RC(uint8_t*, mUnits[index]);
 }
 
-
 uint32_t
-UnitsManager::AddUnit(const uint32_t     glbsCount,
-                       const uint32_t     procsCount,
-                       const uint8_t*     constData,
-                       const uint32_t     constDataSize)
+UnitsManager::AddUnit(const uint32_t glbsCount,
+                      const uint32_t procsCount,
+                      const uint8_t* constData,
+                      const uint32_t constDataSize)
 {
-  const uint_t entrySize = sizeof(Unit) +
-                           (glbsCount + procsCount) * sizeof(uint32_t) +
-                           constDataSize;
+  const uint_t entrySize = sizeof(Unit)
+                           + (glbsCount + procsCount) * sizeof(uint32_t)
+                           + constDataSize;
 
   unique_ptr<uint8_t> entryBuff(new uint8_t[entrySize]);
-  Unit* const       entry = _RC(Unit*, entryBuff.get());
+  Unit* const entry = _RC(Unit*, entryBuff.get());
 
-  entry->mGlbsCount  = glbsCount;
+  entry->mGlbsCount = glbsCount;
   entry->mProcsCount = procsCount;
-  entry->mConstSize  = constDataSize;
+  entry->mConstSize = constDataSize;
 
   memcpy(entry->mUnitData + ((glbsCount + procsCount) * sizeof(uint32_t)),
-          constData,
-          constDataSize);
+         constData,
+         constDataSize);
 
   const uint32_t result = mUnits.size();
   mUnits.push_back(entry);
@@ -153,8 +143,8 @@ UnitsManager::GetUnit(const uint32_t unitIndex)
 
 void
 UnitsManager::SetGlobalIndex(const uint32_t unitIndex,
-                              const uint32_t unitGlbIndex,
-                              const uint32_t glbMgrIndex)
+                             const uint32_t unitGlbIndex,
+                             const uint32_t glbMgrIndex)
 {
   assert(unitIndex < mUnits.size());
 
@@ -164,8 +154,8 @@ UnitsManager::SetGlobalIndex(const uint32_t unitIndex,
 
 void
 UnitsManager::SetProcedureIndex(const uint32_t unitIndex,
-                                 const uint32_t unitProcIndex,
-                                 const uint32_t procMgrIndex)
+                                const uint32_t unitProcIndex,
+                                const uint32_t procMgrIndex)
 {
   assert(unitIndex < mUnits.size());
 
@@ -174,8 +164,7 @@ UnitsManager::SetProcedureIndex(const uint32_t unitIndex,
 
 
 uint32_t
-UnitsManager::GetGlobalIndex(const uint32_t unitIndex,
-                              const uint32_t unitGlbIndex) const
+UnitsManager::GetGlobalIndex(const uint32_t unitIndex, const uint32_t unitGlbIndex) const
 {
   assert(unitIndex < mUnits.size());
 
@@ -184,8 +173,8 @@ UnitsManager::GetGlobalIndex(const uint32_t unitIndex,
 
 
 uint32_t
-UnitsManager::GetProcedureIndex(const uint32_t     unitIndex,
-                                 const uint32_t     unitProcIndex) const
+UnitsManager::GetProcedureIndex(const uint32_t unitIndex,
+                                const uint32_t unitProcIndex) const
 {
   assert(unitIndex < mUnits.size());
 
@@ -195,4 +184,3 @@ UnitsManager::GetProcedureIndex(const uint32_t     unitIndex,
 
 } //namespace prima
 } //namespace whais
-

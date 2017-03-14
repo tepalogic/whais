@@ -32,22 +32,21 @@
 
 using namespace std;
 
-
 namespace whais {
 namespace prima {
 
 
 uint32_t
-ProcedureManager::AddProcedure(const uint8_t* const  name,
-                                const uint_t          nameLength,
-                                const uint32_t        localsCount,
-                                const uint32_t        argsCount,
-                                const uint32_t        syncCount,
-                                vector<StackValue>&   localValues,
-                                const uint32_t*       typesOffset,
-                                const uint8_t*        code,
-                                const uint32_t        codeSize,
-                                Unit* const           unit)
+ProcedureManager::AddProcedure(const uint8_t* const name,
+                               const uint_t nameLength,
+                               const uint32_t localsCount,
+                               const uint32_t argsCount,
+                               const uint32_t syncCount,
+                               vector<StackValue>& localValues,
+                               const uint32_t* typesOffset,
+                               const uint8_t* code,
+                               const uint32_t codeSize,
+                               Unit* const unit)
 {
   assert(GetProcedure(name, nameLength) == INVALID_ENTRY);
   assert(localsCount > 0);
@@ -73,37 +72,30 @@ ProcedureManager::AddProcedure(const uint8_t* const  name,
   const uint32_t result = mProcsEntrys.size();
 
   mSyncStmts.insert(mSyncStmts.end(), syncCount, false);
-  mLocalsValues.insert(mLocalsValues.end(),
-                         &localValues[0],
-                         &localValues[0] + localsCount);
+  mLocalsValues.insert(mLocalsValues.end(), &localValues[0], &localValues[0] + localsCount);
   mIdentifiers.insert(mIdentifiers.end(), name, name + nameLength);
   mIdentifiers.push_back(0);
   mDefinitions.insert(mDefinitions.end(), code, code + codeSize);
-  mLocalsTypes.insert(mLocalsTypes.end(),
-                       typesOffset,
-                       typesOffset + localsCount);
+  mLocalsTypes.insert(mLocalsTypes.end(), typesOffset, typesOffset + localsCount);
 
   mProcsEntrys.push_back(entry);
 
   return result;
 }
 
-
 uint32_t
-ProcedureManager::GetProcedure(const uint8_t* const name,
-                                const uint_t         nameLength) const
+ProcedureManager::GetProcedure(const uint8_t* const name, const uint_t nameLength) const
 {
   for (uint32_t index = 0; index < mProcsEntrys.size(); ++index)
-    {
-      const char* const entryName =
-              _RC(const char*, &mIdentifiers[mProcsEntrys[index].mIdIndex]);
+  {
+    const char* const entryName = _RC(const char*, &mIdentifiers[mProcsEntrys[index].mIdIndex]);
 
-      if ((strlen(entryName) == nameLength)
-          && (memcmp(name, entryName, nameLength) == 0))
-        {
-          return index;
-        }
+    if (strlen(entryName) == nameLength
+        && memcmp(name, entryName, nameLength) == 0)
+    {
+      return index;
     }
+  }
 
   return INVALID_ENTRY;
 }
@@ -120,7 +112,6 @@ ProcedureManager::GetProcedure(const uint32_t procId)
 
   return mProcsEntrys[procedure];
 }
-
 
 const uint8_t*
 ProcedureManager::Name(const uint_t procId) const
@@ -142,10 +133,8 @@ ProcedureManager::ArgsCount(const uint_t procId) const
   return mProcsEntrys[procedure].mArgsCount;
 }
 
-
 const StackValue&
-ProcedureManager::LocalValue(const uint_t   procId,
-                              const uint32_t local) const
+ProcedureManager::LocalValue(const uint_t procId, const uint32_t local) const
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
@@ -160,10 +149,8 @@ ProcedureManager::LocalValue(const uint_t   procId,
   return mLocalsValues[entry.mLocalsIndex + local];
 }
 
-
 const uint8_t*
-ProcedureManager::LocalTypeDescription(const uint_t   procId,
-                                        const uint32_t local) const
+ProcedureManager::LocalTypeDescription(const uint_t procId, const uint32_t local) const
 {
   const uint32_t procedure = procId & ~GLOBAL_ID;
 
@@ -184,10 +171,8 @@ ProcedureManager::LocalTypeDescription(const uint_t   procId,
   return typeMgr.TypeDescription(mLocalsTypes[entry.mTypeOff + local]);
 }
 
-
 const uint8_t*
-ProcedureManager::Code(const Procedure&      proc,
-                        uint_t* const         outCodeSize) const
+ProcedureManager::Code(const Procedure& proc, uint_t* const outCodeSize) const
 {
   assert(proc.mProcMgr == this);
 
@@ -196,7 +181,6 @@ ProcedureManager::Code(const Procedure&      proc,
 
   return &mDefinitions[proc.mCodeIndex];
 }
-
 
 void
 ProcedureManager::AquireSync(const Procedure& proc, const uint32_t sync)
@@ -208,24 +192,22 @@ ProcedureManager::AquireSync(const Procedure& proc, const uint32_t sync)
     throw InterException(_EXTRA(InterException::INVALID_SYNC_REQ));
 
   do
+  {
+    LockRAII<Lock> holder(mSync);
+    const bool aquired = mSyncStmts[proc.mSyncIndex + sync];
+    if (aquired)
     {
-      LockRAII<Lock> holder(mSync);
-      const bool aquired = mSyncStmts[proc.mSyncIndex + sync];
-      if (aquired)
-        {
-          //Some one has taken this before us! Prepare to try again!
-          holder.Release();
-          wh_yield();
-        }
-      else
-        {
-          mSyncStmts[proc.mSyncIndex + sync] = true;
-          break;
-        }
+      //Some one has taken this before us! Prepare to try again!
+      holder.Release();
+      wh_yield();
     }
-  while (true);
+    else
+    {
+      mSyncStmts[proc.mSyncIndex + sync] = true;
+      break;
+    }
+  } while (true);
 }
-
 
 void
 ProcedureManager::ReleaseSync(const Procedure& proc, const uint32_t sync)
@@ -244,4 +226,3 @@ ProcedureManager::ReleaseSync(const Procedure& proc, const uint32_t sync)
 
 } //namespace prima
 } //namespace whais
-

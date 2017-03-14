@@ -28,33 +28,18 @@
 #include "pm_globals.h"
 #include "pm_interpreter.h"
 
+
 using namespace std;
-
-
 
 namespace whais {
 namespace prima {
 
 
-
-GlobalsManager::~GlobalsManager()
-{
-#if 0
-  for (vector<GlobalValue>::iterator it = mStorage.begin();
-       it != mStorage.end();
-       ++it)
-    {
-      it->Operand().~BaseOperand();
-    }
-#endif
-}
-
-
 uint32_t
 GlobalsManager::AddGlobal(const uint8_t* const name,
-                           const uint_t         nameLength,
-                           const GlobalValue&   value,
-                           const uint32_t       typeOffset)
+                          const uint_t         nameLength,
+                          GlobalValue&&        value,
+                          const uint32_t       typeOffset)
 {
   assert(FindGlobal(name, nameLength) == INVALID_ENTRY);
   assert(mGlobalsEntrys.size() == mStorage.size());
@@ -65,7 +50,7 @@ GlobalsManager::AddGlobal(const uint8_t* const name,
   mIdentifiers.insert(mIdentifiers.end(), name, name + nameLength);
   mIdentifiers.push_back(0);
 
-  mStorage.push_back(value);
+  mStorage.push_back(std::move(value));
 
   const GlobalEntry entry = {IdOffset, typeOffset};
 
@@ -74,29 +59,24 @@ GlobalsManager::AddGlobal(const uint8_t* const name,
   return result;
 }
 
-
 uint32_t
-GlobalsManager::FindGlobal(const uint8_t* const name,
-                            const uint_t         nameLength)
+GlobalsManager::FindGlobal(const uint8_t* const name, const uint_t nameLength)
 {
   assert(mGlobalsEntrys.size() == mStorage.size());
 
   uint32_t iterator = 0;
+  for (auto& entry : mGlobalsEntrys)
+  {
+    const auto entryName = _RC(const char*, &mIdentifiers[entry.mIdOffet]);
 
-  while (iterator < mGlobalsEntrys.size())
+    if (strlen(entryName) == nameLength
+        && memcmp(entryName, name, nameLength) == 0)
     {
-      const GlobalEntry& entry     = mGlobalsEntrys[iterator];
-      const char* const  entryName = _RC(const char*,
-                                          &mIdentifiers[entry.mIdOffet]);
-
-      if ((strlen(entryName) == nameLength)
-          && (memcmp(entryName, name, nameLength) == 0))
-        {
-          return iterator;
-        }
-
-      ++iterator;
+      return iterator;
     }
+
+    ++iterator;
+  }
 
   return INVALID_ENTRY;
 }
@@ -108,9 +88,7 @@ GlobalsManager::Name(const uint_t index) const
   if (index >= mStorage.size())
     throw InterException(_EXTRA(InterException::INVALID_GLOBAL_REQ));
 
-  const GlobalEntry& entry = mGlobalsEntrys[index];
-
-  return  &mIdentifiers [entry.mIdOffet];
+  return &mIdentifiers[mGlobalsEntrys[index].mIdOffet];
 }
 
 GlobalValue&
@@ -138,16 +116,14 @@ GlobalsManager::TypeDescription(const uint32_t glbId)
   if (index >= mGlobalsEntrys.size())
     throw InterException(_EXTRA(InterException::INVALID_GLOBAL_REQ));
 
-  TypeManager&   typeMgr = mNames.GetTypeManager();
-  const uint8_t* pType   = typeMgr.TypeDescription(
-                                          mGlobalsEntrys[index].mTypeOffset
-                                                   );
+  TypeManager& typeMgr = mNames.GetTypeManager();
+  const uint8_t* const pType = typeMgr.TypeDescription(mGlobalsEntrys[index].mTypeOffset);
 
   assert(typeMgr.IsTypeValid(pType));
 
   return pType;
 }
 
+
 } //namespace prima
 } //namespace whais
-

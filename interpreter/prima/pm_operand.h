@@ -25,18 +25,15 @@
 #ifndef PM_OPERAND_H_
 #define PM_OPERAND_H_
 
-#include "utils/wthread.h"
 
+#include "utils/wthread.h"
 #include "interpreter.h"
 #include "operands.h"
-
 #include "pm_table.h"
-
 
 
 namespace whais {
 namespace prima {
-
 
 
 template <typename T_DEST, typename T_SRC> T_DEST
@@ -48,7 +45,6 @@ internal_add(const T_DEST& firstOp, const T_SRC& secondOp)
   return _SC(T_DEST, firstOp.mValue + secondOp.mValue);
 }
 
-
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_sub(const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -57,7 +53,6 @@ internal_sub(const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST(firstOp.mValue - secondOp.mValue);
 }
-
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mul(const T_DEST& firstOp, const T_SRC& secondOp)
@@ -68,7 +63,6 @@ internal_mul(const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST(firstOp.mValue * secondOp.mValue);
 }
 
-
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_div(const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -77,7 +71,6 @@ internal_div(const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST(firstOp.mValue / secondOp.mValue);
 }
-
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_mod(const T_DEST& firstOp, const T_SRC& secondOp)
@@ -88,7 +81,6 @@ internal_mod(const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST(firstOp.mValue % secondOp.mValue);
 }
 
-
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_and(const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -97,7 +89,6 @@ internal_and(const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST(firstOp.mValue & secondOp.mValue);
 }
-
 
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_xor(const T_DEST& firstOp, const T_SRC& secondOp)
@@ -108,7 +99,6 @@ internal_xor(const T_DEST& firstOp, const T_SRC& secondOp)
   return T_DEST(firstOp.mValue ^ secondOp.mValue);
 }
 
-
 template <typename T_DEST, typename T_SRC> T_DEST
 internal_or(const T_DEST& firstOp, const T_SRC& secondOp)
 {
@@ -117,7 +107,6 @@ internal_or(const T_DEST& firstOp, const T_SRC& secondOp)
 
   return T_DEST(firstOp.mValue ^ secondOp.mValue);
 }
-
 
 template <typename T_SRC, typename T_DEST> void
 number_convert(const T_SRC& from, T_DEST& to)
@@ -131,7 +120,6 @@ class FieldOperand;
 class NativeObjectOperand;
 class LocalOperand;
 class GlobalOperand;
-
 
 
 class BaseOperand : public IOperand
@@ -226,16 +214,11 @@ public:
 };
 
 
-
 class NullOperand : public BaseOperand
 {
 public:
-  NullOperand()
-    : BaseOperand()
-  {
-  }
-
-  virtual ~NullOperand();
+  NullOperand() = default;
+  virtual ~NullOperand() = default;
 
   virtual bool IsNull() const;
 
@@ -267,8 +250,7 @@ class BoolOperand : public BaseOperand
 {
 public:
   explicit BoolOperand(const DBool& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -298,8 +280,7 @@ class CharOperand : public BaseOperand
 {
 public:
   explicit CharOperand(const DChar& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -323,8 +304,7 @@ class DateOperand : public BaseOperand
 {
 public:
   explicit DateOperand(const DDate& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -350,8 +330,7 @@ class DateTimeOperand : public BaseOperand
 {
 public:
   explicit DateTimeOperand(const DDateTime& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -377,8 +356,7 @@ class HiresTimeOperand : public BaseOperand
 {
 public:
   explicit HiresTimeOperand(const DHiresTime& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -404,8 +382,7 @@ class UInt8Operand : public BaseOperand
 {
 public:
   explicit UInt8Operand(const DUInt8& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -458,8 +435,7 @@ class UInt16Operand : public BaseOperand
 {
 public:
   explicit UInt16Operand(const DUInt16& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -510,8 +486,7 @@ class UInt32Operand : public BaseOperand
 {
 public:
   explicit UInt32Operand(const DUInt32& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -564,8 +539,7 @@ class UInt64Operand : public BaseOperand
 {
 public:
   explicit UInt64Operand(const DUInt64& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -618,8 +592,7 @@ class Int8Operand : public BaseOperand, public DInt8
 {
 public:
   explicit Int8Operand(const DInt8& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -672,8 +645,7 @@ class Int16Operand : public BaseOperand, public DInt16
 {
 public:
   explicit Int16Operand(const DInt16& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -726,8 +698,7 @@ class Int32Operand : public BaseOperand
 {
 public:
   explicit Int32Operand(const DInt32& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -780,8 +751,7 @@ class Int64Operand : public BaseOperand
 {
 public:
   explicit Int64Operand(const DInt64& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -834,8 +804,7 @@ class RealOperand : public BaseOperand
 {
 public:
   explicit RealOperand(const DReal& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -872,8 +841,7 @@ class RichRealOperand : public BaseOperand
 {
 public:
   explicit RichRealOperand(const DRichReal& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -910,8 +878,7 @@ class TextOperand : public BaseOperand
 {
 public:
   explicit TextOperand(const DText& value)
-    : BaseOperand(),
-      mValue(value)
+    : mValue(value)
   {
   }
 
@@ -942,16 +909,14 @@ class CharTextElOperand : public BaseOperand
 {
 public:
   CharTextElOperand(DText &text, const uint64_t index)
-    : BaseOperand(),
-      mIndex(index),
+    : mIndex(index),
       mText()
   {
     text.MakeMirror(mText);
   }
 
   CharTextElOperand(const CharTextElOperand& source)
-    : BaseOperand(),
-      mIndex(source.mIndex),
+    : mIndex(source.mIndex),
       mText()
   {
     _CC(DText&, source.mText).MakeMirror(mText);
@@ -983,11 +948,10 @@ class ArrayOperand : public BaseOperand
 {
 public:
   explicit ArrayOperand(const DArray& array)
-    : BaseOperand(),
-      mValue(array),
+    : mValue(array),
       mFirstArrayType(array.Type())
-    {
-    }
+  {
+  }
 
   virtual bool IsNull() const;
 
@@ -1014,16 +978,13 @@ class BaseArrayElOperand : public BaseOperand
 {
 protected:
   BaseArrayElOperand(DArray& array, const uint64_t index)
-    : BaseOperand(),
-      mIndex(index),
-      mArray()
+    : mIndex(index)
   {
     array.MakeMirror(mArray);
   }
 
   BaseArrayElOperand(const BaseArrayElOperand& source)
-    : BaseOperand(),
-      mIndex(source.mIndex),
+    : mIndex(source.mIndex),
       mArray()
   {
     source.mArray.MakeMirror(mArray);
@@ -1033,14 +994,14 @@ protected:
   template <typename DBS_T> void Get(DBS_T& out) const
   {
     if (mArray.Count() <= mIndex)
-      {
-        out = DBS_T();
-        return ;
-      }
+    {
+      out = DBS_T();
+      return;
+    }
 
     mArray.Get(mIndex, out);
 
-    assert(! out.IsNull());
+    assert( !out.IsNull());
   }
 
   template <typename DBS_T> void Set(const DBS_T& value)
@@ -1649,24 +1610,21 @@ class TableOperand : public BaseOperand
 {
 public:
   TableOperand(IDBSHandler& dbsHnd, ITable& table, const bool changeable)
-    : BaseOperand(),
-      mTableRef(new TableReference(dbsHnd, table)),
+    : mTableRef(new TableReference(dbsHnd, table)),
       mChangeable(changeable)
   {
     mTableRef->IncrementRefCount();
   }
 
   TableOperand(const TableOperand& source)
-    : BaseOperand(),
-      mTableRef(source.mTableRef),
+    : mTableRef(source.mTableRef),
       mChangeable(source.mChangeable)
   {
     mTableRef->IncrementRefCount();
   }
 
   TableOperand(TableReference& tableRef)
-    : BaseOperand(),
-      mTableRef(&tableRef),
+    : mTableRef(&tableRef),
       mChangeable(true)
   {
     mTableRef->IncrementRefCount();
@@ -1677,13 +1635,13 @@ public:
   const TableOperand& operator= (const TableOperand& source)
   {
     if (this != &source)
-      {
-        mTableRef->DecrementRefCount();
-        mTableRef = source.mTableRef;
-        mTableRef->IncrementRefCount();
+    {
+      mTableRef->DecrementRefCount();
+      mTableRef = source.mTableRef;
+      mTableRef->IncrementRefCount();
 
-        mChangeable = source.mChangeable;
-      }
+      mChangeable = source.mChangeable;
+    }
     return *this;
   }
 
@@ -1765,9 +1723,7 @@ class BaseFieldElOperand : public BaseOperand
   friend class ArrayFieldElOperand;
 
 protected:
-  BaseFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  BaseFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : mTableRef(tableRef),
       mRow(row),
       mField(field)
@@ -1786,15 +1742,15 @@ protected:
 
   virtual ~BaseFieldElOperand();
 
-  template <typename DBS_T> void Get(DBS_T& out) const
+  template<typename DBS_T> void Get(DBS_T& out) const
   {
     ITable& table = mTableRef->GetTable();
 
     if (table.AllocatedRows() <= mRow)
-      {
-        out = DBS_T();
-        return ;
-      }
+    {
+      out = DBS_T();
+      return;
+    }
 
     table.Get(mRow, mField, out);
   }
@@ -1823,9 +1779,7 @@ private:
 class BoolFieldElOperand : public BaseFieldElOperand
 {
 public:
-  BoolFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  BoolFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -1852,9 +1806,7 @@ public:
 class CharFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  CharFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -1875,9 +1827,7 @@ public:
 class DateFieldElOperand : public BaseFieldElOperand
 {
 public:
-  DateFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  DateFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -1901,9 +1851,9 @@ class DateTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
 
-  DateTimeFieldElOperand(TableReference*   tableRef,
-                          const ROW_INDEX   row,
-                          const FIELD_INDEX field)
+  DateTimeFieldElOperand(TableReference* const tableRef,
+                         const ROW_INDEX row,
+                         const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -1926,9 +1876,9 @@ public:
 class HiresTimeFieldElOperand : public BaseFieldElOperand
 {
 public:
-  HiresTimeFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field)
+  HiresTimeFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -1951,9 +1901,7 @@ public:
 class UInt8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt8FieldElOperand(TableReference*   tableRef,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
+  UInt8FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2003,10 +1951,8 @@ public:
 class UInt16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt16FieldElOperand(TableReference*   tableRef,
-                        const ROW_INDEX   row,
-                        const FIELD_INDEX field)
-    : BaseFieldElOperand(tableRef, row, field)
+  UInt16FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
+      : BaseFieldElOperand(tableRef, row, field)
   {
   }
 
@@ -2055,9 +2001,7 @@ public:
 class UInt32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt32FieldElOperand(TableReference*   tableRef,
-                        const ROW_INDEX   row,
-                        const FIELD_INDEX field)
+  UInt32FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2107,9 +2051,7 @@ public:
 class UInt64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  UInt64FieldElOperand(TableReference*   tableRef,
-                        const ROW_INDEX   row,
-                        const FIELD_INDEX field)
+  UInt64FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2159,10 +2101,8 @@ public:
 class Int8FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int8FieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
-    : BaseFieldElOperand(tableRef, row, field)
+  Int8FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
+      : BaseFieldElOperand(tableRef, row, field)
   {
   }
 
@@ -2211,9 +2151,7 @@ public:
 class Int16FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int16FieldElOperand(TableReference*   tableRef,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
+  Int16FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2263,9 +2201,7 @@ public:
 class Int32FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int32FieldElOperand(TableReference*   tableRef,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
+  Int32FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2315,9 +2251,7 @@ public:
 class Int64FieldElOperand : public BaseFieldElOperand
 {
 public:
-  Int64FieldElOperand(TableReference*   tableRef,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
+  Int64FieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2368,9 +2302,7 @@ public:
 class RealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RealFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  RealFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2404,9 +2336,9 @@ public:
 class RichRealFieldElOperand : public BaseFieldElOperand
 {
 public:
-  RichRealFieldElOperand(TableReference*   tableRef,
-                          const ROW_INDEX   row,
-                          const FIELD_INDEX field)
+  RichRealFieldElOperand(TableReference* const tableRef,
+                         const ROW_INDEX row,
+                         const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2440,9 +2372,7 @@ public:
 class TextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  TextFieldElOperand(TableReference*   tableRef,
-                      const ROW_INDEX   row,
-                      const FIELD_INDEX field)
+  TextFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2467,9 +2397,7 @@ public:
 class ArrayFieldElOperand : public BaseFieldElOperand
 {
 public:
-  ArrayFieldElOperand(TableReference*   tableRef,
-                       const ROW_INDEX   row,
-                       const FIELD_INDEX field)
+  ArrayFieldElOperand(TableReference* const tableRef, const ROW_INDEX row, const FIELD_INDEX field)
     : BaseFieldElOperand(tableRef, row, field)
   {
   }
@@ -2491,10 +2419,10 @@ public:
 class CharTextFieldElOperand : public BaseFieldElOperand
 {
 public:
-  CharTextFieldElOperand(TableReference*   tableRef,
-                          const ROW_INDEX   row,
-                          const FIELD_INDEX field,
-                          const uint64_t    index)
+  CharTextFieldElOperand(TableReference* const tableRef,
+                         const ROW_INDEX row,
+                         const FIELD_INDEX field,
+                         const uint64_t index)
     : BaseFieldElOperand(tableRef, row, field),
       mIndex(index)
   {
@@ -2522,10 +2450,10 @@ private:
 class BaseArrayFieldElOperand : public BaseOperand
 {
 protected:
-  BaseArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  BaseArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
      : mIndex(index),
        mTableRef(tableRef),
        mRow(row),
@@ -2602,10 +2530,10 @@ private:
 class BoolArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  BoolArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  BoolArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2630,10 +2558,10 @@ public:
 class CharArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  CharArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  CharArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2652,10 +2580,10 @@ public:
 class DateArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  DateArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2675,10 +2603,10 @@ public:
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  DateTimeArrayFieldElOperand(TableReference*   tableRef,
-                               const ROW_INDEX   row,
-                               const FIELD_INDEX field,
-                               const uint64_t    index)
+  DateTimeArrayFieldElOperand(TableReference* const tableRef,
+                              const ROW_INDEX row,
+                              const FIELD_INDEX field,
+                              const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2698,10 +2626,10 @@ public:
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  HiresTimeArrayFieldElOperand(TableReference*   tableRef,
-                                const ROW_INDEX   row,
-                                const FIELD_INDEX field,
-                                const uint64_t    index)
+  HiresTimeArrayFieldElOperand(TableReference* const tableRef,
+                               const ROW_INDEX row,
+                               const FIELD_INDEX field,
+                               const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2721,10 +2649,10 @@ public:
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt8ArrayFieldElOperand(TableReference*   tableRef,
-                            const ROW_INDEX   row,
-                            const FIELD_INDEX field,
-                            const uint64_t    index)
+  UInt8ArrayFieldElOperand(TableReference* const tableRef,
+                           const ROW_INDEX row,
+                           const FIELD_INDEX field,
+                           const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2772,10 +2700,10 @@ public:
 class UInt16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt16ArrayFieldElOperand(TableReference*   tableRef,
-                             const ROW_INDEX   row,
-                             const FIELD_INDEX field,
-                             const uint64_t    index)
+  UInt16ArrayFieldElOperand(TableReference* const tableRef,
+                            const ROW_INDEX row,
+                            const FIELD_INDEX field,
+                            const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2821,10 +2749,10 @@ public:
 class UInt32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt32ArrayFieldElOperand(TableReference*   tableRef,
-                             const ROW_INDEX   row,
-                             const FIELD_INDEX field,
-                             const uint64_t    index)
+  UInt32ArrayFieldElOperand(TableReference* const tableRef,
+                            const ROW_INDEX row,
+                            const FIELD_INDEX field,
+                            const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2872,10 +2800,10 @@ public:
 class UInt64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  UInt64ArrayFieldElOperand(TableReference*   tableRef,
-                             const ROW_INDEX   row,
-                             const FIELD_INDEX field,
-                             const uint64_t    index)
+  UInt64ArrayFieldElOperand(TableReference* const tableRef,
+                            const ROW_INDEX row,
+                            const FIELD_INDEX field,
+                            const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2922,10 +2850,10 @@ public:
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int8ArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  Int8ArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -2973,10 +2901,10 @@ public:
 class Int16ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int16ArrayFieldElOperand(TableReference*   tableRef,
-                            const ROW_INDEX   row,
-                            const FIELD_INDEX field,
-                            const uint64_t    index)
+  Int16ArrayFieldElOperand(TableReference* const tableRef,
+                           const ROW_INDEX row,
+                           const FIELD_INDEX field,
+                           const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -3024,10 +2952,10 @@ public:
 class Int32ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int32ArrayFieldElOperand(TableReference*   tableRef,
-                            const ROW_INDEX   row,
-                            const FIELD_INDEX field,
-                            const uint64_t    index)
+  Int32ArrayFieldElOperand(TableReference* const tableRef,
+                           const ROW_INDEX row,
+                           const FIELD_INDEX field,
+                           const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -3075,10 +3003,10 @@ public:
 class Int64ArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  Int64ArrayFieldElOperand(TableReference*   tableRef,
-                            const ROW_INDEX   row,
-                            const FIELD_INDEX field,
-                            const uint64_t    index)
+  Int64ArrayFieldElOperand(TableReference* const tableRef,
+                           const ROW_INDEX row,
+                           const FIELD_INDEX field,
+                           const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -3126,10 +3054,10 @@ public:
 class RealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RealArrayFieldElOperand(TableReference*   tableRef,
-                           const ROW_INDEX   row,
-                           const FIELD_INDEX field,
-                           const uint64_t    index)
+  RealArrayFieldElOperand(TableReference* const tableRef,
+                          const ROW_INDEX row,
+                          const FIELD_INDEX field,
+                          const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -3161,10 +3089,10 @@ public:
 class RichRealArrayFieldElOperand : public BaseArrayFieldElOperand
 {
 public:
-  RichRealArrayFieldElOperand(TableReference*   tableRef,
-                               const ROW_INDEX   row,
-                               const FIELD_INDEX field,
-                               const uint64_t    index)
+  RichRealArrayFieldElOperand(TableReference* const tableRef,
+                              const ROW_INDEX row,
+                              const FIELD_INDEX field,
+                              const uint64_t index)
     : BaseArrayFieldElOperand(tableRef, row, field, index)
   {
   }
@@ -3198,44 +3126,36 @@ class GlobalValue
 public:
   template <class OP_T>
   explicit GlobalValue(const OP_T& op)
-    : mSync(),
-      mOperandOwner(true)
   {
     const BaseOperand& compileTest = op;
     (void)compileTest; //Just to make sure OP_T is a valid type!
 
-    assert(sizeof(OP_T) <= sizeof(mStorage));
+    static_assert(sizeof(OP_T) <= sizeof(mStorage), "GLobal value needs more storage!");
     _placement_new(mStorage, op);
   }
 
-  GlobalValue(const GlobalValue& source)
-    : mSync(),
-      mOperandOwner(source.mOperandOwner)
+  GlobalValue(GlobalValue&& source)
   {
     for (uint_t i = 0; i < sizeof(mStorage) / sizeof(mStorage[0]); ++i)
       mStorage[i] = source.mStorage[i];
 
-    _CC(bool&, source.mOperandOwner) = false;
+    _placement_new(source.mStorage, NullOperand());
   }
 
-  const GlobalValue& operator= (const GlobalValue& source)
+  GlobalValue& operator= (GlobalValue&& source)
   {
     if (this == &source)
       return *this;
 
-    mOperandOwner = source.mOperandOwner;
     for (uint_t i = 0; i < sizeof(mStorage) / sizeof(mStorage[0]); ++i)
       mStorage[i] = source.mStorage[i];
 
-    _CC(bool&, source.mOperandOwner) = false;
+    _placement_new(source.mStorage, NullOperand());
+
     return *this;
   }
 
-  ~GlobalValue()
-  {
-    if (mOperandOwner)
-      Operand().~BaseOperand();
-  }
+  ~GlobalValue() { Operand().~BaseOperand(); }
 
   bool IsNull()
   {
@@ -3442,8 +3362,6 @@ public:
 
 private:
   Lock          mSync;
-  bool          mOperandOwner;
-
   uint64_t      mStorage[QWORDS_PER_OP];
 };
 
@@ -3644,5 +3562,5 @@ private:
 } //namespace prima
 } //namespace whais
 
-#endif /* PM_OPERAND_H_ */
 
+#endif /* PM_OPERAND_H_ */

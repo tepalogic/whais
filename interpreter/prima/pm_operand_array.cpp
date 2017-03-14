@@ -25,17 +25,14 @@
 #include <assert.h>
 
 #include "dbs/dbs_valtranslator.h"
-
 #include "pm_operand.h"
 #include "pm_typemanager.h"
 
+
 using namespace std;
-
-
 
 namespace whais {
 namespace prima {
-
 
 
 bool
@@ -44,20 +41,17 @@ ArrayOperand::IsNull() const
   return mValue.IsNull();
 }
 
-
 void
 ArrayOperand::GetValue(DArray& outValue) const
 {
   outValue = mValue;
 }
 
-
 void
 ArrayOperand::SetValue(const DArray& value)
 {
   mValue = value;
 }
-
 
 uint_t
 ArrayOperand::GetType()
@@ -67,7 +61,6 @@ ArrayOperand::GetType()
 
   return type;
 }
-
 
 StackValue
 ArrayOperand::GetValueAt(const uint64_t index)
@@ -126,13 +119,11 @@ ArrayOperand::GetValueAt(const uint64_t index)
   throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
 }
 
-
 StackValue
 ArrayOperand::Duplicate() const
 {
   return StackValue(*this);
 }
-
 
 bool
 ArrayOperand::StartIterate(const bool reverse, StackValue& outStartItem)
@@ -146,7 +137,6 @@ ArrayOperand::StartIterate(const bool reverse, StackValue& outStartItem)
   return true;
 }
 
-
 bool
 ArrayOperand::PrepareToCopy(void* const dest)
 {
@@ -155,25 +145,23 @@ ArrayOperand::PrepareToCopy(void* const dest)
 }
 
 
-
 bool
 BaseArrayElOperand::IsNull() const
 {
   return(mArray.Count() <= mIndex) ? true : false;
 }
 
-
 bool
 BaseArrayElOperand::Iterate(const bool reverse)
 {
   if (reverse)
-    {
-      if (mIndex == 0)
-        return false;
+  {
+    if (mIndex == 0)
+      return false;
 
-      _CC(uint64_t&, mIndex)--;
-      return true;
-    }
+    _CC(uint64_t&, mIndex)--;
+    return true;
+  }
 
   if (mIndex >= mArray.Count() - 1)
     return false;
@@ -182,13 +170,11 @@ BaseArrayElOperand::Iterate(const bool reverse)
   return true;
 }
 
-
 uint64_t
 BaseArrayElOperand::IteratorOffset()
 {
   return mIndex;
 }
-
 
 
 void
@@ -218,7 +204,6 @@ BoolArrayElOperand::SetValue(const DBool& value)
 {
   Set(value);
 }
-
 
 void
 BoolArrayElOperand::SelfAnd(const DBool& value)
@@ -255,13 +240,11 @@ BoolArrayElOperand::SelfOr(const DBool& value)
   Set(currValue);
 }
 
-
 uint_t
 BoolArrayElOperand::GetType()
 {
   return T_BOOL;
 }
-
 
 StackValue
 BoolArrayElOperand::Duplicate() const
@@ -286,7 +269,6 @@ CharArrayElOperand::GetValue(DChar& outValue) const
   Get(outValue);
 }
 
-
 void
 CharArrayElOperand::GetValue(DText& outValue) const
 {
@@ -297,20 +279,17 @@ CharArrayElOperand::GetValue(DText& outValue) const
   outValue.Append(ch);
 }
 
-
 void
 CharArrayElOperand::SetValue(const DChar& value)
 {
   Set(value);
 }
 
-
 uint_t
 CharArrayElOperand::GetType()
 {
   return T_CHAR;
 }
-
 
 StackValue
 CharArrayElOperand::Duplicate() const
@@ -320,7 +299,6 @@ CharArrayElOperand::Duplicate() const
 
   return StackValue(CharOperand(ch));
 }
-
 
 bool
 CharArrayElOperand::PrepareToCopy(void* const dest)
@@ -336,7 +314,6 @@ DateArrayElOperand::GetValue(DDate& outValue) const
   Get(outValue);
 }
 
-
 void
 DateArrayElOperand::GetValue(DDateTime& outValue) const
 {
@@ -346,7 +323,6 @@ DateArrayElOperand::GetValue(DDateTime& outValue) const
   outValue = currValue;
 }
 
-
 void
 DateArrayElOperand::GetValue(DHiresTime& outValue) const
 {
@@ -355,7 +331,6 @@ DateArrayElOperand::GetValue(DHiresTime& outValue) const
 
   outValue = currValue;
 }
-
 
 void
 DateArrayElOperand::GetValue(DText& outValue) const
@@ -368,7 +343,6 @@ DateArrayElOperand::GetValue(DText& outValue) const
 
   outValue = DText(_RC(char*, text));
 }
-
 
 void
 DateArrayElOperand::SetValue(const DHiresTime& value)
@@ -383,13 +357,11 @@ DateArrayElOperand::SetValue(const DHiresTime& value)
   Set(v);
 }
 
-
 uint_t
 DateArrayElOperand::GetType()
 {
   return T_DATE;
 }
-
 
 StackValue
 DateArrayElOperand::Duplicate() const
@@ -400,7 +372,6 @@ DateArrayElOperand::Duplicate() const
 
   return StackValue(DateOperand(value));
 }
-
 
 bool
 DateArrayElOperand::PrepareToCopy(void* const dest)
@@ -422,13 +393,11 @@ DateTimeArrayElOperand::GetValue(DDate& outValue) const
   _CC(uint8_t&,  outValue.mDay)    = currValue.mDay;
 }
 
-
 void
 DateTimeArrayElOperand::GetValue(DDateTime& outValue) const
 {
   Get(outValue);
 }
-
 
 void
 DateTimeArrayElOperand::GetValue(DHiresTime& outValue) const
@@ -438,7 +407,6 @@ DateTimeArrayElOperand::GetValue(DHiresTime& outValue) const
 
   outValue = currValue;
 }
-
 
 void
 DateTimeArrayElOperand::GetValue(DText& outValue) const
@@ -451,7 +419,6 @@ DateTimeArrayElOperand::GetValue(DText& outValue) const
 
   outValue = DText(_RC(char*, text));
 }
-
 
 void
 DateTimeArrayElOperand::SetValue(const DHiresTime& value)
@@ -469,13 +436,11 @@ DateTimeArrayElOperand::SetValue(const DHiresTime& value)
   Set(v);
 }
 
-
 uint_t
 DateTimeArrayElOperand::GetType()
 {
   return T_DATETIME;
 }
-
 
 StackValue
 DateTimeArrayElOperand::Duplicate() const
@@ -486,7 +451,6 @@ DateTimeArrayElOperand::Duplicate() const
 
   return StackValue(DateTimeOperand(value));
 }
-
 
 bool
 DateTimeArrayElOperand::PrepareToCopy(void* const dest)
@@ -508,7 +472,6 @@ HiresTimeArrayElOperand::GetValue(DDate& outValue) const
   _CC(uint8_t&, outValue.mDay)    = currValue.mDay;;
 }
 
-
 void
 HiresTimeArrayElOperand::GetValue(DDateTime& outValue) const
 {
@@ -524,13 +487,11 @@ HiresTimeArrayElOperand::GetValue(DDateTime& outValue) const
   _CC(uint8_t&, outValue.mSeconds)  = currValue.mSeconds;
 }
 
-
 void
 HiresTimeArrayElOperand::GetValue(DHiresTime& outValue) const
 {
   Get(outValue);
 }
-
 
 void
 HiresTimeArrayElOperand::GetValue(DText& outValue) const
@@ -544,13 +505,11 @@ HiresTimeArrayElOperand::GetValue(DText& outValue) const
   outValue = DText(_RC(char*, text));
 }
 
-
 void
 HiresTimeArrayElOperand::SetValue(const DHiresTime& value)
 {
   Set(value);
 }
-
 
 uint_t
 HiresTimeArrayElOperand::GetType()
@@ -567,7 +526,6 @@ HiresTimeArrayElOperand::Duplicate() const
 
   return StackValue(HiresTimeOperand(value));
 }
-
 
 bool
 HiresTimeArrayElOperand::PrepareToCopy(void* const dest)
@@ -586,7 +544,6 @@ UInt8ArrayElOperand::GetValue(DInt8& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DInt16& outValue) const
 {
@@ -595,7 +552,6 @@ UInt8ArrayElOperand::GetValue(DInt16& outValue) const
 
   number_convert(currValue, outValue);
 }
-
 
 void
 UInt8ArrayElOperand::GetValue(DInt32& outValue) const
@@ -606,7 +562,6 @@ UInt8ArrayElOperand::GetValue(DInt32& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DInt64& outValue) const
 {
@@ -615,7 +570,6 @@ UInt8ArrayElOperand::GetValue(DInt64& outValue) const
 
   number_convert(currValue, outValue);
 }
-
 
 void
 UInt8ArrayElOperand::GetValue(DRichReal& outValue) const
@@ -626,7 +580,6 @@ UInt8ArrayElOperand::GetValue(DRichReal& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DReal& outValue) const
 {
@@ -636,13 +589,11 @@ UInt8ArrayElOperand::GetValue(DReal& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DUInt8& outValue) const
 {
   Get(outValue);
 }
-
 
 void
 UInt8ArrayElOperand::GetValue(DUInt16& outValue) const
@@ -653,7 +604,6 @@ UInt8ArrayElOperand::GetValue(DUInt16& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DUInt32& outValue) const
 {
@@ -663,7 +613,6 @@ UInt8ArrayElOperand::GetValue(DUInt32& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt8ArrayElOperand::GetValue(DUInt64& outValue) const
 {
@@ -672,7 +621,6 @@ UInt8ArrayElOperand::GetValue(DUInt64& outValue) const
 
   number_convert(currValue, outValue);
 }
-
 
 void
 UInt8ArrayElOperand::GetValue(DText& outValue) const
@@ -685,7 +633,6 @@ UInt8ArrayElOperand::GetValue(DText& outValue) const
   Utf8Translator::Write(text, sizeof text, currValue);
   outValue = DText(_RC(char*, text));
 }
-
 
 void
 UInt8ArrayElOperand::SetValue(const DUInt64& value)
@@ -705,7 +652,6 @@ UInt8ArrayElOperand::SetValue(const DInt64& value)
   Set(v);
 }
 
-
 void
 UInt8ArrayElOperand::SelfAdd(const DInt64& value)
 {
@@ -716,7 +662,6 @@ UInt8ArrayElOperand::SelfAdd(const DInt64& value)
 
   Set(currValue);
 }
-
 
 void
 UInt8ArrayElOperand::SelfSub(const DInt64& value)
@@ -729,7 +674,6 @@ UInt8ArrayElOperand::SelfSub(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 UInt8ArrayElOperand::SelfMul(const DInt64& value)
 {
@@ -740,7 +684,6 @@ UInt8ArrayElOperand::SelfMul(const DInt64& value)
 
   Set(currValue);
 }
-
 
 void
 UInt8ArrayElOperand::SelfMul(const DUInt64& value)
@@ -753,7 +696,6 @@ UInt8ArrayElOperand::SelfMul(const DUInt64& value)
   Set(currValue);
 }
 
-
 void
 UInt8ArrayElOperand::SelfDiv(const DInt64& value)
 {
@@ -764,7 +706,6 @@ UInt8ArrayElOperand::SelfDiv(const DInt64& value)
 
   Set(currValue);
 }
-
 
 void
 UInt8ArrayElOperand::SelfDiv(const DUInt64& value)
@@ -811,7 +752,6 @@ UInt8ArrayElOperand::SelfAnd(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 UInt8ArrayElOperand::SelfXor(const DInt64& value)
 {
@@ -822,7 +762,6 @@ UInt8ArrayElOperand::SelfXor(const DInt64& value)
 
   Set(currValue);
 }
-
 
 void
 UInt8ArrayElOperand::SelfOr(const DInt64& value)
@@ -835,13 +774,11 @@ UInt8ArrayElOperand::SelfOr(const DInt64& value)
   Set(currValue);
 }
 
-
 uint_t
 UInt8ArrayElOperand::GetType()
 {
   return T_UINT8;
 }
-
 
 StackValue
 UInt8ArrayElOperand::Duplicate() const
@@ -851,7 +788,6 @@ UInt8ArrayElOperand::Duplicate() const
 
   return StackValue(UInt8Operand(value));
 }
-
 
 bool
 UInt8ArrayElOperand::PrepareToCopy(void* const dest)
@@ -870,7 +806,6 @@ UInt16ArrayElOperand::GetValue(DInt8& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt16ArrayElOperand::GetValue(DInt16& outValue) const
 {
@@ -879,7 +814,6 @@ UInt16ArrayElOperand::GetValue(DInt16& outValue) const
 
   number_convert(currValue, outValue);
 }
-
 
 void
 UInt16ArrayElOperand::GetValue(DInt32& outValue) const
@@ -890,7 +824,6 @@ UInt16ArrayElOperand::GetValue(DInt32& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 UInt16ArrayElOperand::GetValue(DInt64& outValue) const
 {
@@ -899,7 +832,6 @@ UInt16ArrayElOperand::GetValue(DInt64& outValue) const
 
   number_convert(currValue, outValue);
 }
-
 
 void
 UInt16ArrayElOperand::GetValue(DRichReal& outValue) const
@@ -3146,4 +3078,3 @@ RichRealArrayElOperand::PrepareToCopy(void* const dest)
 
 } //namespace prima
 } //namespace whais
-

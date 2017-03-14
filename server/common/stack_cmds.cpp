@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "dbs/dbs_valtranslator.h"
 #include "utils/endianness.h"
-#include "utils/auto_array.h"
 #include "utils/wutf.h"
 #include "server_protocol.h"
 
@@ -271,9 +270,9 @@ cmd_push_stack(ClientConnection& conn, uint_t* const inoutDataOff)
     }
   else
     {
-      static const uint_t            STACK_FIELDS_SIZE = 0x10;
-      DBSFieldDescriptor             stackFields[STACK_FIELDS_SIZE];
-      auto_array<DBSFieldDescriptor> heapFields;
+      static const uint_t              STACK_FIELDS_SIZE = 0x10;
+      DBSFieldDescriptor               stackFields[STACK_FIELDS_SIZE];
+      unique_ptr<DBSFieldDescriptor[]> heapFields;
 
       if ((*inoutDataOff + sizeof(uint16_t)) > dataSize)
         goto push_frame_error;
@@ -284,9 +283,15 @@ cmd_push_stack(ClientConnection& conn, uint_t* const inoutDataOff)
       if (fieldsCount == 0)
         return WCS_INVALID_ARGS;
 
-      DBSFieldDescriptor* const fields_ = (fieldsCount <= STACK_FIELDS_SIZE) ?
-                                            stackFields :
-                                            heapFields.Reset(fieldsCount);
+      DBSFieldDescriptor* fields_;
+      if (fieldsCount <= STACK_FIELDS_SIZE)
+        fields_ = stackFields;
+
+      else
+      {
+        heapFields = unique_array_make(DBSFieldDescriptor, fieldsCount);
+        fields_ = heapFields.get();
+      }
 
       for (uint_t field = 0; field < fieldsCount; ++field)
         {

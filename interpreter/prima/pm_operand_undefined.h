@@ -41,8 +41,8 @@ class NativeObjectOperand : public BaseOperand
 public:
   NativeObjectOperand();
   explicit NativeObjectOperand(INativeObject& object);
-  explicit NativeObjectOperand(const DArray&  array);
-  explicit NativeObjectOperand(const DText&   text);
+  explicit NativeObjectOperand(const DArray& array);
+  explicit NativeObjectOperand(const DText& text);
 
   NativeObjectOperand(const bool nullValue, const bool value);
 
@@ -51,29 +51,27 @@ public:
   NativeObjectOperand(const bool nullValue, const int64_t value);
   NativeObjectOperand(const bool nullValue, const uint64_t value);
 
-  NativeObjectOperand(const bool     nullValue,
-                       const int64_t  valIntPart,
-                       const int64_t  valFracPart);
+  NativeObjectOperand(const bool nullValue, const int64_t valIntPart, const int64_t valFracPart);
 
-  NativeObjectOperand(const bool      nullValue,
-                       const uint16_t  year,
-                       const uint8_t   month,
-                       const uint8_t   day,
-                       const uint8_t   hours        = 0,
-                       const uint8_t   mins         = 0,
-                       const uint8_t   secs         = 0,
-                       const uint32_t  microsec     = 0);
+  NativeObjectOperand(const bool nullValue,
+                      const uint16_t year,
+                      const uint8_t month,
+                      const uint8_t day,
+                      const uint8_t hours = 0,
+                      const uint8_t mins = 0,
+                      const uint8_t secs = 0,
+                      const uint32_t microsec = 0);
 
   explicit NativeObjectOperand(TableReference& tableRef);
 
   explicit NativeObjectOperand(TableReference* const tableRef,
-                                const uint_t          fieldIndex,
-                                const uint_t          type);
+                               const uint_t fieldIndex,
+                               const uint_t type);
 
   NativeObjectOperand(const NativeObjectOperand& source);
   virtual ~NativeObjectOperand();
 
-  NativeObjectOperand& operator= (const NativeObjectOperand& source);
+  NativeObjectOperand& operator=(const NativeObjectOperand& source);
 
   virtual bool IsNull() const;
   virtual void GetValue(DBool& outValue) const;
@@ -122,7 +120,7 @@ public:
 
   virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
 
-  virtual void           NativeObject(INativeObject* const value);
+  virtual void NativeObject(INativeObject* const value);
   virtual INativeObject& NativeObject();
 
   virtual bool PrepareToCopy(void* const dest);
@@ -134,7 +132,7 @@ private:
   {
     int64_t   mIntPart  : 64;
     int64_t   mFracPart : 63;
-    int64_t   mNull     : 1;
+    bool      mNull     : 1;
   };
 
   struct FieldValue
@@ -171,21 +169,21 @@ private:
   void Initialise();
   void Cleanup();
 
-  uint16_t               mType;
   union
-    {
-      UIntValue          mUIntValue;
-      IntValue           mIntValue;
+  {
+    UIntValue          mUIntValue;
+    IntValue           mIntValue;
 
-      INativeObject*     mNativeValue;
-      TableReference*    mTableValue;
-      FieldValue         mFieldValue;
-      RealValue          mRealValue;
-      TimeValue          mTimeValue;
+    INativeObject*     mNativeValue;
+    TableReference*    mTableValue;
+    FieldValue         mFieldValue;
+    RealValue          mRealValue;
+    TimeValue          mTimeValue;
 
-      uint8_t            mArrayValue[sizeof(DArray)];
-      uint8_t            mTextValue[sizeof(DText)];
-    };
+    uint8_t            mArrayValue[sizeof(DArray)];
+    uint8_t            mTextValue[sizeof(DText)];
+  };
+  uint16_t mType;
 };
 
 

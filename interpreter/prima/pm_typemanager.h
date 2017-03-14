@@ -44,34 +44,26 @@ class TypeManager
 
 public:
   TypeManager(NameSpace& space);
+  TypeManager(const TypeManager&) = delete;
+  TypeManager& operator= (const TypeManager&) = delete;
+
 
   uint32_t FindType(const uint8_t* const typeDesc);
-
   uint32_t AddType(const uint8_t* const typeDesc);
-
   const uint8_t* TypeDescription(const uint32_t offset) const;
-
   static bool IsTypeValid(const uint8_t* const typeDesc);
-
   static uint_t GetTypeLength(const uint8_t* const typeDesc);
 
-  GlobalValue CreateGlobalValue(uint8_t* const inoutTypeDesc,
-                                 ITable*        persitentTable);
-
+  GlobalValue CreateGlobalValue(uint8_t* const inoutTypeDesc, ITable* persitentTable);
   StackValue  CreateLocalValue(uint8_t* const inoutTypeDesc);
 
 
   static const uint32_t INVALID_OFFSET = 0xFFFFFFFF;
 
 private:
-  TypeManager(const TypeManager&);
-  TypeManager& operator= (const TypeManager&);
-
-
   NameSpace&           mNameSpace;
   std::vector<uint8_t> mTypesDescriptions;
 };
-
 
 
 std::vector<uint8_t>
@@ -81,5 +73,5 @@ compute_table_typeinfo(ITable& table);
 } //namespace prima
 } //namespace whais
 
-#endif /* PR_TYPEMANAGER_H_ */
 
+#endif /* PR_TYPEMANAGER_H_ */

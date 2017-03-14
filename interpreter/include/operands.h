@@ -47,7 +47,7 @@ class INativeObject;
 class INTERP_SHL INativeObject
 {
 public:
-  virtual ~INativeObject();
+  virtual ~INativeObject() = default;
 
   virtual void RegisterUser() = 0;
   virtual void ReleaseUser() = 0;
@@ -59,7 +59,7 @@ class INTERP_SHL IOperand
   friend class StackValue;
 
 public:
-  virtual ~IOperand();
+  virtual ~IOperand() = default;
 
   virtual bool IsNull() const = 0;
 
@@ -151,7 +151,7 @@ public:
     const IOperand& compileTest = op;
     (void)compileTest;  //Just to make sure the right type is used.
 
-    assert(sizeof(OP_T) <= sizeof(mStorage));
+    static_assert(sizeof(OP_T) <= sizeof(mStorage), "Stack value storage not big enough!");
 
     _placement_new(mStorage, op);
   }
@@ -181,10 +181,7 @@ public:
     return *this;
   }
 
-  IOperand& Operand()
-  {
-    return *_RC(IOperand*, mStorage);
-  }
+  IOperand& Operand() { return *_RC(IOperand*, mStorage); }
 
 
   static StackValue Create(const DBool& value);
@@ -205,12 +202,8 @@ public:
   static StackValue Create(const DText& value);
   static StackValue Create(const DArray& value);
 
-
 private:
-  void Clear()
-  {
-    Operand().~IOperand();
-  }
+  void Clear() { Operand().~IOperand(); }
 
   uint64_t mStorage[QWORDS_PER_OP];
 };

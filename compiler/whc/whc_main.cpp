@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wfile.h"
 #include "utils/endianness.h"
 #include "utils/woutstream.h"
-#include "utils/auto_array.h"
 #include "msglog.h"
 #include "whc_cmdline.h"
 #include "whc_preprocess.h"

@@ -28,29 +28,21 @@
 #include "pm_interpreter.h"
 #include "pm_procedures.h"
 
+
 namespace whais {
 namespace prima {
+
 
 class ProcedureCall
 {
 public:
-  ProcedureCall(Session&              session,
-                 SessionStack&         stack,
-                 const Procedure&      procedure);
+  ProcedureCall(Session& session, SessionStack& stack, const Procedure& procedure);
 
   void AquireSync(const uint8_t sync);
-
   void ReleaseSync(const uint8_t sync);
 
-  Session& GetSession() const
-  {
-    return mSession;
-  }
-
-  SessionStack& GetStack() const
-  {
-    return mStack;
-  }
+  Session& GetSession() const { return mSession; }
+  SessionStack& GetStack() const { return mStack; }
 
   const Unit& GetUnit() const
   {
@@ -59,38 +51,21 @@ public:
     return *mProcedure.mUnit;
   }
 
-  const uint8_t* Code() const
-  {
-    return mCode;
-  }
-
-  uint32_t CodeSize() const
-  {
-    return mProcedure.mCodeSize;
-  }
-
-  uint32_t CurrentOffset() const
-  {
-    return mCodePos;
-  }
-
-  size_t LocalsCount() const
-  {
-    return mProcedure.mLocalsCount;
-  }
+  const uint8_t* Code() const { return mCode; }
+  uint32_t CodeSize() const { return mProcedure.mCodeSize; }
+  uint32_t CurrentOffset() const { return mCodePos; }
+  size_t LocalsCount() const { return mProcedure.mLocalsCount; }
 
   const StackValue& GetLocalDefault(const uint_t local) const
   {
     return mProcedure.mProcMgr->LocalValue(mProcedure.mId, local);
   }
-
-  uint32_t StackBegin() const
-  {
-    return mStackBegin;
-  }
+  uint32_t StackBegin() const { return mStackBegin; }
 
 private:
   void Run();
+
+  static const uint16_t NO_INDEX = 0xFFFF;
 
   const Procedure&        mProcedure;
   Session&                mSession;
@@ -99,13 +74,11 @@ private:
   uint32_t                mStackBegin;
   uint32_t                mCodePos;
   uint16_t                mAquiredSync;
-
-  static const uint16_t NO_INDEX = 0xFFFF;
 };
+
 
 } //namespace prima
 } //namespace whais
 
 
 #endif //PM_PROCESSOR_H_
-

@@ -23,17 +23,14 @@
  *****************************************************************************/
 
 #include "dbs/dbs_valtranslator.h"
-
 #include "pm_operand.h"
 #include "pm_typemanager.h"
 
+
 using namespace std;
-
-
 
 namespace whais {
 namespace prima {
-
 
 
 bool
@@ -54,19 +51,19 @@ CharTextFieldElOperand::GetValue(DChar& outValue) const
   ITable& table = mTableRef->GetTable();
 
   if (table.AllocatedRows() <= mRow)
-    {
-      outValue = DChar();
-      return;
-    }
+  {
+    outValue = DChar();
+    return;
+  }
 
   DText text;
   table.Get(mRow, mField, text);
 
   if (text.Count() <= mIndex)
-    {
-      outValue = DChar();
-      return;
-    }
+  {
+    outValue = DChar();
+    return;
+  }
 
   outValue = text.CharAt(mIndex);
 }
@@ -132,12 +129,12 @@ CharTextFieldElOperand::Iterate(const bool reverse)
     return false;
 
   if (reverse)
-    {
-      if (mIndex == 0)
-        return false;
+  {
+    if (mIndex == 0)
+      return false;
 
-      _CC(uint64_t&, mIndex) = min(mIndex - 1, maxCount);
-    }
+    _CC(uint64_t&, mIndex) = min(mIndex - 1, maxCount);
+  }
 
   if (mIndex >= maxCount)
     return false;
@@ -190,13 +187,13 @@ BaseArrayFieldElOperand::Iterate(const bool reverse)
     return false;
 
   if (reverse)
-    {
-      if (mIndex == 0)
-        return false;
+  {
+    if (mIndex == 0)
+      return false;
 
-      _CC(uint64_t&, mIndex) = min(mIndex - 1, maxCount);
-      return true;
-    }
+    _CC(uint64_t&, mIndex) = min(mIndex - 1, maxCount);
+    return true;
+  }
 
   if (mIndex >= maxCount)
     return false;
@@ -217,7 +214,6 @@ bool
 BaseArrayFieldElOperand::PrepareToCopy(void* const)
 {
   mTableRef->IncrementRefCount();
-
   return true;
 }
 
@@ -3073,6 +3069,6 @@ RichRealArrayFieldElOperand::Duplicate() const
   return StackValue(RichRealOperand(value));
 }
 
+
 } //namespace prima
 } //namespace whais
-

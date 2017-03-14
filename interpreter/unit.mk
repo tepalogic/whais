@@ -12,7 +12,7 @@ wprima_SRC:=prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
            prima/pm_typemanager.cpp prima/pm_procedures.cpp prima/pm_units.cpp\
            prima/pm_processor.cpp prima/pm_operand_arrayfields.cpp\
            prima/pm_operand_fields.cpp prima/pm_operand_array.cpp\
-           prima/pm_general_table.cpp prima/pm_operand_undefined.cpp\
+           prima/pm_generic_table.cpp prima/pm_operand_undefined.cpp\
            prima/pm_exception.cpp
 
 wprima_cmn_DEF=WVER_MAJ=1 WVER_MIN=0

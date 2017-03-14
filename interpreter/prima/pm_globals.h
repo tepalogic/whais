@@ -31,14 +31,12 @@
 
 #include "pm_operand.h"
 
+
 namespace whais {
 namespace prima {
 
 
-
 class NameSpace;
-
-
 
 struct GlobalEntry
 {
@@ -46,57 +44,33 @@ struct GlobalEntry
   uint32_t  mTypeOffset;
 };
 
-
-
 class GlobalsManager
 {
 public:
-  GlobalsManager(NameSpace& space)
-    : mNames(space),
-      mIdentifiers(),
-      mStorage(),
-      mGlobalsEntrys()
+  explicit GlobalsManager(NameSpace& space)
+    : mNames(space)
   {
   }
+  GlobalsManager(const GlobalsManager&) = delete;
+  GlobalsManager& operator= (const GlobalsManager) = delete;
 
-  ~GlobalsManager();
-
-  uint_t Count() const
-  {
-    return mGlobalsEntrys.size();
-  }
+  uint_t Count() const { return mGlobalsEntrys.size(); }
 
   uint32_t AddGlobal(const uint8_t* const name,
-                      const uint_t         nameLength,
-                      const GlobalValue&   value,
-                      const uint32_t       tiOffset);
-
+                     const uint_t nameLength,
+                     GlobalValue&& value,
+                     const uint32_t tiOffset);
   uint32_t FindGlobal(const uint8_t *const name, const uint_t nameLength);
 
-  const uint8_t* Name(const uint_t index) const;
-
+  const uint8_t* Name(const uint_t glbId) const;
   GlobalValue& Value(const uint32_t glbId);
-
   const uint8_t* TypeDescription(const uint32_t glbId);
 
-  static bool IsValid(const uint32_t glbId)
-  {
-    return glbId != INVALID_ENTRY;
-  }
-
-  static bool IsGlobalEntry(const uint32_t glbId)
-  {
-    return IsValid(glbId) && ((glbId & GLOBAL_ID) != 0);
-  }
-
-  static void MarkAsGlobalEntry(uint32_t& glbId)
-  {
-    glbId |= GLOBAL_ID;
-  }
+  static bool IsValid(const uint32_t glbId) { return glbId != INVALID_ENTRY; }
+  static bool IsGlobalEntry(const uint32_t glbId) { return IsValid(glbId) && (glbId & GLOBAL_ID); }
+  static void MarkAsGlobalEntry(uint32_t& glbId) { glbId |= GLOBAL_ID; }
 
 private:
-  GlobalsManager(const GlobalsManager&);
-  GlobalsManager& operator= (const GlobalsManager);
 
   static const uint32_t GLOBAL_ID     = 0x80000000;
   static const uint32_t INVALID_ENTRY = 0xFFFFFFFF;
@@ -106,6 +80,7 @@ private:
   std::vector<GlobalValue> mStorage;
   std::vector<GlobalEntry> mGlobalsEntrys;
 };
+
 
 } //namespace prima
 } //namespace whais

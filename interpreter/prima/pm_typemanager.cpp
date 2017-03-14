@@ -29,15 +29,13 @@
 #include "dbs/dbs_types.h"
 #include "compiler/whaisc.h"
 #include "utils/endianness.h"
-
 #include "pm_typemanager.h"
+#include "pm_generic_table.h"
 #include "pm_interpreter.h"
-#include "pm_general_table.h"
 #include "pm_operand_undefined.h"
 
+
 using namespace std;
-
-
 
 namespace whais {
 namespace prima {
@@ -83,11 +81,9 @@ private:
 
 
 TypeManager::TypeManager(NameSpace& space)
-  : mNameSpace(space),
-    mTypesDescriptions()
+  : mNameSpace(space)
 {
 }
-
 
 uint32_t
 TypeManager::AddType(const uint8_t* const typeDesc)
@@ -103,9 +99,7 @@ TypeManager::AddType(const uint8_t* const typeDesc)
 
   const TypeSpec spec(typeDesc);
 
-  mTypesDescriptions.insert(mTypesDescriptions.end(),
-                             typeDesc,
-                             typeDesc + spec.RawSize());
+  mTypesDescriptions.insert(mTypesDescriptions.end(), typeDesc, typeDesc + spec.RawSize());
   return result;
 }
 
@@ -120,18 +114,18 @@ TypeManager::FindType(const uint8_t* const typeDesc)
   uint32_t result = 0;
 
   while (result < mTypesDescriptions.size())
-    {
-      assert(IsTypeValid(&mTypesDescriptions[result]));
+  {
+    assert(IsTypeValid( &mTypesDescriptions[result]));
 
-      const TypeSpec specIt(&mTypesDescriptions[result]);
+    const TypeSpec specIt( &mTypesDescriptions[result]);
 
-      if (spec == specIt)
-        return result;
+    if (spec == specIt)
+      return result;
 
-      result += specIt.RawSize();
+    result += specIt.RawSize();
 
-      assert(result <= mTypesDescriptions.size());
-    }
+    assert(result <= mTypesDescriptions.size());
+  }
 
   return INVALID_OFFSET;
 }
@@ -142,7 +136,7 @@ TypeManager::TypeDescription(const uint32_t offset) const
 {
   assert((offset == 0) || (offset < mTypesDescriptions.size()));
 
-  const uint8_t *const typeDesc = &mTypesDescriptions[offset];
+  const uint8_t * const typeDesc = &mTypesDescriptions[offset];
 
   assert(IsTypeValid(typeDesc));
 
@@ -151,8 +145,7 @@ TypeManager::TypeDescription(const uint32_t offset) const
 
 
 static ITable&
-create_non_persistent_table(IDBSHandler&       dbs,
-                             uint8_t* const     inoutTypeDesc)
+create_non_persistent_table(IDBSHandler& dbs, uint8_t* const inoutTypeDesc)
 {
   assert(TypeManager::IsTypeValid(inoutTypeDesc));
 
@@ -161,30 +154,30 @@ create_non_persistent_table(IDBSHandler&       dbs,
   assert(IS_TABLE(spec.Type()));
 
   vector<DBSFieldDescriptor> fields;
-  int                        typeOff = 0;
+  int typeOff = 0;
 
   while (typeOff < spec.DataSize() - 2)
-    {
-      DBSFieldDescriptor fd;
-      uint16_t           type;
+  {
+    DBSFieldDescriptor fd;
+    uint16_t type;
 
-      fd.name = _RC(const char*, spec.Data() + typeOff);
+    fd.name = _RC(const char*, spec.Data() + typeOff);
 
-      typeOff += strlen(fd.name) + 1;
+    typeOff += strlen(fd.name) + 1;
 
-      assert(typeOff < spec.DataSize() - 2);
+    assert(typeOff < spec.DataSize() - 2);
 
-      type     = load_le_int16(spec.Data() + typeOff);
-      typeOff += sizeof(uint16_t);
+    type = load_le_int16(spec.Data() + typeOff);
+    typeOff += sizeof(uint16_t);
 
-      fd.isArray = IS_ARRAY(type);
-      fd.type    = _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(type));
+    fd.isArray = IS_ARRAY(type);
+    fd.type = _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(type));
 
-      fields.push_back(fd);
-    }
+    fields.push_back(fd);
+  }
 
   if (fields.size() == 0)
-    return GeneralTable::Instance();
+    return GenericTable::Instance();
 
   ITable& table = dbs.CreateTempTable(fields.size(), &fields[0]);
 
@@ -192,185 +185,175 @@ create_non_persistent_table(IDBSHandler&       dbs,
 
   typeOff = 0;
   for (uint_t fieldIndex = 0; fieldIndex < fields.size(); ++fieldIndex)
-    {
-      DBSFieldDescriptor field   = table.DescribeField(fieldIndex);
-      uint16_t           type    = field.type;
-      const uint_t       nameLen = strlen(field.name) + 1;
+  {
+    DBSFieldDescriptor field = table.DescribeField(fieldIndex);
+    uint16_t type = field.type;
+    const uint_t nameLen = strlen(field.name) + 1;
 
-      if (field.isArray)
-        MARK_ARRAY(type);
+    if (field.isArray)
+      MARK_ARRAY(type);
 
-      memcpy(_CC(uint8_t*, spec.Data()) + typeOff, field.name, nameLen);
+    memcpy(_CC(uint8_t*, spec.Data()) + typeOff, field.name, nameLen);
 
-      typeOff += nameLen;
-      store_le_int16(type, _CC(uint8_t*, spec.Data()) + typeOff);
-      typeOff += sizeof(uint16_t);
-    }
+    typeOff += nameLen;
+    store_le_int16(type, _CC(uint8_t*, spec.Data()) + typeOff);
+    typeOff += sizeof(uint16_t);
+  }
 
   return table;
 }
 
 
 GlobalValue
-TypeManager::CreateGlobalValue(uint8_t*    inoutTypeDesc,
-                                ITable*     persitentTable)
+TypeManager::CreateGlobalValue(uint8_t* inoutTypeDesc, ITable* persitentTable)
 {
   assert(TypeManager::IsTypeValid(inoutTypeDesc));
 
   const TypeSpec spec(inoutTypeDesc);
 
   if ((spec.Type() > T_UNKNOWN) && (spec.Type() < T_UNDETERMINED))
+  {
+    assert(persitentTable == nullptr);
+
+    switch (spec.Type())
     {
-      assert(persitentTable == nullptr);
+    case T_BOOL:
+      return GlobalValue(BoolOperand(DBool()));
 
-      switch(spec.Type())
-      {
-      case T_BOOL:
-        return GlobalValue(BoolOperand(DBool()));
+    case T_CHAR:
+      return GlobalValue(CharOperand(DChar()));
 
-      case T_CHAR:
-        return GlobalValue(CharOperand(DChar()));
+    case T_DATE:
+      return GlobalValue(DateOperand(DDate()));
 
-      case T_DATE:
-        return GlobalValue(DateOperand(DDate()));
+    case T_DATETIME:
+      return GlobalValue(DateTimeOperand(DDateTime()));
 
-      case T_DATETIME:
-        return GlobalValue(DateTimeOperand(DDateTime()));
+    case T_HIRESTIME:
+      return GlobalValue(HiresTimeOperand(DHiresTime()));
 
-      case T_HIRESTIME:
-        return GlobalValue(HiresTimeOperand(DHiresTime()));
+    case T_INT8:
+      return GlobalValue(Int8Operand(DInt8()));
 
-      case T_INT8:
-        return GlobalValue(Int8Operand(DInt8()));
+    case T_INT16:
+      return GlobalValue(Int16Operand(DInt16()));
 
-      case T_INT16:
-        return GlobalValue(Int16Operand(DInt16()));
+    case T_INT32:
+      return GlobalValue(Int32Operand(DInt32()));
 
-      case T_INT32:
-        return GlobalValue(Int32Operand(DInt32()));
+    case T_INT64:
+      return GlobalValue(Int64Operand(DInt64()));
 
-      case T_INT64:
-        return GlobalValue(Int64Operand(DInt64()));
+    case T_UINT8:
+      return GlobalValue(UInt8Operand(DUInt8()));
 
-      case T_UINT8:
-        return GlobalValue(UInt8Operand(DUInt8()));
+    case T_UINT16:
+      return GlobalValue(UInt16Operand(DUInt16()));
 
-      case T_UINT16:
-        return GlobalValue(UInt16Operand(DUInt16()));
+    case T_UINT32:
+      return GlobalValue(UInt32Operand(DUInt32()));
 
-      case T_UINT32:
-        return GlobalValue(UInt32Operand(DUInt32()));
+    case T_UINT64:
+      return GlobalValue(UInt64Operand(DUInt64()));
 
-      case T_UINT64:
-        return GlobalValue(UInt64Operand(DUInt64()));
+    case T_REAL:
+      return GlobalValue(RealOperand(DReal()));
 
-      case T_REAL:
-        return GlobalValue(RealOperand(DReal()));
+    case T_RICHREAL:
+      return GlobalValue(RichRealOperand(DRichReal()));
 
-      case T_RICHREAL:
-        return GlobalValue(RichRealOperand(DRichReal()));
+    case T_TEXT:
+      return GlobalValue(TextOperand(DText()));
 
-      case T_TEXT:
-        return GlobalValue(TextOperand(DText()));
-
-      default:
-        assert(false);
-      }
+    default:
+      assert(false);
     }
+  }
   else if (IS_ARRAY(spec.Type()))
+  {
+    assert(persitentTable == nullptr);
+
+    switch (GET_BASIC_TYPE(spec.Type()))
     {
-      assert(persitentTable == nullptr);
+    case T_BOOL:
+      return GlobalValue(ArrayOperand(DArray((DBool*)nullptr)));
 
-      switch(GET_BASIC_TYPE(spec.Type()))
-      {
-      case T_BOOL:
-        return GlobalValue(ArrayOperand( DArray((DBool*) nullptr)));
+    case T_CHAR:
+      return GlobalValue(ArrayOperand(DArray((DChar*)nullptr)));
 
-      case T_CHAR:
-        return GlobalValue(ArrayOperand( DArray((DChar*) nullptr)));
+    case T_DATE:
+      return GlobalValue(ArrayOperand(DArray((DDate*)nullptr)));
 
-      case T_DATE:
-        return GlobalValue(ArrayOperand( DArray((DDate*) nullptr)));
+    case T_DATETIME:
+      return GlobalValue(ArrayOperand(DArray((DDateTime*)nullptr)));
 
-      case T_DATETIME:
-        return GlobalValue(ArrayOperand( DArray((DDateTime*) nullptr)));
+    case T_HIRESTIME:
+      return GlobalValue(ArrayOperand(DArray((DHiresTime*)nullptr)));
 
-      case T_HIRESTIME:
-        return GlobalValue(ArrayOperand( DArray((DHiresTime*) nullptr)));
+    case T_INT8:
+      return GlobalValue(ArrayOperand(DArray((DInt8*)nullptr)));
 
-      case T_INT8:
-        return GlobalValue(ArrayOperand( DArray((DInt8*) nullptr)));
+    case T_INT16:
+      return GlobalValue(ArrayOperand(DArray((DInt16*)nullptr)));
 
-      case T_INT16:
-        return GlobalValue(ArrayOperand( DArray((DInt16*) nullptr)));
+    case T_INT32:
+      return GlobalValue(ArrayOperand(DArray((DInt32*)nullptr)));
 
-      case T_INT32:
-        return GlobalValue(ArrayOperand( DArray((DInt32*) nullptr)));
+    case T_INT64:
+      return GlobalValue(ArrayOperand(DArray((DInt64*)nullptr)));
 
-      case T_INT64:
-        return GlobalValue(ArrayOperand( DArray((DInt64*) nullptr)));
+    case T_UINT8:
+      return GlobalValue(ArrayOperand(DArray((DUInt8*)nullptr)));
 
-      case T_UINT8:
-        return GlobalValue(ArrayOperand( DArray((DUInt8*) nullptr)));
+    case T_UINT16:
+      return GlobalValue(ArrayOperand(DArray((DUInt16*)nullptr)));
 
-      case T_UINT16:
-        return GlobalValue(ArrayOperand( DArray((DUInt16*) nullptr)));
+    case T_UINT32:
+      return GlobalValue(ArrayOperand(DArray((DUInt32*)nullptr)));
 
-      case T_UINT32:
-        return GlobalValue(ArrayOperand( DArray((DUInt32*) nullptr)));
+    case T_UINT64:
+      return GlobalValue(ArrayOperand(DArray((DUInt64*)nullptr)));
 
-      case T_UINT64:
-        return GlobalValue(ArrayOperand( DArray((DUInt64*) nullptr)));
+    case T_REAL:
+      return GlobalValue(ArrayOperand(DArray((DReal*)nullptr)));
 
-      case T_REAL:
-        return GlobalValue(ArrayOperand( DArray((DReal*) nullptr)));
+    case T_RICHREAL:
+      return GlobalValue(ArrayOperand(DArray((DRichReal*)nullptr)));
 
-      case T_RICHREAL:
-        return GlobalValue(ArrayOperand( DArray((DRichReal*) nullptr)));
+    case T_TEXT:
+      throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
 
-      case T_TEXT:
-        throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                              nullptr);
+    case T_UNDETERMINED:
+      return GlobalValue(ArrayOperand(DArray()));
 
-      case T_UNDETERMINED:
-        return GlobalValue(ArrayOperand( DArray()));
-
-      default:
-        assert(false);
-      }
+    default:
+      assert(false);
     }
+  }
   else if (IS_FIELD(spec.Type()))
+  {
+    assert(persitentTable == nullptr);
+
+    const uint16_t type = GET_FIELD_TYPE(spec.Type());
+    if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
     {
-      assert(persitentTable == nullptr);
-
-      const uint16_t type = GET_FIELD_TYPE(spec.Type());
-      if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
-        {
-          throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                                nullptr);
-        }
-
-      return GlobalValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));
+      throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
     }
+
+    return GlobalValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));
+  }
   else if (IS_TABLE(spec.Type()))
+  {
+    if (persitentTable == nullptr)
     {
-      if (persitentTable == nullptr)
-        {
-          ITable& table = create_non_persistent_table(
-                                             mNameSpace.GetDBSHandler(),
-                                             inoutTypeDesc
-                                                      );
-          return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(),
-                                            table,
-                                            true));
-        }
-      else
-        {
-          return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(),
-                                            *persitentTable,
-                                            true));
-        }
+      ITable& table = create_non_persistent_table(mNameSpace.GetDBSHandler(), inoutTypeDesc);
+      return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(), table, true));
     }
+    else
+    {
+      return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(), *persitentTable, true));
+    }
+  }
 
   assert(false);
 
@@ -378,155 +361,147 @@ TypeManager::CreateGlobalValue(uint8_t*    inoutTypeDesc,
 }
 
 
-StackValue
-TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
+StackValue TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
 {
   assert(TypeManager::IsTypeValid(inoutTypeDesc));
 
   const TypeSpec spec(inoutTypeDesc);
 
   if ((spec.Type() > T_UNKNOWN) && (spec.Type() <= T_UNDETERMINED))
+  {
+    switch (spec.Type())
     {
-      switch(spec.Type())
-      {
-      case T_BOOL:
-        return StackValue(BoolOperand(DBool()));
+    case T_BOOL:
+      return StackValue(BoolOperand(DBool()));
 
-      case T_CHAR:
-        return StackValue(CharOperand(DChar()));
+    case T_CHAR:
+      return StackValue(CharOperand(DChar()));
 
-      case T_DATE:
-        return StackValue(DateOperand(DDate()));
+    case T_DATE:
+      return StackValue(DateOperand(DDate()));
 
-      case T_DATETIME:
-        return StackValue(DateTimeOperand(DDateTime()));
+    case T_DATETIME:
+      return StackValue(DateTimeOperand(DDateTime()));
 
-      case T_HIRESTIME:
-        return StackValue(HiresTimeOperand(DHiresTime()));
+    case T_HIRESTIME:
+      return StackValue(HiresTimeOperand(DHiresTime()));
 
-      case T_INT8:
-        return StackValue(Int8Operand(DInt8()));
+    case T_INT8:
+      return StackValue(Int8Operand(DInt8()));
 
-      case T_INT16:
-        return StackValue(Int16Operand(DInt16()));
+    case T_INT16:
+      return StackValue(Int16Operand(DInt16()));
 
-      case T_INT32:
-        return StackValue(Int32Operand(DInt32()));
+    case T_INT32:
+      return StackValue(Int32Operand(DInt32()));
 
-      case T_INT64:
-        return StackValue(Int64Operand(DInt64()));
+    case T_INT64:
+      return StackValue(Int64Operand(DInt64()));
 
-      case T_REAL:
-        return StackValue(RealOperand(DReal()));
+    case T_REAL:
+      return StackValue(RealOperand(DReal()));
 
-      case T_RICHREAL:
-        return StackValue(RichRealOperand(DRichReal()));
+    case T_RICHREAL:
+      return StackValue(RichRealOperand(DRichReal()));
 
-      case T_TEXT:
-        return StackValue(TextOperand(DText()));
+    case T_TEXT:
+      return StackValue(TextOperand(DText()));
 
-      case T_UINT8:
-        return StackValue(UInt8Operand(DUInt8()));
+    case T_UINT8:
+      return StackValue(UInt8Operand(DUInt8()));
 
-      case T_UINT16:
-        return StackValue(UInt16Operand(DUInt16()));
+    case T_UINT16:
+      return StackValue(UInt16Operand(DUInt16()));
 
-      case T_UINT32:
-        return StackValue(UInt32Operand(DUInt32()));
+    case T_UINT32:
+      return StackValue(UInt32Operand(DUInt32()));
 
-      case T_UINT64:
-        return StackValue(UInt64Operand(DUInt64()));
+    case T_UINT64:
+      return StackValue(UInt64Operand(DUInt64()));
 
-      case T_UNDETERMINED:
-        return StackValue(NativeObjectOperand());
+    case T_UNDETERMINED:
+      return StackValue(NativeObjectOperand());
 
-      default:
-        assert(false);
-      }
+    default:
+      assert(false);
     }
+  }
   else if (IS_ARRAY(spec.Type()))
+  {
+    switch (GET_BASIC_TYPE(spec.Type()))
     {
-      switch(GET_BASIC_TYPE(spec.Type()))
-      {
-      case T_BOOL:
-        return StackValue(ArrayOperand( DArray((DBool*) nullptr)));
+    case T_BOOL:
+      return StackValue(ArrayOperand(DArray((DBool*)nullptr)));
 
-      case T_CHAR:
-        return StackValue(ArrayOperand( DArray((DChar*) nullptr)));
+    case T_CHAR:
+      return StackValue(ArrayOperand(DArray((DChar*)nullptr)));
 
-      case T_DATE:
-        return StackValue(ArrayOperand( DArray((DDate*) nullptr)));
+    case T_DATE:
+      return StackValue(ArrayOperand(DArray((DDate*)nullptr)));
 
-      case T_DATETIME:
-        return StackValue(ArrayOperand( DArray((DDateTime*) nullptr)));
+    case T_DATETIME:
+      return StackValue(ArrayOperand(DArray((DDateTime*)nullptr)));
 
-      case T_HIRESTIME:
-        return StackValue(ArrayOperand( DArray((DHiresTime*) nullptr)));
+    case T_HIRESTIME:
+      return StackValue(ArrayOperand(DArray((DHiresTime*)nullptr)));
 
-      case T_INT8:
-        return StackValue(ArrayOperand( DArray((DInt8*) nullptr)));
+    case T_INT8:
+      return StackValue(ArrayOperand(DArray((DInt8*)nullptr)));
 
-      case T_INT16:
-        return StackValue(ArrayOperand( DArray((DInt16*) nullptr)));
+    case T_INT16:
+      return StackValue(ArrayOperand(DArray((DInt16*)nullptr)));
 
-      case T_INT32:
-        return StackValue(ArrayOperand( DArray((DInt32*) nullptr)));
+    case T_INT32:
+      return StackValue(ArrayOperand(DArray((DInt32*)nullptr)));
 
-      case T_INT64:
-        return StackValue(ArrayOperand( DArray((DInt64*) nullptr)));
+    case T_INT64:
+      return StackValue(ArrayOperand(DArray((DInt64*)nullptr)));
 
-      case T_UINT8:
-        return StackValue(ArrayOperand( DArray((DUInt8*) nullptr)));
+    case T_UINT8:
+      return StackValue(ArrayOperand(DArray((DUInt8*)nullptr)));
 
-      case T_UINT16:
-        return StackValue(ArrayOperand( DArray((DUInt16*) nullptr)));
+    case T_UINT16:
+      return StackValue(ArrayOperand(DArray((DUInt16*)nullptr)));
 
-      case T_UINT32:
-        return StackValue(ArrayOperand( DArray((DUInt32*) nullptr)));
+    case T_UINT32:
+      return StackValue(ArrayOperand(DArray((DUInt32*)nullptr)));
 
-      case T_UINT64:
-        return StackValue(ArrayOperand( DArray((DUInt64*) nullptr)));
+    case T_UINT64:
+      return StackValue(ArrayOperand(DArray((DUInt64*)nullptr)));
 
-      case T_REAL:
-        return StackValue(ArrayOperand( DArray((DReal*) nullptr)));
+    case T_REAL:
+      return StackValue(ArrayOperand(DArray((DReal*)nullptr)));
 
-      case T_RICHREAL:
-        return StackValue(ArrayOperand( DArray((DRichReal*) nullptr)));
+    case T_RICHREAL:
+      return StackValue(ArrayOperand(DArray((DRichReal*)nullptr)));
 
-      case T_TEXT:
-        throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                              nullptr);
+    case T_TEXT:
+      throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
 
-      case T_UNDETERMINED:
-        //Just a default
-        return StackValue(ArrayOperand(DArray()));
+    case T_UNDETERMINED:
+      //Just a default
+      return StackValue(ArrayOperand(DArray()));
 
-      default:
-        assert(false);
-      }
+    default:
+      assert(false);
     }
+  }
   else if (IS_FIELD(spec.Type()))
+  {
+    const uint16_t type = GET_FIELD_TYPE(spec.Type());
+    if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
     {
-      const uint16_t type = GET_FIELD_TYPE(spec.Type());
-      if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
-        {
-          throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP),
-                                nullptr);
-        }
-
-      return StackValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));
+      throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
     }
+
+    return StackValue(FieldOperand(GET_FIELD_TYPE(spec.Type())));
+  }
   else if (IS_TABLE(spec.Type()))
-    {
-      ITable& table = create_non_persistent_table(
-                                             mNameSpace.GetDBSHandler(),
-                                             inoutTypeDesc
-                                                  );
+  {
+    ITable& table = create_non_persistent_table(mNameSpace.GetDBSHandler(), inoutTypeDesc);
 
-      return StackValue(TableOperand(mNameSpace.GetDBSHandler(),
-                                       table,
-                                       false));
-    }
+    return StackValue(TableOperand(mNameSpace.GetDBSHandler(), table, false));
+  }
 
   assert(false);
 
@@ -559,23 +534,22 @@ compute_table_typeinfo(ITable& table)
 
   const FIELD_INDEX fieldsCount = table.FieldsCount();
   for (FIELD_INDEX fieldId = 0; fieldId < fieldsCount; ++fieldId)
-    {
-      DBSFieldDescriptor field = table.DescribeField(fieldId);
+  {
+    DBSFieldDescriptor field = table.DescribeField(fieldId);
 
-      const uint_t nameLen = strlen(field.name) + 1;
+    const uint_t nameLen = strlen(field.name) + 1;
 
-      data.insert(data.end(), field.name, field.name + nameLen);
+    data.insert(data.end(), field.name, field.name + nameLen);
 
-      uint16_t type = field.type;
+    uint16_t type = field.type;
 
-      if (field.isArray)
-        MARK_ARRAY(type);
+    if (field.isArray)
+      MARK_ARRAY(type);
 
-      store_le_int16(type, _RC(uint8_t*, &type));
-      data.insert(data.end(),
-                   _RC(uint8_t*, &type),
-                   _RC(uint8_t*, &type) + 2);
-    }
+    store_le_int16(type, _RC(uint8_t*, &type));
+    data.insert(data.end(), _RC(uint8_t*, &type),
+    _RC(uint8_t*, &type) + 2);
+  }
 
   data.push_back(TYPE_SPEC_END_MARK);
   data.push_back(0);
@@ -586,15 +560,11 @@ compute_table_typeinfo(ITable& table)
   MARK_TABLE(temp);
 
   store_le_int16(temp, _RC(uint8_t*, &temp));
-  result.insert(result.end(),
-                 _RC(uint8_t*, &temp),
-                 _RC(uint8_t*, &temp) + sizeof(temp));
+  result.insert(result.end(), _RC(uint8_t*, &temp), _RC(uint8_t*, &temp) + sizeof(temp));
 
   temp = data.size();
   store_le_int16(temp, _RC(uint8_t*, &temp));
-  result.insert(result.end(),
-                 _RC(uint8_t*, &temp),
-                 _RC(uint8_t*, &temp) + sizeof(temp));
+  result.insert(result.end(), _RC(uint8_t*, &temp), _RC(uint8_t*, &temp) + sizeof(temp));
 
   result.insert(result.end(), data.begin(), data.end());
 
@@ -604,4 +574,3 @@ compute_table_typeinfo(ITable& table)
 
 } //naemspace prima
 } //naemspace whais
-

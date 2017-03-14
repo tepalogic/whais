@@ -11,7 +11,6 @@
 
 #include "utils/endianness.h"
 #include "utils/wrandom.h"
-#include "utils/auto_array.h"
 #include "utils/wunicode.h"
 #include "utils/wutf.h"
 
@@ -564,8 +563,8 @@ test_text_substrings_matches(const uint_t  patternSize,
 
   assert(pattern != lowerPattern);
 
-  auto_array<DUInt64> pattOffsets(ITERATIONS);
-  auto_array<DUInt64> pattOffsetsLowerCases(ITERATIONS);
+  std::vector<DUInt64> pattOffsets(ITERATIONS);
+  std::vector<DUInt64> pattOffsetsLowerCases(ITERATIONS);
 
   DText temp;
 
@@ -585,7 +584,7 @@ test_text_substrings_matches(const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.size(); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring(pattern, false, next) != pattOffsets[i])
@@ -603,7 +602,7 @@ test_text_substrings_matches(const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 2; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 2; i < pattOffsets.size(); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring(lowerPattern, true, next) != pattOffsets[i])
@@ -638,7 +637,7 @@ test_text_substrings_matches(const uint_t  patternSize,
     }
   else
     {
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.size(); ++i)
         {
           const uint64_t next = pattOffsets[i -1].mValue + 1;
           if ((temp.FindSubstring(pattern, false, next) != pattOffsets[i])
@@ -662,7 +661,7 @@ test_text_substrings_matches(const uint_t  patternSize,
   else
     {
       uint64_t next = pattOffsetsLowerCases[0].mValue + 1;
-      for (uint_t i = 1; i < pattOffsets.Size(); ++i)
+      for (uint_t i = 1; i < pattOffsets.size(); ++i)
         {
           if ((temp.FindSubstring(lowerPattern, true, next) != pattOffsets[i])
               || (check_text_match(temp, pattern, pattOffsets[0].mValue, false) == false))

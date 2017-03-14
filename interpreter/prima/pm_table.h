@@ -29,13 +29,11 @@
 
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_table.h"
-#include "pm_general_table.h"
-
+#include "pm_generic_table.h"
 
 
 namespace whais {
 namespace prima {
-
 
 
 class TableReference
@@ -89,7 +87,7 @@ public:
 private:
   ~TableReference()
   {
-    if (&mTable != &GeneralTable::Instance())
+    if (&mTable != &GenericTable::Instance())
       mDbsHnd.ReleaseTable(mTable);
   }
 

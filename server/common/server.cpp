@@ -63,19 +63,19 @@ public:
 
   bool SearchFreeUser(void(*task)( void* args), Socket& socket)
   {
-    assert(mUsersPool.Size() > 0);
+    assert(mUsersPool.size() > 0);
 
-    for (uint_t index = 0; index < mUsersPool.Size(); ++index)
-      {
-        if ( ! mUsersPool[index].mEndConnection)
-          continue;
+    for (auto& user : mUsersPool)
+    {
+      if ( !user.mEndConnection)
+        continue;
 
-        mUsersPool[index].mSocket        = socket;
-        mUsersPool[index].mEndConnection = false;
-        mUsersPool[index].mLastReqTick   = 0;
-        if (mUsersPool[index].mThread.Run(task, &mUsersPool[index]))
-          return true;
-      }
+      user.mSocket = socket;
+      user.mEndConnection = false;
+      user.mLastReqTick = 0;
+      if (user.mThread.Run(task, &user))
+        return true;
+    }
     return false;
   }
 
@@ -89,14 +89,14 @@ public:
     //Cancel any pending IO operations.
     mSocket.Close();
 
-    for (uint_t index = 0; index < mUsersPool.Size(); ++index)
+    for (auto& user : mUsersPool)
       {
-        mUsersPool[index].mThread.IgnoreExceptions(true);
-        mUsersPool[index].mThread.DiscardException();
+        user.mThread.IgnoreExceptions(true);
+        user.mThread.DiscardException();
 
-        mUsersPool[index].mEndConnection = true;
-        mUsersPool[index].mSocket.Close();
-        mUsersPool[index].mThread.WaitToEnd(false);
+        user.mEndConnection = true;
+        user.mSocket.Close();
+        user.mThread.WaitToEnd(false);
       }
   }
 
@@ -104,43 +104,39 @@ public:
   {
     const WTICKS msecTicks = wh_msec_ticks();
 
-    for (uint_t c = 0; c < mUsersPool.Size(); ++c)
+    for (auto& user : mUsersPool)
+    {
+      if ((user.mEndConnection) || (user.mLastReqTick == 0))
+        continue;
+
+      if (user.mDesc == nullptr)
       {
-        if ((mUsersPool[c].mEndConnection) || (mUsersPool[c].mLastReqTick == 0))
+        if ((msecTicks - user.mLastReqTick) < _SC(uint_t, GetAdminSettings().mAuthTMO))
+        {
           continue;
+        }
 
-        if (mUsersPool[c].mDesc == nullptr)
-          {
-            if ((msecTicks - mUsersPool[c].mLastReqTick) <
-                _SC(uint_t, GetAdminSettings().mAuthTMO))
-              {
-                continue ;
-              }
-
-            mUsersPool[c].mSocket.Close();
-            sMainLog->Log(LT_WARNING,
-                           "Authentication terminated as it took too long...");
-            continue ;
-          }
-        else if ((msecTicks - mUsersPool[c].mLastReqTick) <
-                 _SC(uint_t, mUsersPool[c].mDesc->mWaitReqTmo))
-          {
-            continue;
-          }
-
-        mUsersPool[c].mSocket.Close();
-        mUsersPool[c].mDesc->mLogger->Log(
-                    LT_WARNING,
-                    "Connection dropped due to a long wait for a request..."
-                                          );
+        user.mSocket.Close();
+        sMainLog->Log(LT_WARNING, "Authentication terminated as it took too long...");
+        continue;
       }
+      else if ((msecTicks - user.mLastReqTick)
+          < _SC(uint_t, user.mDesc->mWaitReqTmo))
+      {
+        continue;
+      }
+
+      user.mSocket.Close();
+      user.mDesc->mLogger->Log(LT_WARNING,
+                               "Connection dropped due to a long wait for a request...");
+    }
   }
 
-  const char*             mInterface;
-  const char*             mPort;
-  Thread                  mListenThread;
-  Socket                  mSocket;
-  auto_array<UserHandler> mUsersPool;
+  const char*         mInterface;
+  const char*         mPort;
+  Thread              mListenThread;
+  Socket              mSocket;
+  vector<UserHandler> mUsersPool;
 
 private:
   Listener(const Listener& );
@@ -149,7 +145,7 @@ private:
   static const uint_t MAX_AUTH_TMO_MS = 200;
 };
 
-static auto_array<Listener>* volatile  sListeners;
+static vector<Listener>* volatile sListeners;
 
 
 void
@@ -362,7 +358,7 @@ ticks_routine()
 
         for (uint_t i = 0;
              (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
-                 && (i < sListeners->Size());
+                 && (i < sListeners->size());
              ++i)
           {
             (*sListeners)[i].ReqTmoCloseTick();
@@ -377,7 +373,7 @@ ticks_routine()
 
   if (sListeners != nullptr)
     {
-      for (uint_t i = 0; i < sListeners->Size(); ++i)
+      for (uint_t i = 0; i < sListeners->size(); ++i)
         (*sListeners)[i].Close();
     }
 }
@@ -387,7 +383,7 @@ listener_routine(void* args)
 {
   Listener* const listener = _RC(Listener*, args);
 
-  assert(listener->mUsersPool.Size() > 0);
+  assert(listener->mUsersPool.size() > 0);
   assert(listener->mListenThread.HasExceptionPending() == false);
   assert(listener->mPort != nullptr);
 
@@ -503,30 +499,29 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
 
   const ServerSettings& server = GetAdminSettings();
 
-  auto_array<Listener> listeners(server.mListens.size());
-  sListenersMaxFails = listeners.Size();
+  vector<Listener> listeners(server.mListens.size());
+  sListenersMaxFails = listeners.size();
 
   sListeners = &listeners;
 
   sAcceptUsersConnections = true;
   sServerStopped          = false;
 
-  for (uint_t index = 0; index < listeners.Size(); ++index)
-    {
-      Listener* const listener = &listeners[index];
+  for (uint_t i = 0; i < listeners.size(); ++i)
+  {
+    auto& l = listeners[i];
 
-      listener->mInterface = (server.mListens[index].mInterface.empty())
-                              ? nullptr
-                              : server.mListens[index].mInterface.c_str();
-      listener->mPort = server.mListens[index].mService.c_str();
-      if ( ! listener->mListenThread.Run(listener_routine, listener))
-        {
-          ostringstream logBuffer;
-          logBuffer << "Failed to start listener for '"
-                    << server.mListens[index].mInterface << '\'';
-          log.Log(LT_ERROR, logBuffer.str());
-        }
+    l.mInterface = server.mListens[i].mInterface.empty()
+                   ? nullptr
+                   : server.mListens[i].mInterface.c_str();
+    l.mPort = server.mListens[i].mService.c_str();
+    if ( !l.mListenThread.Run(listener_routine, &l))
+    {
+      ostringstream logBuffer;
+      logBuffer << "Failed to start listener for '" << server.mListens[i].mInterface << '\'';
+      log.Log(LT_ERROR, logBuffer.str());
     }
+  }
 
   log.Log(LT_INFO, "Server has started!");
   ticks_routine();
@@ -536,10 +531,10 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
   sListeners = nullptr;
   holder.Release();
 
-  for (uint_t index = 0; index < listeners.Size(); ++index)
+  for (uint_t index = 0; index < listeners.size(); ++index)
     listeners[index].mListenThread.WaitToEnd(false);
 
-  listeners.Reset(0);
+  listeners.clear();
 
   log.Log(LT_INFO, "Server stopped!");
 }

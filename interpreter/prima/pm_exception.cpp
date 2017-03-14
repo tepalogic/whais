@@ -29,10 +29,10 @@ using namespace whais;
 
 
 InterException::InterException(const uint32_t  code,
-                                const char*     file,
-                                uint32_t        line,
-                                const char*     fmtMsg,
-                                ...)
+                               const char*     file,
+                               uint32_t        line,
+                               const char*     fmtMsg,
+                               ...)
   : Exception(code, file, line)
 {
   if (fmtMsg != nullptr)
@@ -44,7 +44,6 @@ InterException::InterException(const uint32_t  code,
       va_end(vl);
     }
 }
-
 
 Exception*
 InterException::Clone() const
@@ -171,4 +170,3 @@ InterException::Description() const
   assert(false);
   return "An unknown interpreter exception was thrown.";
 }
-

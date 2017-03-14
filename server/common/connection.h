@@ -30,8 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whais.h"
 
-
-#include "utils/auto_array.h"
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
 #include "server/server_protocol.h"

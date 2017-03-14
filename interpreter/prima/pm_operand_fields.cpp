@@ -45,7 +45,7 @@ TableOperand::~TableOperand()
 bool
 TableOperand::IsNull() const
 {
-  return(mTableRef->GetTable().AllocatedRows() == 0);
+  return (mTableRef->GetTable().AllocatedRows() == 0);
 }
 
 
@@ -109,27 +109,26 @@ TableOperand::GetTableReference()
   assert(mTableRef != nullptr);
 
   if ( ! mChangeable)
-    {
-      TableReference* const temp = mTableRef->Spawn();
+  {
+    TableReference* const temp = mTableRef->Spawn();
 
-      mTableRef->DecrementRefCount();
-      mTableRef = temp;
-      mTableRef->IncrementRefCount();
-      mChangeable = true;
-    }
+    mTableRef->DecrementRefCount();
+    mTableRef = temp;
+    mTableRef->IncrementRefCount();
+    mChangeable = true;
+  }
 
   return *mTableRef;
 }
 
 
 FieldOperand::FieldOperand(TableOperand& tableOp, const FIELD_INDEX field)
-  : BaseOperand(),
-    mTableRef(&tableOp.GetTableReference()),
+  : mTableRef(&tableOp.GetTableReference()),
     mField(field)
 {
   mTableRef->IncrementRefCount();
 
-  ITable&                  table     = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable();
   const DBSFieldDescriptor fieldDesc = table.DescribeField(field);
 
   mFieldType = fieldDesc.type;
@@ -137,11 +136,11 @@ FieldOperand::FieldOperand(TableOperand& tableOp, const FIELD_INDEX field)
   assert((mFieldType > T_UNKNOWN) && (mFieldType < T_UNDETERMINED));
 
   if (fieldDesc.isArray)
-    {
-      assert(mFieldType != T_TEXT);
+  {
+    assert(mFieldType != T_TEXT);
 
-      MARK_ARRAY(mFieldType);
-    }
+    MARK_ARRAY(mFieldType);
+  }
 }
 
 
@@ -152,7 +151,7 @@ FieldOperand::FieldOperand(TableReference& tableRef, const FIELD_INDEX field)
 {
   mTableRef->IncrementRefCount();
 
-  ITable&                  table     = mTableRef->GetTable();
+  ITable& table = mTableRef->GetTable();
   const DBSFieldDescriptor fieldDesc = table.DescribeField(field);
 
   mFieldType = fieldDesc.type;
@@ -160,11 +159,11 @@ FieldOperand::FieldOperand(TableReference& tableRef, const FIELD_INDEX field)
   assert((mFieldType > T_UNKNOWN) && (mFieldType < T_UNDETERMINED));
 
   if (fieldDesc.isArray)
-    {
-      assert(mFieldType != T_TEXT);
+  {
+    assert(mFieldType != T_TEXT);
 
-      MARK_ARRAY(mFieldType);
-    }
+    MARK_ARRAY(mFieldType);
+  }
 }
 
 
@@ -189,23 +188,21 @@ const FieldOperand&
 FieldOperand::operator= (const FieldOperand& source)
 {
   if (this != &source)
-    {
-      if ((mFieldType != T_UNDETERMINED)
-          && (mFieldType != source.mFieldType))
-        {
-          throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
-        }
+  {
+    if ((mFieldType != T_UNDETERMINED) && (mFieldType != source.mFieldType))
+      throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
 
-      if (mTableRef != nullptr)
-        mTableRef->DecrementRefCount();
+    if (mTableRef != nullptr)
+      mTableRef->DecrementRefCount();
 
-      mField     = source.mField;
-      mTableRef  = source.mTableRef;
-      mFieldType = source.mFieldType;
+    mField = source.mField;
+    mTableRef = source.mTableRef;
+    mFieldType = source.mFieldType;
 
-      if (mTableRef)
-        mTableRef->IncrementRefCount();
-    }
+    if (mTableRef)
+      mTableRef->IncrementRefCount();
+  }
+
   return *this;
 }
 
@@ -323,9 +320,8 @@ FieldOperand::StartIterate(const bool reverse, StackValue& outStartItem)
   if (mTableRef->GetTable().AllocatedRows() <= 0)
     return false;
 
-  outStartItem = GetValueAt(reverse
-                             ? mTableRef->GetTable().AllocatedRows() - 1
-                             : 0);
+  outStartItem = GetValueAt(reverse ? mTableRef->GetTable().AllocatedRows() - 1 : 0);
+
   return true;
 }
 
@@ -376,13 +372,13 @@ BaseFieldElOperand::Iterate(const bool reverse)
   ITable& table = mTableRef->GetTable();
 
   if (reverse)
-    {
-      if (mRow == 0)
-        return false;
+  {
+    if (mRow == 0)
+      return false;
 
-      _CC(ROW_INDEX&, mRow)--;
-      return true;
-    }
+    _CC(ROW_INDEX&, mRow)--;
+    return true;
+  }
 
   if (mRow >= table.AllocatedRows() - 1)
     return false;
@@ -3232,13 +3228,11 @@ RealFieldElOperand::SelfDiv(const DRichReal& value)
   Set(currValue);
 }
 
-
 uint_t
 RealFieldElOperand::GetType()
 {
   return T_REAL;
 }
-
 
 StackValue
 RealFieldElOperand::Duplicate() const
@@ -3250,7 +3244,6 @@ RealFieldElOperand::Duplicate() const
   return StackValue(RealOperand(value));
 }
 
-
 bool
 RichRealFieldElOperand::IsNull() const
 {
@@ -3259,7 +3252,6 @@ RichRealFieldElOperand::IsNull() const
 
   return currValue.IsNull();
 }
-
 
 void
 RichRealFieldElOperand::GetValue(DReal& outValue) const
@@ -3270,13 +3262,11 @@ RichRealFieldElOperand::GetValue(DReal& outValue) const
   number_convert(currValue, outValue);
 }
 
-
 void
 RichRealFieldElOperand::GetValue(DRichReal& outValue) const
 {
   Get(outValue);
 }
-
 
 void
 RichRealFieldElOperand::GetValue(DText& outValue) const
@@ -3290,13 +3280,11 @@ RichRealFieldElOperand::GetValue(DText& outValue) const
   outValue = DText(_RC(char*, text));
 }
 
-
 void
 RichRealFieldElOperand::SetValue(const DRichReal& value)
 {
   Set(value);
 }
-
 
 void
 RichRealFieldElOperand::SelfAdd(const DInt64& value)
@@ -3309,7 +3297,6 @@ RichRealFieldElOperand::SelfAdd(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 RichRealFieldElOperand::SelfAdd(const DRichReal& value)
 {
@@ -3320,7 +3307,6 @@ RichRealFieldElOperand::SelfAdd(const DRichReal& value)
 
   Set(currValue);
 }
-
 
 void
 RichRealFieldElOperand::SelfSub(const DInt64& value)
@@ -3333,7 +3319,6 @@ RichRealFieldElOperand::SelfSub(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 RichRealFieldElOperand::SelfSub(const DRichReal& value)
 {
@@ -3344,7 +3329,6 @@ RichRealFieldElOperand::SelfSub(const DRichReal& value)
 
   Set(currValue);
 }
-
 
 void
 RichRealFieldElOperand::SelfMul(const DInt64& value)
@@ -3357,7 +3341,6 @@ RichRealFieldElOperand::SelfMul(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 RichRealFieldElOperand::SelfMul(const DRichReal& value)
 {
@@ -3368,7 +3351,6 @@ RichRealFieldElOperand::SelfMul(const DRichReal& value)
 
   Set(currValue);
 }
-
 
 void
 RichRealFieldElOperand::SelfDiv(const DInt64& value)
@@ -3381,7 +3363,6 @@ RichRealFieldElOperand::SelfDiv(const DInt64& value)
   Set(currValue);
 }
 
-
 void
 RichRealFieldElOperand::SelfDiv(const DRichReal& value)
 {
@@ -3393,13 +3374,11 @@ RichRealFieldElOperand::SelfDiv(const DRichReal& value)
   Set(currValue);
 }
 
-
 uint_t
 RichRealFieldElOperand::GetType()
 {
   return T_RICHREAL;
 }
-
 
 StackValue
 RichRealFieldElOperand::Duplicate() const
@@ -3410,7 +3389,6 @@ RichRealFieldElOperand::Duplicate() const
   return StackValue(RichRealOperand(value));
 }
 
-
 bool
 TextFieldElOperand::IsNull() const
 {
@@ -3420,20 +3398,17 @@ TextFieldElOperand::IsNull() const
   return currValue.IsNull();
 }
 
-
 void
 TextFieldElOperand::GetValue(DText& outValue) const
 {
   Get(outValue);
 }
 
-
 void
 TextFieldElOperand::SetValue(const DText& value)
 {
   Set(value);
 }
-
 
 void
 TextFieldElOperand::SelfAdd(const DChar& value)
@@ -3446,7 +3421,6 @@ TextFieldElOperand::SelfAdd(const DChar& value)
   Set(currValue);
 }
 
-
 void
 TextFieldElOperand::SelfAdd(const DText& value)
 {
@@ -3458,23 +3432,17 @@ TextFieldElOperand::SelfAdd(const DText& value)
   Set(currValue);
 }
 
-
 uint_t
 TextFieldElOperand::GetType()
 {
   return T_TEXT;
 }
 
-
 StackValue
 TextFieldElOperand::GetValueAt(const uint64_t index)
 {
-  return StackValue(CharTextFieldElOperand(mTableRef,
-                                             mRow,
-                                             mField,
-                                             index));
+  return StackValue(CharTextFieldElOperand(mTableRef, mRow, mField, index));
 }
-
 
 StackValue
 TextFieldElOperand::Duplicate() const
@@ -3484,7 +3452,6 @@ TextFieldElOperand::Duplicate() const
 
   return StackValue(TextOperand(value));
 }
-
 
 bool
 TextFieldElOperand::StartIterate(const bool reverse, StackValue& outStartItem)
@@ -3502,7 +3469,6 @@ TextFieldElOperand::StartIterate(const bool reverse, StackValue& outStartItem)
 }
 
 
-
 bool
 ArrayFieldElOperand::IsNull() const
 {
@@ -3513,20 +3479,17 @@ ArrayFieldElOperand::IsNull() const
   return currValue.IsNull();
 }
 
-
 void
 ArrayFieldElOperand::GetValue(DArray& outValue) const
 {
   Get(outValue);
 }
 
-
 void
 ArrayFieldElOperand::SetValue(const DArray& value)
 {
   Set(value);
 }
-
 
 uint_t
 ArrayFieldElOperand::GetType()
@@ -3538,7 +3501,6 @@ ArrayFieldElOperand::GetType()
   return type;
 }
 
-
 StackValue
 ArrayFieldElOperand::GetValueAt(const uint64_t index)
 {
@@ -3548,96 +3510,51 @@ ArrayFieldElOperand::GetValueAt(const uint64_t index)
 
   assert(fd.isArray);
 
-  switch(fd.type)
+  switch (fd.type)
   {
   case T_BOOL:
-    return StackValue(BoolArrayFieldElOperand(mTableRef,
-                                                mRow,
-                                                mField,
-                                                index));
+    return StackValue(BoolArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_CHAR:
-    return StackValue(CharArrayFieldElOperand(mTableRef,
-                                                mRow,
-                                                mField,
-                                                index));
+    return StackValue(CharArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_DATE:
-    return StackValue(DateArrayFieldElOperand(mTableRef,
-                                                mRow,
-                                                mField,
-                                                index));
+    return StackValue(DateArrayFieldElOperand(mTableRef, mRow, mField, index));
   case T_DATETIME:
-    return StackValue(DateTimeArrayFieldElOperand(mTableRef,
-                                                    mRow,
-                                                    mField,
-                                                    index));
+    return StackValue(DateTimeArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_HIRESTIME:
-    return StackValue(HiresTimeArrayFieldElOperand(mTableRef,
-                                                     mRow,
-                                                     mField,
-                                                     index));
+    return StackValue(HiresTimeArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_UINT8:
-    return StackValue(UInt8ArrayFieldElOperand(mTableRef,
-                                                 mRow,
-                                                 mField,
-                                                 index));
+    return StackValue(UInt8ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_UINT16:
-    return StackValue(UInt16ArrayFieldElOperand(mTableRef,
-                                                  mRow,
-                                                  mField,
-                                                  index));
+    return StackValue(UInt16ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_UINT32:
-    return StackValue(UInt32ArrayFieldElOperand(mTableRef,
-                                                  mRow,
-                                                  mField,
-                                                  index));
+    return StackValue(UInt32ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_UINT64:
-    return StackValue(UInt64ArrayFieldElOperand(mTableRef,
-                                                  mRow,
-                                                  mField,
-                                                  index));
+    return StackValue(UInt64ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_INT8:
-    return StackValue(Int8ArrayFieldElOperand(mTableRef,
-                                                mRow,
-                                                mField,
-                                                index));
+    return StackValue(Int8ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_INT16:
-    return StackValue(Int16ArrayFieldElOperand(mTableRef,
-                                                 mRow,
-                                                 mField,
-                                                 index));
+    return StackValue(Int16ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_INT32:
-    return StackValue(Int32ArrayFieldElOperand(mTableRef,
-                                                 mRow,
-                                                 mField,
-                                                 index));
+    return StackValue(Int32ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_INT64:
-    return StackValue(Int64ArrayFieldElOperand(mTableRef,
-                                                 mRow,
-                                                 mField,
-                                                 index));
+    return StackValue(Int64ArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_REAL:
-    return StackValue(RealArrayFieldElOperand(mTableRef,
-                                                mRow,
-                                                mField,
-                                                index));
+    return StackValue(RealArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   case T_RICHREAL:
-    return StackValue(RichRealArrayFieldElOperand(mTableRef,
-                                                    mRow,
-                                                    mField,
-                                                    index));
+    return StackValue(RichRealArrayFieldElOperand(mTableRef, mRow, mField, index));
 
   default:
     assert(false);
@@ -3645,7 +3562,6 @@ ArrayFieldElOperand::GetValueAt(const uint64_t index)
 
   throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
 }
-
 
 StackValue
 ArrayFieldElOperand::Duplicate() const
@@ -3656,7 +3572,6 @@ ArrayFieldElOperand::Duplicate() const
 
   return StackValue(ArrayOperand(value));
 }
-
 
 bool
 ArrayFieldElOperand::StartIterate(const bool reverse, StackValue& outStartItem)
@@ -3675,6 +3590,6 @@ ArrayFieldElOperand::StartIterate(const bool reverse, StackValue& outStartItem)
   return true;
 }
 
+
 } //namespace prima
 } //namespace whais
-

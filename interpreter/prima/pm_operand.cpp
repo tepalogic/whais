@@ -32,13 +32,6 @@ using namespace std;
 
 
 namespace whais {
-
-
-IOperand::~IOperand()
-{
-}
-
-
 namespace prima {
 
 
@@ -483,11 +476,6 @@ static void assign_null(T& output)
   output = T();
 }
 
-
-
-NullOperand::~NullOperand()
-{
-}
 
 
 bool
