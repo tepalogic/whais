@@ -27,8 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdarg.h>
 #include <assert.h>
 
+
 static WLOG_FUNC_CONTEXT sgLoggerContext = NULL;
 static WLOG_FUNC         sgLogger        = NULL;
+
 
 void
 wh_register_logger(WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
@@ -36,7 +38,6 @@ wh_register_logger(WLOG_FUNC man, WLOG_FUNC_CONTEXT bag)
   sgLoggerContext = bag;
   sgLogger = man;
 }
-
 
 WLOG_FUNC
 wh_logger(void)
@@ -52,37 +53,28 @@ wh_logger_context(void)
 
 
 void
-wh_log_msg(uint_t        position,
-            uint_t        code,
-            uint_t        type,
-            char*         formatedMsg,
-            va_list       args)
+wh_log_msg(uint_t position, uint_t code, uint_t type, char* formatedMsg, va_list args)
 {
   sgLogger(sgLoggerContext, position, code, type, formatedMsg, args);
 }
 
-
 char*
-wh_copy_first(char*         dest,
-               const char*   src,
-               uint_t        destMax,
-               uint_t        srcLength)
+wh_copy_first(char* dest, const char* src, uint_t destMax, uint_t srcLength)
 {
   assert(destMax > 4);  /* Make sure we can hold the '...' string. */
 
   if (srcLength > destMax)
-    {
-      srcLength = destMax - 4;
-      strncpy(dest, src, srcLength);
-      dest[srcLength] = 0;
-      strcat(dest, "...");
-    }
+  {
+    srcLength = destMax - 4;
+    strncpy(dest, src, srcLength);
+    dest[srcLength] = 0;
+    strcat(dest, "...");
+  }
   else
-    {
-      strncpy(dest, src, srcLength);
-      dest[srcLength] = 0;
-    }
+  {
+    strncpy(dest, src, srcLength);
+    dest[srcLength] = 0;
+  }
 
   return dest;
 }
-

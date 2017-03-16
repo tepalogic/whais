@@ -24,14 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVER_H_
 #define SERVER_H_
 
+
 #include <vector>
 
 #include "whais.h"
 
 #include "utils/logger.h"
-
 #include "configuration.h"
-
 
 
 void
@@ -40,6 +39,4 @@ StartServer(whais::FileLogger& log, std::vector<DBSDescriptors>& databases);
 void
 StopServer();
 
-
 #endif /* SERVER_H_ */
-

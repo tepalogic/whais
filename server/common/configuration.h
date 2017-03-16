@@ -29,23 +29,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 
 #include "whais.h"
-
 #include "dbs/dbs_mgr.h"
 #include "interpreter/interpreter.h"
 #include "utils/logger.h"
-
 #include "server_protocol.h"
+
 
 #define UNSET_VALUE             0
 #define DEFAULT_MAX_STACK_CNT   4096
+
 
 struct ListenEntry
 {
   std::string mInterface;
   std::string mService;
 };
-
-
 
 struct ServerSettings
 {
@@ -61,14 +59,9 @@ struct ServerSettings
       mSyncWakeup(UNSET_VALUE),
       mSyncInterval(UNSET_VALUE),
       mWaitReqTmo(UNSET_VALUE),
-      mWorkDirectory(),
-      mTempDirectory(),
-      mLogFile(),
-      mListens(),
       mCipher(UNSET_VALUE),
       mShowDebugLog(false)
-  {
-  }
+  {}
 
   uint_t                   mMaxConnections;
   uint_t                   mMaxFrameSize;
@@ -100,16 +93,11 @@ struct DBSDescriptors
       mSyncInterval(UNSET_VALUE),
       mWaitReqTmo(UNSET_VALUE),
       mStackCount(DEFAULT_MAX_STACK_CNT),
-      mDbsName(),
-      mDbsDirectory(),
-      mObjectLibs(),
-      mNativeLibs(),
       mDbs(nullptr),
       mSession(nullptr),
       mLogger(nullptr),
       mLastFlushTick(0)
-  {
-  }
+  {}
 
   uint_t                           mConfigLine;
   int                              mSyncInterval;
@@ -141,15 +129,13 @@ bool
 FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine);
 
 bool
-ParseConfigurationSection(std::ifstream&       config,
-                           uint_t&              inoutConfigLine,
-                           std::ostream&        errOut);
+ParseConfigurationSection(std::ifstream& config, uint_t& inoutConfigLine, std::ostream& errOut);
 
 bool
-ParseContextSection(whais::Logger&        log,
-                     std::ifstream&          config,
-                     uint_t&                 inoutConfigLine,
-                     DBSDescriptors&         output);
+ParseContextSection(whais::Logger& log,
+                    std::ifstream& config,
+                    uint_t& inoutConfigLine,
+                    DBSDescriptors& output);
 
 bool
 PrepareConfigurationSection(whais::Logger& log);
@@ -158,4 +144,3 @@ bool
 PrepareContextSection(whais::Logger& log, DBSDescriptors& inoutDesc);
 
 #endif /* CONFIGURATION_H_ */
-

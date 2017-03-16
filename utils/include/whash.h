@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHASH_H_
 #define WHASH_H_
 
+
 #include "whais.h"
 
 
@@ -41,5 +42,5 @@ wh_hash(const uint8_t* key, const uint_t keySize);
 }
 #endif
 
-#endif /* WHASH_H_ */
 
+#endif /* WHASH_H_ */

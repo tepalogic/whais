@@ -106,11 +106,11 @@ exchange_16bit_pair(uint32_t value, const uint_t p1, const uint_t p2)
 
 void
 wh_buff_3k_encode(const uint32_t           firstKing,
-                   const uint32_t           secondKing,
-                   const uint8_t* const     key,
-                   const uint_t             keyLen,
-                   uint8_t* const           buffer,
-                   const uint_t             bufferSize)
+                  const uint32_t           secondKing,
+                  const uint8_t* const     key,
+                  const uint_t             keyLen,
+                  uint8_t* const           buffer,
+                  const uint_t             bufferSize)
 {
   uint_t pos;
   uint_t keyIndex = firstKing % keyLen;
@@ -120,125 +120,129 @@ wh_buff_3k_encode(const uint32_t           firstKing,
 
 
   for (pos = 0; pos < bufferSize; pos += sizeof(uint32_t))
+  {
+    uint64_t message = load_le_int32(buffer + pos);
+    uint32_t thirdKing = 0;
+
+    message -= firstKing;
+    message ^= secondKing;
+
+    thirdKing = key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    keyIndex %= keyLen;
+
+    for (b = 0; b < 16; ++b)
     {
-      uint64_t message   = load_le_int32(buffer + pos);
-      uint32_t thirdKing = 0;
-
-      message -= firstKing;
-      message ^= secondKing;
-
-      thirdKing = key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++];
-      keyIndex %= keyLen;
-
-      for (b = 0; b < 16; ++b)
-        {
-          if (thirdKing & (1 << b))
-            message = exchange_1bit_pair(message, 2 * b, 2 * b + 1);
-        }
-
-      for (b = 0; b < 8; ++b)
-        {
-          if (thirdKing & (1 << (16 + b)))
-            message = exchange_2bit_pair(message, 4 * b, 4 * b + 2);
-        }
-
-      for (b = 0; b < 4; ++b)
-        {
-          if (thirdKing & (1 << (24 + b)))
-            message = exchange_4bit_pair(message, 8 * b, 8 * b + 4);
-        }
-
-      for (b = 0; b < 2; ++b)
-        {
-          if (thirdKing & (1 << (28 + b)))
-            message = exchange_8bit_pair(message, 16 * b, 16 * b + 8);
-        }
-
-      if (thirdKing & (1 << 30))
-        message = exchange_16bit_pair(message, 0, 16);
-
-      if (thirdKing & (1 << 31))
-        message = exchange_8bit_pair(message, 8, 16);
-
-      store_le_int32(message, buffer + pos);
+      if (thirdKing & (1 << b))
+        message = exchange_1bit_pair(message, 2 * b, 2 * b + 1);
     }
+
+    for (b = 0; b < 8; ++b)
+    {
+      if (thirdKing & (1 << (16 + b)))
+        message = exchange_2bit_pair(message, 4 * b, 4 * b + 2);
+    }
+
+    for (b = 0; b < 4; ++b)
+    {
+      if (thirdKing & (1 << (24 + b)))
+        message = exchange_4bit_pair(message, 8 * b, 8 * b + 4);
+    }
+
+    for (b = 0; b < 2; ++b)
+    {
+      if (thirdKing & (1 << (28 + b)))
+        message = exchange_8bit_pair(message, 16 * b, 16 * b + 8);
+    }
+
+    if (thirdKing & (1 << 30))
+      message = exchange_16bit_pair(message, 0, 16);
+
+    if (thirdKing & (1 << 31))
+      message = exchange_8bit_pair(message, 8, 16);
+
+    store_le_int32(message, buffer + pos);
+  }
 }
 
 
 void
 wh_buff_3k_decode(const uint32_t           firstKing,
-                   const uint32_t           secondKing,
-                   const uint8_t* const     key,
-                   const uint_t             keyLen,
-                   uint8_t* const           buffer,
-                   const uint_t             bufferSize)
+                  const uint32_t           secondKing,
+                  const uint8_t* const     key,
+                  const uint_t             keyLen,
+                  uint8_t* const           buffer,
+                  const uint_t             bufferSize)
 {
-  uint_t pos;
-  uint_t keyIndex = firstKing % keyLen;
+  uint_t pos, keyIndex = firstKing % keyLen;
   int    b;
 
   assert(bufferSize % sizeof(uint32_t) == 0);
 
-
   for (pos = 0; pos < bufferSize; pos += sizeof(uint32_t))
+  {
+    uint64_t message = load_le_int32(buffer + pos);
+    uint32_t thirdKing = 0;
+
+    thirdKing = key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    thirdKing <<= 8;
+    keyIndex %= keyLen;
+
+    thirdKing |= key[keyIndex++];
+    keyIndex %= keyLen;
+
+    if (thirdKing & (1 << 31))
+      message = exchange_8bit_pair(message, 8, 16);
+
+    if (thirdKing & (1 << 30))
+      message = exchange_16bit_pair(message, 0, 16);
+
+    for (b = 1; b >= 0; --b)
     {
-      uint64_t message   = load_le_int32(buffer + pos);
-      uint32_t thirdKing = 0;
-
-      thirdKing = key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++]; thirdKing <<= 8;
-      keyIndex %= keyLen;
-
-      thirdKing |= key[keyIndex++];
-      keyIndex %= keyLen;
-
-      if (thirdKing & (1 << 31))
-        message = exchange_8bit_pair(message, 8, 16);
-
-      if (thirdKing & (1 << 30))
-        message = exchange_16bit_pair(message, 0, 16);
-
-      for (b = 1; b >= 0; --b)
-        {
-          if (thirdKing & (1 << (28 + b)))
-            message = exchange_8bit_pair(message, 16 * b, 16 * b + 8);
-        }
-
-      for (b = 3; b >= 0; --b)
-        {
-          if (thirdKing & (1 << (24 + b)))
-            message = exchange_4bit_pair(message, 8 * b, 8 * b + 4);
-        }
-
-      for (b = 7; b >= 0; --b)
-        {
-          if (thirdKing & (1 << (16 + b)))
-            message = exchange_2bit_pair(message, 4 * b, 4 * b + 2);
-        }
-
-      for (b = 15; b >= 0; --b)
-        {
-          if (thirdKing & (1 << b))
-            message = exchange_1bit_pair(message, 2 * b, 2 * b + 1);
-        }
-
-      message ^= secondKing;
-      message += firstKing;
-
-      store_le_int32(message, buffer + pos);
+      if (thirdKing & (1 << (28 + b)))
+        message = exchange_8bit_pair(message, 16 * b, 16 * b + 8);
     }
+
+    for (b = 3; b >= 0; --b)
+    {
+      if (thirdKing & (1 << (24 + b)))
+        message = exchange_4bit_pair(message, 8 * b, 8 * b + 4);
+    }
+
+    for (b = 7; b >= 0; --b)
+    {
+      if (thirdKing & (1 << (16 + b)))
+        message = exchange_2bit_pair(message, 4 * b, 4 * b + 2);
+    }
+
+    for (b = 15; b >= 0; --b)
+    {
+      if (thirdKing & (1 << b))
+        message = exchange_1bit_pair(message, 2 * b, 2 * b + 1);
+    }
+
+    message ^= secondKing;
+    message += firstKing;
+
+    store_le_int32(message, buffer + pos);
+  }
 }

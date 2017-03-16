@@ -24,10 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
+
 #include <fstream>
 
 #include "wthread.h"
-
 
 
 namespace whais
@@ -44,16 +44,14 @@ enum LOG_TYPE
   LT_DEBUG
 };
 
-
 class Logger
 {
 public:
-  virtual ~Logger();
+  virtual ~Logger() = default;
 
   virtual void Log(const LOG_TYPE type, const char* str) = 0;
   virtual void Log(const LOG_TYPE type, const std::string& str) = 0;
 };
-
 
 
 class FileLogger : public Logger
@@ -88,6 +86,8 @@ public:
 
 extern NullLogger NULL_LOGGER;
 
+
 } //namespace whais
+
 
 #endif /* LOGGER_H_ */

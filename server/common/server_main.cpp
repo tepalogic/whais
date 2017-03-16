@@ -18,8 +18,10 @@
 #include "../common/loader.h"
 #include "../common/server.h"
 
+
 using namespace std;
 using namespace whais;
+
 
 static const char sProgramName[] = "Whais";
 static const char sProgramDesc[] = "A database server(generic).";
@@ -29,60 +31,52 @@ static bool sInterpreterInited = false;
 
 static vector<DBSDescriptors> databases;
 
+
 static void
 clean_frameworks(FileLogger& log)
 {
   if (sInterpreterInited)
+  {
+    assert(sDbsInited);
+
+    for (auto dbs = databases.rbegin() ; dbs != databases.rend(); ++dbs)
     {
-      assert(sDbsInited);
+      if (dbs->mSession != nullptr)
+      {
+        ReleaseInstance(*(dbs->mSession));
+        dbs->mSession = nullptr;
+      }
 
-      vector<DBSDescriptors>::reverse_iterator dbsIterator;
-
-      for (dbsIterator = databases.rbegin();
-           dbsIterator != databases.rend();
-           ++dbsIterator)
-        {
-          if (dbsIterator->mSession != nullptr)
-            {
-              ReleaseInstance(*(dbsIterator->mSession));
-              dbsIterator->mSession = nullptr;
-            }
-
-          ostringstream logEntry;
-          logEntry << "Closing session '" << dbsIterator->mDbsName << "'.";
-          log.Log(LT_INFO, logEntry.str());
-        }
+      ostringstream logEntry;
+      logEntry << "Closing session '" << dbs->mDbsName << "'.";
+      log.Log(LT_INFO, logEntry.str());
     }
+  }
 
   if (sInterpreterInited)
     CleanInterpreter();
 
   if (sInterpreterInited)
+  {
+    assert(sDbsInited);
+
+    for (auto dbsIterator = databases.rbegin(); dbsIterator != databases.rend(); ++dbsIterator)
     {
-      assert(sDbsInited);
+      if (dbsIterator->mDbs != nullptr)
+        DBSReleaseDatabase( *(dbsIterator->mDbs));
 
-      vector<DBSDescriptors>::reverse_iterator dbsIterator;
+      if (dbsIterator->mLogger != nullptr)
+      {
+        dbsIterator->mLogger->Log(LT_INFO, "Database context ended!");
+        delete dbsIterator->mLogger;
+      }
 
-      for (dbsIterator = databases.rbegin();
-           dbsIterator != databases.rend();
-           ++dbsIterator)
-        {
-          if (dbsIterator->mDbs != nullptr)
-            DBSReleaseDatabase(*(dbsIterator->mDbs));
-
-          if (dbsIterator->mLogger != nullptr)
-            {
-              dbsIterator->mLogger->Log(LT_INFO, "Database context ended!");
-              delete dbsIterator->mLogger;
-            }
-
-          ostringstream logEntry;
-          logEntry << "Cleaned resources of database '";
-          logEntry << dbsIterator->mDbsName << "'.";
-          log.Log(LT_INFO, logEntry.str());
-        }
+      ostringstream logEntry;
+      logEntry << "Cleaned resources of database '";
+      logEntry << dbsIterator->mDbsName << "'.";
+      log.Log(LT_INFO, logEntry.str());
     }
-
+  }
   if (sDbsInited)
     DBSShoutdown();
 }
@@ -105,8 +99,8 @@ set_signals()
 {
   struct sigaction action;
 
-  memset(&action, 0, sizeof action);
-  action.sa_flags     = SA_SIGINFO;
+  memset( &action, 0, sizeof action);
+  action.sa_flags = SA_SIGINFO;
   action.sa_sigaction = &sigterm_hdl;
 
  if (sigaction(SIGINT, &action, nullptr) < 0)
@@ -140,35 +134,32 @@ set_signals()
 int
 main(int argc, char** argv)
 {
-  unique_ptr<ifstream>   config;
+  unique_ptr<ifstream> config;
   unique_ptr<FileLogger> glbLog;
 
   displayLicenseInformation(cout, sProgramName, sProgramDesc);
   cout << endl << endl;
 
   if (argc < 2)
+  {
+    cerr << "Main configuration file was not passed as argument!\n";
+    return EINVAL;
+  }
+  else
+  {
+    config.reset(new ifstream(argv[1], ios_base::in | ios_base::binary));
+    if ( !config->good())
     {
-      cerr << "Main configuration file was not passed as argument!\n";
-
+      cerr << "Could not open the configuration file '" << argv[1] << "'.\n";
       return EINVAL;
     }
-  else
-    {
-      config.reset(new ifstream(argv[1], ios_base::in | ios_base::binary));
-      if (! config->good())
-        {
-          cerr << "Could not open the configuration file ";
-          cerr << '\'' << argv[1] << "'.\n";
+  }
 
-          return EINVAL;
-        }
-    }
-
-  if (! whs_init())
-    {
-      cerr << "Could not initialize the network socket framework.\n";
-      return ENOTSOCK;
-    }
+  if ( !whs_init())
+  {
+    cerr << "Could not initialize the network socket framework.\n";
+    return ENOTSOCK;
+  }
 
   try
   {
@@ -189,9 +180,7 @@ main(int argc, char** argv)
   }
   catch(ios_base::failure& e)
   {
-      cerr << "Unexpected error during configuration read:\n";
-      cerr << e.what() << endl;
-
+      cerr << "Unexpected error during configuration read:\n" << e.what() << endl;
       return -1;
   }
   catch(...)
@@ -205,66 +194,59 @@ main(int argc, char** argv)
     if (! set_signals())
       throw std::runtime_error("Signals handlers could not be overwritten.");
 
-    vector<DBSDescriptors>::iterator dbsIterator;
-
     if ( ! PrepareConfigurationSection(*glbLog))
       return -1;
 
     uint_t configLine = 0;
     config->clear();
     config->seekg(0);
-    while (FindNextContextSection(*config, configLine))
+    while (FindNextContextSection( *config, configLine))
+    {
+      DBSDescriptors dbs(configLine);
+
+      //Inherit some global settings from the server configuration area in
+      //case are not set in the context configuration section.
+      dbs.mWaitReqTmo = GetAdminSettings().mWaitReqTmo;
+      dbs.mSyncInterval = GetAdminSettings().mSyncInterval;
+
+      if ( !ParseContextSection( *glbLog, *config, configLine, dbs))
+        return -1;
+
+      if ( !PrepareContextSection( *glbLog, dbs))
+        return -1;
+
+      ostringstream logEntry;
+
+      for (const auto& d : databases)
       {
-        DBSDescriptors dbs(configLine);
-
-        //Inherit some global settings from the server configuration area in
-        //case are not set in the context configuration section.
-        dbs.mWaitReqTmo   = GetAdminSettings().mWaitReqTmo;
-        dbs.mSyncInterval = GetAdminSettings().mSyncInterval;
-
-        if ( ! ParseContextSection(*glbLog, *config, configLine, dbs))
-          return -1;
-
-        if ( ! PrepareContextSection(*glbLog, dbs))
-          return -1;
-
-        ostringstream   logEntry;
-
-        for (dbsIterator = databases.begin();
-             dbsIterator != databases.end();
-             ++dbsIterator)
-          {
-            if (dbsIterator->mDbsName == dbs.mDbsName)
-              {
-                logEntry << "Duplicate entry '" << dbs.mDbsName << "'. ";
-                logEntry << "Ignoring the last configuration entry.\n";
-                glbLog->Log(LT_ERROR, logEntry.str());
-                continue;
-              }
-          }
-
-        if (dbs.mDbsName == GlobalContextDatabase())
-          databases.insert(databases.begin(), dbs);
-
-        else
-          databases.push_back(dbs);
+        if (d.mDbsName == dbs.mDbsName)
+        {
+          logEntry << "Duplicate entry '" << dbs.mDbsName << "'. Ignoring the last"
+              << " configuration entry.\n";
+          glbLog->Log(LT_ERROR, logEntry.str());
+          continue;
+        }
       }
+
+      if (dbs.mDbsName == GlobalContextDatabase())
+        databases.insert(databases.begin(), dbs);
+
+      else
+        databases.push_back(dbs);
+    }
 
     if (databases.size() == 0)
-      {
-        glbLog->Log(LT_CRITICAL, "No database context configured.");
-        return -1;
-      }
+    {
+      glbLog->Log(LT_CRITICAL, "No database context configured.");
+      return -1;
+    }
     else if (databases[0].mDbsName != GlobalContextDatabase())
-      {
-        ostringstream noGlbMsg;
+    {
+      ostringstream noGlbMsg;
 
-        noGlbMsg << "No entry for global section '";
-        noGlbMsg << GlobalContextDatabase();
-        noGlbMsg << "' was found.";
-
-        glbLog->Log(LT_CRITICAL, noGlbMsg.str());
-      }
+      noGlbMsg << "No entry for global section '" << GlobalContextDatabase() << "' was found.";
+      glbLog->Log(LT_CRITICAL, noGlbMsg.str());
+    }
 
     const ServerSettings& confSettings = GetAdminSettings();
 
@@ -283,12 +265,8 @@ main(int argc, char** argv)
     InitInterpreter(databases[0].mDbsDirectory.c_str());
     sInterpreterInited = true;
 
-    for (dbsIterator = databases.begin();
-         dbsIterator != databases.end();
-         ++dbsIterator)
-      {
-        LoadDatabase(*glbLog, *dbsIterator);
-      }
+    for (auto& d : databases)
+      LoadDatabase( *glbLog, d);
 
     StartServer(*glbLog, databases);
   }
@@ -300,15 +278,13 @@ main(int argc, char** argv)
     if (e.Description())
       logEntry << "Description:\n\t" << e.Description() << endl;
 
-    if ( ! e.Message().empty())
+    if ( !e.Message().empty())
       logEntry << "Message:\n\t" << e.Message() << endl;
 
-    logEntry <<"Extra: " << e.Code() << " (";
-    logEntry << e.File() << ':' << e.Line() << ").\n";
-
+    logEntry << "Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").\n";
     glbLog->Log(LT_CRITICAL, logEntry.str());
 
-    clean_frameworks(*glbLog);
+    clean_frameworks( *glbLog);
 
     return -1;
   }
@@ -324,8 +300,8 @@ main(int argc, char** argv)
     ostringstream logEntry;
 
     logEntry << "General system failure: " << e.what() << endl;
-
     glbLog->Log(LT_CRITICAL, logEntry.str());
+
     clean_frameworks(*glbLog);
 
     return -1;
@@ -345,4 +321,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-

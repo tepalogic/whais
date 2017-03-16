@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ENDIANNESS_H_
 #define ENDIANNESS_H_
 
+
 #include "whais.h"
+
 
 #ifdef __cplusplus
 #undef INLINE
@@ -75,15 +77,12 @@ load_le_int64(const uint8_t* from)
   return result;
 }
 
-
-
 static INLINE void
 store_le_int16(const uint16_t value, uint8_t* const to)
 {
   to[0] = value        & 0xFF;
   to[1] = (value >> 8) & 0xFF;
 }
-
 
 static INLINE void
 store_le_int32(const uint32_t value, uint8_t* const to)
@@ -93,7 +92,6 @@ store_le_int32(const uint32_t value, uint8_t* const to)
   to[2] = (value >> 16) & 0xFF;
   to[3] = (value >> 24) & 0xFF;
 }
-
 
 static INLINE void
 store_le_int64(const uint64_t value, uint8_t* const to)
@@ -108,7 +106,6 @@ store_le_int64(const uint64_t value, uint8_t* const to)
   to[7] = (value >> 56) & 0xFF;
 }
 
-
 static INLINE uint16_t
 load_ge_int16(const uint8_t* from)
 {
@@ -119,7 +116,6 @@ load_ge_int16(const uint8_t* from)
 
   return result;
 }
-
 
 static INLINE uint32_t
 load_ge_int32(const uint8_t* from)
@@ -133,7 +129,6 @@ load_ge_int32(const uint8_t* from)
 
   return result;
 }
-
 
 static INLINE uint64_t
 load_ge_int64(const uint8_t* from)
@@ -152,14 +147,12 @@ load_ge_int64(const uint8_t* from)
   return result;
 }
 
-
 static INLINE void
 store_ge_int16(const uint16_t value, uint8_t* const to)
 {
   to[1] = value        & 0xFF;
   to[0] = (value >> 8) & 0xFF;
 }
-
 
 static INLINE void
 store_ge_int32(const uint32_t value, uint8_t* const to)
@@ -169,7 +162,6 @@ store_ge_int32(const uint32_t value, uint8_t* const to)
   to[1] = (value >> 16) & 0xFF;
   to[0] = (value >> 24) & 0xFF;
 }
-
 
 static INLINE void
 store_ge_int64(const uint64_t value, uint8_t* const to)
@@ -184,7 +176,4 @@ store_ge_int64(const uint64_t value, uint8_t* const to)
   to[0] = (value >> 56) & 0xFF;
 }
 
-
-
 #endif /* ENDIANNESS_H_ */
-

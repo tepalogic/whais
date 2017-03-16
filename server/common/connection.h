@@ -29,7 +29,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <memory>
 
 #include "whais.h"
-
 #include "utils/wthread.h"
 #include "utils/wsocket.h"
 #include "server/server_protocol.h"
@@ -45,7 +44,6 @@ struct UserHandler
   UserHandler()
     : mDesc(nullptr),
       mLastReqTick(0),
-      mThread(),
       mSocket(INVALID_SOCKET),
       mRoot(false),
       mEndConnection(true)
@@ -66,34 +64,30 @@ struct UserHandler
 class ConnectionException : public Exception
 {
 public:
-  ConnectionException(const uint32_t  code,
-                       const char*     file,
-                       uint32_t        line,
-                       const char*     fmtMsg = nullptr,
-                       ...);
+  ConnectionException(const uint32_t code,
+                      const char* file,
+                      uint32_t line,
+                      const char* fmtMsg = nullptr,
+                      ...);
 
   virtual Exception* Clone() const;
-
   virtual EXCEPTION_TYPE Type() const;
-
   virtual const char* Description() const;
 };
-
-
 
 class ClientConnection
 {
 public:
-  ClientConnection(UserHandler&                 client,
-                    std::vector<DBSDescriptors>& databases);
+  ClientConnection(UserHandler& client, std::vector<DBSDescriptors>& databases);
+
+  ClientConnection(const ClientConnection&) = delete;
+  const ClientConnection& operator= (const ClientConnection&) = delete;
 
   uint_t MaxSize() const;
-
   uint_t DataSize() const;
   void   DataSize(const uint16_t size);
 
   uint8_t* Data();
-
   uint32_t ReadCommand();
 
   void SendCmdResponse(const uint16_t respType);
@@ -101,25 +95,15 @@ public:
   const DBSDescriptors& Dbs()
   {
     assert(mUserHandler.mDesc != nullptr);
-
     return *mUserHandler.mDesc;
   }
 
-  SessionStack& Stack()
-  {
-    return mStack;
-  }
-
-  bool IsAdmin() const
-  {
-    return mUserHandler.mRoot;
-  }
+  SessionStack& Stack() { return mStack; }
+  bool IsAdmin() const { return mUserHandler.mRoot; }
 
 private:
   uint8_t* RawCmdData();
-
   void ReciveRawClientFrame();
-
   void SendRawClientFrame(const uint8_t type);
 
   UserHandler&                  mUserHandler;
@@ -137,10 +121,7 @@ private:
     uint64_t _DES[3 * 16];
     uint8_t  _3K[1];
   }                             mKey;
-
-  ClientConnection(const ClientConnection&);
-  const ClientConnection& operator= (const ClientConnection&);
 };
 
-#endif /* CONNECTION_H_ */
 
+#endif /* CONNECTION_H_ */

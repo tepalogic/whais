@@ -47,7 +47,7 @@ using namespace pastra;
 static const uint_t  MAX_VALUE_RAW_STORAGE = Serializer::MAX_VALUE_RAW_SIZE;
 static const uint_t  MNTH_DAYS[]           = MNTH_DAYS_A;
 
-static const UTF8_CU_COUNTER _cuCache;
+extern const UTF8_CU_COUNTER _cuCache;
 
 
 static bool

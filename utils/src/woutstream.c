@@ -27,17 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "woutstream.h"
 
 struct WOutputStream*
-wh_ostream_init(const uint_t                increment,
-                 struct WOutputStream* const outStream)
+wh_ostream_init(const uint_t increment, struct WOutputStream* const outStream)
 {
   assert(outStream != NULL);
 
-  outStream->dataSize  = 0;
-  outStream->increment = (increment != 0) ?
-                            increment :
-                            OUTSTREAM_INCREMENT_SIZE;
-  outStream->data      = NULL;
-  outStream->reserved  = 0;
+  outStream->dataSize = 0;
+  outStream->increment = (increment != 0) ? increment :
+  OUTSTREAM_INCREMENT_SIZE;
+  outStream->data = NULL;
+  outStream->reserved = 0;
 
   return outStream;
 }
@@ -54,32 +52,30 @@ wh_ostream_clean(struct WOutputStream* const stream)
 
 
 struct WOutputStream*
-wh_ostream_write(struct WOutputStream* const stream,
-                  const uint8_t*              data,
-                  uint_t                      dataSize)
+wh_ostream_write(struct WOutputStream* const stream, const uint8_t* data, uint_t dataSize)
 {
   assert(stream->reserved >= stream->dataSize);
 
   if (dataSize + stream->dataSize > stream->reserved)
+  {
+    /* output buffer needs to be enlarged */
+
+    uint8_t* temp;
+    uint_t increment = dataSize + stream->dataSize - stream->reserved;
+    if (increment > stream->increment)
     {
-      /* output buffer needs to be enlarged */
-
-      uint8_t* temp;
-      uint_t   increment = dataSize + stream->dataSize - stream->reserved;
-      if (increment > stream->increment)
-        {
-          /* The increment defined previously is not enough to hold the new
-           * data. Avoid this problem in future */
-          stream->increment = increment;
-        }
-
-      temp = mem_realloc(stream->data, stream->increment + stream->reserved);
-      if (temp == NULL)
-        return NULL;
-
-      stream->data     = temp;
-      stream->reserved += stream->increment;
+      /* The increment defined previously is not enough to hold the new
+       * data. Avoid this problem in future */
+      stream->increment = increment;
     }
+
+    temp = mem_realloc(stream->data, stream->increment + stream->reserved);
+    if (temp == NULL)
+      return NULL;
+
+    stream->data = temp;
+    stream->reserved += stream->increment;
+  }
 
   /* add the data at the end */
   while (dataSize-- > 0)

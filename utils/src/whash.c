@@ -39,10 +39,10 @@ wh_hash(const uint8_t* key, const uint_t keySize)
   uint_t   i;
 
   for (i = 0; i < keySize; ++i)
-    {
-      result ^= key[i] ? key[i] : 0x77;
-      result *= FNV_PRIME;
-    }
+  {
+    result ^= key[i] ? key[i] : 0x77;
+    result *= FNV_PRIME;
+  }
 
   return result;
 }

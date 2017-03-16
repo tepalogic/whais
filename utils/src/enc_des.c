@@ -165,10 +165,7 @@ static const uint8_t sgIPInv[] =
 
 
 static uint64_t
-permute(const uint64_t val,
-         const uint_t   valBits,
-         const uint8_t* perm,
-         const uint_t   permCount)
+permute(const uint64_t val, const uint_t valBits, const uint8_t* perm, const uint_t permCount)
 {
   uint64_t result = 0, b;
 
@@ -202,13 +199,13 @@ mangle(const uint64_t k, const uint32_t r)
 
   int b;
   for (b = 7; b >= 0; --b)
-    {
-      const uint8_t row = (nr & 1) | ((nr >> 4) & 0x02);
-      const uint8_t col = (nr >> 1) & 0x0F;
+  {
+    const uint8_t row = (nr & 1) | ((nr >> 4) & 0x02);
+    const uint8_t col = (nr >> 1) & 0x0F;
 
-      result |= ((uint32_t)sgSG[b][row][col] << ( 4 * (7 - b)));
-      nr >>= 6;
-    }
+    result |= ((uint32_t)sgSG[b][row][col] << ( 4 * (7 - b)));
+    nr >>= 6;
+  }
 
   return permute(result, 32, sgSP, sizeof sgSP);
 }
@@ -224,19 +221,17 @@ encode_buffer(const uint64_t* const k, uint64_t m)
   l = (m >> 32) & 0xFFFFFFFF;
 
   for (i = 0; i < 16; ++i)
+  {
+    for (i = 0; i < 16; ++i)
     {
-      for (i = 0; i < 16; ++i)
-        {
-          const uint32_t nl = r;
-          const uint32_t nr = l ^ mangle(k[i], r);
+      const uint32_t nl = r;
+      const uint32_t nr = l ^ mangle(k[i], r);
 
-          l = nl, r = nr;
-        }
+      l = nl, r = nr;
     }
+  }
 
-  m = r;
-  m <<= 32;
-  m |= l;
+  m = r; m <<= 32; m |= l;
 
   return permute(m, 64, sgIPInv, sizeof sgIPInv);
 }
@@ -246,19 +241,19 @@ static uint64_t
 decode_buffer(const uint64_t* const k, uint64_t m)
 {
   uint32_t l, r;
-  int   i;
+  int i;
 
   m = permute(m, 64, sgIP, sizeof sgIP);
   l = m & 0xFFFFFFFF;
   r = (m >> 32) & 0xFFFFFFFF;
 
   for (i = 15; i >= 0; --i)
-    {
-      const uint32_t nr = l;
-      const uint32_t nl = r ^ mangle(k[i], l);
+  {
+    const uint32_t nr = l;
+    const uint32_t nl = r ^ mangle(k[i], l);
 
-      l = nl, r = nr;
-    }
+    l = nl, r = nr;
+  }
 
   m = l;
   m <<= 32;
@@ -269,9 +264,7 @@ decode_buffer(const uint64_t* const k, uint64_t m)
 
 
 void
-wh_buff_des_encode(const uint8_t* const     key,
-                    uint8_t* const           buffer,
-                    const uint_t             bufferSize)
+wh_buff_des_encode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize)
 {
   assert(bufferSize % sizeof(uint64_t) == 0);
 
@@ -283,9 +276,7 @@ wh_buff_des_encode(const uint8_t* const     key,
 
 
 void
-wh_buff_des_decode(const uint8_t* const     key,
-                    uint8_t* const           buffer,
-                    const uint_t             bufferSize)
+wh_buff_des_decode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize)
 {
   assert(bufferSize % sizeof(uint64_t) == 0);
 
@@ -297,9 +288,7 @@ wh_buff_des_decode(const uint8_t* const     key,
 
 
 void
-wh_buff_3des_encode(const uint8_t* const     key,
-                     uint8_t* const           buffer,
-                     const uint_t             bufferSize)
+wh_buff_3des_encode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize)
 {
   wh_buff_des_encode(key, buffer, bufferSize);
   wh_buff_des_decode(key + sizeof(uint64_t), buffer, bufferSize);
@@ -308,9 +297,7 @@ wh_buff_3des_encode(const uint8_t* const     key,
 
 
 void
-wh_buff_3des_decode(const uint8_t* const     key,
-                     uint8_t* const           buffer,
-                     const uint_t             bufferSize)
+wh_buff_3des_decode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize)
 {
   wh_buff_des_decode(key + 2 * sizeof(uint64_t), buffer, bufferSize);
   wh_buff_des_encode(key + sizeof(uint64_t), buffer, bufferSize);
@@ -319,10 +306,10 @@ wh_buff_3des_decode(const uint8_t* const     key,
 
 
 void
-wh_prepare_des_keys(const uint8_t*   userKey,
-                     const uint_t     keyLenght,
-                     const bool_t     _3des,
-                     uint64_t* const  outPreparedKeys)
+wh_prepare_des_keys(const uint8_t* userKey,
+                    const uint_t keyLenght,
+                    const bool_t _3des,
+                    uint64_t* const outPreparedKeys)
 {
   uint64_t c, d, key;
   uint_t   i;
@@ -336,12 +323,12 @@ wh_prepare_des_keys(const uint8_t*   userKey,
   c >>= 28;
 
   for (i = 0; i < 16; ++i)
-    {
-      c = rotate_left(c, sgLeftShifts[i % 16]);
-      d = rotate_left(d, sgLeftShifts[i % 16]);
+  {
+    c = rotate_left(c, sgLeftShifts[i % 16]);
+    d = rotate_left(d, sgLeftShifts[i % 16]);
 
-      outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
-    }
+    outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
+  }
 
   if (! _3des)
     return ;
@@ -352,12 +339,12 @@ wh_prepare_des_keys(const uint8_t*   userKey,
   c >>= 28;
 
   for (i = 16; i < 32; ++i)
-    {
-      c = rotate_left(c, sgLeftShifts[i % 16]);
-      d = rotate_left(d, sgLeftShifts[i % 16]);
+  {
+    c = rotate_left(c, sgLeftShifts[i % 16]);
+    d = rotate_left(d, sgLeftShifts[i % 16]);
 
-      outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
-    }
+    outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
+  }
 
   key = load_ge_int64(normalizedKey + 2 * sizeof(uint64_t));
   c = permute(key, 64, sgPC1, sizeof sgPC1);
@@ -365,66 +352,63 @@ wh_prepare_des_keys(const uint8_t*   userKey,
   c >>= 28;
 
   for (i = 32; i < 48; ++i)
-    {
-      c = rotate_left(c, sgLeftShifts[i % 16]);
-      d = rotate_left(d, sgLeftShifts[i % 16]);
+  {
+    c = rotate_left(c, sgLeftShifts[i % 16]);
+    d = rotate_left(d, sgLeftShifts[i % 16]);
 
-      outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
-    }
+    outPreparedKeys[i] = permute((c << 28) | d, 56, sgPC2, sizeof sgPC2);
+  }
 }
 
-
 void
-wh_buff_des_encode_ex(const uint64_t* const    preparedKeys,
-                       uint8_t* const           buffer,
-                       const uint_t             bufferSize)
+wh_buff_des_encode_ex(const uint64_t* const preparedKeys,
+                      uint8_t* const buffer,
+                      const uint_t bufferSize)
 {
   uint_t offset;
 
   assert(bufferSize % sizeof(uint64_t) == 0);
 
   for (offset = 0; offset < bufferSize; offset += sizeof(uint64_t))
-    {
-      uint64_t m = load_ge_int64(buffer + offset);
-      m = encode_buffer(preparedKeys, m);
-      store_ge_int64(m, buffer + offset);
-    }
+  {
+    uint64_t m = load_ge_int64(buffer + offset);
+    m = encode_buffer(preparedKeys, m);
+    store_ge_int64(m, buffer + offset);
+  }
 }
 
 
 void
-wh_buff_des_decode_ex(const uint64_t* const    preparedKeys,
-                       uint8_t* const           buffer,
-                       const uint_t             bufferSize)
+wh_buff_des_decode_ex(const uint64_t* const preparedKeys,
+                      uint8_t* const buffer,
+                      const uint_t bufferSize)
 {
   uint_t offset;
 
   assert(bufferSize % sizeof(uint64_t) == 0);
 
   for (offset = 0; offset < bufferSize; offset += sizeof(uint64_t))
-    {
-      uint64_t m = load_ge_int64(buffer + offset);
-      m = decode_buffer(preparedKeys, m);
-      store_ge_int64(m, buffer + offset);
-    }
+  {
+    uint64_t m = load_ge_int64(buffer + offset);
+    m = decode_buffer(preparedKeys, m);
+    store_ge_int64(m, buffer + offset);
+  }
 }
 
-
 void
-wh_buff_3des_encode_ex(const uint64_t* const    preparedKeys,
-                        uint8_t* const           buffer,
-                        const uint_t             bufferSize)
+wh_buff_3des_encode_ex(const uint64_t* const preparedKeys,
+                       uint8_t* const buffer,
+                       const uint_t bufferSize)
 {
   wh_buff_des_encode_ex(preparedKeys, buffer, bufferSize);
   wh_buff_des_decode_ex(preparedKeys + 16, buffer, bufferSize);
   wh_buff_des_encode_ex(preparedKeys + 32, buffer, bufferSize);
 }
 
-
 void
-wh_buff_3des_decode_ex(const uint64_t* const    preparedKeys,
-                        uint8_t* const           buffer,
-                        const uint_t             bufferSize)
+wh_buff_3des_decode_ex(const uint64_t* const preparedKeys,
+                       uint8_t* const buffer,
+                       const uint_t bufferSize)
 {
   wh_buff_des_decode_ex(preparedKeys + 32, buffer, bufferSize);
   wh_buff_des_encode_ex(preparedKeys + 16, buffer, bufferSize);

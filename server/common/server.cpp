@@ -54,12 +54,14 @@ public:
   Listener()
     : mInterface(nullptr),
       mPort(nullptr),
-      mListenThread(),
       mSocket(INVALID_SOCKET),
       mUsersPool(GetAdminSettings().mMaxConnections)
   {
     mListenThread.IgnoreExceptions(true);
   }
+
+  Listener(const Listener& ) = delete;
+  Listener& operator= (const Listener&) = delete;
 
   bool SearchFreeUser(void(*task)( void* args), Socket& socket)
   {
@@ -90,14 +92,14 @@ public:
     mSocket.Close();
 
     for (auto& user : mUsersPool)
-      {
-        user.mThread.IgnoreExceptions(true);
-        user.mThread.DiscardException();
+    {
+      user.mThread.IgnoreExceptions(true);
+      user.mThread.DiscardException();
 
-        user.mEndConnection = true;
-        user.mSocket.Close();
-        user.mThread.WaitToEnd(false);
-      }
+      user.mEndConnection = true;
+      user.mSocket.Close();
+      user.mThread.WaitToEnd(false);
+    }
   }
 
   void ReqTmoCloseTick()
@@ -112,19 +114,14 @@ public:
       if (user.mDesc == nullptr)
       {
         if ((msecTicks - user.mLastReqTick) < _SC(uint_t, GetAdminSettings().mAuthTMO))
-        {
           continue;
-        }
 
         user.mSocket.Close();
         sMainLog->Log(LT_WARNING, "Authentication terminated as it took too long...");
         continue;
       }
-      else if ((msecTicks - user.mLastReqTick)
-          < _SC(uint_t, user.mDesc->mWaitReqTmo))
-      {
+      else if ((msecTicks - user.mLastReqTick) < _SC(uint_t, user.mDesc->mWaitReqTmo))
         continue;
-      }
 
       user.mSocket.Close();
       user.mDesc->mLogger->Log(LT_WARNING,
@@ -139,11 +136,11 @@ public:
   vector<UserHandler> mUsersPool;
 
 private:
-  Listener(const Listener& );
-  Listener& operator= (const Listener&);
+
 
   static const uint_t MAX_AUTH_TMO_MS = 200;
 };
+
 
 static vector<Listener>* volatile sListeners;
 
@@ -160,59 +157,49 @@ client_handler_routine(void* args)
 
   try
   {
-      client->mLastReqTick = wh_msec_ticks(); //Start authentication timer.
-      ClientConnection connection(*client, *sDbsDescriptors);
+    client->mLastReqTick = wh_msec_ticks(); //Start authentication timer.
+    ClientConnection connection( *client, *sDbsDescriptors);
 
-      while (true)
+    while (true)
+    {
+      const COMMAND_HANDLER* cmds;
+
+      client->mLastReqTick = wh_msec_ticks(); //Start request timer!
+      uint16_t cmdType = connection.ReadCommand();
+      client->mLastReqTick = 0;                //Stop request timer!
+
+      if (cmdType == CMD_CLOSE_CONN)
+        break;
+
+      if ((cmdType & 1) != 0)
+        throw ConnectionException(_EXTRA(cmdType), "Invalid command requested.");
+
+      if (cmdType >= USER_CMD_BASE)
+      {
+        cmdType -= USER_CMD_BASE, cmdType /= 2;
+
+        if (cmdType >= USER_CMDS_COUNT)
+          throw ConnectionException(_EXTRA(cmdType), "Invalid user command received.");
+
+        cmds = gpUserCommands;
+      }
+      else
+      {
+        cmdType /= 2;
+        if (cmdType >= ADMIN_CMDS_COUNT)
+          throw ConnectionException(_EXTRA(cmdType), "Invalid administrator command received.");
+
+        else if ( !connection.IsAdmin())
         {
-          const COMMAND_HANDLER* cmds;
-
-          client->mLastReqTick = wh_msec_ticks(); //Start request timer!
-          uint16_t cmdType = connection.ReadCommand();
-          client->mLastReqTick = 0;                //Stop request timer!
-
-          if (cmdType == CMD_CLOSE_CONN)
-            break;
-
-          if ((cmdType & 1) != 0)
-            {
-              throw ConnectionException(_EXTRA(cmdType),
-                                         "Invalid command requested.");
-            }
-          if (cmdType >= USER_CMD_BASE)
-            {
-              cmdType -= USER_CMD_BASE;
-              cmdType /= 2;
-              if (cmdType >= USER_CMDS_COUNT)
-                {
-                  throw ConnectionException(_EXTRA(cmdType),
-                                             "Invalid user command received.");
-                }
-              cmds = gpUserCommands;
-            }
-          else
-            {
-              cmdType /= 2;
-              if (cmdType >= ADMIN_CMDS_COUNT)
-                {
-                  throw ConnectionException(
-                                  _EXTRA(cmdType),
-                                  "Invalid administrator command received."
-                                            );
-                }
-              else if (! connection.IsAdmin())
-                {
-                  throw ConnectionException(
-                      _EXTRA(cmdType),
-                      "Regular user wants to execute an administrator command."
-                                            );
-                }
-              cmds = gpAdminCommands;
-            }
-          cmds[cmdType] (connection);
+          throw ConnectionException(_EXTRA(cmdType),
+                                    "Regular user wants to execute an administrator command.");
         }
+        cmds = gpAdminCommands;
+      }
+      cmds[cmdType](connection);
+    }
   }
-  catch(SocketException& e)
+  catch (SocketException& e)
   {
       assert(e.Description() != nullptr);
 
@@ -223,9 +210,7 @@ client_handler_routine(void* args)
       if ( ! e.Message().empty())
         logEntry << "Message:\n" << e.Message() << endl;
 
-      logEntry <<"Extra: " << e.Code() << " (";
-      logEntry << e.File() << ':' << e.Line() << ").";
-
+      logEntry <<"Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").";
       sMainLog->Log(LT_ERROR, logEntry.str());
   }
   catch(ConnectionException& e)
@@ -240,17 +225,14 @@ client_handler_routine(void* args)
   {
       ostringstream logEntry;
 
-      logEntry << "Client session exception: Unable to deal "
-                  "with error condition.\n";
+      logEntry << "Client session exception: Unable to deal with error condition.\n";
       if (e.Description())
         logEntry << "Description:\n" << e.Description() << endl;
 
       if ( ! e.Message().empty())
         logEntry << "Message:\n" << e.Message() << endl;
 
-      logEntry <<"Extra: " << e.Code() << " (";
-      logEntry << e.File() << ':' << e.Line() << ").";
-
+      logEntry <<"Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").";
       sMainLog->Log(LT_CRITICAL, logEntry.str());
 
       StopServer();
@@ -266,9 +248,7 @@ client_handler_routine(void* args)
       if ( ! e.Message().empty())
         logEntry << "Message:\n" << e.Message() << endl;
 
-      logEntry <<"Extra: " << e.Code() << " (";
-      logEntry << e.File() << ':' << e.Line() << ").";
-
+      logEntry <<"Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").";
       client->mDesc->mLogger->Log(LT_ERROR, logEntry.str());
   }
   catch(std::bad_alloc&)
@@ -282,7 +262,6 @@ client_handler_routine(void* args)
       ostringstream logEntry;
 
       logEntry << "General system failure: " << e.what();
-
       sMainLog->Log(LT_CRITICAL, logEntry.str());
 
       StopServer();
@@ -306,82 +285,80 @@ ticks_routine()
 
   uint_t syncElapsedTicks = 0, reqCheckElapsedTics = 0;
   do
+  {
+    if (sServerStopped || sListenersMaxFails <= 0)
+      break;
+
+    wh_sleep(SLEEP_TICK_RESOLUTION);
+    syncElapsedTicks += SLEEP_TICK_RESOLUTION;
+    reqCheckElapsedTics += SLEEP_TICK_RESOLUTION;
+
+    if (syncElapsedTicks < syncWakeup
+        && reqCheckElapsedTics < REQ_TICK_RESOLUTION)
     {
-      if ((sServerStopped) || (sListenersMaxFails <= 0))
-        break ;
-
-      wh_sleep(SLEEP_TICK_RESOLUTION);
-      syncElapsedTicks    += SLEEP_TICK_RESOLUTION;
-      reqCheckElapsedTics += SLEEP_TICK_RESOLUTION;
-      if ((syncElapsedTicks < syncWakeup)
-          && (reqCheckElapsedTics < REQ_TICK_RESOLUTION))
-        {
-          continue;
-        }
-
-      for (size_t i = 0;
-           (syncElapsedTicks >= syncWakeup) && (i < sDbsDescriptors->size());
-           ++i)
-        {
-          if (sServerStopped)
-            break ;
-
-          const uint64_t dbsLstFlush = (*sDbsDescriptors)[i].mLastFlushTick;
-          const int      dbsSyncTmo  = (*sDbsDescriptors)[i].mSyncInterval;
-
-          if (_SC(int64_t, wh_msec_ticks() - dbsLstFlush) < dbsSyncTmo)
-            continue;
-
-          IDBSHandler&      hnd         = *((*sDbsDescriptors)[i].mDbs);
-          const TABLE_INDEX tablesCount = hnd.PersistentTablesCount();
-          for (TABLE_INDEX t = 0; t < tablesCount; ++t)
-            {
-              if (sServerStopped)
-                break ;
-
-              hnd.SyncTableContent(t);
-            }
-
-          if ( ! sServerStopped)
-            {
-              (*sDbsDescriptors)[i].mDbs->SyncAllTablesContent();
-            }
-
-          (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks();
-        }
-
-        if ((sServerStopped) || (sListenersMaxFails <= 0))
-          break ;
-
-        if (syncElapsedTicks >= syncWakeup)
-          syncElapsedTicks = 0;
-
-        for (uint_t i = 0;
-             (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
-                 && (i < sListeners->size());
-             ++i)
-          {
-            (*sListeners)[i].ReqTmoCloseTick();
-          }
-
-        if (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
-          reqCheckElapsedTics = 0;
+      continue;
     }
-  while (true);
+
+    for (size_t i = 0;
+        (syncElapsedTicks >= syncWakeup) && (i < sDbsDescriptors->size());
+        ++i)
+    {
+      if (sServerStopped)
+        break;
+
+      const uint64_t dbsLstFlush = ( *sDbsDescriptors)[i].mLastFlushTick;
+      const int dbsSyncTmo = ( *sDbsDescriptors)[i].mSyncInterval;
+
+      if (_SC(int64_t, wh_msec_ticks() - dbsLstFlush) < dbsSyncTmo)
+        continue;
+
+      IDBSHandler& hnd = *(( *sDbsDescriptors)[i].mDbs);
+      const TABLE_INDEX tablesCount = hnd.PersistentTablesCount();
+      for (TABLE_INDEX t = 0; t < tablesCount; ++t)
+      {
+        if (sServerStopped)
+          break;
+
+        hnd.SyncTableContent(t);
+      }
+
+      if ( !sServerStopped)
+        (*sDbsDescriptors)[i].mDbs->SyncAllTablesContent();
+
+      (*sDbsDescriptors)[i].mLastFlushTick = wh_msec_ticks();
+    }
+
+    if (sServerStopped || sListenersMaxFails <= 0)
+      break;
+
+    if (syncElapsedTicks >= syncWakeup)
+      syncElapsedTicks = 0;
+
+    for (uint_t i = 0;
+        (reqCheckElapsedTics >= REQ_TICK_RESOLUTION) && (i < sListeners->size());
+        ++i)
+    {
+      (*sListeners)[i].ReqTmoCloseTick();
+    }
+
+    if (reqCheckElapsedTics >= REQ_TICK_RESOLUTION)
+      reqCheckElapsedTics = 0;
+
+  } while (true);
 
   LockRAII<Lock> holder(sClosingLock);
 
   if (sListeners != nullptr)
-    {
-      for (uint_t i = 0; i < sListeners->size(); ++i)
-        (*sListeners)[i].Close();
-    }
+  {
+    for (uint_t i = 0; i < sListeners->size(); ++i)
+      (*sListeners)[i].Close();
+  }
 }
 
 void
 listener_routine(void* args)
 {
-  Listener* const listener = _RC(Listener*, args);
+  const auto listener = _RC(Listener*, args);
 
   assert(listener->mUsersPool.size() > 0);
   assert(listener->mListenThread.HasExceptionPending() == false);
@@ -389,101 +366,88 @@ listener_routine(void* args)
 
   try
   {
-      {
-        ostringstream logEntry;
+    {
+      ostringstream logEntry;
 
-        logEntry << "Listening ";
-        logEntry << ((listener->mInterface == nullptr) ?
-                       "*" :
-                       listener->mInterface);
-        logEntry << '@' << listener->mPort << ".";
+      logEntry << "Listening " << ((listener->mInterface == nullptr) ? "*" : listener->mInterface)
+               << '@' << listener->mPort << ".";
+      sMainLog->Log(LT_INFO, logEntry.str());
+    }
 
-        sMainLog->Log(LT_INFO, logEntry.str());
-      }
-
-    listener->mSocket = Socket(listener->mInterface,
-                                listener->mPort,
-                                SOCKET_BACK_LOG);
+    listener->mSocket = Socket(listener->mInterface, listener->mPort, SOCKET_BACK_LOG);
 
     bool acceptUserConnections = sAcceptUsersConnections;
-
     while (acceptUserConnections)
+    {
+      try
       {
-        try
+        Socket client = listener->mSocket.Accept();
+
+        if ( !listener->SearchFreeUser(client_handler_routine, client))
         {
-          Socket client = listener->mSocket.Accept();
+          static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
 
-          if ( ! listener->SearchFreeUser(client_handler_routine, client))
-            {
-              static const uint8_t busyResp[] = { 0x04, 0x00, 0xFF, 0xFF };
-              client.Write(busyResp, sizeof busyResp);
+          client.Write(busyResp, sizeof busyResp);
 
-              sMainLog->Log(
-                    LT_INFO,
-                    "Connection refused because of unavailable slots."
-                            );
-            }
+          sMainLog->Log(LT_INFO, "Connection refused because of unavailable slots.");
         }
-        catch(SocketException& e)
-        {
-            if (sAcceptUsersConnections)
-              {
-                assert(e.Description() != nullptr);
-                ostringstream logEntry;
-
-                logEntry << "Description:\n" << e.Description() << endl;
-
-                if ( ! e.Message().empty())
-                  logEntry << "Message:\n" << e.Message() << endl;
-
-                logEntry <<"Extra: " << e.Code() << " (";
-                logEntry << e.File() << ':' << e.Line() << ").";
-
-                sMainLog->Log(LT_ERROR, logEntry.str());
-              }
-            break ;
-        }
-        acceptUserConnections = sAcceptUsersConnections;
       }
+      catch (SocketException& e)
+      {
+        if (sAcceptUsersConnections)
+        {
+          assert(e.Description() != nullptr);
+          ostringstream logEntry;
+
+          logEntry << "Description:\n" << e.Description() << endl;
+
+          if ( !e.Message().empty())
+            logEntry << "Message:\n" << e.Message() << endl;
+
+          logEntry << "Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").";
+          sMainLog->Log(LT_ERROR, logEntry.str());
+        }
+        break;
+      }
+      acceptUserConnections = sAcceptUsersConnections;
+    }
   }
-  catch(Exception& e)
+  catch (Exception& e)
   {
-      assert(e.Description() != nullptr);
+    assert(e.Description() != nullptr);
 
-      ostringstream logEntry;
+    ostringstream logEntry;
 
-      logEntry << "Unable to deal with this error condition at this point.\n";
-      logEntry << "Description:\n" << e.Description() << endl;
+    logEntry << "Unable to deal with this error condition at this point.\n" << "Description:\n"
+             << e.Description() << endl;
 
-      if ( ! e.Message().empty())
-        logEntry << "Message:\n" << e.Message() << endl;
+    if ( ! e.Message().empty())
+      logEntry << "Message:\n" << e.Message() << endl;
 
-      logEntry <<"Extra: " << e.Code() << " (";
-      logEntry << e.File() << ':' << e.Line() << ").";
-
-      sMainLog->Log(LT_ERROR, logEntry.str());
+    logEntry << "Extra: " << e.Code() << " (" << e.File() << ':' << e.Line() << ").";
+    sMainLog->Log(LT_ERROR, logEntry.str());
   }
-  catch(std::bad_alloc&)
+  catch (std::bad_alloc&)
   {
-      sMainLog->Log(LT_CRITICAL, "OUT OF MEMORY!!!");
-      StopServer();
+    sMainLog->Log(LT_CRITICAL, "OUT OF MEMORY!!!");
+    StopServer();
   }
-  catch(std::exception& e)
+  catch (std::exception& e)
   {
-      ostringstream logEntry;
+    ostringstream logEntry;
 
-      logEntry << "General system failure: " << e.what();
-      sMainLog->Log(LT_CRITICAL, logEntry.str());
+    logEntry << "General system failure: " << e.what();
+    sMainLog->Log(LT_CRITICAL, logEntry.str());
 
-      StopServer();
+    StopServer();
   }
-  catch(...)
+  catch (...)
   {
-      sMainLog->Log(LT_CRITICAL, "Listener received unexpected exception!");
-      StopServer();
+    sMainLog->Log(LT_CRITICAL, "Listener received unexpected exception!");
+    StopServer();
   }
 
-  wh_atomic_fetch_dec32(&sListenersMaxFails);
+  wh_atomic_fetch_dec32( &sListenersMaxFails);
 }
 
 
@@ -543,16 +507,12 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
 void
 StopServer()
 {
-  if ((sListeners == nullptr)
-      || sServerStopped)
-    {
+  if ( ! sListeners || sServerStopped)
       return ;
-    }
 
   LockRAII<Lock> holder(sClosingLock);
 
-  sMainLog->Log(LT_INFO,
-                 "Server asked to shutdown. Waiting for the next tick...");
+  sMainLog->Log(LT_INFO, "Server asked to shutdown. Waiting for the next tick...");
 
   sAcceptUsersConnections = false;
   sServerStopped          = true;
@@ -561,8 +521,8 @@ StopServer()
     (*sDbsDescriptors)[i].mSession->NotifyEvent(ISession::SERVER_STOPED, nullptr);
 }
 
+
 #ifdef ENABLE_MEMORY_TRACE
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "WHAIS";
 #endif
-

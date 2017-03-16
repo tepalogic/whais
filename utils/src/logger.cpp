@@ -34,16 +34,8 @@ NullLogger NULL_LOGGER;
 
 
 
-Logger::~Logger()
-{
-}
-
-
 FileLogger::FileLogger(const char* const file, const bool printStart)
-  : Logger(),
-    mStartTick(wh_msec_ticks()),
-    mSync(),
-    mOutStream(),
+  : mStartTick(wh_msec_ticks()),
     mLogFile(file),
     mTodayTime(wh_get_currtime())
 {
@@ -51,22 +43,19 @@ FileLogger::FileLogger(const char* const file, const bool printStart)
   SwitchFile();
 
   if (printStart)
-    {
-      const WTime dayStart = wh_get_currtime();
+  {
+    const WTime dayStart = wh_get_currtime();
 
-      mOutStream << "\n* Server start on: " << (int)dayStart.year;
-      mOutStream << '-' << (int)dayStart.month;
-      mOutStream << "-" << (int)dayStart.day;
-      mOutStream << ' ' << (int)dayStart.hour;
-      mOutStream << ':' << (int)dayStart.min;
-      mOutStream << ':' << (int)dayStart.sec << "\n\n";
-    }
+    mOutStream << "\n* Server start on: " << (int)dayStart.year
+               << '-' << (int)dayStart.month
+               << "-" << (int)dayStart.day
+               << ' ' << (int)dayStart.hour
+               << ':' << (int)dayStart.min
+               << ':' << (int)dayStart.sec << "\n\n";
+  }
 
   if (! mOutStream.good())
-    {
-      throw ios_base::failure("The file associated with the output stream "
-                               "could not be opened.");
-    }
+    throw ios_base::failure("The file associated with the output stream could not be opened.");
 }
 
 void
@@ -80,18 +69,19 @@ FileLogger::Log(const LOG_TYPE type, const char* str)
      for string messages that have more than one line, to keep
      a mice indentation. */
   while (*str != 0)
-    {
-      if ((*str == '\n') && (*(str + 1) != '\n'))
-        {
-          mOutStream << endl;
-          for (int i = 0; i < markSize; ++i)
-            mOutStream << ' ';
-        }
-      else
-        mOutStream << *str;
+  {
+    if ((*str == '\n') && (*(str + 1) != '\n'))
+      {
+        mOutStream << endl;
+        for (int i = 0; i < markSize; ++i)
+          mOutStream << ' ';
+      }
+    else
+      mOutStream << *str;
 
-      ++str;
-    }
+    ++str;
+  }
+
   mOutStream << endl;
   mOutStream.flush();
 }
@@ -117,17 +107,17 @@ FileLogger::PrintTimeMark(LOG_TYPE type)
   if ((ctime.day != mTodayTime.day)
       || (ctime.month != mTodayTime.month)
       || (ctime.year != mTodayTime.year))
-    {
-      SwitchFile();
-      mTodayTime = ctime;
+  {
+    SwitchFile();
+    mTodayTime = ctime;
 
-      mOutStream << "\n* Hello on: " << (int)mTodayTime.year;
-      mOutStream << '-' << (int)mTodayTime.month;
-      mOutStream << "-" << (int)mTodayTime.day;
-      mOutStream << ' ' << (int)mTodayTime.hour;
-      mOutStream << ':' << (int)mTodayTime.min;
-      mOutStream << ':' << (int)mTodayTime.sec << "\n\n";
-    }
+    mOutStream << "\n* Hello on: " << (int)mTodayTime.year
+               << '-' << (int)mTodayTime.month
+               << "-" << (int)mTodayTime.day
+               << ' ' << (int)mTodayTime.hour
+               << ':' << (int)mTodayTime.min
+               << ':' << (int)mTodayTime.sec << "\n\n";
+  }
 
   const char       fill  = mOutStream.fill();
   const streamsize width = mOutStream.width();
@@ -154,21 +144,21 @@ void
 FileLogger::SwitchFile()
 {
   if (mOutStream.is_open())
-    {
-      mOutStream.close();
-      string oldFile;
+  {
+    mOutStream.close();
+    string oldFile;
 
-      oldFile.resize(mLogFile.length() + 16);
+    oldFile.resize(mLogFile.length() + 16);
 
-      sprintf(_CC(char*, oldFile.c_str()),
-               "%s.%04u%02u%02u",
-               mLogFile.c_str(),
-               mTodayTime.year,
-               mTodayTime.month,
-               mTodayTime.day);
+    sprintf(_CC(char*, oldFile.c_str()),
+            "%s.%04u%02u%02u",
+            mLogFile.c_str(),
+            mTodayTime.year,
+            mTodayTime.month,
+            mTodayTime.day);
 
-      whf_move_file(mLogFile.c_str(), oldFile.c_str());
-    }
+    whf_move_file(mLogFile.c_str(), oldFile.c_str());
+  }
 
   mOutStream.open(mLogFile.c_str(), ios::app | ios::out);
 }
@@ -185,5 +175,5 @@ NullLogger::Log(const LOG_TYPE, const string&)
 {
 }
 
-} //namespace whais
 
+} //namespace whais

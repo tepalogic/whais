@@ -25,11 +25,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WTHREAD_H_
 #define WTHREAD_H_
 
+
 #include <assert.h>
 
 #include "whais.h"
 
+
 namespace whais {
+
 
 class EXCEP_SHL Lock
 {
@@ -48,7 +51,6 @@ private:
   WH_LOCK mLock;
 };
 
-
 class EXCEP_SHL SpinLock
 {
 public:
@@ -64,6 +66,7 @@ private:
 
   volatile int16_t mLock;
 };
+
 
 template<class T>
 class LockRAII

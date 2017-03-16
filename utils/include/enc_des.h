@@ -25,7 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ENC_DES_H_
 #define ENC_DES_H_
 
+
 #include "whais.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,47 +35,41 @@ extern "C" {
 
 
 void
-wh_buff_des_encode(const uint8_t* const     key,
-                    uint8_t* const           buffer,
-                    const uint_t             bufferSize);
-void
-wh_buff_des_decode(const uint8_t* const     key,
-                    uint8_t* const           buffer,
-                    const uint_t             bufferSize);
+wh_buff_des_encode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize);
 
 void
-wh_buff_3des_encode(const uint8_t* const     key,
-                     uint8_t* const           buffer,
-                     const uint_t             bufferSize);
+wh_buff_des_decode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize);
 
 void
-wh_buff_3des_decode(const uint8_t* const     key,
-                     uint8_t* const           buffer,
-                     const uint_t             bufferSize);
+wh_buff_3des_encode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize);
 
 void
-wh_prepare_des_keys(const uint8_t*           userKey,
-                     const uint_t             keyLenght,
-                     const bool_t             _3des,
-                     uint64_t* const          outPreparedKeys);
-void
-wh_buff_des_encode_ex(const uint64_t* const    preparedKeys,
-                       uint8_t* const           buffer,
-                       const uint_t             bufferSize);
-void
-wh_buff_des_decode_ex(const uint64_t* const    preparedKeys,
-                       uint8_t* const           buffer,
-                       const uint_t             bufferSize);
+wh_buff_3des_decode(const uint8_t* const key, uint8_t* const buffer, const uint_t bufferSize);
 
 void
-wh_buff_3des_encode_ex(const uint64_t* const    preparedKeys,
-                        uint8_t* const           buffer,
-                        const uint_t             bufferSize);
+wh_prepare_des_keys(const uint8_t* userKey,
+                    const uint_t keyLenght,
+                    const bool_t _3des,
+                    uint64_t* const outPreparedKeys);
+void
+wh_buff_des_encode_ex(const uint64_t* const preparedKeys,
+                      uint8_t* const buffer,
+                      const uint_t bufferSize);
 
 void
-wh_buff_3des_decode_ex(const uint64_t* const    preparedKeys,
-                        uint8_t* const           buffer,
-                        const uint_t             bufferSize);
+wh_buff_des_decode_ex(const uint64_t* const preparedKeys,
+                      uint8_t* const buffer,
+                      const uint_t bufferSize);
+
+void
+wh_buff_3des_encode_ex(const uint64_t* const preparedKeys,
+                       uint8_t* const buffer,
+                       const uint_t bufferSize);
+
+void
+wh_buff_3des_decode_ex(const uint64_t* const preparedKeys,
+                       uint8_t* const buffer,
+                       const uint_t bufferSize);
 
 
 #ifdef __cplusplus

@@ -27,69 +27,69 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "tokenizer.h"
 
+
 using namespace std;
 
 namespace whais
 {
 
+
 const std::string
-NextToken(const std::string&     text,
-           size_t&                inoutOff,
-           const string&          delims)
+NextToken(const std::string& text, size_t& inoutOff, const string& delims)
 {
   inoutOff = text.find_first_not_of(delims, inoutOff);
 
   if (inoutOff == string::npos)
-    {
-      inoutOff  = text.length();
-      return string();
-    }
+  {
+    inoutOff  = text.length();
+    return string();
+  }
 
   assert(inoutOff != string::npos);
   assert(inoutOff < text.length());
 
   size_t lastPos = inoutOff;
   if (text[lastPos] == '"')
+  {
+    bool ignoreEnd = false;
+
+    while ((text[++lastPos] != '"') || ignoreEnd)
     {
-      bool ignoreEnd = false;
-
-      while ((text[++lastPos] != '"') || ignoreEnd)
-        {
-          ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
-          if (text[lastPos] == 0)
-            {
-              //Most likely an error, but not our jub to handle it!
-              lastPos = string::npos;
-              break;
-            }
-        }
-
-      if (lastPos != string::npos)
-        {
-          assert(text[lastPos] == '"');
-          ++lastPos;
-        }
+      ignoreEnd = (text[lastPos] == '\\') ? !ignoreEnd : false;
+      if (text[lastPos] == 0)
+      {
+        //Most likely an error, but not our jub to handle it!
+        lastPos = string::npos;
+        break;
+      }
     }
+
+    if (lastPos != string::npos)
+    {
+      assert(text[lastPos] == '"');
+      ++lastPos;
+    }
+  }
   else if (text[lastPos] == '\'')
+  {
+    bool ignoreEnd = false;
+    while ((text[++lastPos] != '\'') || ignoreEnd)
     {
-      bool ignoreEnd = false;
-      while ((text[++lastPos] != '\'') || ignoreEnd)
-        {
-          ignoreEnd = (text[lastPos] == '\\') ? ! ignoreEnd : false;
-          if (text[lastPos] == 0)
-            {
-              //Most likely an error, but not our jub to handle it!
-              lastPos = string::npos;
-              break;
-            }
-        }
-
-      if (lastPos != string::npos)
-        {
-          assert(text[lastPos] == '\'');
-          ++lastPos;
-        }
+      ignoreEnd = (text[lastPos] == '\\') ? !ignoreEnd : false;
+      if (text[lastPos] == 0)
+      {
+        //Most likely an error, but not our jub to handle it!
+        lastPos = string::npos;
+        break;
+      }
     }
+
+    if (lastPos != string::npos)
+    {
+      assert(text[lastPos] == '\'');
+      ++lastPos;
+    }
+  }
   else
     lastPos = text.find_first_of(delims, inoutOff);
 
@@ -102,7 +102,6 @@ NextToken(const std::string&     text,
   assert(inoutOff <= lastPos);
 
   const string result = text.substr(inoutOff, lastPos - inoutOff + 1);
-
   inoutOff = lastPos + 1;
 
   return result;
@@ -114,20 +113,17 @@ NormalizeFilePath(std::string& path, const bool isDirectory)
 {
   const char directoryDelimiter = whf_dir_delim();
 
-  for (size_t i = 0; i < path.length(); ++i)
-    {
-      if ((path[i] == '\\') || (path[i] == '/'))
-        path[i] = directoryDelimiter;
-    }
+  for (auto& c : path)
+  {
+    if ((c == '\\') || (c == '/'))
+      c = directoryDelimiter;
+  }
 
-  if (isDirectory
-      && (path[path.length() - 1] != directoryDelimiter))
-    {
-      path.append(1, directoryDelimiter);
-    }
+  if (isDirectory && (path[path.length() - 1] != directoryDelimiter))
+    path.append(1, directoryDelimiter);
 
   return path;
 }
 
-} //namespace whais
 
+} //namespace whais

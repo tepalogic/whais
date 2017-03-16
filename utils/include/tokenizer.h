@@ -27,19 +27,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <istream>
 
+
 namespace whais
 {
 
 
 const std::string
-NextToken(const std::string&       text,
-           size_t&                  inoutOff,
-           const std::string&       delims);
+NextToken(const std::string& text, size_t& inoutOff, const std::string& delims);
 
 std::string&
 NormalizeFilePath(std::string& path, const bool isDirectory);
 
+
 } //namespace whais
 
-#endif /* TOKENIZER_H_ */
 
+#endif /* TOKENIZER_H_ */

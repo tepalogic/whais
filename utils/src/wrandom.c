@@ -26,10 +26,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "wrandom.h"
 
-#define XORSHIFT_DEFAULT_SEED 858495253484946541
 
+#define XORSHIFT_DEFAULT_SEED 858495253484946541
 static uint64_t _seed    = XORSHIFT_DEFAULT_SEED;
 static uint64_t _current = XORSHIFT_DEFAULT_SEED;
+
 
 uint64_t
 wh_rnd_seed()
@@ -37,7 +38,6 @@ wh_rnd_seed()
   assert(_seed != 0);
   return _seed;
 }
-
 
 void
 wh_rnd_set_seed(uint64_t seed)
@@ -47,7 +47,6 @@ wh_rnd_set_seed(uint64_t seed)
 
   _seed = seed;
 }
-
 
 uint64_t
 wh_rnd()
@@ -63,4 +62,3 @@ wh_rnd()
 
   return current - 1;
 }
-

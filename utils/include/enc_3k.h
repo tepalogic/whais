@@ -25,27 +25,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ENC_3K_H_
 #define ENC_3K_H_
 
+
 #include "whais.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void
-wh_buff_3k_encode(const uint32_t           firstKing,
-                   const uint32_t           secondKing,
-                   const uint8_t* const     key,
-                   const uint_t             keyLen,
-                   uint8_t* const           buffer,
-                   const uint_t             bufferSize);
 
 void
-wh_buff_3k_decode(const uint32_t           firstKing,
-                   const uint32_t           secondKing,
-                   const uint8_t* const     key,
-                   const uint_t             keyLen,
-                   uint8_t* const           buffer,
-                   const uint_t             bufferSize);
+wh_buff_3k_encode(const uint32_t firstKing,
+                  const uint32_t secondKing,
+                  const uint8_t* const key,
+                  const uint_t keyLen,
+                  uint8_t* const buffer,
+                  const uint_t bufferSize);
+
+void
+wh_buff_3k_decode(const uint32_t firstKing,
+                  const uint32_t secondKing,
+                  const uint8_t* const key,
+                  const uint_t keyLen,
+                  uint8_t* const buffer,
+                  const uint_t bufferSize);
+
 
 #ifdef __cplusplus
 }

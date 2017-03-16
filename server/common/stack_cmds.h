@@ -25,9 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef STACK_CMDS_H
 #define STACK_CMDS_H
 
+
 #include "whais.h"
 
 #include "connection.h"
+
 
 uint_t
 cmd_pop_stack(ClientConnection& conn, uint_t* const inoutDataOff);
@@ -39,42 +41,39 @@ uint_t
 cmd_update_stack_top(ClientConnection& conn, uint_t* const inoutDataOff);
 
 uint_t
-cmd_read_basic_stack_top(ClientConnection& conn,
-                          StackValue&       value,
-                          uint_t* const     inoutDataOffset);
+cmd_read_basic_stack_top(ClientConnection& conn, StackValue& value, uint_t* const inoutDataOffset);
 
 uint_t
 cmd_read_array_stack_top(ClientConnection& conn,
-                          StackValue&       value,
-                          uint64_t          hintOffset,
-                          uint_t* const     inoutDataOffset);
+                         StackValue& value,
+                         uint64_t hintOffset,
+                         uint_t* const inoutDataOffset);
 
 uint_t
 cmd_read_text_stack_top(ClientConnection& conn,
-                         StackValue&       value,
-                         const uint64_t    hintOffset,
-                         uint_t* const     inoutDataOffset);
+                        StackValue& value,
+                        const uint64_t hintOffset,
+                        uint_t* const inoutDataOffset);
 
 uint_t
 cmd_read_field_stack_top(ClientConnection& conn,
-                          StackValue&       topValue,
-                          uint64_t          hintRow,
-                          uint64_t          hintArrayOff,
-                          uint64_t          hintTextOff,
-                          uint_t* const     inoutDataOffset);
+                         StackValue& topValue,
+                         uint64_t hintRow,
+                         uint64_t hintArrayOff,
+                         uint64_t hintTextOff,
+                         uint_t* const inoutDataOffset);
 
 uint_t
 cmd_read_table_stack_top(ClientConnection& conn,
-                          StackValue&       topValue,
-                          const uint_t      hintField,
-                          uint64_t          hintRow,
-                          uint64_t          hintArrayOff,
-                          uint64_t          hintTextOff,
-                          uint_t* const     pDataOffset);
+                         StackValue& topValue,
+                         const uint_t hintField,
+                         uint64_t hintRow,
+                         uint64_t hintArrayOff,
+                         uint64_t hintTextOff,
+                         uint_t* const pDataOffset);
 
 uint_t
-cmd_update_stack_table_add_rows(ClientConnection& conn,
-                                 uint_t* const inoutDataOff);
+cmd_update_stack_table_add_rows(ClientConnection& conn, uint_t* const inoutDataOff);
+
 
 #endif /* STACK_CMDS_H */
-

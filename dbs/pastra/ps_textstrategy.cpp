@@ -952,7 +952,7 @@ ITextStrategy::GetRowStorage()
 namespace pastra {
 
 
-static const UTF8_CU_COUNTER _cuCache;
+const UTF8_CU_COUNTER _cuCache;
 
 
 /* Return the numbers of characters encoded by this string. The string is

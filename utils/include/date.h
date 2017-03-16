@@ -51,18 +51,18 @@ static BOOL_R
 is_leap_year(const int year)
 {
   if ((year % 4) == 0)
+  {
+    if ((year % 100) == 0)
     {
-      if ((year % 100) == 0)
-        {
-          if ((year % 400) == 0)
-            return TRUE_R;
-
-          else
-            return FALSE_R;
-        }
-      else
+      if ((year % 400) == 0)
         return TRUE_R;
+
+      else
+        return FALSE_R;
     }
+    else
+      return TRUE_R;
+  }
   else
     return FALSE_R;
 }

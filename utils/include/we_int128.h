@@ -34,26 +34,24 @@ class WE_I128
 public:
 
   WE_I128()
-  {
-  }
+  {}
 
   WE_I128(const WE_I128& source)
   : mHi(source.mHi),
     mLo(source.mLo)
-  {
-  }
+  {}
 
   template <typename T_INT>
   WE_I128(const T_INT source)
     : mHi(0),
       mLo(source)
+  {
+    if (source < 0)
     {
-      if (source < 0)
-        {
-          mLo = _SC(int64_t, source);
-          mHi = ~(_SC(uint64_t, 0));
-        }
+      mLo = _SC(int64_t, source);
+      mHi = ~(_SC(uint64_t, 0));
     }
+  }
 
   WE_I128
   operator- () const
@@ -72,168 +70,154 @@ public:
 
   WE_I128
   operator+ (const WE_I128& op) const
-    {
-      WE_I128 result(*this);
+  {
+    WE_I128 result( *this);
 
-      result.mHi += op.mHi;
-      result.mLo += op.mLo;
+    result.mHi += op.mHi;
+    result.mLo += op.mLo;
 
-      if (result.mLo < op.mLo)
-        result.mHi++;
+    if (result.mLo < op.mLo)
+      result.mHi++;
 
-      return result;
-    }
+    return result;
+  }
 
   WE_I128
   operator- (const WE_I128& op) const
-    {
-      WE_I128 result(*this);
+  {
+    WE_I128 result( *this);
 
-      if (op.mLo > result.mLo)
-        result.mHi--;
+    if (op.mLo > result.mLo)
+      result.mHi--;
 
-      result.mLo -= op.mLo;
-      result.mHi -= op.mHi;
+    result.mLo -= op.mLo;
+    result.mHi -= op.mHi;
 
-      return result;
-    }
+    return result;
+  }
 
   WE_I128
   operator* (const WE_I128& op) const
+  {
+    WE_I128 tthis( *this);
+    WE_I128 top(op);
+    bool tneg = false;
+    bool oneg = false;
+
+    if (*this < 0)
     {
-      WE_I128 tthis(*this);
-      WE_I128 top(op);
-      bool    tneg = false;
-      bool    oneg = false;
-
-      if (*this < 0)
-        {
-          tneg  = true;
-          tthis = -(*this);
-        }
-
-      if (op < 0)
-        {
-          oneg = true;
-          top  = -top;
-        }
-
-      if ((top.mHi == 0) && (top.mLo <= 0xFFFFFFFF))
-        tthis = tthis.multiply32(top.mLo);
-      else
-        tthis = tthis.multiply(top);
-
-      if (tneg ^ oneg)
-        return -tthis;
-
-      return tthis;
+      tneg = true;
+      tthis = -( *this);
     }
 
-  WE_I128
-  operator/ (const WE_I128& op) const
+    if (op < 0)
     {
-      WE_I128 quotient, reminder;
-
-      WE_I128 tthis(*this);
-      WE_I128 top(op);
-      bool    tneg = false;
-      bool    oneg = false;
-
-      if (*this < 0)
-        {
-          tneg  = true;
-          tthis = - (*this);
-        }
-
-      if (op < 0)
-        {
-          oneg = true;
-          top  = -top;
-        }
-
-      if ((top.mHi == 0)
-          && ((tthis.mHi == 0)
-              || (tthis.mHi >= top.mLo)
-              || (top.mLo <= 0xFFFFFFFF)))
-        {
-          tthis.devide64(top.mLo, quotient, reminder);
-        }
-      else
-        tthis.devide(top, quotient, reminder);
-
-      if (tneg ^ oneg)
-        quotient = -quotient;
-
-      return quotient;
+      oneg = true;
+      top = -top;
     }
+
+    if ((top.mHi == 0) && (top.mLo <= 0xFFFFFFFF))
+      tthis = tthis.multiply32(top.mLo);
+    else
+      tthis = tthis.multiply(top);
+
+    if (tneg ^ oneg)
+      return -tthis;
+
+    return tthis;
+  }
+
+  WE_I128 operator/(const WE_I128& op) const
+  {
+    WE_I128 quotient, reminder;
+
+    WE_I128 tthis( *this);
+    WE_I128 top(op);
+    bool tneg = false;
+    bool oneg = false;
+
+    if ( *this < 0)
+    {
+      tneg = true;
+      tthis = -( *this);
+    }
+
+    if (op < 0)
+    {
+      oneg = true;
+      top = -top;
+    }
+
+    if ((top.mHi == 0)
+        && ((tthis.mHi == 0) || (tthis.mHi >= top.mLo) || (top.mLo <= 0xFFFFFFFF)))
+    {
+      tthis.devide64(top.mLo, quotient, reminder);
+    }
+    else
+      tthis.devide(top, quotient, reminder);
+
+    if (tneg ^ oneg)
+      quotient = -quotient;
+
+    return quotient;
+  }
 
   WE_I128
   operator% (const WE_I128& op) const
+  {
+    WE_I128 quotient, reminder;
+
+    WE_I128 tthis( *this);
+    WE_I128 top(op);
+    bool tneg = false;
+
+    if ( *this < 0)
     {
-      WE_I128 quotient, reminder;
-
-      WE_I128 tthis(*this);
-      WE_I128 top(op);
-      bool    tneg = false;
-
-      if (*this < 0)
-        {
-          tneg  = true;
-          tthis = - (*this);
-        }
-
-      if (op < 0)
-        top  = -top;
-
-      if ((top.mHi == 0)
-          && ((tthis.mHi == 0)
-              || (tthis.mHi >= top.mLo)
-              || (top.mLo <= 0xFFFFFFFF)))
-        {
-          tthis.devide64(top.mLo, quotient, reminder);
-        }
-      else
-        tthis.devide(top, quotient, reminder);
-
-      if (tneg)
-        reminder = -reminder;
-
-      return reminder;
+      tneg = true;
+      tthis = -( *this);
     }
+
+    if (op < 0)
+      top = -top;
+
+    if ((top.mHi == 0)
+        && ((tthis.mHi == 0) || (tthis.mHi >= top.mLo) || (top.mLo <= 0xFFFFFFFF)))
+    {
+      tthis.devide64(top.mLo, quotient, reminder);
+    }
+    else
+      tthis.devide(top, quotient, reminder);
+
+    if (tneg)
+      reminder = -reminder;
+
+    return reminder;
+  }
 
   WE_I128
   operator| (const WE_I128& op) const
-    {
-      WE_I128 result = *this;
+  {
+    WE_I128 result = *this;
 
-      result.mHi |= op.mHi;
-      result.mLo |= op.mLo;
+    result.mHi |= op.mHi;
+    result.mLo |= op.mLo;
 
-      return result;
-    }
+    return result;
+  }
 
   WE_I128
   operator& (const WE_I128& op) const
-    {
-      WE_I128 result = *this;
-
-      result.mHi &= op.mHi;
-      result.mLo &= op.mLo;
-
-      return result;
-    }
-
-  bool
-  operator== (const WE_I128& op) const
   {
-    return(mHi == op.mHi) && (mLo == op.mLo);
+    WE_I128 result = *this;
+
+    result.mHi &= op.mHi;
+    result.mLo &= op.mLo;
+
+    return result;
   }
 
-  bool
-  operator!= (const WE_I128& op) const
-  {
-    return ! (*this == op);
-  }
+  bool operator== (const WE_I128& op) const { return (mHi == op.mHi) && (mLo == op.mLo); }
+  bool operator!= (const WE_I128& op) const { return ! (*this == op); }
 
   bool
   operator<  (const WE_I128& op) const
@@ -248,113 +232,32 @@ public:
             || ((mHi == op.mHi) && ((mLo < op.mLo))));
   }
 
-  bool
-  operator<=  (const WE_I128& op) const
-  {
-    return(*this == op) || (*this < op);
-  }
+  bool operator<=  (const WE_I128& op) const { return (*this == op) || (*this < op); }
+  bool operator>  (const WE_I128& op) const { return ! (*this <= op); }
+  bool operator>=  (const WE_I128& op) const { return ! (*this < op); }
 
-  bool
-  operator>  (const WE_I128& op) const
-  {
-    return ! (*this <= op);
-  }
+  const WE_I128& operator+= (const WE_I128& op) { return *this = *this + op; }
+  const WE_I128& operator-= (const WE_I128& op) { return *this = *this - op; }
+  const WE_I128& operator*= (const WE_I128& op) { return *this = *this * op; }
+  const WE_I128& operator/= (const WE_I128& op) { return *this = *this / op; }
+  const WE_I128& operator%= (const WE_I128& op) { return *this = *this % op; }
+  const WE_I128& operator|= (const WE_I128& op) { return *this = *this | op; }
+  const WE_I128& operator&= (const WE_I128& op) { return *this = *this & op; }
 
-  bool
-  operator>=  (const WE_I128& op) const
-  {
-    return ! (*this < op);
-  }
-
-  const WE_I128&
-  operator+= (const WE_I128& op)
-  {
-    return *this = *this + op;
-  }
-
-  const WE_I128&
-  operator-= (const WE_I128& op)
-  {
-    return *this = *this - op;
-  }
-
-  const WE_I128&
-  operator*= (const WE_I128& op)
-  {
-    return *this = *this * op;
-  }
-
-  const WE_I128&
-  operator/= (const WE_I128& op)
-  {
-    return *this = *this / op;
-  }
-
-  const WE_I128&
-  operator%= (const WE_I128& op)
-  {
-    return *this = *this % op;
-  }
-
-  const WE_I128&
-  operator|= (const WE_I128& op)
-  {
-    return *this = *this | op;
-  }
-
-  const WE_I128&
-  operator&= (const WE_I128& op)
-  {
-    return *this = *this & op;
-  }
-
-  int64_t
-  Int64() const
-  {
-    return mLo;
-  }
+  int64_t Int64() const { return mLo; }
 
 private:
 
-  const WE_I128&
-  lshift96()
-  {
-    mHi = mLo;
-    mHi <<= 32;
-    mLo = 0;
-
-    return *this;
-  }
-
-  const WE_I128&
-  lshift64()
-  {
-    mHi = mLo;
-    mLo = 0;
-
-    return *this;
-  }
-
-  const WE_I128&
-  lshift32()
+  const WE_I128& lshift96() { mHi = mLo; mHi <<= 32; mLo = 0; return *this; }
+  const WE_I128& lshift64() { mHi = mLo; mLo = 0; return *this; }
+  const WE_I128& lshift32()
   {
     mHi <<= 32;
-    mHi  |= (mLo >> 32) & 0xFFFFFFFF;
+    mHi |= (mLo >> 32) & 0xFFFFFFFF;
     mLo <<= 32;
-
     return *this;
   }
-
-  const WE_I128&
-  lshift()
-  {
-    mHi <<= 1;
-    mHi  |= (mLo >> 63) & 1;
-    mLo <<= 1;
-
-    return *this;
-  }
-
+  const WE_I128& lshift() { mHi <<= 1; mHi |= (mLo >> 63) & 1; mLo <<= 1; return *this; }
   const WE_I128&
   rshift()
   {
@@ -370,7 +273,6 @@ private:
 
     return *this;
   }
-
   WE_I128
   multiply32(const uint32_t op) const
   {
@@ -388,7 +290,6 @@ private:
 
     return result;
   }
-
   WE_I128
   multiply(const WE_I128& op) const
   {
@@ -402,7 +303,6 @@ private:
     const uint64_t opw2 = (op.mHi) & 0xFFFFFFFF;
     const uint64_t opw3 = (op.mHi >> 32) & 0xFFFFFFFF;
 
-
     WE_I128 temp   = opw0 * tw0;
     WE_I128 result = temp;
 
@@ -415,8 +315,6 @@ private:
     temp   = opw0 * tw3;
     result += temp.lshift96();
 
-
-
     temp    = opw1 * tw0;
     result += temp.lshift32();
 
@@ -426,15 +324,11 @@ private:
     temp    = opw1 * tw2;
     result += temp.lshift96();
 
-
-
     temp    = opw2 * tw0;
     result += temp.lshift64();
 
     temp    = opw2 * tw1;
     result += temp.lshift96();
-
-
 
     temp   = opw3 * tw0;
     result += temp.lshift96();
@@ -458,24 +352,24 @@ private:
       ++sq, sr = 0;
 
     while (reminder.mHi > 0)
-      {
-        WE_I128 temp;
+    {
+      WE_I128 temp;
 
-        temp      = reminder.mHi;
-        temp     *= sq;
-        quotient += temp;
+      temp = reminder.mHi;
+      temp *= sq;
+      quotient += temp;
 
-        temp  = reminder.mHi;
-        temp *= sr;
+      temp = reminder.mHi;
+      temp *= sr;
 
-        temp += reminder.mLo;
+      temp += reminder.mLo;
 
-        quotient.mHi += temp.mHi / op;
-        quotient      += temp.mLo / op;
+      quotient.mHi += temp.mHi / op;
+      quotient += temp.mLo / op;
 
-        reminder.mHi = temp.mHi % op;
-        reminder.mLo = temp.mLo % op;
-      }
+      reminder.mHi = temp.mHi % op;
+      reminder.mLo = temp.mLo % op;
+    }
   }
 
   void
@@ -485,17 +379,17 @@ private:
     reminder = 0;
 
     for (uint_t i = 0; i < 128; ++i)
-      {
-        reminder.lshift();
-        reminder.mLo |= (quotient.mHi >> 63) & 1;
-        quotient.lshift();
+    {
+      reminder.lshift();
+      reminder.mLo |= (quotient.mHi >> 63) & 1;
+      quotient.lshift();
 
-        if (reminder >= op)
-          {
-            quotient.mLo |= 1;
-            reminder -= op;
-          }
+      if (reminder >= op)
+      {
+        quotient.mLo |= 1;
+        reminder -= op;
       }
+    }
   }
 
   uint64_t  mHi;
@@ -510,14 +404,12 @@ operator+ (const T op1, const WE_I128& op2)
   return op2 + op1;
 }
 
-
 template <typename T>
 WE_I128
 operator- (const T op1, const WE_I128& op2)
 {
   return WE_I128(op1) - op2;
 }
-
 
 template <typename T>
 WE_I128
@@ -526,7 +418,6 @@ operator* (const T op1, const WE_I128& op2)
   return op2 * op1;
 }
 
-
 template <typename T>
 WE_I128
 operator/ (const T op1, const WE_I128& op2)
@@ -534,14 +425,12 @@ operator/ (const T op1, const WE_I128& op2)
   return WE_I128(op1) / op2;
 }
 
-
 template <typename T>
 WE_I128
 operator% (const T op1, const WE_I128& op2)
 {
   return WE_I128(op1) % op2;
 }
-
 
 static inline int64_t
 toInt64(const WE_I128& value)
@@ -554,13 +443,11 @@ toInt64(const WE_I128& value)
 
 typedef int128_t WE_I128;
 
-
 static inline int64_t
 toInt64(const WE_I128& value)
 {
   return value;
 }
-
 
 #endif /* int128_t */
 
