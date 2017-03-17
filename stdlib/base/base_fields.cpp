@@ -24,10 +24,8 @@
 
 #include <cassert>
 
-
 #include "base_fields.h"
 #include "base_types.h"
-
 
 
 using namespace whais;
@@ -46,15 +44,14 @@ WLIB_PROC_DESCRIPTION         gProcFieldAverage;
 
 WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
+
 static WLIB_STATUS
 proc_field_table( SessionStack& stack, ISession&)
 {
   IOperand& op = stack[stack.Size() - 1].Operand();
-
   StackValue temp = op.GetTableValue();
 
   stack.Pop(1);
-
   stack.Push( temp);
 
   return WOP_OK;
@@ -67,12 +64,12 @@ proc_field_isindexed( SessionStack& stack, ISession&)
   IOperand& op = stack[stack.Size() - 1].Operand();
 
   if (op.IsNull())
-    {
-      stack.Pop(1);
-      stack.Push( DBool());
+  {
+    stack.Pop(1);
+    stack.Push(DBool());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
   ITable&           table = op.GetTable();
   const FIELD_INDEX field = op.GetField();
@@ -92,21 +89,21 @@ proc_field_name( SessionStack& stack, ISession&)
   IOperand& op = stack[stack.Size() - 1].Operand();
 
   if (op.IsNull())
-    {
-      stack.Pop(1);
-      stack.Push( DText());
+  {
+    stack.Pop(1);
+    stack.Push(DText());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
-  ITable&           table = op.GetTable();
+  ITable& table = op.GetTable();
   const FIELD_INDEX field = op.GetField();
 
-  DBSFieldDescriptor fd = table.DescribeField( field);
-  DText result( fd.name);
+  DBSFieldDescriptor fd = table.DescribeField(field);
+  DText result(fd.name);
 
   stack.Pop(1);
-  stack.Push( result);
+  stack.Push(result);
 
   return WOP_OK;
 }
@@ -118,17 +115,17 @@ proc_field_index( SessionStack& stack, ISession&)
   IOperand& op = stack[stack.Size() - 1].Operand();
 
   if (op.IsNull())
-    {
-      stack.Pop(1);
-      stack.Push( DUInt64());
+  {
+    stack.Pop(1);
+    stack.Push(DUInt64());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
   const uint64_t field = op.GetField();
 
   stack.Pop(1);
-  stack.Push( DUInt64(field));
+  stack.Push(DUInt64(field));
 
   return WOP_OK;
 }
@@ -143,9 +140,9 @@ match_field_rows( ITable&               table,
                   const ROW_INDEX       toRow)
 {
   if (from <= to)
-    return table.MatchRows( from, to, fromRow, toRow, field);
+    return table.MatchRows(from, to, fromRow, toRow, field);
 
-  return table.MatchRows( to, from, fromRow, toRow, field);
+  return table.MatchRows(to, from, fromRow, toRow, field);
 }
 
 
@@ -155,12 +152,12 @@ proc_field_find_range( SessionStack& stack, ISession&)
   IOperand& opField = stack[stack.Size() - 5].Operand();
 
   if (opField.IsNull())
-    {
-      stack.Pop(5);
-      stack.Push( DArray());
+  {
+    stack.Pop(5);
+    stack.Push(DArray());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
   const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
@@ -174,207 +171,206 @@ proc_field_find_range( SessionStack& stack, ISession&)
 
     }
 
-  IOperand&    opFrom       = stack[stack.Size() - 4].Operand();
-  IOperand&    opTo         = stack[stack.Size() - 3].Operand();
-  IOperand&    opFromRow    = stack[stack.Size() - 2].Operand();
-  IOperand&    opToRow      = stack[stack.Size() - 1].Operand();
-  ITable&      table        = opField.GetTable();
-  DArray       result;
-  DUInt64      row;
+  IOperand& opFrom = stack[stack.Size() - 4].Operand();
+  IOperand& opTo = stack[stack.Size() - 3].Operand();
+  IOperand& opFromRow = stack[stack.Size() - 2].Operand();
+  IOperand& opToRow = stack[stack.Size() - 1].Operand();
+  ITable& table = opField.GetTable();
+  DArray result;
+  DUInt64 row;
 
-  opFromRow.GetValue( row);
+  opFromRow.GetValue(row);
   const ROW_INDEX fromRow = row.IsNull() ? 0 : row.mValue;
 
-  opToRow.GetValue( row);
+  opToRow.GetValue(row);
   const ROW_INDEX toRow = row.IsNull() ? table.AllocatedRows() - 1 : row.mValue;
 
   const FIELD_INDEX field = opField.GetField();
-  switch( GET_BASIC_TYPE( fieldType))
-    {
-    case T_BOOL:
-        {
-          DBool from, to;
+  switch (GET_BASIC_TYPE(fieldType))
+  {
+  case T_BOOL:
+  {
+    DBool from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_DATE:
-        {
-          DDate from, to;
+  case T_DATE:
+  {
+    DDate from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_DATETIME:
-        {
-          DDateTime from, to;
+  case T_DATETIME:
+  {
+    DDateTime from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_HIRESTIME:
-        {
-          DHiresTime from, to;
+  case T_HIRESTIME:
+  {
+    DHiresTime from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_INT8:
-        {
-          DInt8 from, to;
+  case T_INT8:
+  {
+    DInt8 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_INT16:
-        {
-          DInt16 from, to;
+  case T_INT16:
+  {
+    DInt16 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_INT32:
-        {
-          DInt32 from, to;
+  case T_INT32:
+  {
+    DInt32 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_INT64:
-        {
-          DInt64 from, to;
+  case T_INT64:
+  {
+    DInt64 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_UINT8:
-        {
-          DUInt8 from, to;
+  case T_UINT8:
+  {
+    DUInt8 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_UINT16:
-        {
-          DUInt16 from, to;
+  case T_UINT16:
+  {
+    DUInt16 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_UINT32:
-        {
-          DUInt32 from, to;
+  case T_UINT32:
+  {
+    DUInt32 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_UINT64:
-        {
-          DUInt64 from, to;
+  case T_UINT64:
+  {
+    DUInt64 from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_REAL:
-        {
-          DReal from, to;
+  case T_REAL:
+  {
+    DReal from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    case T_RICHREAL:
-        {
-          DRichReal from, to;
+  case T_RICHREAL:
+  {
+    DRichReal from, to;
 
-          opFrom.GetValue( from);
-          opTo.GetValue( to);
+    opFrom.GetValue(from);
+    opTo.GetValue(to);
 
-          result = match_field_rows( table, field, from, to, fromRow, toRow);
-        }
-      break;
+    result = match_field_rows(table, field, from, to, fromRow, toRow);
+  }
+    break;
 
-    default:
-      throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
-    }
+  default:
+    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+  }
 
   stack.Pop(5);
-  stack.Push( result);
+  stack.Push(result);
 
   return WOP_OK;
 }
 
 
 template<typename T> uint64_t
-retrieve_minim_value( ITable&           table,
-                      const FIELD_INDEX field)
+retrieve_minim_value(ITable& table, const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  T              minim     = T::Max();
-  uint64_t       foundRow  = 0;
+  T minim = T::Max();
+  uint64_t foundRow = 0;
 
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
-    {
-      T value;
-      table.Get(row, field, value);
+  {
+    T value;
+    table.Get(row, field, value);
 
-      if ( ! value.IsNull() && (value <= minim))
-        {
-          minim    = value;
-          foundRow = row;
-        }
+    if ( !value.IsNull() && (value <= minim))
+    {
+      minim = value;
+      foundRow = row;
     }
+  }
 
   return foundRow;
 }
@@ -385,20 +381,20 @@ retrieve_maxim_value( ITable&           table,
                       const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  T              maxim     = T::Min();
-  uint64_t       foundRow  = 0;
+  T maxim = T::Min();
+  uint64_t foundRow = 0;
 
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
-    {
-      T value;
-      table.Get(row, field, value);
+  {
+    T value;
+    table.Get(row, field, value);
 
-      if ( ! value.IsNull() && (maxim <= value))
-        {
-          maxim    = value;
-          foundRow = row;
-        }
+    if ( !value.IsNull() && (maxim <= value))
+    {
+      maxim = value;
+      foundRow = row;
     }
+  }
 
   return foundRow;
 }
@@ -408,182 +404,185 @@ template<bool minSearch> WLIB_STATUS
 field_search_minmax( SessionStack& stack, ISession&)
 {
   IOperand& opField = stack[stack.Size() - 1].Operand();
-  uint64_t  foundRow;
+  uint64_t foundRow;
 
   if (opField.IsNull())
-    {
-      stack.Pop(1);
-      stack.Push( DUInt64());
+  {
+    stack.Pop(1);
+    stack.Push(DUInt64());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
   const uint_t fieldType = opField.GetType();
-  if (IS_ARRAY( fieldType)
-      || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
+  if (IS_ARRAY(fieldType) || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
-    {
-      throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
-                            "Searching for min and max values is available "
-                              "only for basic types( e.g. reals, integers, "
-                              "dates, etc. and not for arrays or text.");
-    }
+  {
+    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
+                         "Searching for min and max values is available "
+                         "only for basic types( e.g. reals, integers, "
+                         "dates, etc. and not for arrays or text.");
+  }
 
-  ITable&           table = opField.GetTable();
+  ITable& table = opField.GetTable();
   const FIELD_INDEX field = opField.GetField();
 
-  switch( GET_BASIC_TYPE( fieldType))
+  switch (GET_BASIC_TYPE(fieldType))
   {
   case T_BOOL:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DBool> (table, field) :
-                    retrieve_maxim_value<DBool> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DBool>(table, field) : retrieve_maxim_value<DBool>(table, field);
+  }
     break;
 
   case T_CHAR:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DChar> (table, field) :
-                    retrieve_maxim_value<DChar> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DChar>(table, field) : retrieve_maxim_value<DChar>(table, field);
+  }
     break;
 
   case T_DATE:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DDate> (table, field) :
-                    retrieve_maxim_value<DDate> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DDate>(table, field) : retrieve_maxim_value<DDate>(table, field);
+  }
     break;
 
   case T_DATETIME:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DDateTime> (table, field) :
-                    retrieve_maxim_value<DDateTime> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DDateTime>(table, field) :
+            retrieve_maxim_value<DDateTime>(table, field);
+  }
     break;
 
   case T_HIRESTIME:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DHiresTime> (table, field) :
-                    retrieve_maxim_value<DHiresTime> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DHiresTime>(table, field) :
+            retrieve_maxim_value<DHiresTime>(table, field);
+  }
     break;
 
   case T_INT8:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DInt8> (table, field) :
-                    retrieve_maxim_value<DInt8> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DInt8>(table, field) : retrieve_maxim_value<DInt8>(table, field);
+  }
     break;
 
   case T_INT16:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DInt16> (table, field) :
-                    retrieve_maxim_value<DInt16> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DInt16>(table, field) : retrieve_maxim_value<DInt16>(table, field);
+  }
     break;
 
   case T_INT32:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DInt32> (table, field) :
-                    retrieve_maxim_value<DInt32> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DInt32>(table, field) : retrieve_maxim_value<DInt32>(table, field);
+  }
     break;
 
   case T_INT64:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DInt32> (table, field) :
-                    retrieve_maxim_value<DInt32> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DInt32>(table, field) : retrieve_maxim_value<DInt32>(table, field);
+  }
     break;
 
   case T_UINT8:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DUInt8> (table, field) :
-                    retrieve_maxim_value<DUInt8> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DUInt8>(table, field) : retrieve_maxim_value<DUInt8>(table, field);
+  }
     break;
 
   case T_UINT16:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DUInt16> (table, field) :
-                    retrieve_maxim_value<DUInt16> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DUInt16>(table, field) :
+            retrieve_maxim_value<DUInt16>(table, field);
+  }
     break;
 
   case T_UINT32:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DUInt32> (table, field) :
-                    retrieve_maxim_value<DUInt32> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DUInt32>(table, field) :
+            retrieve_maxim_value<DUInt32>(table, field);
+  }
     break;
 
   case T_UINT64:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DUInt64> (table, field) :
-                    retrieve_maxim_value<DUInt64> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DUInt64>(table, field) :
+            retrieve_maxim_value<DUInt64>(table, field);
+  }
     break;
 
   case T_REAL:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DReal> (table, field) :
-                    retrieve_maxim_value<DReal> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DReal>(table, field) : retrieve_maxim_value<DReal>(table, field);
+  }
     break;
 
   case T_RICHREAL:
-      {
-        foundRow = minSearch ?
-                    retrieve_minim_value<DRichReal> (table, field) :
-                    retrieve_maxim_value<DRichReal> (table, field);
-      }
+  {
+    foundRow =
+        minSearch ?
+            retrieve_minim_value<DRichReal>(table, field) :
+            retrieve_maxim_value<DRichReal>(table, field);
+  }
     break;
 
   default:
-    throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
+    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
   }
 
   stack.Pop(1);
-  stack.Push( DUInt64(foundRow));
+  stack.Push(DUInt64(foundRow));
 
   return WOP_OK;
 }
 
 
 template<typename T> DRichReal
-compute_integer_field_average_value( ITable&              table,
-                                     const FIELD_INDEX    field)
+compute_integer_field_average_value(ITable& table, const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  uint64_t       rowsAdded = 0;
-  WE_I128        sum       = 0;
+  uint64_t rowsAdded = 0;
+  WE_I128 sum = 0;
 
   T currentValue;
   for (uint64_t row = 0; row < rowsCount; ++row)
+  {
+    table.Get(row, field, currentValue);
+    if ( !currentValue.IsNull())
     {
-      table.Get(row, field, currentValue);
-
-      if ( ! currentValue.IsNull())
-        {
-          sum += currentValue.mValue;
-          ++rowsAdded;
-        }
+      sum += currentValue.mValue;
+      ++rowsAdded;
     }
+  }
 
   if (rowsAdded == 0)
     return DRichReal();
@@ -591,45 +590,43 @@ compute_integer_field_average_value( ITable&              table,
   const RICHREAL_T quotient = sum / rowsAdded;
   const RICHREAL_T reminder = sum % rowsAdded;
 
-  return DRichReal( quotient + reminder / rowsAdded);
+  return DRichReal(quotient + reminder / rowsAdded);
 }
 
 
 template<typename T> DRichReal
-compute_real_field_average_value( ITable&             table,
-                                  const FIELD_INDEX   field)
+compute_real_field_average_value(ITable& table, const FIELD_INDEX field)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  uint64_t       rowsAdded = 0;
-  WE_I128        integerSum = 0, fractionalSum = 0;
+  uint64_t rowsAdded = 0;
+  WE_I128 integerSum = 0, fractionalSum = 0;
 
   T currentValue;
   for (uint64_t row = 0; row < rowsCount; ++row)
+  {
+    table.Get(row, field, currentValue);
+
+    if ( !currentValue.IsNull())
     {
-      table.Get(row, field, currentValue);
+      const RICHREAL_T temp = currentValue.mValue;
 
-      if ( ! currentValue.IsNull())
-        {
-          const RICHREAL_T temp = currentValue.mValue;
+      integerSum += temp.Integer();
+      fractionalSum += temp.Fractional();
 
-          integerSum    += temp.Integer();
-          fractionalSum += temp.Fractional();
-
-          ++rowsAdded;
-        }
+      ++rowsAdded;
     }
+  }
 
   if (rowsAdded == 0)
     return DRichReal();
 
-  integerSum    += fractionalSum / DBS_RICHREAL_PREC;
+  integerSum += fractionalSum / DBS_RICHREAL_PREC;
   fractionalSum %= DBS_RICHREAL_PREC;
 
   RICHREAL_T result = _SC(RICHREAL_T, integerSum) / rowsAdded;
-  result += RICHREAL_T( 0, toInt64(fractionalSum), DBS_RICHREAL_PREC)
-            / rowsAdded;
+  result += RICHREAL_T(0, toInt64(fractionalSum), DBS_RICHREAL_PREC) / rowsAdded;
 
-  return DRichReal( result);
+  return DRichReal(result);
 }
 
 
@@ -639,76 +636,75 @@ compute_field_average( SessionStack& stack, ISession&)
   IOperand& opField = stack[stack.Size() - 1].Operand();
 
   if (opField.IsNull())
-    {
-      stack.Pop(1);
-      stack.Push( DRichReal());
+  {
+    stack.Pop(1);
+    stack.Push(DRichReal());
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
   const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
       || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
-    {
-      throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
-                            "Computing field average value is available "
-                              "only for basic types( e.g. reals, integers, "
-                              "dates, etc. and not for arrays or text.");
-    }
+  {
+    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
+                         "Computing field average value is available only for basic types( e.g."
+                         " reals, integers, dates, etc. and not for arrays or text.");
+  }
 
   ITable&           table = opField.GetTable();
   const FIELD_INDEX field = opField.GetField();
   DRichReal         result;
 
-  switch( fieldType)
-    {
-    case T_INT8:
-      result = compute_integer_field_average_value<DInt8> (table, field);
-      break;
+  switch (fieldType)
+  {
+  case T_INT8:
+    result = compute_integer_field_average_value<DInt8>(table, field);
+    break;
 
-    case T_INT16:
-      result = compute_integer_field_average_value<DInt16> (table, field);
-      break;
+  case T_INT16:
+    result = compute_integer_field_average_value<DInt16>(table, field);
+    break;
 
-    case T_INT32:
-      result = compute_integer_field_average_value<DInt32> (table, field);
-      break;
+  case T_INT32:
+    result = compute_integer_field_average_value<DInt32>(table, field);
+    break;
 
-    case T_INT64:
-      result = compute_integer_field_average_value<DInt64> (table, field);
-      break;
+  case T_INT64:
+    result = compute_integer_field_average_value<DInt64>(table, field);
+    break;
 
-    case T_UINT8:
-      result = compute_integer_field_average_value<DUInt8> (table, field);
-      break;
+  case T_UINT8:
+    result = compute_integer_field_average_value<DUInt8>(table, field);
+    break;
 
-    case T_UINT16:
-      result = compute_integer_field_average_value<DUInt16> (table, field);
-      break;
+  case T_UINT16:
+    result = compute_integer_field_average_value<DUInt16>(table, field);
+    break;
 
-    case T_UINT32:
-      result = compute_integer_field_average_value<DUInt32> (table, field);
-      break;
+  case T_UINT32:
+    result = compute_integer_field_average_value<DUInt32>(table, field);
+    break;
 
-    case T_UINT64:
-      result = compute_integer_field_average_value<DUInt64> (table, field);
-      break;
+  case T_UINT64:
+    result = compute_integer_field_average_value<DUInt64>(table, field);
+    break;
 
-    case T_REAL:
-      result = compute_real_field_average_value<DReal> (table, field);
-      break;
+  case T_REAL:
+    result = compute_real_field_average_value<DReal>(table, field);
+    break;
 
-    case T_RICHREAL:
-      result = compute_real_field_average_value<DRichReal> (table, field);
-      break;
+  case T_RICHREAL:
+    result = compute_real_field_average_value<DRichReal>(table, field);
+    break;
 
-    default:
-      throw InterException( _EXTRA( InterException::INTERNAL_ERROR));
-    }
+  default:
+    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+  }
 
   stack.Pop(1);
-  stack.Push( result);
+  stack.Push(result);
 
   return WOP_OK;
 }
@@ -717,24 +713,23 @@ compute_field_average( SessionStack& stack, ISession&)
 static WLIB_STATUS
 field_sort_table( SessionStack& stack, ISession&)
 {
-  DBool  result;
-  DBool  reverseSort;
+  DBool result;
+  DBool reverseSort;
 
   IOperand& opField = stack[stack.Size() - 2].Operand();
-  stack[stack.Size() - 1].Operand().GetValue( reverseSort);
+  stack[stack.Size() - 1].Operand().GetValue(reverseSort);
 
+  if ( !opField.IsNull())
+  {
+    const FIELD_INDEX field = opField.GetField();
+    ITable& table = opField.GetTable();
 
-  if ( ! opField.IsNull())
-    {
-      const FIELD_INDEX field = opField.GetField();
-      ITable&           table = opField.GetTable();
-
-      table.Sort( field,
-                  0,
-                  table.AllocatedRows() - 1,
-                  reverseSort.IsNull() ? false : reverseSort.mValue);
-      result = DBool( true);
-    }
+    table.Sort(field,
+               0,
+               table.AllocatedRows() - 1,
+               reverseSort.IsNull() ? false : reverseSort.mValue);
+    result = DBool(true);
+  }
 
   stack.Pop(1);
 

@@ -29,7 +29,6 @@
 #include "stdlib/interface.h"
 
 
-
 extern uint8_t gBoolType[sizeof( TypeSpec)];
 extern uint8_t gCharType[sizeof( TypeSpec)];
 extern uint8_t gDateType[sizeof( TypeSpec)];
@@ -69,8 +68,8 @@ extern uint8_t gARealType[sizeof( TypeSpec)];
 extern uint8_t gARichRealType[sizeof( TypeSpec)];
 
 
-
 whais::WLIB_STATUS
 base_types_init();
+
 
 #endif //BASE_TYPES_H_

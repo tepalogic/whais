@@ -44,4 +44,3 @@ whais::WLIB_STATUS
 base_fields_init();
 
 #endif /* BASE_FIELDS_H_ */
-

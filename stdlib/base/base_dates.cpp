@@ -30,12 +30,10 @@
 #include "utils/wtypes.h"
 #include "utils/date.h"
 #include "interpreter/interpreter.h"
-
 #include "base_types.h"
 
 
 using namespace whais;
-
 
 
 struct YearsAttrs
@@ -44,7 +42,6 @@ struct YearsAttrs
   uint8_t       firstJanWeekDay : 3;
   uint8_t       reserved        : 4;
 };
-
 
 
 static const uint_t         REF_JAN_FIRST  = 5;
@@ -58,9 +55,7 @@ static const int64_t        uSECS_PER_MIN  = SECS_PER_MIN  * uSECS_PER_SEC;
 static const int64_t        uSECS_PER_HOUR = SECS_PER_HOUR * uSECS_PER_SEC;
 static const int64_t        uSECS_PER_DAY  = SECS_PER_DAY  * uSECS_PER_SEC;
 
-
 static YearsAttrs cachedYears[0xFFFF];
-
 
 WLIB_PROC_DESCRIPTION       gProcTicks;
 WLIB_PROC_DESCRIPTION       gProcNow;
@@ -83,26 +78,25 @@ WLIB_PROC_DESCRIPTION       gProcLastDateOfWeek;
 WLIB_PROC_DESCRIPTION       gProcDayOfWeek;
 
 
-
 static void
-compute_year_attrs( const int                refYear,
-                    const uint_t             refFirstJan,
-                    const int                year,
-                    YearsAttrs* const        oAttrs)
+compute_year_attrs(const int refYear,
+                   const uint_t refFirstJan,
+                   const int year,
+                   YearsAttrs* const oAttrs)
 {
-  int  cYear            = refYear;
-  int  firstJanWeekDay  = refFirstJan;
+  int cYear = refYear;
+  int firstJanWeekDay = refFirstJan;
 
-  while ( cYear < year)
-    firstJanWeekDay += is_leap_year( cYear++) ? 2 : 1;
+  while (cYear < year)
+    firstJanWeekDay += is_leap_year(cYear++) ? 2 : 1;
 
-  while ( year < cYear)
-    firstJanWeekDay -= is_leap_year( --cYear) ? 2 : 1;
+  while (year < cYear)
+    firstJanWeekDay -= is_leap_year(--cYear) ? 2 : 1;
 
-  oAttrs->leaps  = is_leap_year( year);
+  oAttrs->leaps = is_leap_year(year);
 
   if (firstJanWeekDay < 0)
-    oAttrs->firstJanWeekDay = 7 - (-firstJanWeekDay % 7);
+    oAttrs->firstJanWeekDay = 7 - ( -firstJanWeekDay % 7);
 
   else
     oAttrs->firstJanWeekDay = firstJanWeekDay % 7;
@@ -110,9 +104,9 @@ compute_year_attrs( const int                refYear,
 
 
 static inline bool
-is_leap( const int year)
+is_leap(const int year)
 {
-  assert( (-32768 <= year) && (year <= 32767));
+  assert(( -32768 <= year) && (year <= 32767));
 
   return cachedYears[year + 32768].leaps != 0;
 }
@@ -121,7 +115,7 @@ is_leap( const int year)
 static inline uint_t
 get_first_jan_weekday( const int year)
 {
-  assert( (-32768 <= year) && (year <= 32767));
+  assert(( -32768 <= year) && (year <= 32767));
 
   return cachedYears[year + 32768].firstJanWeekDay;
 }
@@ -130,18 +124,18 @@ get_first_jan_weekday( const int year)
 static inline int
 days_of_year( const int year)
 {
-  return is_leap( year) ? DAYS_PER_YEAR + 1 : DAYS_PER_YEAR;
+  return is_leap(year) ? DAYS_PER_YEAR + 1 : DAYS_PER_YEAR;
 }
 
 
 static inline int
 days_to_month( const int year, const uint_t month)
 {
-  assert( (1 <= month) && (month <= 12));
+  assert((1 <= month) && (month <= 12));
 
   const int16_t MNTH_YDAYS[] = MNTH_YDAYS_A;
 
-  if (is_leap( year) && (month > 2))
+  if (is_leap(year) && (month > 2))
     return MNTH_YDAYS[month - 1] + 1;
 
   else
@@ -161,15 +155,15 @@ day_of_date( const int year, const uint_t month, const uint_t day)
 static inline uint_t
 week_of_first_jan( const int year)
 {
-  const uint_t janFirst = get_first_jan_weekday( year);
+  const uint_t janFirst = get_first_jan_weekday(year);
 
   if (janFirst < 4)
     return 1;
 
-  if (is_leap( year - 1))
-    return( janFirst == 5) ? 53 : 52;
+  if (is_leap(year - 1))
+    return (janFirst == 5) ? 53 : 52;
 
-  return( janFirst == 4) ? 53 : 52;
+  return (janFirst == 4) ? 53 : 52;
 }
 
 
@@ -179,15 +173,15 @@ years_days_diff( const int year1, const int year2)
   int result = 0;
 
   if (year1 < year2)
-    {
-      for (int y = year1; y < year2; ++y)
-        result += days_of_year( y);
-    }
+  {
+    for (int y = year1; y < year2; ++y)
+      result += days_of_year(y);
+  }
   else
-    {
-      for (int y = year2; y < year1; ++y)
-        result -= days_of_year( y);
-    }
+  {
+    for (int y = year2; y < year1; ++y)
+      result -= days_of_year(y);
+  }
 
   return result;
 }
@@ -196,28 +190,27 @@ years_days_diff( const int year1, const int year2)
 static inline uint_t
 get_date_week( const int year, const uint_t month, const uint_t day)
 {
-  const uint_t janFirst = get_first_jan_weekday( year);
+  const uint_t janFirst = get_first_jan_weekday(year);
 
-  uint_t dateDays   = day_of_date( year, month, day);
-  uint_t weeksCount = week_of_first_jan( year);
+  uint_t dateDays = day_of_date(year, month, day);
+  uint_t weeksCount = week_of_first_jan(year);
 
-  assert( janFirst < 7);
-  assert( dateDays > 0);
-  assert( (weeksCount == 1) || (weeksCount == 52) || (weeksCount == 53));
+  assert(janFirst < 7);
+  assert(dateDays > 0);
+  assert((weeksCount == 1) || (weeksCount == 52) || (weeksCount == 53));
 
   if (dateDays <= (6 - janFirst + 1))
     return weeksCount;
 
-  dateDays   -= 6 - janFirst + 1;
-  weeksCount  = (weeksCount == 1) ? 1 : 0;
+  dateDays -= 6 - janFirst + 1;
+  weeksCount = (weeksCount == 1) ? 1 : 0;
   weeksCount += (dateDays / 7) + ((dateDays % 7 != 0) ? 1 : 0);
 
-  if ((weeksCount == 53)
-      && (week_of_first_jan( year + 1) == 1))
-    {
-      //It looks like this date is actually part of the next year week count.
-      weeksCount = 1;
-    }
+  if ((weeksCount == 53) && (week_of_first_jan(year + 1) == 1))
+  {
+    //It looks like this date is actually part of the next year week count.
+    weeksCount = 1;
+  }
 
   return weeksCount;
 }
@@ -226,89 +219,83 @@ get_date_week( const int year, const uint_t month, const uint_t day)
 static inline uint_t
 get_date_weekday( const int year, const uint_t month, const uint_t day)
 {
-  const uint_t janFirst = get_first_jan_weekday( year);
-  const uint_t dateDays = day_of_date( year, month, day);
+  const uint_t janFirst = get_first_jan_weekday(year);
+  const uint_t dateDays = day_of_date(year, month, day);
 
-  assert( janFirst < 7);
-  assert( dateDays > 0);
+  assert(janFirst < 7);
+  assert(dateDays > 0);
 
-  return(janFirst + dateDays - 1) % 7;
+  return (janFirst + dateDays - 1) % 7;
 }
 
 
 static bool
-add_date_days( int32_t          days,
-               int16_t* const   ioYear,
-               int8_t* const    ioMonth,
-               int8_t* const    ioDay)
+add_date_days(int32_t days, int16_t* const ioYear, int8_t* const ioMonth, int8_t* const ioDay)
 {
   days += day_of_date( *ioYear, *ioMonth, *ioDay);
 
   int year = *ioYear;
   if (days > 0)
+  {
+    while (days > days_of_year(year))
     {
-      while ( days > days_of_year( year))
-        {
-          if (year > 32767)
-            return false;
+      if (year > 32767)
+        return false;
 
-          else
-            days -= days_of_year( year++);
-        }
+      else
+        days -= days_of_year(year++);
     }
+  }
   else
+  {
+    while (days <= 0)
     {
-      while ( days <= 0)
-        {
-          if (year <= -32768)
-            return false;
+      if (year <= -32768)
+        return false;
 
-          else
-            days += days_of_year( --year);
-        }
+      else
+        days += days_of_year(--year);
     }
+  }
 
-  assert( (0 < days) && (days <= days_of_year( year)));
-  assert( (-32768 <= year) && (year <= 32767));
+  assert((0 < days) && (days <= days_of_year(year)));
+  assert(( -32768 <= year) && (year <= 32767));
 
   uint8_t month = 2;
-  while ( (month <= 12) && (days > days_to_month( year, month)))
+  while ((month <= 12) && (days > days_to_month(year, month)))
     ++month;
 
-  days -= days_to_month( year, --month);
+  days -= days_to_month(year, --month);
 
-  assert( month <= 12);
-  assert( 0 < days);
+  assert(month <= 12);
+  assert(0 < days);
 
-  *ioYear  = year;
+  *ioYear = year;
   *ioMonth = month;
-  *ioDay   = days;
+  *ioDay = days;
 
   return true;
 }
-
 
 static WLIB_STATUS
 get_ticks( SessionStack& stack, ISession&)
 {
   stack.Push( DUInt64(wh_msec_ticks()));
-
   return WOP_OK;
 }
-
 
 static WLIB_STATUS
 get_curr_time( SessionStack& stack, ISession&)
 {
   const WTime ctime = wh_get_currtime();
 
-  stack.Push( DHiresTime( ctime.year,
-                          ctime.month,
-                          ctime.day,
-                          ctime.hour,
-                          ctime.min,
-                          ctime.sec,
-                          ctime.usec));
+  stack.Push(DHiresTime(ctime.year,
+                        ctime.month,
+                        ctime.day,
+                        ctime.hour,
+                        ctime.min,
+                        ctime.sec,
+                        ctime.usec));
   return WOP_OK;
 }
 
@@ -318,14 +305,14 @@ get_date_year( SessionStack& stack, ISession&)
 {
   DDate date;
 
-  stack[stack.Size() - 1].Operand().GetValue( date);
+  stack[stack.Size() - 1].Operand().GetValue(date);
   stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DInt16());
+    stack.Push(DInt16());
 
   else
-    stack.Push( DInt16(date.mYear));
+    stack.Push(DInt16(date.mYear));
 
   return WOP_OK;
 }
@@ -336,14 +323,14 @@ get_date_month( SessionStack& stack, ISession&)
 {
   DDate date;
 
-  stack[stack.Size() - 1].Operand().GetValue( date);
+  stack[stack.Size() - 1].Operand().GetValue(date);
   stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DUInt8());
+    stack.Push(DUInt8());
 
   else
-    stack.Push( DUInt8(date.mMonth));
+    stack.Push(DUInt8(date.mMonth));
 
   return WOP_OK;
 }
@@ -354,14 +341,14 @@ get_date_day( SessionStack& stack, ISession&)
 {
   DDate date;
 
-  stack[stack.Size() - 1].Operand().GetValue( date);
+  stack[stack.Size() - 1].Operand().GetValue(date);
   stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push( DUInt8());
+    stack.Push(DUInt8());
 
   else
-    stack.Push( DUInt8(date.mDay));
+    stack.Push(DUInt8(date.mDay));
 
   return WOP_OK;
 }
@@ -372,14 +359,14 @@ get_date_hours( SessionStack& stack, ISession&)
 {
   DDateTime time;
 
-  stack[stack.Size() - 1].Operand().GetValue( time);
+  stack[stack.Size() - 1].Operand().GetValue(time);
   stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8());
+    stack.Push(DUInt8());
 
   else
-    stack.Push( DUInt8(time.mHour));
+    stack.Push(DUInt8(time.mHour));
 
   return WOP_OK;
 }
@@ -390,14 +377,14 @@ get_date_mins( SessionStack& stack, ISession&)
 {
   DDateTime time;
 
-  stack[stack.Size() - 1].Operand().GetValue( time);
+  stack[stack.Size() - 1].Operand().GetValue(time);
   stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8());
+    stack.Push(DUInt8());
 
   else
-    stack.Push( DUInt8(time.mMinutes));
+    stack.Push(DUInt8(time.mMinutes));
 
   return WOP_OK;
 }
@@ -408,14 +395,14 @@ get_date_secs( SessionStack& stack, ISession&)
 {
   DDateTime time;
 
-  stack[stack.Size() - 1].Operand().GetValue( time);
+  stack[stack.Size() - 1].Operand().GetValue(time);
   stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt8());
+    stack.Push(DUInt8());
 
   else
-    stack.Push( DUInt8(time.mSeconds));
+    stack.Push(DUInt8(time.mSeconds));
 
   return WOP_OK;
 }
@@ -426,14 +413,14 @@ get_date_microsecs( SessionStack& stack, ISession&)
 {
   DHiresTime time;
 
-  stack[stack.Size() - 1].Operand().GetValue( time);
+  stack[stack.Size() - 1].Operand().GetValue(time);
   stack.Pop(1);
 
   if (time.IsNull())
-    stack.Push( DUInt32());
+    stack.Push(DUInt32());
 
   else
-    stack.Push( DUInt32(time.mMicrosec));
+    stack.Push(DUInt32(time.mMicrosec));
 
   return WOP_OK;
 }
@@ -444,27 +431,21 @@ diff_date_days( SessionStack& stack, ISession&)
 {
   DDate firstDate, secondDate;
 
-  stack[stack.Size() - 2].Operand().GetValue( firstDate);
-  stack[stack.Size() - 1].Operand().GetValue( secondDate);
+  stack[stack.Size() - 2].Operand().GetValue(firstDate);
+  stack[stack.Size() - 1].Operand().GetValue(secondDate);
   stack.Pop(2);
 
   if (firstDate.IsNull() || secondDate.IsNull())
-    stack.Push( DInt32());
+    stack.Push(DInt32());
 
   else
-    {
-      int32_t result = years_days_diff( firstDate.mYear, secondDate.mYear);
+  {
+    int32_t result = years_days_diff(firstDate.mYear, secondDate.mYear);
+    result += day_of_date(secondDate.mYear, secondDate.mMonth, secondDate.mDay);
+    result -= day_of_date(firstDate.mYear, firstDate.mMonth, firstDate.mDay);
 
-      result += day_of_date( secondDate.mYear,
-                             secondDate.mMonth,
-                             secondDate.mDay);
-
-      result -= day_of_date( firstDate.mYear,
-                             firstDate.mMonth,
-                             firstDate.mDay);
-
-      stack.Push( DInt32(result));
-    }
+    stack.Push(DInt32(result));
+  }
 
   return WOP_OK;
 }
@@ -474,35 +455,35 @@ static WLIB_STATUS
 add_time_delta_days( SessionStack& stack, ISession&)
 {
   DHiresTime time;
-  DInt64     days;
+  DInt64 days;
 
-  stack[stack.Size() - 2].Operand().GetValue( time);
-  stack[stack.Size() - 1].Operand().GetValue( days);
+  stack[stack.Size() - 2].Operand().GetValue(time);
+  stack[stack.Size() - 1].Operand().GetValue(days);
   stack.Pop(2);
 
   if (time.IsNull())
-    stack.Push( DHiresTime());
+    stack.Push(DHiresTime());
 
   else if (days.IsNull() || (days.mValue == 0))
-    stack.Push( time);
+    stack.Push(time);
 
   else
-    {
-      int16_t year  = time.mYear;
-      int8_t  month = time.mMonth;
-      int8_t  day   = time.mDay;
+  {
+    int16_t year = time.mYear;
+    int8_t month = time.mMonth;
+    int8_t day = time.mDay;
 
-      if (! add_date_days( days.mValue, &year, &month, &day))
-        return WOP_UNKNOW;
+    if ( !add_date_days(days.mValue, &year, &month, &day))
+      return WOP_UNKNOW;
 
-      stack.Push( DHiresTime( year,
-                              month,
-                              day,
-                              time.mHour,
-                              time.mMinutes,
-                              time.mSeconds,
-                              time.mMicrosec));
-    }
+    stack.Push(DHiresTime(year,
+                          month,
+                          day,
+                          time.mHour,
+                          time.mMinutes,
+                          time.mSeconds,
+                          time.mMicrosec));
+  }
 
   return WOP_OK;
 }
@@ -513,38 +494,34 @@ diff_time_seconds( SessionStack& stack, ISession&)
 {
   DDateTime firstTime, secondTime;
 
-  stack[stack.Size() - 2].Operand().GetValue( firstTime);
-  stack[stack.Size() - 1].Operand().GetValue( secondTime);
+  stack[stack.Size() - 2].Operand().GetValue(firstTime);
+  stack[stack.Size() - 1].Operand().GetValue(secondTime);
   stack.Pop(2);
 
   if (firstTime.IsNull() || secondTime.IsNull())
-    stack.Push( DInt64());
+    stack.Push(DInt64());
 
   else
-    {
-      int64_t result = years_days_diff( firstTime.mYear, secondTime.mYear);
+  {
+    int64_t result = years_days_diff(firstTime.mYear, secondTime.mYear);
 
-      result += day_of_date( secondTime.mYear,
-                             secondTime.mMonth,
-                             secondTime.mDay);
+    result += day_of_date(secondTime.mYear, secondTime.mMonth, secondTime.mDay);
 
-      result -= day_of_date( firstTime.mYear,
-                             firstTime.mMonth,
-                             firstTime.mDay);
+    result -= day_of_date(firstTime.mYear, firstTime.mMonth, firstTime.mDay);
 
-      result *= SECS_PER_DAY;
+    result *= SECS_PER_DAY;
 
-      result += secondTime.mHour    * SECS_PER_HOUR;
-      result -= firstTime.mHour     * SECS_PER_HOUR;
+    result += secondTime.mHour * SECS_PER_HOUR;
+    result -= firstTime.mHour * SECS_PER_HOUR;
 
-      result += secondTime.mMinutes * SECS_PER_MIN;
-      result -= firstTime.mMinutes  * SECS_PER_MIN;
+    result += secondTime.mMinutes * SECS_PER_MIN;
+    result -= firstTime.mMinutes * SECS_PER_MIN;
 
-      result += secondTime.mSeconds;
-      result -= firstTime.mSeconds;
+    result += secondTime.mSeconds;
+    result -= firstTime.mSeconds;
 
-      stack.Push( DInt64(result));
-    }
+    stack.Push(DInt64(result));
+  }
 
   return WOP_OK;
 }
@@ -555,65 +532,57 @@ add_time_delta_seconds( SessionStack& stack, ISession&)
   DHiresTime time;
   DInt64     seconds;
 
-  stack[stack.Size() - 2].Operand().GetValue( time);
-  stack[stack.Size() - 1].Operand().GetValue( seconds);
+  stack[stack.Size() - 2].Operand().GetValue(time);
+  stack[stack.Size() - 1].Operand().GetValue(seconds);
   stack.Pop(2);
 
   if (time.IsNull())
-    stack.Push( DHiresTime());
+    stack.Push(DHiresTime());
 
   else if (seconds.IsNull() || (seconds.mValue == 0))
-    stack.Push( time);
+    stack.Push(time);
 
   else
+  {
+    int days = 0;
+
+    int64_t secs = seconds.mValue + time.mHour * SECS_PER_HOUR + time.mMinutes * SECS_PER_MIN
+        + time.mSeconds;
+
+    if (secs < 0)
     {
-      int days = 0;
+      secs = -secs;
+      days = secs / SECS_PER_DAY;
 
-      int64_t secs  = seconds.mValue                  +
-                      time.mHour      * SECS_PER_HOUR +
-                      time.mMinutes   * SECS_PER_MIN  +
-                      time.mSeconds;
-
-      if (secs < 0)
-        {
-          secs = -secs;
-          days = secs / SECS_PER_DAY;
-
-          if ((secs % SECS_PER_DAY) > 0)
-            {
-              days = -(days + 1);
-              secs = SECS_PER_DAY - secs % SECS_PER_DAY;
-            }
-          else
-            days = -days, secs = 0;
-        }
+      if ((secs % SECS_PER_DAY) > 0)
+      {
+        days = -(days + 1);
+        secs = SECS_PER_DAY - secs % SECS_PER_DAY;
+      }
       else
-        {
-          days  = secs / SECS_PER_DAY;
-          secs %= SECS_PER_DAY;
-        }
-
-      int16_t year  = time.mYear;
-      int8_t  month = time.mMonth;
-      int8_t  day   = time.mDay;
-      int8_t  hour  = secs / SECS_PER_HOUR;
-
-      secs %= SECS_PER_HOUR;
-      const int8_t min = secs / SECS_PER_MIN;
-
-      secs %= SECS_PER_MIN;
-
-      if (! add_date_days( days, &year, &month, &day))
-        return WOP_UNKNOW;
-
-      stack.Push( DHiresTime( year,
-                              month,
-                              day,
-                              hour,
-                              min,
-                              secs,
-                              time.mMicrosec));
+        days = -days, secs = 0;
     }
+    else
+    {
+      days = secs / SECS_PER_DAY;
+      secs %= SECS_PER_DAY;
+    }
+
+    int16_t year = time.mYear;
+    int8_t month = time.mMonth;
+    int8_t day = time.mDay;
+    int8_t hour = secs / SECS_PER_HOUR;
+
+    secs %= SECS_PER_HOUR;
+    const int8_t min = secs / SECS_PER_MIN;
+
+    secs %= SECS_PER_MIN;
+
+    if ( !add_date_days(days, &year, &month, &day))
+      return WOP_UNKNOW;
+
+    stack.Push(DHiresTime(year, month, day, hour, min, secs, time.mMicrosec));
+  }
 
   return WOP_OK;
 }
@@ -622,44 +591,39 @@ add_time_delta_seconds( SessionStack& stack, ISession&)
 static WLIB_STATUS
 diff_time_microsecs( SessionStack& stack, ISession&)
 {
-
   DHiresTime firstTime, secondTime;
 
-  stack[stack.Size() - 2].Operand().GetValue( firstTime);
-  stack[stack.Size() - 1].Operand().GetValue( secondTime);
+  stack[stack.Size() - 2].Operand().GetValue(firstTime);
+  stack[stack.Size() - 1].Operand().GetValue(secondTime);
   stack.Pop(2);
 
   if (firstTime.IsNull() || secondTime.IsNull())
-    stack.Push( DInt64());
+    stack.Push(DInt64());
 
   else
-    {
-      int64_t result = years_days_diff( firstTime.mYear, secondTime.mYear);
+  {
+    int64_t result = years_days_diff(firstTime.mYear, secondTime.mYear);
 
-      result += day_of_date( secondTime.mYear,
-                             secondTime.mMonth,
-                             secondTime.mDay);
+    result += day_of_date(secondTime.mYear, secondTime.mMonth, secondTime.mDay);
 
-      result -= day_of_date( firstTime.mYear,
-                              firstTime.mMonth,
-                              firstTime.mDay);
+    result -= day_of_date(firstTime.mYear, firstTime.mMonth, firstTime.mDay);
 
-      result *= uSECS_PER_DAY;
+    result *= uSECS_PER_DAY;
 
-      result += secondTime.mHour    * uSECS_PER_HOUR;
-      result -= firstTime.mHour     * uSECS_PER_HOUR;
+    result += secondTime.mHour * uSECS_PER_HOUR;
+    result -= firstTime.mHour * uSECS_PER_HOUR;
 
-      result += secondTime.mMinutes * uSECS_PER_MIN;
-      result -= firstTime.mMinutes  * uSECS_PER_MIN;
+    result += secondTime.mMinutes * uSECS_PER_MIN;
+    result -= firstTime.mMinutes * uSECS_PER_MIN;
 
-      result += secondTime.mSeconds * uSECS_PER_SEC;
-      result -= firstTime.mSeconds  * uSECS_PER_SEC;
+    result += secondTime.mSeconds * uSECS_PER_SEC;
+    result -= firstTime.mSeconds * uSECS_PER_SEC;
 
-      result += secondTime.mMicrosec;
-      result -= firstTime.mMicrosec;
+    result += secondTime.mMicrosec;
+    result -= firstTime.mMicrosec;
 
-      stack.Push( DInt64(result));
-    }
+    stack.Push(DInt64(result));
+  }
 
   return WOP_OK;
 }
@@ -669,70 +633,61 @@ static WLIB_STATUS
 add_time_delta_microseconds( SessionStack& stack, ISession&)
 {
   DHiresTime time;
-  DInt64     useconds;
+  DInt64 useconds;
 
-  stack[stack.Size() - 2].Operand().GetValue( time);
-  stack[stack.Size() - 1].Operand().GetValue( useconds);
+  stack[stack.Size() - 2].Operand().GetValue(time);
+  stack[stack.Size() - 1].Operand().GetValue(useconds);
   stack.Pop(2);
 
   if (time.IsNull())
-    stack.Push( DHiresTime());
+    stack.Push(DHiresTime());
 
   else if (useconds.IsNull() || (useconds.mValue == 0))
-    stack.Push( time);
+    stack.Push(time);
 
   else
+  {
+    int days = 0;
+    int64_t usecs = useconds.mValue + time.mHour * uSECS_PER_HOUR + time.mMinutes * uSECS_PER_MIN
+        + time.mSeconds * uSECS_PER_SEC + time.mMicrosec;
+
+    if (usecs < 0)
     {
-      int     days   = 0;
-      int64_t usecs  = useconds.mValue                  +
-                       time.mHour      * uSECS_PER_HOUR +
-                       time.mMinutes   * uSECS_PER_MIN  +
-                       time.mSeconds   * uSECS_PER_SEC  +
-                       time.mMicrosec;
+      usecs = -usecs;
+      days = usecs / uSECS_PER_DAY;
 
-      if (usecs < 0)
-        {
-          usecs = -usecs;
-          days  = usecs / uSECS_PER_DAY;
-
-          if ((usecs % uSECS_PER_DAY) > 0)
-            {
-              days  = -(days + 1);
-              usecs = uSECS_PER_DAY - usecs % uSECS_PER_DAY;
-            }
-          else
-            days = -days, usecs = 0;
-        }
+      if ((usecs % uSECS_PER_DAY) > 0)
+      {
+        days = -(days + 1);
+        usecs = uSECS_PER_DAY - usecs % uSECS_PER_DAY;
+      }
       else
-        {
-          days   = usecs / uSECS_PER_DAY;
-          usecs %= uSECS_PER_DAY;
-        }
-
-      int16_t year  = time.mYear;
-      int8_t  month = time.mMonth;
-      int8_t  day   = time.mDay;
-
-      const int8_t hour = usecs / uSECS_PER_HOUR;
-      usecs %= uSECS_PER_HOUR;
-
-      const int8_t min = usecs / uSECS_PER_MIN;
-      usecs %= uSECS_PER_MIN;
-
-      const int8_t secs = usecs / uSECS_PER_SEC;
-      usecs %= uSECS_PER_SEC;
-
-      if (! add_date_days( days , &year, &month, &day))
-        return WOP_UNKNOW;
-
-      stack.Push( DHiresTime( year,
-                              month,
-                              day,
-                              hour,
-                              min,
-                              secs,
-                              usecs));
+        days = -days, usecs = 0;
     }
+    else
+    {
+      days = usecs / uSECS_PER_DAY;
+      usecs %= uSECS_PER_DAY;
+    }
+
+    int16_t year = time.mYear;
+    int8_t month = time.mMonth;
+    int8_t day = time.mDay;
+
+    const int8_t hour = usecs / uSECS_PER_HOUR;
+    usecs %= uSECS_PER_HOUR;
+
+    const int8_t min = usecs / uSECS_PER_MIN;
+    usecs %= uSECS_PER_MIN;
+
+    const int8_t secs = usecs / uSECS_PER_SEC;
+    usecs %= uSECS_PER_SEC;
+
+    if ( !add_date_days(days, &year, &month, &day))
+      return WOP_UNKNOW;
+
+    stack.Push(DHiresTime(year, month, day, hour, min, secs, usecs));
+  }
   return WOP_OK;
 }
 

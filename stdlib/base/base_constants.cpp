@@ -86,10 +86,7 @@ WLIB_PROC_DESCRIPTION     gProcMaxRR;
 static WLIB_STATUS
 get_PI( SessionStack& stack, ISession&)
 {
-  stack.Push( DRichReal( RICHREAL_T( 3,
-                                     14159265358979ull,
-                                     DBS_RICHREAL_PREC)));
-
+  stack.Push(DRichReal(RICHREAL_T(3, 14159265358979ull, DBS_RICHREAL_PREC)));
   return WOP_OK;
 }
 
@@ -97,10 +94,7 @@ get_PI( SessionStack& stack, ISession&)
 static WLIB_STATUS
 get_SQRT2(SessionStack& stack, ISession&)
 {
-  stack.Push( DRichReal( RICHREAL_T( 2,
-                                     41421356237309ull,
-                                     DBS_RICHREAL_PREC)));
-
+  stack.Push(DRichReal(RICHREAL_T(2, 41421356237309ull, DBS_RICHREAL_PREC)));
   return WOP_OK;
 }
 
@@ -108,10 +102,7 @@ get_SQRT2(SessionStack& stack, ISession&)
 static WLIB_STATUS
 get_NE( SessionStack& stack, ISession&)
 {
-  stack.Push( DRichReal( RICHREAL_T( 2,
-                                     71828182845904ull,
-                                     DBS_RICHREAL_PREC)));
-
+  stack.Push(DRichReal(RICHREAL_T(2, 71828182845904ull, DBS_RICHREAL_PREC)));
   return WOP_OK;
 }
 
@@ -120,8 +111,7 @@ template<class T>
 WLIB_STATUS
 get_min_value( SessionStack& stack, ISession& )
 {
-  stack.Push( T::Min());
-
+  stack.Push(T::Min());
   return WOP_OK;
 }
 

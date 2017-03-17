@@ -30,7 +30,6 @@
 #include "utils/wtypes.h"
 
 
-
 using namespace whais;
 
 
@@ -63,7 +62,6 @@ uint8_t gGenericArrayType[sizeof( TypeSpec)];
 uint8_t gGenericFieldType[sizeof( TypeSpec)];
 uint8_t gGenericTableType[sizeof( TypeSpec)];
 
-
 uint8_t gABoolType[sizeof( TypeSpec)];
 
 uint8_t gACharType[sizeof( TypeSpec)];
@@ -84,7 +82,6 @@ uint8_t gAInt64Type[sizeof( TypeSpec)];
 
 uint8_t gARealType[sizeof( TypeSpec)];
 uint8_t gARichRealType[sizeof( TypeSpec)];
-
 
 
 WLIB_STATUS
@@ -119,25 +116,25 @@ base_types_init()
                                 _RC(TypeSpec*, gGenericFieldType)) <= 0)
       || (wh_define_basic_type( T_UNKNOWN,
                                 _RC(TypeSpec*, gGenericTableType)) <= 0))
-    {
-      return WOP_UNKNOW;
-    }
+  {
+    return WOP_UNKNOW;
+  }
 
-  memcpy( gABoolType, gBoolType, sizeof gBoolType);
-  memcpy( gACharType, gCharType, sizeof gCharType);
-  memcpy( gADateType, gDateType, sizeof gDateType);
-  memcpy( gADateTimeType, gDateTimeType, sizeof gDateTimeType);
-  memcpy( gAHiresTimeType, gHiresTimeType, sizeof gHiresTimeType);
-  memcpy( gAInt8Type, gInt8Type, sizeof gInt8Type);
-  memcpy( gAInt16Type, gInt16Type, sizeof gInt16Type);
-  memcpy( gAInt32Type, gInt32Type, sizeof gInt32Type);
-  memcpy( gAInt64Type, gInt64Type, sizeof gInt64Type);
-  memcpy( gAUInt8Type, gUInt8Type, sizeof gUInt8Type);
-  memcpy( gAUInt16Type, gUInt16Type, sizeof gUInt16Type);
-  memcpy( gAUInt32Type, gUInt32Type, sizeof gUInt32Type);
-  memcpy( gAUInt64Type, gUInt64Type, sizeof gUInt64Type);
-  memcpy( gARealType, gRealType, sizeof gRealType);
-  memcpy( gARichRealType, gRichRealType, sizeof gRichRealType);
+  memcpy(gABoolType, gBoolType, sizeof gBoolType);
+  memcpy(gACharType, gCharType, sizeof gCharType);
+  memcpy(gADateType, gDateType, sizeof gDateType);
+  memcpy(gADateTimeType, gDateTimeType, sizeof gDateTimeType);
+  memcpy(gAHiresTimeType, gHiresTimeType, sizeof gHiresTimeType);
+  memcpy(gAInt8Type, gInt8Type, sizeof gInt8Type);
+  memcpy(gAInt16Type, gInt16Type, sizeof gInt16Type);
+  memcpy(gAInt32Type, gInt32Type, sizeof gInt32Type);
+  memcpy(gAInt64Type, gInt64Type, sizeof gInt64Type);
+  memcpy(gAUInt8Type, gUInt8Type, sizeof gUInt8Type);
+  memcpy(gAUInt16Type, gUInt16Type, sizeof gUInt16Type);
+  memcpy(gAUInt32Type, gUInt32Type, sizeof gUInt32Type);
+  memcpy(gAUInt64Type, gUInt64Type, sizeof gUInt64Type);
+  memcpy(gARealType, gRealType, sizeof gRealType);
+  memcpy(gARichRealType, gRichRealType, sizeof gRichRealType);
 
   if ((wh_apply_array_modifier( _RC(TypeSpec*, gABoolType)) <= 0)
       || (wh_apply_array_modifier( _RC(TypeSpec*, gACharType)) <= 0)
@@ -158,9 +155,9 @@ base_types_init()
       || (wh_apply_array_modifier( _RC(TypeSpec*, gARichRealType)) <= 0)
 
       || (wh_apply_array_modifier( _RC(TypeSpec*, gGenericArrayType)) <= 0))
-    {
-      return WOP_UNKNOW;
-    }
+  {
+    return WOP_UNKNOW;
+  }
 
   if (wh_apply_field_modifier( _RC(TypeSpec*, gGenericFieldType)) <= 0)
     return WOP_UNKNOW;
@@ -171,5 +168,3 @@ base_types_init()
 
   return WOP_OK;
 }
-
-

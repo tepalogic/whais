@@ -29,7 +29,6 @@
 #include "stdlib/interface.h"
 
 
-
 extern whais::WLIB_PROC_DESCRIPTION       gIsUpper;
 extern whais::WLIB_PROC_DESCRIPTION       gIsLower;
 extern whais::WLIB_PROC_DESCRIPTION       gIsDigit;
@@ -59,5 +58,5 @@ extern whais::WLIB_PROC_DESCRIPTION       gTextCompare;
 whais::WLIB_STATUS
 base_text_init();
 
-#endif //BASE_TEXT_H_
 
+#endif //BASE_TEXT_H_

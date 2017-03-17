@@ -234,20 +234,18 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcTableSort
                                                           };
 
-
-static const WLIB_DESCRIPTION sgLibraryDescription = {
+static const WLIB_DESCRIPTION sgLibraryDescription =
+  {
     sizeof( sgRegisteredProcs) / sizeof( sgRegisteredProcs[0]),
     sgRegisteredProcs
-                                                     };
+  };
 
 static int      sgRefsCount = 0;
 static Lock     sgShlLocker;
 static bool_t   sgInited;
 
 
-
 extern "C" {
-
 
 
 SHL_EXPORT_SYMBOL WLIB_STATUS
@@ -258,21 +256,21 @@ wlib_start()
   assert( sgRefsCount >= 0);
 
   if (sgRefsCount == 0)
-    {
-      WLIB_STATUS status;
+  {
+    WLIB_STATUS status;
 
-      if (((status = base_types_init()) != WOP_OK)
-          || ((status = base_generics_init()) != WOP_OK)
-          || ((status = base_constants_init()) != WOP_OK)
-          || ((status = base_dates_init()) != WOP_OK)
-          || ((status = base_text_init()) != WOP_OK)
-          || ((status = base_arrays_init()) != WOP_OK)
-          || ((status = base_fields_init()) != WOP_OK)
-          || ((status = base_tables_init()) != WOP_OK))
-        {
-          return status;
-        }
+    if (((status = base_types_init()) != WOP_OK)
+        || ((status = base_generics_init()) != WOP_OK)
+        || ((status = base_constants_init()) != WOP_OK)
+        || ((status = base_dates_init()) != WOP_OK)
+        || ((status = base_text_init()) != WOP_OK)
+        || ((status = base_arrays_init()) != WOP_OK)
+        || ((status = base_fields_init()) != WOP_OK)
+        || ((status = base_tables_init()) != WOP_OK))
+    {
+      return status;
     }
+  }
 
   sgInited = true;
   sgRefsCount++;

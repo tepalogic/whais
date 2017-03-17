@@ -25,6 +25,7 @@
 #ifndef BASE_TABLES_H_
 #define BASE_TABLES_H_
 
+
 #include "stdlib/interface.h"
 
 
@@ -40,7 +41,9 @@ extern whais::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableExchangeRows;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableSort;
 
+
 whais::WLIB_STATUS
 base_tables_init();
+
 
 #endif /* BASE_TABLES_H_ */

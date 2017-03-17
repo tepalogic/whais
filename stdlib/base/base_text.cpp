@@ -26,13 +26,10 @@
 #include <algorithm>
 
 #include "whais.h"
-
 #include "utils/wutf.h"
 #include "utils/whash.h"
 #include "utils/wunicode.h"
-
 #include "base_types.h"
-
 
 
 using namespace std;
@@ -75,12 +72,8 @@ WLIB_PROC_DESCRIPTION       gTextReplace;
 WLIB_PROC_DESCRIPTION       gTextCompare;
 
 
-
 static int
-compare_chars( const int   c1,
-               const int   c2,
-               const bool  ignoreCase,
-               const bool  alphabetically)
+compare_chars(const int c1, const int c2, const bool ignoreCase, const bool alphabetically)
 {
   const int lc1 = (alphabetically || ignoreCase) ? wh_to_lowercase( c1) : c1;
   const int lc2 = (alphabetically || ignoreCase) ? wh_to_lowercase( c2) : c2;
@@ -93,10 +86,7 @@ compare_chars( const int   c1,
 
 
 static int
-compare_chars( const DChar c1,
-               const DChar c2,
-               const bool  ignoreCase,
-               const bool  alphabetically)
+compare_chars(const DChar c1, const DChar c2, const bool ignoreCase, const bool alphabetically)
 {
   if (c1.IsNull() && c2.IsNull())
     return 0;
@@ -116,16 +106,16 @@ is_func_XX( SessionStack& stack, ISession&)
 {
   DChar ch;
 
-  stack[stack.Size() - 1].Operand().GetValue( ch);
+  stack[stack.Size() - 1].Operand().GetValue(ch);
   stack.Pop(1);
 
   if (ch.IsNull())
-    {
-      stack.Push( DBool());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DBool());
+    return WOP_OK;
+  }
 
-  stack.Push( DBool( F(ch.mValue) != 0));
+  stack.Push(DBool(F(ch.mValue) != 0));
   return WOP_OK;
 }
 
@@ -134,16 +124,16 @@ get_char_cp( SessionStack& stack, ISession&)
 {
   DChar ch;
 
-  stack[stack.Size() - 1].Operand().GetValue( ch);
+  stack[stack.Size() - 1].Operand().GetValue(ch);
   stack.Pop(1);
 
   if (ch.IsNull())
-    {
-      stack.Push( DUInt32());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DUInt32());
+    return WOP_OK;
+  }
 
-  stack.Push( DUInt32(ch.mValue));
+  stack.Push(DUInt32(ch.mValue));
 
   return WOP_OK;
 }
@@ -154,16 +144,16 @@ get_char_upper( SessionStack& stack, ISession&)
 {
   DChar ch;
 
-  stack[stack.Size() - 1].Operand().GetValue( ch);
+  stack[stack.Size() - 1].Operand().GetValue(ch);
   stack.Pop(1);
 
   if (ch.IsNull())
-    {
-      stack.Push( DChar());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DChar());
+    return WOP_OK;
+  }
 
-  stack.Push( DChar( wh_to_uppercase( ch.mValue)));
+  stack.Push(DChar(wh_to_uppercase(ch.mValue)));
   return WOP_OK;
 }
 
@@ -173,16 +163,16 @@ get_char_lower( SessionStack& stack, ISession&)
 {
   DChar ch;
 
-  stack[stack.Size() - 1].Operand().GetValue( ch);
+  stack[stack.Size() - 1].Operand().GetValue(ch);
   stack.Pop(1);
 
   if (ch.IsNull())
-    {
-      stack.Push( DChar());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DChar());
+    return WOP_OK;
+  }
 
-  stack.Push( DChar( wh_to_lowercase( ch.mValue)));
+  stack.Push(DChar(wh_to_lowercase(ch.mValue)));
   return WOP_OK;
 }
 
@@ -192,10 +182,10 @@ get_text_upper( SessionStack& stack, ISession&)
 {
   DText input;
 
-  stack[stack.Size() - 1].Operand().GetValue( input);
+  stack[stack.Size() - 1].Operand().GetValue(input);
   stack.Pop(1);
 
-  stack.Push( input.UpperCase());
+  stack.Push(input.UpperCase());
   return WOP_OK;
 }
 
@@ -205,10 +195,10 @@ get_text_lower( SessionStack& stack, ISession&)
 {
   DText input;
 
-  stack[stack.Size() - 1].Operand().GetValue( input);
+  stack[stack.Size() - 1].Operand().GetValue(input);
   stack.Pop(1);
 
-  stack.Push( input.LowerCase());
+  stack.Push(input.LowerCase());
   return WOP_OK;
 }
 
@@ -216,77 +206,75 @@ get_text_lower( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_utf8_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DBool*, nullptr));
-  DText       result;
+  DArray source(_SC(DBool*, nullptr));
+  DText result;
 
-  stack[stack.Size() - 1].Operand().GetValue( source);
+  stack[stack.Size() - 1].Operand().GetValue(source);
   stack.Pop(1);
 
   const uint64_t arrayCount = source.Count();
-  uint64_t       it = 0;
-  while ( it < arrayCount)
+  uint64_t it = 0;
+  while (it < arrayCount)
+  {
+    uint8_t temp[UTF8_MAX_BYTES_COUNT * 16];
+    uint_t tempCount;
+
+    //Read into temporal buffer as much as we can.
+    for (tempCount = 0; (tempCount < sizeof temp) && (it + tempCount < arrayCount); ++tempCount)
     {
-      uint8_t temp[UTF8_MAX_BYTES_COUNT * 16];
-      uint_t  tempCount;
+      DUInt8 codeUnit;
+      source.Get(it + tempCount, codeUnit);
 
-      //Read into temporal buffer as much as we can.
-      for (tempCount = 0;
-           (tempCount < sizeof temp) && (it + tempCount < arrayCount);
-           ++tempCount)
-        {
-          DUInt8 codeUnit;
-          source.Get(it + tempCount, codeUnit);
-
-          temp[tempCount] = codeUnit.mValue;
-        }
-
-      //Load the characters from the temporal buffer.
-      uint_t i = 0;
-      while ( i < tempCount)
-        {
-          uint32_t ch;
-
-          //Check if all characters' code units are in the temporal buffer.
-          assert( wh_utf8_cu_count( temp[i]) > 0);
-
-          if (i + wh_utf8_cu_count( temp[i]) > tempCount)
-            break;
-
-          i += wh_load_utf8_cp(temp + i, &ch);
-          result.Append( DChar( ch));
-        }
-
-      if (i == 0)
-        return WOP_UNKNOW; //The array does not hold any valid UTF8 code units.
-
-      //Count only what was consumed.
-      it += i;
+      temp[tempCount] = codeUnit.mValue;
     }
 
-  stack.Push( result);
+    //Load the characters from the temporal buffer.
+    uint_t i = 0;
+    while (i < tempCount)
+    {
+      uint32_t ch;
+
+      //Check if all characters' code units are in the temporal buffer.
+      assert(wh_utf8_cu_count(temp[i]) > 0);
+
+      if (i + wh_utf8_cu_count(temp[i]) > tempCount)
+        break;
+
+      i += wh_load_utf8_cp(temp + i, &ch);
+      result.Append(DChar(ch));
+    }
+
+    if (i == 0)
+      return WOP_UNKNOW; //The array does not hold any valid UTF8 code units.
+
+    //Count only what was consumed.
+    it += i;
+  }
+
+  stack.Push(result);
   return WOP_OK;
 }
 
 static WLIB_STATUS
 store_utf8_text( SessionStack& stack, ISession&)
 {
-  DText      source;
-  DArray     result( _SC(DUInt8*, nullptr));
+  DText source;
+  DArray result(_SC(DUInt8*, nullptr));
 
-  stack[stack.Size() - 1].Operand().GetValue( source);
+  stack[stack.Size() - 1].Operand().GetValue(source);
   stack.Pop(1);
 
   const uint64_t textCount = source.Count();
   for (uint64_t c = 0; c < textCount; ++c)
-    {
-      const DChar ch = source.CharAt( c);
+  {
+    const DChar ch = source.CharAt(c);
 
-      uint8_t      temp[UTF8_MAX_BYTES_COUNT];
-      const uint_t codeUnits = wh_store_utf8_cp(ch.mValue, temp);
+    uint8_t temp[UTF8_MAX_BYTES_COUNT];
+    const uint_t codeUnits = wh_store_utf8_cp(ch.mValue, temp);
 
-      for (uint_t i = 0; i < codeUnits; ++i)
-        result.Add(DUInt8(temp[i]));
-    }
+    for (uint_t i = 0; i < codeUnits; ++i)
+      result.Add(DUInt8(temp[i]));
+  }
 
   stack.Push( result);
   return WOP_OK;
@@ -296,37 +284,37 @@ store_utf8_text( SessionStack& stack, ISession&)
 static WLIB_STATUS
 store_utf16_text( SessionStack& stack, ISession&)
 {
-  DText      source;
-  DArray     result( _SC(DUInt16*, nullptr));
+  DText source;
+  DArray result(_SC(DUInt16*, nullptr));
 
-  stack[stack.Size() - 1].Operand().GetValue( source);
+  stack[stack.Size() - 1].Operand().GetValue(source);
   stack.Pop(1);
 
   const uint64_t textCount = source.Count();
   for (uint64_t c = 0; c < textCount; ++c)
+  {
+    const DChar ch = source.CharAt(c);
+
+    uint16_t temp[2];
+    const uint_t codeUnits = wh_store_utf16_cp(ch.mValue, temp);
+
+    switch (codeUnits)
     {
-      const DChar ch = source.CharAt( c);
+    case 1:
+      result.Add(DUInt16(temp[0]));
+      break;
 
-      uint16_t     temp[2];
-      const uint_t codeUnits = wh_store_utf16_cp(ch.mValue, temp);
+    case 2:
+      result.Add(DUInt16(temp[0]));
+      result.Add(DUInt16(temp[1]));
+      break;
 
-      switch( codeUnits)
-        {
-        case 1:
-          result.Add(DUInt16(temp[0]));
-          break;
-
-        case 2:
-          result.Add(DUInt16(temp[0]));
-          result.Add(DUInt16(temp[1]));
-          break;
-
-        default:
-          return WOP_UNKNOW;
-        }
+    default:
+      return WOP_UNKNOW;
     }
+  }
 
-  stack.Push( result);
+  stack.Push(result);
   return WOP_OK;
 }
 
@@ -334,53 +322,51 @@ store_utf16_text( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_utf16_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DUInt16*, nullptr));
-  DText       result;
+  DArray source(_SC(DUInt16*, nullptr));
+  DText result;
 
-  stack[stack.Size() - 1].Operand().GetValue( source);
+  stack[stack.Size() - 1].Operand().GetValue(source);
   stack.Pop(1);
 
   const uint64_t arrayCount = source.Count();
-  uint64_t       it = 0;
-  while ( it < arrayCount)
+  uint64_t it = 0;
+  while (it < arrayCount)
+  {
+    uint16_t temp[16];
+    uint_t tempCount;
+
+    //Read into temporal buffer as much as we can.
+    for (tempCount = 0;
+        (tempCount < (sizeof temp / sizeof(temp[0]))) && (it + tempCount < arrayCount); ++tempCount)
     {
-      uint16_t temp[16];
-      uint_t   tempCount;
+      DUInt16 codeUnit;
+      source.Get(it + tempCount, codeUnit);
 
-      //Read into temporal buffer as much as we can.
-      for (tempCount = 0;
-           (tempCount < (sizeof temp / sizeof( temp[0]))) &&
-            (it + tempCount < arrayCount);
-           ++tempCount)
-        {
-          DUInt16 codeUnit;
-          source.Get(it + tempCount, codeUnit);
-
-          temp[tempCount] = codeUnit.mValue;
-        }
-
-      //Load the characters from the temporal buffer.
-      uint_t i = 0;
-      while ( i < tempCount)
-        {
-          uint32_t ch;
-
-          //Check if all characters' code units are in the temporal buffer.
-          if (i + wh_utf16_cu_count( temp[i]) > tempCount)
-            break;
-
-          i += wh_load_utf16_cp(temp + i, &ch);
-          result.Append( DChar( ch));
-        }
-
-      if (i == 0)
-        return WOP_UNKNOW; //The array does not hold valid UTF16 code units.
-
-      //Count only what was used.
-      it += i;
+      temp[tempCount] = codeUnit.mValue;
     }
 
-  stack.Push( result);
+    //Load the characters from the temporal buffer.
+    uint_t i = 0;
+    while (i < tempCount)
+    {
+      uint32_t ch;
+
+      //Check if all characters' code units are in the temporal buffer.
+      if (i + wh_utf16_cu_count(temp[i]) > tempCount)
+        break;
+
+      i += wh_load_utf16_cp(temp + i, &ch);
+      result.Append(DChar(ch));
+    }
+
+    if (i == 0)
+      return WOP_UNKNOW; //The array does not hold valid UTF16 code units.
+
+    //Count only what was used.
+    it += i;
+  }
+
+  stack.Push(result);
   return WOP_OK;
 }
 
@@ -406,23 +392,23 @@ store_achar_text( SessionStack& stack, ISession&)
 static WLIB_STATUS
 load_achar_text( SessionStack& stack, ISession&)
 {
-  DArray      source( _SC(DChar*, nullptr));
-  DText       result;
+  DArray source(_SC(DChar*, nullptr));
+  DText result;
 
-  stack[stack.Size() - 1].Operand().GetValue( source);
+  stack[stack.Size() - 1].Operand().GetValue(source);
   stack.Pop(1);
 
   const uint64_t arrayCount = source.Count();
   for (uint64_t i = 0; i < arrayCount; ++i)
-    {
-      DChar ch;
+  {
+    DChar ch;
 
-      source.Get(i, ch);
-      result.Append( ch);
-    }
+    source.Get(i, ch);
+    result.Append(ch);
+  }
 
-    stack.Push( result);
-    return WOP_OK;
+  stack.Push(result);
+  return WOP_OK;
 }
 
 
@@ -431,14 +417,14 @@ get_chars_count( SessionStack& stack, ISession&)
 {
   DText text;
 
-  stack[stack.Size() - 1].Operand().GetValue( text);
+  stack[stack.Size() - 1].Operand().GetValue(text);
   stack.Pop(1);
 
   if (text.IsNull())
-    stack.Push( DUInt64());
+    stack.Push(DUInt64());
 
   else
-    stack.Push( DUInt64(text.Count()));
+    stack.Push(DUInt64(text.Count()));
 
   return WOP_OK;
 }
@@ -448,20 +434,20 @@ get_hash_code( SessionStack& stack, ISession&)
 {
   DText text;
 
-  stack[stack.Size() - 1].Operand().GetValue( text);
+  stack[stack.Size() - 1].Operand().GetValue(text);
   stack.Pop(1);
 
   if (text.IsNull())
-    {
-      stack.Push( DUInt64());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
 
-  uint8_t      key[512];
+  uint8_t key[512];
   const uint_t keySize = MIN(text.RawSize(), sizeof key);
 
-  text.RawRead( 0, keySize, key);
-  stack.Push( DUInt64(wh_hash( key, keySize)));
+  text.RawRead(0, keySize, key);
+  stack.Push(DUInt64(wh_hash(key, keySize)));
 
   return WOP_OK;
 }
@@ -470,42 +456,41 @@ get_hash_code( SessionStack& stack, ISession&)
 static WLIB_STATUS
 find_char_offset( SessionStack& stack, ISession&)
 {
-  DText   text;
-  DChar   ch;
-  DBool   ignoreCase;
   DUInt64 from, to;
+  DText text;
+  DChar ch;
+  DBool ignoreCase;
 
-  stack[stack.Size() - 5].Operand().GetValue( text);
-  stack[stack.Size() - 4].Operand().GetValue( ch);
-  stack[stack.Size() - 3].Operand().GetValue( ignoreCase);
-  stack[stack.Size() - 2].Operand().GetValue( from);
-  stack[stack.Size() - 1].Operand().GetValue( to);
+  stack[stack.Size() - 5].Operand().GetValue(text);
+  stack[stack.Size() - 4].Operand().GetValue(ch);
+  stack[stack.Size() - 3].Operand().GetValue(ignoreCase);
+  stack[stack.Size() - 2].Operand().GetValue(from);
+  stack[stack.Size() - 1].Operand().GetValue(to);
   stack.Pop(5);
 
   if (text.IsNull() || ch.IsNull())
-    {
-      stack.Push( DUInt64());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
 
-  const bool     igCase  = (ignoreCase == DBool( true));
+  const bool igCase = (ignoreCase == DBool(true));
   const uint64_t fromOff = from.IsNull() ? 0 : from.mValue;
-  const uint64_t endOff  = MIN((to.IsNull() ? ~0ull : to.mValue),
-                                text.Count());
-  const uint32_t c       = igCase ? wh_to_lowercase( ch.mValue) : ch.mValue;
+  const uint64_t endOff = MIN((to.IsNull() ? ~0ull : to.mValue), text.Count());
+  const uint32_t c = igCase ? wh_to_lowercase(ch.mValue) : ch.mValue;
 
   for (uint64_t i = fromOff; i < endOff; ++i)
+  {
+    const DChar ch = text.CharAt(i);
+
+    if (c == (igCase ? wh_to_lowercase(ch.mValue) : ch.mValue))
     {
-      const DChar ch = text.CharAt( i);
-
-      if (c == (igCase ? wh_to_lowercase( ch.mValue) : ch.mValue))
-        {
-          stack.Push( DUInt64(i));
-          return WOP_OK;
-        }
+      stack.Push(DUInt64(i));
+      return WOP_OK;
     }
+  }
 
-  stack.Push( DUInt64());
+  stack.Push(DUInt64());
   return WOP_OK;
 }
 
@@ -513,29 +498,28 @@ find_char_offset( SessionStack& stack, ISession&)
 static WLIB_STATUS
 find_substring_offset( SessionStack& stack, ISession&)
 {
-  DText   text, substring;
+  DText text, substring;
   DUInt64 from, to;
-  DBool   ignoreCase;
+  DBool ignoreCase;
 
-  stack[stack.Size() - 5].Operand().GetValue( text);
-  stack[stack.Size() - 4].Operand().GetValue( substring);
-  stack[stack.Size() - 3].Operand().GetValue( ignoreCase);
-  stack[stack.Size() - 2].Operand().GetValue( from);
-  stack[stack.Size() - 1].Operand().GetValue( to);
+  stack[stack.Size() - 5].Operand().GetValue(text);
+  stack[stack.Size() - 4].Operand().GetValue(substring);
+  stack[stack.Size() - 3].Operand().GetValue(ignoreCase);
+  stack[stack.Size() - 2].Operand().GetValue(from);
+  stack[stack.Size() - 1].Operand().GetValue(to);
   stack.Pop(5);
 
   if (text.IsNull() || substring.IsNull())
-    {
-      stack.Push( DUInt64());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
 
-  const bool     igCase  = (ignoreCase == DBool( true));
+  const bool igCase = (ignoreCase == DBool(true));
   const uint64_t fromOff = from.IsNull() ? 0 : from.mValue;
-  const uint64_t endOff  = MIN((to.IsNull() ? ~0ull : to.mValue),
-                                text.Count());
+  const uint64_t endOff = MIN((to.IsNull() ? ~0ull : to.mValue), text.Count());
 
-  stack.Push( substring.FindInText( text, igCase, fromOff, endOff));
+  stack.Push(substring.FindInText(text, igCase, fromOff, endOff));
   return WOP_OK;
 }
 
@@ -543,40 +527,35 @@ find_substring_offset( SessionStack& stack, ISession&)
 static WLIB_STATUS
 replace_substring_offset( SessionStack& stack, ISession&)
 {
-  DText   text, substring, newString;
+  DText text, substring, newString;
   DUInt64 from, to;
-  DBool   ignoreCase;
+  DBool ignoreCase;
 
-  stack[stack.Size() - 6].Operand().GetValue( text);
-  stack[stack.Size() - 5].Operand().GetValue( substring);
-  stack[stack.Size() - 4].Operand().GetValue( newString);
-  stack[stack.Size() - 3].Operand().GetValue( ignoreCase);
-  stack[stack.Size() - 2].Operand().GetValue( from);
-  stack[stack.Size() - 1].Operand().GetValue( to);
+  stack[stack.Size() - 6].Operand().GetValue(text);
+  stack[stack.Size() - 5].Operand().GetValue(substring);
+  stack[stack.Size() - 4].Operand().GetValue(newString);
+  stack[stack.Size() - 3].Operand().GetValue(ignoreCase);
+  stack[stack.Size() - 2].Operand().GetValue(from);
+  stack[stack.Size() - 1].Operand().GetValue(to);
   stack.Pop(6);
 
   if (text.IsNull())
-    {
-      stack.Push( DText());
-      return WOP_OK;
-    }
+  {
+    stack.Push(DText());
+    return WOP_OK;
+  }
   else if (substring.IsNull())
-    {
-      stack.Push( text);
+  {
+    stack.Push(text);
 
-      return WOP_OK;
-    }
+    return WOP_OK;
+  }
 
-  const bool     igCase  = (ignoreCase == DBool( true));
+  const bool igCase = (ignoreCase == DBool(true));
   const uint64_t fromOff = from.IsNull() ? 0 : from.mValue;
-  const uint64_t endOff  = MIN((to.IsNull() ? ~0ull : to.mValue),
-                                text.Count());
+  const uint64_t endOff = MIN((to.IsNull() ? ~0ull : to.mValue), text.Count());
 
-  stack.Push( text.ReplaceSubstring(substring,
-                                      newString,
-                                      igCase,
-                                      fromOff,
-                                      endOff));
+  stack.Push(text.ReplaceSubstring(substring, newString, igCase, fromOff, endOff));
   return WOP_OK;
 }
 
@@ -587,26 +566,26 @@ compare_texts( SessionStack& stack, ISession&)
   DText text1, text2;
   DBool ignoreCase, alphabetically;
 
-  stack[stack.Size() - 4].Operand().GetValue( text1);
-  stack[stack.Size() - 3].Operand().GetValue( text2);
-  stack[stack.Size() - 2].Operand().GetValue( ignoreCase);
-  stack[stack.Size() - 1].Operand().GetValue( alphabetically);
+  stack[stack.Size() - 4].Operand().GetValue(text1);
+  stack[stack.Size() - 3].Operand().GetValue(text2);
+  stack[stack.Size() - 2].Operand().GetValue(ignoreCase);
+  stack[stack.Size() - 1].Operand().GetValue(alphabetically);
   stack.Pop(4);
 
-  const uint64_t maxCount  = max(text1.Count(), text2.Count());
-  const bool     igCase    = (ignoreCase == DBool( true));
-  const bool     alphabet  = (alphabetically == DBool( true));
+  const uint64_t maxCount = max(text1.Count(), text2.Count());
+  const bool igCase = (ignoreCase == DBool(true));
+  const bool alphabet = (alphabetically == DBool(true));
 
   int result = 0;
   for (uint64_t offset = 0; (offset < maxCount) && (result == 0); ++offset)
-    {
-      const DChar c1 = text1.CharAt( offset);
-      const DChar c2 = text2.CharAt( offset);
+  {
+    const DChar c1 = text1.CharAt(offset);
+    const DChar c2 = text2.CharAt(offset);
 
-      result = compare_chars( c1, c2, igCase, alphabet);
-    }
+    result = compare_chars(c1, c2, igCase, alphabet);
+  }
 
-  stack.Push( DInt32(result));
+  stack.Push(DInt32(result));
   return WOP_OK;
 }
 
@@ -756,7 +735,7 @@ base_text_init()
                                              gBoolType,
                                              gUInt64Type,
                                              gUInt64Type
-                                            };
+                                           };
 
   gCharFind.name              = "find_char";
   gCharFind.localsCount       = 6;
@@ -771,7 +750,7 @@ base_text_init()
                                              gBoolType,
                                              gUInt64Type,
                                              gUInt64Type
-                                            };
+                                           };
 
   gTextFind.name              = "find_substring";
   gTextFind.localsCount       = 6;
@@ -780,14 +759,14 @@ base_text_init()
 
 
   static const uint8_t* replaceTextLocals[] = {
-                                             gTextType,
-                                             gTextType,
-                                             gTextType,
-                                             gTextType,
-                                             gBoolType,
-                                             gUInt64Type,
-                                             gUInt64Type
-                                            };
+                                                gTextType,
+                                                gTextType,
+                                                gTextType,
+                                                gTextType,
+                                                gBoolType,
+                                                gUInt64Type,
+                                                gUInt64Type
+                                              };
 
   gTextReplace.name          = "replace_substring";
   gTextReplace.localsCount   = 7;

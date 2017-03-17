@@ -73,4 +73,3 @@ base_generics_init();
 
 
 #endif //BASE_GENERICS_H_
-

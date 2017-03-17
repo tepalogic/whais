@@ -54,4 +54,3 @@ whais::WLIB_STATUS
 base_dates_init();
 
 #endif //BASE_DATES_H_
-

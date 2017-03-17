@@ -25,6 +25,7 @@
 #ifndef BASE_ARRAYS_H_
 #define BASE_ARRAYS_H_
 
+
 #include "stdlib/interface.h"
 
 
@@ -43,9 +44,7 @@ extern whais::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayHash;
 
 
-
 whais::WLIB_STATUS
 base_arrays_init();
 
 #endif /* BASE_ARRAYS_H_ */
-
