@@ -258,6 +258,8 @@ custom_mem_free(void *ptr)
 
   if (((uint8_t* )real_ptr)[size - 1] != CONTROL_BYTE)
     abort();                   /* blow it up */
+  else
+    ((uint8_t* )real_ptr)[size - 1] = CONTROL_BYTE - 1;
 
   free(real_ptr);
 

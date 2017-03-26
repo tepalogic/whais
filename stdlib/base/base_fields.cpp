@@ -27,7 +27,7 @@
 #include "base_fields.h"
 #include "base_types.h"
 
-
+using namespace std;
 using namespace whais;
 
 
@@ -52,7 +52,7 @@ proc_field_table( SessionStack& stack, ISession&)
   StackValue temp = op.GetTableValue();
 
   stack.Pop(1);
-  stack.Push( temp);
+  stack.Push(move(temp));
 
   return WOP_OK;
 }

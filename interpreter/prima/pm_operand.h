@@ -30,6 +30,7 @@
 #include "interpreter.h"
 #include "operands.h"
 #include "pm_table.h"
+#include "pm_store.h"
 
 
 namespace whais {
@@ -196,11 +197,9 @@ public:
   virtual uint64_t IteratorOffset();
 
   virtual TableOperand GetTableOp();
-
   virtual void CopyTableOp(const TableOperand& source);
 
   virtual FieldOperand GetFieldOp();
-
   virtual void CopyFieldOp(const FieldOperand& source);
 
   virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
@@ -208,7 +207,7 @@ public:
   virtual void           NativeObject(INativeObject* const value);
   virtual INativeObject& NativeObject();
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest);
 
   virtual TableReference& GetTableReference();
 };
@@ -879,8 +878,7 @@ class TextOperand : public BaseOperand
 public:
   explicit TextOperand(const DText& value)
     : mValue(value)
-  {
-  }
+  {}
 
   virtual bool IsNull() const;
 
@@ -898,7 +896,7 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
 private:
   DText mValue;
@@ -936,7 +934,7 @@ public:
   virtual bool Iterate(const bool reverse);
   virtual uint64_t IteratorOffset();
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
 private:
   const uint64_t mIndex;
@@ -948,9 +946,30 @@ class ArrayOperand : public BaseOperand
 {
 public:
   explicit ArrayOperand(const DArray& array)
-    : mValue(array),
+    : mValue(SharedArrayStore::Instance().Alloc()),
       mFirstArrayType(array.Type())
   {
+    *mValue = shared_make(DArray, array);
+  }
+
+  ArrayOperand(ArrayOperand&& src)
+    : mValue(src.mValue),
+      mFirstArrayType(src.mFirstArrayType)
+  {
+    src.mValue = nullptr;
+  }
+
+  ArrayOperand(const ArrayOperand& src)
+    : mValue(SharedArrayStore::Instance().Alloc()),
+      mFirstArrayType(src.mFirstArrayType)
+  {
+    *mValue = *src.mValue;
+  }
+
+  ~ArrayOperand()
+  {
+    if (mValue)
+      SharedArrayStore::Instance().Free(mValue);
   }
 
   virtual bool IsNull() const;
@@ -966,47 +985,44 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
 
-  virtual bool PrepareToCopy(void* const);
+  virtual bool DoSimpleCopy(void* const);
 
 private:
-  DArray    mValue;
-  uint16_t  mFirstArrayType;
+  std::shared_ptr<DArray>* mValue;
+  uint16_t mFirstArrayType;
 };
 
 
 class BaseArrayElOperand : public BaseOperand
 {
 protected:
-  BaseArrayElOperand(DArray& array, const uint64_t index)
-    : mIndex(index)
-  {
-    array.MakeMirror(mArray);
-  }
+  BaseArrayElOperand(std::shared_ptr<DArray>* array, const uint64_t index)
+    : mIndex(index),
+      mArray(array)
+  {}
 
   BaseArrayElOperand(const BaseArrayElOperand& source)
     : mIndex(source.mIndex),
-      mArray()
-  {
-    source.mArray.MakeMirror(mArray);
-  }
+      mArray(source.mArray)
+  {}
 
+  BaseArrayElOperand& operator= (const BaseArrayElOperand& source) = delete;
+  ~BaseArrayElOperand() = default;
 
-  template <typename DBS_T> void Get(DBS_T& out) const
+  template <typename DBS_T> void Get(DBS_T& outValue) const
   {
-    if (mArray.Count() <= mIndex)
+    if (mIndex < (*mArray)->Count())
     {
-      out = DBS_T();
-      return;
+      (*mArray)->Get(mIndex, outValue);
+      assert ( ! outValue.IsNull ());
     }
-
-    mArray.Get(mIndex, out);
-
-    assert( !out.IsNull());
+    else
+      outValue = DBS_T();
   }
 
   template <typename DBS_T> void Set(const DBS_T& value)
   {
-    mArray.Set(mIndex, value);
+    (*mArray)->Set(mIndex, value);
   }
 
   virtual bool IsNull() const;
@@ -1014,17 +1030,15 @@ protected:
   virtual uint64_t IteratorOffset();
 
 private:
-  BaseArrayElOperand& operator= (const BaseArrayElOperand& source);
-
-  const uint64_t mIndex;
-  DArray         mArray;
+  const uint64_t                 mIndex;
+  std::shared_ptr<DArray>* const mArray;
 };
 
 
 class BoolArrayElOperand : public BaseArrayElOperand
 {
 public:
-  BoolArrayElOperand(DArray& array, const uint64_t index)
+  BoolArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1044,14 +1058,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class CharArrayElOperand : public BaseArrayElOperand
 {
 public:
-  CharArrayElOperand(DArray& array, const uint64_t index)
+  CharArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1065,14 +1079,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class DateArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateArrayElOperand(DArray& array, const uint64_t index)
+  DateArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1088,14 +1102,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class DateTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  DateTimeArrayElOperand(DArray& array, const uint64_t index)
+  DateTimeArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1111,14 +1125,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class HiresTimeArrayElOperand : public BaseArrayElOperand
 {
 public:
-  HiresTimeArrayElOperand(DArray& array, const uint64_t index)
+  HiresTimeArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1134,14 +1148,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class UInt8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt8ArrayElOperand(DArray& array, const uint64_t index)
+  UInt8ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1185,14 +1199,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class UInt16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt16ArrayElOperand(DArray& array, const uint64_t index)
+  UInt16ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1235,14 +1249,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class UInt32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt32ArrayElOperand(DArray& array, const uint64_t index)
+  UInt32ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1285,14 +1299,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class UInt64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  UInt64ArrayElOperand(DArray& array, const uint64_t index)
+  UInt64ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1335,14 +1349,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class Int8ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int8ArrayElOperand(DArray& array, const uint64_t index)
+  Int8ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1385,13 +1399,13 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 class Int16ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int16ArrayElOperand(DArray& array, const uint64_t index)
+  Int16ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1434,14 +1448,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class Int32ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int32ArrayElOperand(DArray& array, const uint64_t index)
+  Int32ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1484,14 +1498,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class Int64ArrayElOperand : public BaseArrayElOperand
 {
 public:
-  Int64ArrayElOperand(DArray& array, const uint64_t index)
+  Int64ArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1534,14 +1548,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class RealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RealArrayElOperand(DArray& array, const uint64_t index)
+  RealArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1568,14 +1582,14 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
 class RichRealArrayElOperand : public BaseArrayElOperand
 {
 public:
-  RichRealArrayElOperand(DArray& array, const uint64_t index)
+  RichRealArrayElOperand(std::shared_ptr<DArray>* const array, const uint64_t index)
     : BaseArrayElOperand(array, index)
   {
   }
@@ -1602,7 +1616,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 };
 
 
@@ -1655,7 +1669,7 @@ public:
 
   virtual StackValue Duplicate() const;
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
   virtual TableOperand GetTableOp();
 
@@ -1701,7 +1715,7 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
   virtual FieldOperand GetFieldOp();
 
@@ -1765,7 +1779,7 @@ protected:
   virtual bool Iterate(const bool reverse);
   virtual uint64_t IteratorOffset();
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
 private:
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
@@ -2515,7 +2529,7 @@ protected:
   virtual bool Iterate(const bool reverse);
   virtual uint64_t IteratorOffset();
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
@@ -3296,7 +3310,7 @@ public:
   {
     LockRAII<Lock> dummy(mSync);
 
-    return Operand().PrepareToCopy(dest);
+    return Operand().DoSimpleCopy(dest);
   }
 
   TableOperand GetTableOp()
@@ -3440,7 +3454,7 @@ public:
 
   virtual bool StartIterate(const bool  reverse, StackValue& outStartItem);
 
-  virtual bool PrepareToCopy(void* const);
+  virtual bool DoneCustomCopy(void* const);
 
   virtual TableOperand GetTableOp();
 

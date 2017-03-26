@@ -1485,20 +1485,13 @@ public:
   explicit DArray(const DInt32* const array, const uint64_t count = 0);
   explicit DArray(const DInt64* const array, const uint64_t count = 0);
 
-  explicit DArray(IArrayStrategy& array);
-
-  ~DArray();
+  explicit DArray(std::shared_ptr<IArrayStrategy> s);
 
   DArray(const DArray& source);
   DArray& operator= (const DArray& source);
 
-  bool IsNull() const
-  {
-    return Count() == 0;
-  }
-
+  bool IsNull() const { return Count() == 0; }
   uint64_t Count() const;
-
   DBS_FIELD_TYPE Type() const;
 
   uint64_t Add(const DBool& value);
@@ -1551,55 +1544,17 @@ public:
 
   void Remove(const uint64_t index);
   void Sort(bool reverse = false);
-  void MakeMirror(DArray& mirror) const;
 
-
-  class StrategyRAII
-  {
-  public:
-    StrategyRAII(DArray& source) :
-        mArray(source),
-        mStrategy(nullptr)
-    {
-    }
-
-    ~StrategyRAII()
-    {
-      if (mStrategy != nullptr)
-        mArray.ReleaseStrategy();
-    }
-
-    operator IArrayStrategy&()
-    {
-      if (mStrategy == nullptr)
-        mStrategy = &mArray.GetStrategy();
-
-      return *mStrategy;
-    }
-
-    void Release()
-    {
-      if (mStrategy != nullptr)
-      {
-        mStrategy = nullptr;
-        mArray.ReleaseStrategy();
-      }
-    }
-
-  private:
-    DArray&          mArray;
-    IArrayStrategy*  mStrategy;
-  };
-
-  IArrayStrategy&   GetStrategy();
-  StrategyRAII      GetStrategyRAII() const;
-  void              ReleaseStrategy();
-  void              ReplaceStrategy(IArrayStrategy* const strategy);
+  auto GetStrategy() const -> std::shared_ptr<IArrayStrategy>;
+  void ReplaceStrategy(std::shared_ptr<IArrayStrategy> s);
 
 private:
-  IArrayStrategy* volatile    mArray;
-  volatile uint32_t           mArrayRefs;
-  SpinLock                    mLock;
+  template<class T> uint64_t add_array_element(const T& value);
+  template<class T> void get_array_element(const uint64_t index, T& outElement) const;
+  template<class T> void set_array_element(const T& value, const uint64_t index);
+
+  std::shared_ptr<IArrayStrategy> mArray;
+  mutable whais::Lock         mLock;
 };
 
 

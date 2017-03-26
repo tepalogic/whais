@@ -211,7 +211,7 @@ BaseArrayFieldElOperand::IteratorOffset()
 
 
 bool
-BaseArrayFieldElOperand::PrepareToCopy(void* const)
+BaseArrayFieldElOperand::DoneCustomCopy(void* const)
 {
   mTableRef->IncrementRefCount();
   return true;

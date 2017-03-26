@@ -445,7 +445,7 @@ TemporalFileContainer::TemporalFileContainer(const char* baseName, const uint32_
 
 
 TemporalContainer::TemporalContainer(const uint_t reservedMemory)
-  : mCache_1(new uint8_t[reservedMemory / 2]),
+  : mCache_1(unique_array_make(uint8_t, reservedMemory / 2)),
     mCacheStartPos_1(0),
     mCacheEndPos_1(0),
     mCacheStartPos_2(0),

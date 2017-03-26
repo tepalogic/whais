@@ -38,19 +38,19 @@ namespace prima {
 bool
 ArrayOperand::IsNull() const
 {
-  return mValue.IsNull();
+  return (*mValue)->IsNull();
 }
 
 void
 ArrayOperand::GetValue(DArray& outValue) const
 {
-  outValue = mValue;
+  outValue = *(*mValue);
 }
 
 void
 ArrayOperand::SetValue(const DArray& value)
 {
-  mValue = value;
+  *(*mValue) = value;
 }
 
 uint_t
@@ -65,7 +65,7 @@ ArrayOperand::GetType()
 StackValue
 ArrayOperand::GetValueAt(const uint64_t index)
 {
-  switch(mValue.Type())
+  switch((*mValue)->Type())
   {
   case T_BOOL:
     return StackValue(BoolArrayElOperand(mValue, index));
@@ -131,14 +131,14 @@ ArrayOperand::StartIterate(const bool reverse, StackValue& outStartItem)
   if (IsNull())
     return false;
 
-  assert(mValue.Count() > 0);
+  assert((*mValue)->Count() > 0);
 
-  outStartItem = GetValueAt(reverse ? (mValue.Count() - 1) : 0);
+  outStartItem = GetValueAt(reverse ? ((*mValue)->Count() - 1) : 0);
   return true;
 }
 
 bool
-ArrayOperand::PrepareToCopy(void* const dest)
+ArrayOperand::DoSimpleCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -148,7 +148,7 @@ ArrayOperand::PrepareToCopy(void* const dest)
 bool
 BaseArrayElOperand::IsNull() const
 {
-  return(mArray.Count() <= mIndex) ? true : false;
+  return (*mArray)->Count() <= mIndex ? true : false;
 }
 
 bool
@@ -163,7 +163,7 @@ BaseArrayElOperand::Iterate(const bool reverse)
     return true;
   }
 
-  if (mIndex >= mArray.Count() - 1)
+  if (mIndex >= (*mArray)->Count() - 1)
     return false;
 
   _CC(uint64_t&, mIndex)++;
@@ -256,7 +256,7 @@ BoolArrayElOperand::Duplicate() const
 }
 
 bool
-BoolArrayElOperand::PrepareToCopy(void* const dest)
+BoolArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -301,7 +301,7 @@ CharArrayElOperand::Duplicate() const
 }
 
 bool
-CharArrayElOperand::PrepareToCopy(void* const dest)
+CharArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -374,7 +374,7 @@ DateArrayElOperand::Duplicate() const
 }
 
 bool
-DateArrayElOperand::PrepareToCopy(void* const dest)
+DateArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -453,7 +453,7 @@ DateTimeArrayElOperand::Duplicate() const
 }
 
 bool
-DateTimeArrayElOperand::PrepareToCopy(void* const dest)
+DateTimeArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -528,7 +528,7 @@ HiresTimeArrayElOperand::Duplicate() const
 }
 
 bool
-HiresTimeArrayElOperand::PrepareToCopy(void* const dest)
+HiresTimeArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -790,7 +790,7 @@ UInt8ArrayElOperand::Duplicate() const
 }
 
 bool
-UInt8ArrayElOperand::PrepareToCopy(void* const dest)
+UInt8ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -1070,7 +1070,7 @@ UInt16ArrayElOperand::Duplicate() const
 
 
 bool
-UInt16ArrayElOperand::PrepareToCopy(void* const dest)
+UInt16ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -1351,7 +1351,7 @@ UInt32ArrayElOperand::Duplicate() const
 
 
 bool
-UInt32ArrayElOperand::PrepareToCopy(void* const dest)
+UInt32ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -1624,7 +1624,7 @@ UInt64ArrayElOperand::Duplicate() const
 
 
 bool
-UInt64ArrayElOperand::PrepareToCopy(void* const dest)
+UInt64ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -1904,7 +1904,7 @@ Int8ArrayElOperand::Duplicate() const
 
 
 bool
-Int8ArrayElOperand::PrepareToCopy(void* const dest)
+Int8ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -2187,7 +2187,7 @@ Int16ArrayElOperand::Duplicate() const
 
 
 bool
-Int16ArrayElOperand::PrepareToCopy(void* const dest)
+Int16ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -2469,7 +2469,7 @@ Int32ArrayElOperand::Duplicate() const
 
 
 bool
-Int32ArrayElOperand::PrepareToCopy(void* const dest)
+Int32ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -2752,7 +2752,7 @@ Int64ArrayElOperand::Duplicate() const
 
 
 bool
-Int64ArrayElOperand::PrepareToCopy(void* const dest)
+Int64ArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -2912,7 +2912,7 @@ RealArrayElOperand::Duplicate() const
 
 
 bool
-RealArrayElOperand::PrepareToCopy(void* const dest)
+RealArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -3069,7 +3069,7 @@ RichRealArrayElOperand::Duplicate() const
 
 
 bool
-RichRealArrayElOperand::PrepareToCopy(void* const dest)
+RichRealArrayElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, *this);
   return false;

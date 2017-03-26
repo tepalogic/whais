@@ -524,7 +524,7 @@ proc_table_field_by_id( SessionStack& stack, ISession&)
   StackValue result = op.GetFieldAt(fieldId.mValue);
 
   stack.Pop(2);
-  stack.Push(result);
+  stack.Push(move(result));
 
   return WOP_OK;
 }
@@ -562,7 +562,7 @@ proc_table_field_name( SessionStack& stack, ISession&)
   StackValue result = opTable.GetFieldAt(fieldId);
 
   stack.Pop(2);
-  stack.Push(result);
+  stack.Push(move(result));
 
   return WOP_OK;
 }

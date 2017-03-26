@@ -31,6 +31,8 @@
 #include "pm_operand_undefined.h"
 
 
+using namespace std;
+
 namespace whais {
 namespace prima {
 
@@ -252,7 +254,7 @@ op_func_ldgb8(ProcedureCall& call, int64_t& offset)
   const uint32_t glbId = call.GetUnit().GetGlobalId(globalIndex);
   StackValue glbValue = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack().Push(glbValue);
+  call.GetStack().Push(move(glbValue));
 
   offset += sizeof(uint8_t);
 }
@@ -267,7 +269,7 @@ op_func_ldgb16(ProcedureCall& call, int64_t& offset)
   const uint32_t glbId = call.GetUnit().GetGlobalId(globalIndex);
   StackValue glbValue = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack().Push(glbValue);
+  call.GetStack().Push(move(glbValue));
 
   offset += sizeof(uint16_t);
 }
@@ -282,7 +284,7 @@ op_func_ldgb32(ProcedureCall& call, int64_t& offset)
   const uint32_t glbId = call.GetUnit().GetGlobalId(globalIndex);
   StackValue glbValue = call.GetSession().GetGlobalValue(glbId);
 
-  call.GetStack().Push(glbValue);
+  call.GetStack().Push(move(glbValue));
 
   offset += sizeof(uint32_t);
 }
@@ -528,11 +530,10 @@ op_func_ret(ProcedureCall& call, int64_t& offset)
   if (result.Operand().GetType() == T_UNKNOWN)
   {
     assert(result.Operand().IsNull());
-
-    stack.Push(call.GetLocalDefault(0));
+    stack.Push(StackValue(call.GetLocalDefault(0)));
   }
   else
-    stack.Push(result);
+    stack.Push(move(result));
 
   offset = call.CodeSize(); //Signal the procedure return
 }
@@ -1213,7 +1214,7 @@ op_func_ind(ProcedureCall& call, int64_t& offset)
   StackValue result = stack[stackSize - 2].Operand().GetValueAt(index.mValue);
 
   stack.Pop(2);
-  stack.Push(result);
+  stack.Push(move(result));
 }
 
 
@@ -1244,7 +1245,7 @@ op_func_indta(ProcedureCall& call, int64_t& offset)
   StackValue result = fieldOp.GetValueAt(index.mValue);
 
   stack.Pop(2);
-  stack.Push(result);
+  stack.Push(move(result));
 }
 
 
@@ -1270,7 +1271,7 @@ op_func_self(ProcedureCall& call, int64_t& offset)
   StackValue result(fieldOp);
 
   stack.Pop(1);
-  stack.Push(result);
+  stack.Push(move(result));
 }
 
 
@@ -1465,13 +1466,12 @@ op_start_iterate(ProcedureCall& call, int64_t& offset)
     return;
   }
 
-  NullOperand nullOp;
-  StackValue iterator(nullOp);
-  const bool started = container.StartIterate(reverse, iterator);
+  StackValue it{NullOperand{}};
+  const bool started = container.StartIterate(reverse, it);
 
   stack.Pop(1);
-  stack.Push(iterator);
-  stack.Push(StackValue(BoolOperand(DBool(started))));
+  stack.Push(move(it));
+  stack.Push(StackValue{BoolOperand{DBool{started}}});
 }
 
 
@@ -1743,10 +1743,10 @@ ProcedureCall::ProcedureCall(Session& session, SessionStack& stack, const Proced
     uint32_t local = mProcedure.mArgsCount + 1;
     if (local < LocalsCount())
     {
-      const StackValue* localValue = &GetLocalDefault(local);
+      const StackValue *localValue = &GetLocalDefault(local);
       while (local < LocalsCount())
       {
-        stack.Push( *localValue);
+        stack.Push(StackValue(*localValue));
         ++local, ++localValue;
       }
     }
@@ -1849,7 +1849,6 @@ ProcedureCall::ReleaseSync(const uint8_t sync)
   mProcedure.mProcMgr->ReleaseSync(mProcedure, sync);
   mAquiredSync = NO_INDEX;
 }
-
 
 } //namespace prima
 } //namespace whais

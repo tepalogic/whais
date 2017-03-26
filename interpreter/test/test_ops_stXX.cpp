@@ -479,8 +479,6 @@ test_op_stf(Session& session)
 
   FieldOperand op;
   FieldOperand op2(tableOp, 0);
-  StackValue   sv1(op);
-  StackValue   sv2(op2);
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode(W_LDLO8, testCode);
@@ -490,8 +488,8 @@ test_op_stf(Session& session)
   opSize += w_encode_opcode(W_STF, testCode + opSize);
   w_encode_opcode(W_RET, testCode + opSize);
 
-  stack.Push(sv1);
-  stack.Push(sv2);
+  stack.Push(StackValue(op));
+  stack.Push(StackValue(op2));
 
   if (stack[0].Operand().IsNull() == false)
     return false;

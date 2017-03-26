@@ -101,10 +101,10 @@ SpinLock::Acquire()
     {
       assert(mLock >= 0);
 
-      if (wh_atomic_fetch_inc16(&mLock) == 0)
+      if (wh_atomic_fetch_inc32(&mLock) == 0)
         break;
 
-      wh_atomic_fetch_dec16(&mLock);
+      wh_atomic_fetch_dec32(&mLock);
       wh_yield();
     }
 }
@@ -115,10 +115,10 @@ SpinLock::TryAcquire()
 {
   assert(mLock >= 0);
 
-  if (wh_atomic_fetch_inc16(&mLock) == 0)
+  if (wh_atomic_fetch_inc32(&mLock) == 0)
     return true;
 
-  wh_atomic_fetch_dec16(&mLock);
+  wh_atomic_fetch_dec32(&mLock);
   return false;
 }
 
@@ -126,7 +126,7 @@ void
 SpinLock::Release()
 {
   assert(mLock > 0);
-  wh_atomic_fetch_dec16(&mLock);
+  wh_atomic_fetch_dec32(&mLock);
 }
 
 
@@ -145,46 +145,42 @@ Thread::Thread()
 
 
 bool
-Thread::Run(WH_THREAD_ROUTINE routine,
-             void* const       args,
-             const bool        waitPrevEnd)
+Thread::Run(WH_THREAD_ROUTINE routine, void* const args, const bool waitPrevEnd)
 {
   while (true)
-    {
-      if (wh_atomic_fetch_inc32(&mEnded) == 0)
-        break;
+  {
+    if (wh_atomic_fetch_inc32( &mEnded) == 0)
+      break;
 
-      wh_atomic_fetch_dec32(&mEnded);
+    wh_atomic_fetch_dec32( &mEnded);
 
-      if ( ! waitPrevEnd)
-        return false;
+    if ( !waitPrevEnd)
+      return false;
 
-      WaitToEnd(true);
-    }
+    WaitToEnd(true);
+  }
 
   if (mNeedsClean)
-    {
-      wh_thread_free(mThread);
-      mNeedsClean = false;
+  {
+    wh_thread_free(mThread);
+    mNeedsClean = false;
 
-      ThrowPendingException();
-    }
+    ThrowPendingException();
+  }
 
   assert(mEnded > 0);
   assert(mNeedsClean == false);
 
-  mRoutine     = routine;
+  mRoutine = routine;
   mRoutineArgs = args;
 
-  const uint_t res = wh_thread_create(&mThread,
-                                       Thread::ThreadWrapperRoutine,
-                                       this);
+  const uint_t res = wh_thread_create( &mThread, Thread::ThreadWrapperRoutine, this);
   if (res != WOP_OK)
-    {
-      assert(mEnded > 0);
+  {
+    assert(mEnded > 0);
 
-      throw ThreadException(_EXTRA(errno), "Failed to create a thread.");
-    }
+    throw ThreadException(_EXTRA(errno), "Failed to create a thread.");
+  }
 
   return true;
 }

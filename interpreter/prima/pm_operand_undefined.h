@@ -123,7 +123,7 @@ public:
   virtual void NativeObject(INativeObject* const value);
   virtual INativeObject& NativeObject();
 
-  virtual bool PrepareToCopy(void* const dest);
+  virtual bool DoneCustomCopy(void* const dest);
 
   virtual TableReference& GetTableReference();
 

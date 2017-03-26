@@ -72,7 +72,10 @@ ProcedureManager::AddProcedure(const uint8_t* const name,
   const uint32_t result = mProcsEntrys.size();
 
   mSyncStmts.insert(mSyncStmts.end(), syncCount, false);
-  mLocalsValues.insert(mLocalsValues.end(), &localValues[0], &localValues[0] + localsCount);
+
+  for (uint_t i = 0; i < localsCount; ++i)
+    mLocalsValues.push_back(StackValue(localValues[i]));
+
   mIdentifiers.insert(mIdentifiers.end(), name, name + nameLength);
   mIdentifiers.push_back(0);
   mDefinitions.insert(mDefinitions.end(), code, code + codeSize);

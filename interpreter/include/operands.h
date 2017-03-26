@@ -35,8 +35,8 @@
 namespace whais {
 
 #ifndef QWORDS_PER_OP
-#define QWORDS_PER_OP    4
-#warning "QWORDS_PER_OP holds the default value of 4(e.g. 32 bytes per stack value)."
+#define QWORDS_PER_OP    5
+#warning "QWORDS_PER_OP holds the default value of 5 (e.g. 40 bytes per stack value)."
 #endif
 
 class StackValue;
@@ -138,7 +138,7 @@ public:
   virtual INativeObject& NativeObject() = 0;
 
 protected:
-  virtual bool PrepareToCopy(void* const dest) = 0;
+  virtual bool DoSimpleCopy(void* const dest) = 0;
 };
 
 
@@ -154,14 +154,22 @@ public:
     static_assert(sizeof(OP_T) <= sizeof(mStorage), "Stack value storage not big enough!");
 
     _placement_new(mStorage, op);
+
+    assert (mStorage[0] != 0);
   }
 
   StackValue(const StackValue& source)
   {
     IOperand& op = _CC(StackValue&, source).Operand();
 
-    if (op.PrepareToCopy(mStorage))
+    if (op.DoSimpleCopy(mStorage))
       memcpy(mStorage, &source.mStorage, sizeof mStorage);
+  }
+
+  StackValue(StackValue&& source)
+  {
+    memcpy(mStorage, &source.mStorage, sizeof mStorage);
+    source.mStorage[0] = 0;
   }
 
   ~StackValue()
@@ -170,13 +178,12 @@ public:
   }
 
   StackValue&
-  operator= (const StackValue& source)
+  operator= (StackValue&& source)
   {
-    IOperand& op = _CC(StackValue&, source).Operand();
     Clear();
 
-    if (op.PrepareToCopy(mStorage))
-      memcpy(mStorage, &source.mStorage, sizeof mStorage);
+    memcpy(mStorage, &source.mStorage, sizeof mStorage);
+    source.mStorage[0] = 0;
 
     return *this;
   }
@@ -203,7 +210,7 @@ public:
   static StackValue Create(const DArray& value);
 
 private:
-  void Clear() { Operand().~IOperand(); }
+  void Clear() { if (mStorage[0] != 0) Operand().~IOperand(); }
 
   uint64_t mStorage[QWORDS_PER_OP];
 };
@@ -236,12 +243,11 @@ public:
   void  Push(const DArray& value);
   void  Push(IDBSHandler& dbs, ITable& table);
   void  Push(INativeObject& object);
-  void  Push(const StackValue& value);
+  void  Push(StackValue&& value);
 
   void  Pop(const uint_t count);
 
   size_t Size() const;
-
   StackValue& operator[] (const uint_t index);
 
 private:

@@ -891,20 +891,18 @@ DText::CompareTo(const DText& second) const
 template <class T> void
 wh_array_init(const T* const array,
               const uint64_t count,
-              IArrayStrategy* volatile * outStrategy)
+              shared_ptr<IArrayStrategy> *outStrategy)
 {
   if (count == 0)
   {
     assert(array == nullptr);
-
-    *outStrategy = &NullArray::GetSingletoneInstace(array[0].DBSType());
-
+    *outStrategy = NullArray::GetSingletoneInstace(array[0].DBSType());
     return;
   }
   else if (array == nullptr)
     throw DBSException(_EXTRA(DBSException::BAD_PARAMETERS));
 
-  unique_ptr<IArrayStrategy> s(new TemporalArray(array[0].DBSType()));
+  shared_ptr<IArrayStrategy> s = shared_make(TemporalArray, (array[0].DBSType()));
 
   for (uint64_t index = 0; index < count; ++index)
   {
@@ -920,197 +918,160 @@ wh_array_init(const T* const array,
     Serializer::Store(rawValue, array[index]);
     s->Add(array[index].DBSType(), rawValue, &dummy);
   }
-
-  *outStrategy = s.release();
+  *outStrategy = s;
 }
 
 
 DArray::DArray()
-  : mArray(&NullArray::GetSingletoneInstace(T_UNDETERMINED)),
-    mArrayRefs(0)
+  : mArray(NullArray::GetSingletoneInstace(T_UNDETERMINED))
 {
 }
 
 
+DArray::DArray(const DArray& source)
+  : mArray(source.GetStrategy())
+{
+}
+
+DArray&
+DArray::operator= (const DArray& source)
+{
+  if (this != &source)
+  {
+    LockRAII<decltype(mLock)> _l(source.mLock);
+    ReplaceStrategy(source.mArray);
+  }
+
+  return *this;
+}
+
+
 DArray::DArray(const DBool* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DChar* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DDate* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DDateTime* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DHiresTime* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DUInt8* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DUInt16* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DUInt32* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DUInt64* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DReal* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DRichReal* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DInt8* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DInt16* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DInt32* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
 DArray::DArray(const DInt64* const array, const uint64_t count)
-  : mArray(nullptr),
-    mArrayRefs(0)
+  : mArray(nullptr)
 {
   wh_array_init(array, count, &mArray);
 }
 
 
-DArray::DArray(IArrayStrategy& array)
-  : mArray(&array),
-    mArrayRefs(0)
+DArray::DArray(std::shared_ptr<IArrayStrategy> s)
+  : mArray(s)
 {
-}
-
-
-DArray::DArray(const DArray& source)
-  : mArray(nullptr),
-    mArrayRefs(0)
-{
-  StrategyRAII s = source.GetStrategyRAII();
-  mArray = _SC(IArrayStrategy&, s).MakeClone();
-
-  assert(mArray == source.mArray);
-}
-
-
-DArray::~DArray()
-{
-  assert(mArrayRefs == 0);
-
-  mArray->ReleaseReference();
-}
-
-DArray &
-DArray::operator= (const DArray& source)
-{
-  if (this == &source)
-    return *this;
-
-  StrategyRAII s = source.GetStrategyRAII();
-  StrategyRAII t = GetStrategyRAII();
-
-  if (&_SC(IArrayStrategy&, s) != &_SC(IArrayStrategy&, t))
-    {
-      t.Release();
-      ReplaceStrategy(_SC(IArrayStrategy&, s).MakeClone());
-    }
-
-  return *this;
 }
 
 
 uint64_t
 DArray::Count() const
 {
-  return _SC(IArrayStrategy&, GetStrategyRAII()).Count();
+  return GetStrategy()->Count();
 }
 
 
 DBS_FIELD_TYPE
 DArray::Type() const
 {
-  return _SC(IArrayStrategy&, GetStrategyRAII()).Type();
+  return GetStrategy()->Type();
 }
 
 template <class T> inline uint64_t
-add_array_element(const T& value, DArray& array)
+DArray::add_array_element(const T& value)
 {
   uint64_t result;
   uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
@@ -1119,15 +1080,8 @@ add_array_element(const T& value, DArray& array)
 
   Serializer::Store(rawValue, value);
 
-  DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy& s = a;
-
-  IArrayStrategy* const newArray = s.Add(value.DBSType(), rawValue, &result);
-  if (newArray != &s)
-  {
-    a.Release();
-    array.ReplaceStrategy(newArray);
-  }
+  auto s = GetStrategy();
+  ReplaceStrategy(s->Add(value.DBSType(), rawValue, &result));
 
   return result;
 }
@@ -1135,102 +1089,101 @@ add_array_element(const T& value, DArray& array)
 uint64_t
 DArray::Add(const DBool& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DChar& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DDate& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DDateTime& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DHiresTime& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DUInt8& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DUInt16& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 
 uint64_t
 DArray::Add(const DUInt32& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DUInt64& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DReal& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DRichReal& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DInt8& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DInt16& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DInt32& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 uint64_t
 DArray::Add(const DInt64& value)
 {
-  return add_array_element(value, *this);
+  return add_array_element(value);
 }
 
 template <class T> void
-get_array_element(const DArray& array, const uint64_t index, T& outElement)
+DArray::get_array_element(const uint64_t index, T& outElement) const
 {
-  DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy& s = a;
+  auto s = GetStrategy();
 
   uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
-  const uint_t elSize = s.Get(index, rawValue);
+  const uint_t elSize = s->Get(index, rawValue);
   if (elSize == 0)
   {
     outElement = T();
@@ -1243,101 +1196,101 @@ get_array_element(const DArray& array, const uint64_t index, T& outElement)
 void
 DArray::Get(const uint64_t index, DBool& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DChar& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DDate& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DDateTime& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DHiresTime& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DUInt8& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DUInt16& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DUInt32& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DUInt64& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DReal& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DRichReal& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DInt8& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DInt16& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 
 void
 DArray::Get(const uint64_t index, DInt32& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 void
 DArray::Get(const uint64_t index, DInt64& outValue) const
 {
-  get_array_element(*this, index, outValue);
+  get_array_element(index, outValue);
 }
 
 
 template<class T> inline void
-set_array_element(const T& value, const uint64_t index, DArray& array)
+DArray::set_array_element(const T& value, const uint64_t index)
 {
   if (value.IsNull())
   {
-    array.Remove(index);
+    Remove(index);
     return;
   }
 
@@ -1346,233 +1299,143 @@ set_array_element(const T& value, const uint64_t index, DArray& array)
   assert(Serializer::Size(value.DBSType(), false) <= sizeof rawValue);
 
   Serializer::Store(rawValue, value);
-
-  DArray::StrategyRAII a = array.GetStrategyRAII();
-  IArrayStrategy& s = a;
-
-  IArrayStrategy* const newArray = s.Set(value.DBSType(), rawValue, index);
-  if (newArray != &s)
-  {
-    a.Release();
-    array.ReplaceStrategy(newArray);
-  }
+  auto s = GetStrategy();
+  ReplaceStrategy(s->Set(value.DBSType(), rawValue, index));
 }
 
 
 void
 DArray::Set(const uint64_t index, const DBool& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DChar& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DDate& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DDateTime& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DHiresTime& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index,  const DUInt8& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DUInt16& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DUInt32& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DUInt64& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DReal& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DRichReal& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DInt8& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DInt16& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DInt32& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Set(const uint64_t index, const DInt64& newValue)
 {
-  set_array_element(newValue, index, *this);
+  set_array_element(newValue, index);
 }
 
 
 void
 DArray::Remove(const uint64_t index)
 {
-  DArray::StrategyRAII a = GetStrategyRAII();
-  IArrayStrategy& s = a;
-
-  IArrayStrategy* const newArray = s.Remove(index);
-  if (newArray != &s)
-  {
-    a.Release();
-    ReplaceStrategy(newArray);
-  }
+  ReplaceStrategy(GetStrategy()->Remove(index));
 }
 
 
 void
 DArray::Sort(bool reverse)
 {
-
-  DArray::StrategyRAII a = GetStrategyRAII();
-  IArrayStrategy& s = a;
-
-  IArrayStrategy* const newArray = s.Sort(reverse);
-  if (newArray != &s)
-  {
-    a.Release();
-    ReplaceStrategy(newArray);
-  }
+  ReplaceStrategy(GetStrategy()->Sort(reverse));
 }
 
 
-void
-DArray::MakeMirror(DArray& inoutArray) const
+shared_ptr<IArrayStrategy>
+DArray::GetStrategy() const
 {
-  if (this == &inoutArray)
-    return;
+  LockRAII<decltype(mLock)> _l(mLock);
+  auto result = mArray;
 
-  StrategyRAII s = GetStrategyRAII();
-  IArrayStrategy& t = s;
-
-  StrategyRAII s2 = inoutArray.GetStrategyRAII();
-  IArrayStrategy& t2 = s2;
-
-  if (( &t != &NullArray::GetSingletoneInstace(t.Type())) && ( &t == &t2))
-  {
-    return;
-  }
-
-  IArrayStrategy* const newArray = t.MakeMirrorCopy();
-
-  if (newArray != &t)
-  {
-    s.Release();
-    _CC(DArray&, *this).ReplaceStrategy(newArray);
-  }
-  s.Release();
-
-  if (newArray != &t2)
-  {
-    s2.Release();
-    inoutArray.ReplaceStrategy(newArray);
-  }
-}
-
-IArrayStrategy&
-DArray::GetStrategy()
-{
-  LockRAII<SpinLock> _l(mLock);
-
-  ++mArrayRefs;
-  return *mArray;
-}
-
-DArray::StrategyRAII
-DArray::GetStrategyRAII() const
-{
-  return StrategyRAII( _CC(DArray&, *this));
+  return result;
 }
 
 void
-DArray::ReleaseStrategy()
+DArray::ReplaceStrategy(shared_ptr<IArrayStrategy> s)
 {
-  LockRAII<SpinLock> _l(mLock);
-
-  assert(mArrayRefs > 0);
-
-  --mArrayRefs;
-}
-
-void
-DArray::ReplaceStrategy(IArrayStrategy* const strategy)
-{
-  assert(strategy != nullptr);
-  assert(mArray != strategy);
-
-  LockRAII<SpinLock> _l(mLock);
-
-  do
-  {
-    if (mArrayRefs == 0)
-    {
-      mArray->ReleaseReference();
-      mArray = strategy;
-      return;
-    }
-
-    _l.Release();
-    wh_yield();
-    _l.Acquire();
-
-  } while (true);
+  LockRAII<decltype(mLock)> _l(mLock);
+  if (s != mArray)
+    mArray = s;
 }

@@ -112,7 +112,7 @@ test_op_saddXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -160,7 +160,7 @@ test_op_ssubXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -207,7 +207,7 @@ test_op_smulXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -254,7 +254,7 @@ test_op_sdivXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -302,7 +302,7 @@ test_op_smodXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -349,7 +349,7 @@ test_op_sandXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -396,7 +396,7 @@ test_op_sxorXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);
@@ -443,7 +443,7 @@ test_op_sorXX(Session& session,
 
   stack.Push(first); //This will be modified
   StackValue temp(LocalOperand(stack, 0));
-  stack.Push(temp); //Proc args
+  stack.Push(std::move(temp)); //Proc args
   stack.Push(second);
 
   session.ExecuteProcedure(procName, stack);

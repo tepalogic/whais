@@ -457,7 +457,7 @@ BaseOperand::NativeObject()
 
 
 bool
-BaseOperand::PrepareToCopy(void* const)
+BaseOperand::DoSimpleCopy(void* const)
 {
   return true;
 }
@@ -2725,7 +2725,7 @@ TextOperand::StartIterate(const bool reverse, StackValue& outStartItem)
 
 
 bool
-TextOperand::PrepareToCopy(void* const dest)
+TextOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, TextOperand(mValue));
   return false;
@@ -2812,7 +2812,7 @@ CharTextElOperand::IteratorOffset()
 }
 
 bool
-CharTextElOperand::PrepareToCopy(void* const dest)
+CharTextElOperand::DoneCustomCopy(void* const dest)
 {
   _placement_new(dest, CharTextElOperand(mText, mIndex));
 
@@ -3216,7 +3216,7 @@ GlobalOperand::GetTableReference()
 
 
 bool
-GlobalOperand::PrepareToCopy(void* const)
+GlobalOperand::DoneCustomCopy(void* const)
 {
   return true;
 }
@@ -3846,11 +3846,7 @@ SessionStack::~SessionStack()
 void
 SessionStack::Push()
 {
-  NullOperand stackOp;
-
-  StackValue  stackValue(stackOp);
-
-  Push(stackValue);
+  Push(StackValue(NullOperand()));
 }
 
 void
@@ -3974,11 +3970,7 @@ SessionStack::Push(const DArray& value)
 void
 SessionStack::Push(IDBSHandler& dbsHnd, ITable& table)
 {
-  TableOperand stackOp(dbsHnd, table, true);
-
-  StackValue stackValue(stackOp);
-
-  Push(stackValue);
+  Push(StackValue(TableOperand(dbsHnd, table, true)));
 }
 
 
@@ -3989,13 +3981,13 @@ SessionStack::Push(INativeObject& object)
 
   StackValue stackValue(stackOp);
 
-  Push(stackValue);
+  Push(StackValue(NativeObjectOperand(object)));
 }
 
 void
-SessionStack::Push(const StackValue& value)
+SessionStack::Push(StackValue&& value)
 {
-  mStack.push_back(value);
+  mStack.push_back(move(value));
 }
 
 

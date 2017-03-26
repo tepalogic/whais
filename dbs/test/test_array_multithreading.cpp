@@ -205,6 +205,7 @@ static void
 test_mirror(void* )
 {
   cout << "Started " << __FUNCTION__ << endl;
+
   wh_sleep(100);
 
   try
@@ -215,7 +216,7 @@ test_mirror(void* )
         const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
         const uint_t z = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].MakeMirror(testValues[z]);
+        testValues[z] = testValues[j];
 
         while (resetStart)
           wh_sleep(1);
@@ -231,6 +232,7 @@ test_mirror(void* )
       cout << "Got exception in " << __FUNCTION__ << endl;
       throw;
   }
+
   cout << "Ended " << __FUNCTION__ << endl;
 }
 

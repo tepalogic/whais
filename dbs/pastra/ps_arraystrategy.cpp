@@ -40,10 +40,8 @@ namespace whais {
 
 IArrayStrategy::IArrayStrategy(const DBS_FIELD_TYPE elemsType)
   : mElementsCount(0),
-    mMirrorsCount(0),
-    mCopyReferences(1),
-    mElementsType(elemsType),
-    mElementRawSize(0)
+    mElementRawSize(0),
+    mElementsType(elemsType)
 {
   if (elemsType != T_UNDETERMINED)
   {
@@ -56,8 +54,7 @@ IArrayStrategy::IArrayStrategy(const DBS_FIELD_TYPE elemsType)
 uint64_t
 IArrayStrategy::Count()
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert (mSelfShare.lock().get() == this);
 
   return mElementsCount;
 }
@@ -65,8 +62,7 @@ IArrayStrategy::Count()
 DBS_BASIC_TYPE
 IArrayStrategy::Type()
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert (mSelfShare.lock().get() == this);
 
   return mElementsType;
 }
@@ -75,6 +71,8 @@ uint_t
 IArrayStrategy::Get(const uint64_t index, uint8_t* const dest)
 {
   LockRAII<Lock> _l(mLock);
+
+  assert (mSelfShare.lock().get() == this);
 
   if (index == mElementsCount)
     return 0;
@@ -87,36 +85,36 @@ IArrayStrategy::Get(const uint64_t index, uint8_t* const dest)
   return mElementRawSize;
 }
 
-IArrayStrategy*
+shared_ptr<IArrayStrategy>
 IArrayStrategy::Set(const DBS_BASIC_TYPE type, const uint8_t* const rawValue, const uint64_t index)
 {
   LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  std::unique_ptr<IArrayStrategy> array;
-  IArrayStrategy* r = this;
+  shared_ptr<IArrayStrategy> r = mSelfShare.lock();
+  assert (r.get() == this);
 
   if (type != mElementsType)
   {
     if ((mElementsType != T_UNDETERMINED) && (index > 0))
       throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-    array.reset(new pastra::TemporalArray(type));
-    r = array.get();
+    r = shared_make(pastra::TemporalArray, type);
+    r->SetSelfReference(r);
   }
   else if (index > mElementsCount)
     throw DBSException(_EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
-  if (r->ReferenceCount() > 1)
+  if (r->IsShared())
   {
-    array.reset(r->Clone());
-    r = array.get();
+    assert (r.get() == this);
+
+    r = r->Clone();
 
     assert(r->mElementsCount == mElementsCount);
     assert(r->mElementRawSize == mElementRawSize);
     assert(r->mElementsType == mElementsType);
+
+    assert (r.get() != mSelfShare.lock().get());
   }
 
   r->RawWrite(index * r->mElementRawSize, r->mElementRawSize, rawValue);
@@ -127,22 +125,18 @@ IArrayStrategy::Set(const DBS_BASIC_TYPE type, const uint8_t* const rawValue, co
   assert(r->RawSize() % r->mElementsCount == 0);
   assert(r->RawSize() / r->mElementsCount == r->mElementRawSize);
 
-  array.release();
   return r;
 }
 
-IArrayStrategy*
+shared_ptr<IArrayStrategy>
 IArrayStrategy::Add(const DBS_BASIC_TYPE type,
                     const uint8_t* const rawValue,
                     uint64_t* const outIndex)
 {
   LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  std::unique_ptr<IArrayStrategy> array;
-  IArrayStrategy* r = this;
+  shared_ptr<IArrayStrategy> r = mSelfShare.lock();
+  assert (r.get() == this);
 
   assert((T_UNKNOWN < type) && (type < T_TEXT));
 
@@ -151,14 +145,15 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
     if (mElementsType != T_UNDETERMINED)
       throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
 
-    array.reset(new pastra::TemporalArray(type));
-    r = array.get();
+    r = shared_make(pastra::TemporalArray, type);
+    r->SetSelfReference(r);
   }
 
-  if (r->ReferenceCount() > 1)
+  if (r->IsShared())
   {
-    array.reset(r->Clone());
-    r = array.get();
+    assert (r.get() == this);
+
+    r = r->Clone();
 
     assert(r->mElementsCount == mElementsCount);
     assert(r->mElementRawSize == mElementRawSize);
@@ -171,34 +166,33 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
   assert(r->RawSize() % r->mElementsCount == 0);
   assert(r->RawSize() / r->mElementsCount == r->mElementRawSize);
 
-  array.release();
-
   return r;
 }
 
-IArrayStrategy*
+shared_ptr<IArrayStrategy>
 IArrayStrategy::Remove(const uint64_t index)
 {
   LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  shared_ptr<IArrayStrategy> r = mSelfShare.lock();
+  assert (r.get() == this);
 
   if (index > mElementsCount)
     throw DBSException(_EXTRA(DBSException::ARRAY_INDEX_TOO_BIG));
 
   else if (index == mElementsCount)
-    return this;
+    return r;
 
-  if (ReferenceCount() == 1)
+  if ( ! IsShared())
   {
     ColapseRaw(mElementRawSize * index, mElementRawSize);
     --mElementsCount;
 
-    return this;
+    return r;
   }
 
-  std::unique_ptr<IArrayStrategy> r(new pastra::TemporalArray(mElementsType));
+  r = shared_make(pastra::TemporalArray, mElementsType);
+  r->SetSelfReference(r);
 
   assert(r->mElementRawSize == mElementRawSize);
   assert(r->mElementsType == mElementsType);
@@ -231,35 +225,30 @@ IArrayStrategy::Remove(const uint64_t index)
 
   r->mElementsCount = mElementsCount - 1;
 
-  return r.release();
+  return r;
 }
 
-IArrayStrategy*
+shared_ptr<IArrayStrategy>
 IArrayStrategy::Sort(const bool reverse)
 {
   LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  shared_ptr<IArrayStrategy> r = mSelfShare.lock();
+  assert (r.get() == this);
 
   if (mElementsCount == 0)
-    return this;
-
-  std::unique_ptr<IArrayStrategy> array;
-  IArrayStrategy* r = this;
+    return r;
 
   assert((T_UNKNOWN < mElementsType) && (mElementsType < T_TEXT));
 
-  if (r->ReferenceCount() > 1)
+  if (r->IsShared())
   {
-    array.reset(r->Clone());
-    r = array.get();
+    r = r->Clone();
 
     assert(r->mElementsCount == mElementsCount);
     assert(r->mElementRawSize == mElementRawSize);
     assert(r->mElementsType == mElementsType);
   }
-
 
   switch (mElementsType)
   {
@@ -372,85 +361,15 @@ IArrayStrategy::Sort(const bool reverse)
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
   }
 
-  array.release();
   return r;
 }
 
-void
-IArrayStrategy::ReleaseReference()
-{
-  LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (MirrorsCount() > 0)
-    --mMirrorsCount;
-
-  else
-    --mCopyReferences;
-
-  if (ReferenceCount() == 0)
-  {
-    _l.Release();
-    delete this;
-  }
-}
-
-
-uint32_t
-IArrayStrategy::ReferenceCount() const
-{
-  return mCopyReferences;
-}
-
-uint32_t
-IArrayStrategy::MirrorsCount() const
-{
-  return mMirrorsCount;
-}
-
-IArrayStrategy*
-IArrayStrategy::MakeMirrorCopy()
-{
-  LockRAII<Lock> _l(mLock);
-
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (ReferenceCount() > 1)
-    return Clone()->MakeMirrorCopy();
-
-  ++mMirrorsCount;
-
-  assert(mCopyReferences == 1);
-  assert(mMirrorsCount > 0);
-
-  return this;
-}
-
-IArrayStrategy*
-IArrayStrategy::MakeClone()
-{
-  LockRAII<Lock> _l(mLock);
-
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (MirrorsCount() > 0)
-  {
-    ++mMirrorsCount;
-    return this;
-  }
-
-  ++mCopyReferences;
-  return this;
-}
-
-IArrayStrategy*
+shared_ptr<IArrayStrategy>
 IArrayStrategy::Clone()
 {
-  std::unique_ptr<IArrayStrategy> r(new pastra::TemporalArray(mElementsType));
+  shared_ptr<IArrayStrategy> r = shared_make(pastra::TemporalArray, mElementsType);
+  r->SetSelfReference(r);
 
   assert(r->mElementRawSize == mElementRawSize);
   assert(r->mElementsType == mElementsType);
@@ -471,7 +390,7 @@ IArrayStrategy::Clone()
 
   r->mElementsCount = mElementsCount;
 
-  return r.release();
+  return r;
 }
 
 pastra::TemporalContainer&
@@ -495,22 +414,12 @@ NullArray::NullArray(const DBS_FIELD_TYPE elemsType)
 {
 }
 
-void
-NullArray::ReleaseReference()
-{
-  return ;
-}
 
-uint32_t
-NullArray::ReferenceCount() const
-{
-  return 10; //To force new allocation when it will be modified.
-}
 
-uint32_t
-NullArray::MirrorsCount() const
+bool
+NullArray::IsShared() const
 {
-  return 0;
+  return true;
 }
 
 void
@@ -540,25 +449,49 @@ NullArray::RawSize() const
   return 0;
 }
 
-NullArray&
+shared_ptr<IArrayStrategy>
 NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
 {
-  static NullArray _boolInstance(T_BOOL);
-  static NullArray _charInstance(T_CHAR);
-  static NullArray _dateInstance(T_DATE);
-  static NullArray _datetimeInstance(T_DATETIME);
-  static NullArray _hirestimeInstance(T_HIRESTIME);
-  static NullArray _uint8Instance(T_UINT8);
-  static NullArray _uint16Instance(T_UINT16);
-  static NullArray _uint32Instance(T_UINT32);
-  static NullArray _uint64Instance(T_UINT64);
-  static NullArray _realInstance(T_REAL);
-  static NullArray _richrealInstance(T_RICHREAL);
-  static NullArray _int8Instance(T_INT8);
-  static NullArray _int16Instance(T_INT16);
-  static NullArray _int32Instance(T_INT32);
-  static NullArray _int64Instance(T_INT64);
-  static NullArray _genericInstance(T_UNDETERMINED);
+  static shared_ptr<IArrayStrategy> _boolInstance = shared_make(NullArray, T_BOOL);
+  static shared_ptr<IArrayStrategy> _charInstance = shared_make(NullArray, T_CHAR);
+  static shared_ptr<IArrayStrategy> _dateInstance = shared_make(NullArray, T_DATE);
+  static shared_ptr<IArrayStrategy> _datetimeInstance = shared_make(NullArray, T_DATETIME);
+  static shared_ptr<IArrayStrategy> _hirestimeInstance = shared_make(NullArray, T_HIRESTIME);
+  static shared_ptr<IArrayStrategy> _uint8Instance = shared_make(NullArray, T_UINT8);
+  static shared_ptr<IArrayStrategy> _uint16Instance = shared_make(NullArray, T_UINT16);
+  static shared_ptr<IArrayStrategy> _uint32Instance = shared_make(NullArray, T_UINT32);
+  static shared_ptr<IArrayStrategy> _uint64Instance = shared_make(NullArray, T_UINT64);
+  static shared_ptr<IArrayStrategy> _realInstance = shared_make(NullArray, T_REAL);
+  static shared_ptr<IArrayStrategy> _richrealInstance = shared_make(NullArray, T_RICHREAL);
+  static shared_ptr<IArrayStrategy> _int8Instance = shared_make(NullArray, T_INT8);
+  static shared_ptr<IArrayStrategy> _int16Instance = shared_make(NullArray, T_INT16);
+  static shared_ptr<IArrayStrategy> _int32Instance = shared_make(NullArray, T_INT32);
+  static shared_ptr<IArrayStrategy> _int64Instance = shared_make(NullArray, T_INT64);
+  static shared_ptr<IArrayStrategy> _genericInstance = shared_make(NullArray, T_UNDETERMINED);
+
+  static bool selfShares = false;
+
+  if ( ! selfShares)
+  {
+    selfShares = true;
+
+    _boolInstance->SetSelfReference(_boolInstance);
+    _charInstance->SetSelfReference(_charInstance);
+    _dateInstance->SetSelfReference(_dateInstance);
+    _datetimeInstance->SetSelfReference(_datetimeInstance);
+    _hirestimeInstance->SetSelfReference(_hirestimeInstance);
+    _uint8Instance->SetSelfReference(_uint8Instance);
+    _uint16Instance->SetSelfReference(_uint16Instance);
+    _uint32Instance->SetSelfReference(_uint32Instance);
+    _uint64Instance->SetSelfReference(_uint64Instance);
+    _realInstance->SetSelfReference(_realInstance);
+    _richrealInstance->SetSelfReference(_richrealInstance);
+    _int8Instance->SetSelfReference(_int8Instance);
+    _int16Instance->SetSelfReference(_int16Instance);
+    _int32Instance->SetSelfReference(_int32Instance);
+    _int64Instance->SetSelfReference(_int64Instance);
+    _genericInstance->SetSelfReference(_genericInstance);
+  }
 
   switch(type)
   {
@@ -623,14 +556,8 @@ NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
 
 
 TemporalArray::TemporalArray(const DBS_FIELD_TYPE type)
-  : IArrayStrategy(type),
-    mStorage()
+  : IArrayStrategy(type)
 {
-}
-
-TemporalArray::~TemporalArray()
-{
-  assert(mCopyReferences == 0);
 }
 
 void
@@ -639,15 +566,19 @@ TemporalArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* cons
   mStorage.Read(offset, size, buffer);
 }
 
+bool
+TemporalArray::IsShared() const
+{
+  return mSelfShare.use_count() > 3;
+}
 
 void
 TemporalArray::RawWrite(const uint64_t       offset,
-                         const uint64_t       size,
-                         const uint8_t* const buffer)
+                        const uint64_t       size,
+                        const uint8_t* const buffer)
 {
   assert((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
   assert(mElementRawSize > 0);
-  assert((size % mElementRawSize) == 0);
 
   mStorage.Write(offset, size, buffer);
 }
@@ -714,6 +645,11 @@ RowFieldArray::~RowFieldArray()
   }
 }
 
+bool
+RowFieldArray::IsShared() const
+{
+  return true;
+}
 
 void
 RowFieldArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer)
@@ -761,7 +697,6 @@ RowFieldArray::RawWrite(const uint64_t offset, const uint64_t size, const uint8_
 void
 RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 {
-
   if (mFirstRecordEntry == 0)
   {
     mTempStorage.Colapse(offset, count);

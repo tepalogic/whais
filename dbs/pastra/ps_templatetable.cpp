@@ -1171,13 +1171,14 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   MarkRowModification();
   LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
 
-  DArray::StrategyRAII sMgr = value.GetStrategyRAII();
-  IArrayStrategy& s = sMgr;
-  LockRAII<Lock> _l(s.mLock);
+  auto s = value.GetStrategy();
+  LockRAII<Lock> _l(s->mLock);
 
-  if ( !IS_ARRAY(desc.Type()) || ((GET_BASIC_TYPE(desc.Type()) != s.Type()) && (s.Count() != 0)))
+  if ( ! IS_ARRAY(desc.Type())
+      || (GET_BASIC_TYPE(desc.Type()) != s->Type() && s->Count() != 0))
+  {
     throw DBSException(_EXTRA(DBSException::FIELD_TYPE_INVALID));
-
+  }
   else if (row > mRowsCount)
     throw DBSException(_EXTRA(DBSException::ROW_NOT_ALLOCATED));
 
@@ -1185,39 +1186,38 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   uint64_t newFieldValueSize = 0;
   const uint8_t bitsSet = ~0;
   bool fieldValueWasNull = false;
-  const bool skipVariableStore = s.RawSize() < (2 * sizeof(uint64_t));
+  const bool skipVariableStore = s->RawSize() < (2 * sizeof(uint64_t));
 
   if ( !skipVariableStore)
   {
-    if (s.GetTemporalContainer().Size() == 0)
+    if (s->GetTemporalContainer().Size() == 0)
     {
-      VariableSizeStore& arrayStore = s.GetRowStorage();
-      const uint64_t arrayFirstEntry =
-      _SC(RowFieldArray&, s).mFirstRecordEntry;
+      VariableSizeStore& arrayStore = s->GetRowStorage();
+      const uint64_t arrayFirstEntry = _SC(RowFieldArray&, *s).mFirstRecordEntry;
       if ( &arrayStore == &VSStore())
       {
         arrayStore.IncrementRecordRef(arrayFirstEntry);
 
-        newFieldValueSize = s.RawSize() + RowFieldArray::METADATA_SIZE;
+        newFieldValueSize = s->RawSize() + RowFieldArray::METADATA_SIZE;
         newFirstEntry = arrayFirstEntry;
       }
       else
       {
-        newFieldValueSize = s.RawSize() + RowFieldArray::METADATA_SIZE;
+        newFieldValueSize = s->RawSize() + RowFieldArray::METADATA_SIZE;
         newFirstEntry = VSStore().AddRecord(arrayStore, arrayFirstEntry, 0, newFieldValueSize);
       }
     }
     else
     {
-      newFieldValueSize = s.RawSize();
+      newFieldValueSize = s->RawSize();
 
       uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
-      store_le_int64(s.Count(), elemsCount);
+      store_le_int64(s->Count(), elemsCount);
 
       newFirstEntry = VSStore().AddRecord(elemsCount, sizeof elemsCount);
       VSStore().UpdateRecord(newFirstEntry,
                              sizeof elemsCount,
-                             s.GetTemporalContainer(),
+                             s->GetTemporalContainer(),
                              0,
                              newFieldValueSize);
       newFieldValueSize += sizeof elemsCount;
@@ -1239,17 +1239,17 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && (s.Count() == 0))
+  if (fieldValueWasNull && (s->Count() == 0))
     return;
 
-  else if ((fieldValueWasNull == false) && (s.Count() == 0))
+  else if ((fieldValueWasNull == false) && (s->Count() == 0))
   {
     rowData[byteOff] |= (1 << bitOff);
 
     if (rowData[byteOff] == bitsSet)
       CheckRowToDelete(row);
   }
-  else if (s.Count() != 0)
+  else if (s->Count() != 0)
   {
     if (rowData[byteOff] == bitsSet)
     {
@@ -1268,12 +1268,12 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
 
   if (skipVariableStore)
   {
-    assert(s.RawSize() < _SC(uint_t, Serializer::Size(T_HIRESTIME, true)));
+    assert(s->RawSize() < _SC(uint_t, Serializer::Size(T_HIRESTIME, true)));
 
-    fieldValueSize[sizeof(uint64_t) - 1] = s.RawSize();
+    fieldValueSize[sizeof(uint64_t) - 1] = s->RawSize();
     fieldValueSize[sizeof(uint64_t) - 1] |= 0x80;
 
-    s.RawRead(0, s.RawSize(), rowData + desc.RowDataOff());
+    s->RawRead(0, s->RawSize(), rowData + desc.RowDataOff());
   }
   else
   {
@@ -1461,12 +1461,14 @@ allocate_row_field_text(VariableSizeStore&   store,
 }
 
 
-static RowFieldArray*
+static shared_ptr<IArrayStrategy>
 allocate_row_field_array(VariableSizeStore&        store,
                          const uint64_t            firstRecordEntry,
                          const DBS_FIELD_TYPE      type)
 {
-  return new RowFieldArray(store, firstRecordEntry, type);
+  shared_ptr<IArrayStrategy> r = shared_make(RowFieldArray, store, firstRecordEntry, type);
+  r->SetSelfReference(r);
+  return r;
 }
 
 
@@ -1646,7 +1648,8 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
   }
   else if ((fieldValueSize & 0x8000000000000000ull) != 0)
   {
-    std::unique_ptr<IArrayStrategy> strategy(new TemporalArray(GET_BASIC_TYPE(desc.Type())));
+    shared_ptr<IArrayStrategy> strategy = shared_make(TemporalArray, GET_BASIC_TYPE(desc.Type()));
+    strategy->SetSelfReference(strategy);
 
     assert(((fieldValueSize >> 56) & 0x7F) > 0);
     assert(((fieldValueSize >> 56) & 0x7F) < Serializer::Size(T_BOOL, true));
@@ -1654,18 +1657,15 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
     const uint64_t size = (fieldValueSize >> 56) & 0x7F;
     strategy->RawWrite(0, size, rowData + desc.RowDataOff());
     strategy->mElementsCount = size / strategy->mElementRawSize;
-    outValue = DArray( *strategy.release());
+    outValue = DArray(strategy);
   }
   else
   {
     const uint64_t fieldFirstEntry = load_le_int64(rowData + desc.RowDataOff());
-
-    IArrayStrategy& rowArray = *allocate_row_field_array(VSStore(),
-                                                         fieldFirstEntry,
-                                                         _SC(DBS_FIELD_TYPE,
-                                                             desc.Type()
-                                                               & PS_TABLE_FIELD_TYPE_MASK));
-    outValue = DArray(rowArray);
+    outValue = DArray(allocate_row_field_array(VSStore(),
+                                               fieldFirstEntry,
+                                               _SC(DBS_FIELD_TYPE,
+                                                   desc.Type() & PS_TABLE_FIELD_TYPE_MASK)));
   }
 }
 

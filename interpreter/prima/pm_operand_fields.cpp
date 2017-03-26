@@ -82,7 +82,7 @@ TableOperand::Duplicate() const
 
 
 bool
-TableOperand::PrepareToCopy(void* const)
+TableOperand::DoneCustomCopy(void* const)
 {
   mTableRef->IncrementRefCount();
   return true;
@@ -327,7 +327,7 @@ FieldOperand::StartIterate(const bool reverse, StackValue& outStartItem)
 
 
 bool
-FieldOperand::PrepareToCopy(void *const )
+FieldOperand::DoneCustomCopy(void *const )
 {
   if (mTableRef)
     mTableRef->IncrementRefCount();
@@ -396,7 +396,7 @@ BaseFieldElOperand::IteratorOffset()
 
 
 bool
-BaseFieldElOperand::PrepareToCopy(void* const)
+BaseFieldElOperand::DoneCustomCopy(void* const)
 {
   mTableRef->IncrementRefCount();
   return true;

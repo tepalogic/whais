@@ -52,27 +52,25 @@ class IArrayStrategy
   friend class pastra::PrototypeTable;
 
 public:
-  virtual ~IArrayStrategy() = default;
   IArrayStrategy(const IArrayStrategy&) = delete;
   IArrayStrategy& operator= (const IArrayStrategy&) = delete;
+
+  virtual ~IArrayStrategy() = default;
 
   uint64_t Count();
   DBS_BASIC_TYPE Type();
 
   uint_t Get(const uint64_t index, uint8_t* const dest);
-  IArrayStrategy* Set(const DBS_BASIC_TYPE type,
-                      const uint8_t* const rawValue,
-                      const uint64_t       index);
-  IArrayStrategy* Add(const DBS_BASIC_TYPE type,
-                      const uint8_t* const rawValue,
-                      uint64_t* const      outIndex);
-  IArrayStrategy* Remove(const uint64_t index);
-  IArrayStrategy* Sort(const bool reverse);
+  auto Set(const DBS_BASIC_TYPE type,
+           const uint8_t* const rawValue,
+           const uint64_t index) -> std::shared_ptr<IArrayStrategy>;
+  auto Add(const DBS_BASIC_TYPE type,
+           const uint8_t* const rawValue,
+           uint64_t* const outIndex) -> std::shared_ptr<IArrayStrategy>;
+  auto Remove(const uint64_t index) -> std::shared_ptr<IArrayStrategy>;
+  auto Sort(const bool reverse) -> std::shared_ptr<IArrayStrategy>;
 
-  IArrayStrategy*  MakeMirrorCopy();
-  IArrayStrategy*  MakeClone();
-
-  virtual void ReleaseReference();
+  void SetSelfReference(std::shared_ptr<IArrayStrategy>& self) { mSelfShare = self; }
 
   virtual pastra::TemporalContainer& GetTemporalContainer();
   virtual pastra::VariableSizeStore& GetRowStorage();
@@ -126,21 +124,19 @@ public:
 
 protected:
   IArrayStrategy(const DBS_BASIC_TYPE elemsType);
+  virtual bool IsShared() const = 0;
 
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
-  virtual IArrayStrategy* Clone();
+  virtual std::shared_ptr<IArrayStrategy> Clone();
   virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer) = 0;
   virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer) = 0;
   virtual void ColapseRaw(const uint64_t offset, const uint64_t count) = 0;
   virtual uint64_t RawSize() const = 0;
 
-  uint64_t               mElementsCount;
-  uint_t                 mMirrorsCount;
-  uint_t                 mCopyReferences;
-  const DBS_BASIC_TYPE   mElementsType;
-  uint_t                 mElementRawSize;
-  Lock                   mLock;
+  uint64_t mElementsCount;
+  uint_t mElementRawSize;
+  std::weak_ptr<IArrayStrategy> mSelfShare;
+  const DBS_BASIC_TYPE mElementsType;
+  Lock mLock;
 };
 
 
@@ -153,16 +149,13 @@ class NullArray : public IArrayStrategy
 public:
   NullArray(const DBS_BASIC_TYPE elemsType);
 
-  virtual void ReleaseReference();
-
-  static NullArray& GetSingletoneInstace(const DBS_BASIC_TYPE type);
+  static auto GetSingletoneInstace(const DBS_BASIC_TYPE type) -> std::shared_ptr<IArrayStrategy>;
 protected:
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
-  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
-  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
-  virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
+  bool IsShared() const override;
+  void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer) override;
+  void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer) override;
+  void ColapseRaw(const uint64_t offset, const uint64_t count) override;
+  uint64_t RawSize() const override;
 };
 
 class TemporalArray : public IArrayStrategy
@@ -175,14 +168,13 @@ public:
   TemporalArray& operator= (const TemporalArray&) = delete;
 
 protected:
-  virtual ~TemporalArray();
+  bool IsShared() const override;
+  void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer) override;
+  void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer) override;
+  void ColapseRaw(const uint64_t offset, const uint64_t count) override;
+  uint64_t RawSize() const override;
 
-  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
-  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
-  virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
-
-  virtual pastra::TemporalContainer& GetTemporalContainer();
+  pastra::TemporalContainer& GetTemporalContainer();
 
 private:
   TemporalContainer mStorage;
@@ -201,16 +193,17 @@ public:
   RowFieldArray(const RowFieldArray&) = delete;
   RowFieldArray& operator= (const RowFieldArray&) = delete;
 
-protected:
   ~RowFieldArray();
 
-  virtual void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer);
-  virtual void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer);
-  virtual void ColapseRaw(const uint64_t offset, const uint64_t count);
-  virtual uint64_t RawSize() const;
+protected:
+  bool IsShared() const override;
+  void RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer) override;
+  void RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer) override;
+  void ColapseRaw(const uint64_t offset, const uint64_t count) override;
+  uint64_t RawSize() const override;
 
-  virtual pastra::TemporalContainer& GetTemporalContainer();
-  virtual pastra::VariableSizeStore& GetRowStorage();
+  pastra::TemporalContainer& GetTemporalContainer() override;
+  pastra::VariableSizeStore& GetRowStorage() override;
 
 private:
   uint64_t             mFirstRecordEntry;
