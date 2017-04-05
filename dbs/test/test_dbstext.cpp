@@ -151,7 +151,9 @@ test_nulliness()
 
       uint64_t allocated_entry = storage.AddRecord(nullptr, 0);
 
-      DText textVarRaw(*(new RowFieldText(storage, allocated_entry, 0)));
+      std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText, storage, allocated_entry, 0);
+      s->SetSelfReference(s);
+      DText textVarRaw(s);
 
       if (textVarRaw.IsNull() == false)
         return false;
@@ -254,37 +256,38 @@ test_text_append()
 
       if (originalText.Count() != charsCount)
         result = false;
-      else
+    else
+    {
+      VariableSizeStore storage;
+
+      storage.Init(temp_file_base.c_str(), 1, 713);
+      storage.RegisterReference();
+      storage.MarkForRemoval();
+
+      {
+        std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText,
+                                                       storage,
+                                                       allocated_entry,
+                                                       originalText.RawSize() + 12);
+        s->SetSelfReference(s);
+        DText destinationText(s);
+
+        if (destinationText.Count() != originalText.Count())
+          result = false;
+        else if (destinationText.RawSize() != originalText.RawSize())
+          result = false;
+        else
         {
-          VariableSizeStore storage;
-
-          storage.Init(temp_file_base.c_str(), 1, 713);
-          storage.RegisterReference();
-          storage.MarkForRemoval();
-
-          {
-            DText destinationText(
-                      *(new RowFieldText(storage,
-                                        allocated_entry,
-                                        originalText.RawSize() + 12))
-                                    );
-
-            if (destinationText.Count() != originalText.Count())
+          for (uint_t index = 0; index < charsCount; ++index)
+            if (destinationText.CharAt(index).mIsNull
+                || (destinationText.CharAt(index).mValue != originalText.CharAt(index).mValue)
+                || (destinationText.CharAt(index).mValue != charValues[index]))
               result = false;
-            else if (destinationText.RawSize() != originalText.RawSize())
-              result = false;
-            else
-              {
-                for (uint_t index = 0; index < charsCount; ++index)
-                  if ( destinationText.CharAt(index).mIsNull ||
-                      (destinationText.CharAt(index).mValue != originalText.CharAt(index).mValue) ||
-                      (destinationText.CharAt(index).mValue != charValues[index]))
-                      result = false;
-              }
-          }
-          storage.Flush();
         }
+      }
+      storage.Flush();
     }
+  }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
   return result;
@@ -293,111 +296,76 @@ test_text_append()
 static bool
 test_character_insertion()
 {
-  std::cout << "Testing for text insertion ... "; std::cout.flush();
+  std::cout << "Testing for text insertion ... ";
+  std::cout.flush();
   bool result = true;
 
   if (result)
+  {
+    DText originalText(_RC(const uint8_t*, pOriginalText));
+    const uint_t charsCount = sizeof(charValues) / sizeof(uint32_t);
+
+    if (originalText.Count() != charsCount)
+      result = false;
+    else
     {
-      DText originalText(_RC(const uint8_t*, pOriginalText));
-      const uint_t charsCount = sizeof(charValues) / sizeof(uint32_t);
+      DChar test_char = DChar('A');
+      originalText.CharAt(0, test_char);
 
       if (originalText.Count() != charsCount)
         result = false;
-      else
-        {
-          DChar test_char = DChar('A');
-          originalText.CharAt(0, test_char);
+      else if (originalText.CharAt(0).mValue != 'A')
+        result = false;
 
-          if (originalText.Count() != charsCount)
-            result = false;
-          else if (originalText.CharAt(0).mValue != 'A')
-            result = false;
+      if (result)
+      {
+        DChar test_char = DChar(0x3412);
+        originalText.CharAt(charsCount - 1, test_char);
 
-          if (result)
-            {
-              DChar test_char = DChar(0x3412);
-              originalText.CharAt(charsCount - 1, test_char);
+        if (originalText.Count() != charsCount)
+          result = false;
+        else if (originalText.CharAt(charsCount - 1).mValue != 0x3412)
+          result = false;
+      }
 
-              if (originalText.Count() != charsCount)
-                result = false;
-              else if (originalText.CharAt(charsCount - 1).mValue != 0x3412)
-                result = false;
-            }
+      if (result)
+      {
+        std::string temp_file_base = DBSGetSeettings().mWorkDir;
+        temp_file_base += "ps_t_text";
+        uint64_t allocated_entry = 0;
 
-          if (result)
-            {
-              std::string temp_file_base = DBSGetSeettings().mWorkDir;
-              temp_file_base += "ps_t_text";
-              uint64_t allocated_entry = 0;
+        VariableSizeStore storage;
+        storage.Init(temp_file_base.c_str(), 0, 713);
+        storage.RegisterReference();
+        storage.MarkForRemoval();
 
-              VariableSizeStore storage;
-              storage.Init(temp_file_base.c_str(), 0, 713);
-              storage.RegisterReference();
-              storage.MarkForRemoval();
+        uint8_t tempBuff[1024] = { 0, };
+        strcpy(_RC(char*, tempBuff) + 12, pOriginalText);
+        store_le_int32((sizeof charValues / sizeof(uint32_t)), tempBuff);
 
-               uint8_t tempBuff[1024] = {0, };
-              strcpy(_RC(char*, tempBuff) + 12, pOriginalText);
-              store_le_int32((sizeof charValues / sizeof(uint32_t)), tempBuff);
+        allocated_entry = storage.AddRecord(tempBuff, (sizeof charValues / sizeof(uint32_t)) + 12);
+        std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText,
+                                                       storage,
+                                                       allocated_entry,
+                                                       sizeof(charValues) / sizeof(uint32_t) + 12);
+        s->SetSelfReference(s);
+        DText originalText(s);
+        s.reset();
 
-              allocated_entry = storage.AddRecord(
-                                  tempBuff,
-                                  (sizeof charValues / sizeof(uint32_t)) + 12
-                                                  );
+        DChar test_char = DChar(0x21135);
+        originalText.CharAt(charsCount / 2, test_char);
 
-              DText originalText(
-                    *(new RowFieldText(
-                              storage,
-                              allocated_entry,
-                              sizeof(charValues) / sizeof(uint32_t) + 12
-                                      ))
-                                   );
+        if (originalText.Count() != charsCount)
+          result = false;
+        else if (originalText.CharAt(charsCount / 2).mValue != 0x21135)
+          result = false;
 
-              DChar test_char = DChar(0x21135);
-              originalText.CharAt(charsCount / 2, test_char);
-
-              if (originalText.Count() != charsCount)
-                result = false;
-              else if (originalText.CharAt(charsCount / 2).mValue != 0x21135)
-                result = false;
-
-              storage.Flush();
-            }
-        }
+        storage.Flush();
+      }
     }
+  }
 
-  std::cout << ( result ? "OK" : "FALSE") << std::endl;
-  return result;
-}
-
-bool
-test_text_mirroring()
-{
-  std::cout << "Testing for text mirroring ... "; std::cout.flush();
-  bool result = true;
-
-  const DText arbiter(_RC(const uint8_t*, "Love is all you need!"));
-  const DText arbiter2(_RC(const uint8_t*, "B"));
-
-  DText firstText(_RC(const uint8_t*, "A"));
-  DText secondText(firstText);
-
-  if (firstText != secondText)
-    result = false;
-
-  secondText = arbiter;
-  if ((firstText == secondText) || (secondText != arbiter))
-    result = false;
-
-  firstText.MakeMirror(secondText);
-  if (firstText != secondText)
-    result = false;
-
-
-  secondText.CharAt(0, DChar('B'));
-  if ((secondText != firstText) || (secondText != arbiter2))
-    result = false;
-
-  std::cout << ( result ? "OK" : "FALSE") << std::endl;
+  std::cout << (result ? "OK" : "FALSE") << std::endl;
   return result;
 }
 
@@ -687,8 +655,7 @@ test_text_substrings_matches(const uint_t  patternSize,
 
 
 static bool
-test_text_substrings_replace(const uint_t  patternSize,
-                              const uint_t  textSize)
+test_text_substrings_replace(const uint_t patternSize, const uint_t textSize)
 {
   static const uint_t ITERATIONS = 64;
 
@@ -702,29 +669,37 @@ test_text_substrings_replace(const uint_t  patternSize,
   DText temp, temp2, temp3;
 
   for (uint_t i = 0; i < ITERATIONS; ++i)
+  {
+    temp.Append(pattern);
+    temp2.Append(newSubstr);
+
+    if ((i == 0) || ((i == ITERATIONS - 1) && (textSize == 0)))
+      temp3.Append(pattern);
+
+    else
+      temp3.Append(newSubstr);
+
+    if (textSize > 0)
     {
-      temp.Append(pattern);
-      temp2.Append(newSubstr);
+      const DText t = (build_random_text(wh_rnd() % textSize + 1));
 
-      if ((i == 0) || ((i == ITERATIONS - 1) && (textSize == 0)))
-        temp3.Append(pattern);
-
-      else
-        temp3.Append(newSubstr);
-
-      if (textSize > 0)
-        {
-          const DText t = (build_random_text(wh_rnd() % textSize + 1));
-
-          temp.Append(t);
-          temp2.Append(t);
-          temp3.Append(t);
-        }
+      temp.Append(t);
+      temp2.Append(t);
+      temp3.Append(t);
     }
+  }
+
+  DText t = temp;
+  if (t != temp)
+    return false;
+
+  if (temp == temp2)
+    return false;
 
   if (temp.ReplaceSubstring( pattern, newSubstr) != temp2)
     return false;
 
+  temp = t;
   if (temp.ReplaceSubstring( pattern, newSubstr, false, 1, temp.Count() - 1) != temp3)
     return false;
 
@@ -764,12 +739,13 @@ test_text_substrings_replace(const uint_t  patternSize,
         }
     }
 
- if (temp.ReplaceSubstring(pattern, newSubstr, true) != temp2)
+  t = temp;
+  if (temp.ReplaceSubstring(pattern, newSubstr, true) != temp2)
     return false;
 
+  temp = t;
   if (temp.ReplaceSubstring(pattern, newSubstr, true, 1) != temp3)
     return false;
-
 
   return true;
 }
@@ -972,7 +948,6 @@ main()
   success = success && test_nulliness();
   success = success && test_text_append();
   success = success && test_character_insertion();
-  success = success && test_text_mirroring();
   success = success && test_text_substrings();
   success = success && test_text_substrings_2();
   success = success && test_text_char_offsets();

@@ -44,6 +44,7 @@ protected:
 };
 
 using SharedArrayStore = Store<std::shared_ptr<DArray>>;
+using SharedTextStore = Store<std::shared_ptr<DText>>;
 
 
 } /* namespace: prima */

@@ -97,26 +97,26 @@ public:
   PrototypeTable(DbsHandler& dbs);
   PrototypeTable(const PrototypeTable& prototype);
 
-  virtual uint64_t NodeRawSize() const;
-  virtual NODE_INDEX AllocateNode(const NODE_INDEX parent, const KEY_INDEX parentKey);
-  virtual void FreeNode(const NODE_INDEX node);
-  virtual NODE_INDEX RootNodeId();
-  virtual void RootNodeId(const NODE_INDEX node);
-  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* const from);
-  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* const to);
-  virtual FIELD_INDEX FieldsCount();
-  virtual FIELD_INDEX RetrieveField(const char* name);
-  virtual DBSFieldDescriptor DescribeField(const FIELD_INDEX field);
-  virtual ROW_INDEX AllocatedRows();
-  virtual ROW_INDEX AddRow(const bool skipThreadSafety = false);
-  virtual ROW_INDEX GetReusableRow(const bool forceAdd);
-  virtual ROW_INDEX ReusableRowsCount();
-  virtual void MarkRowForReuse(const ROW_INDEX row);
+  virtual uint64_t NodeRawSize() const override;
+  virtual NODE_INDEX AllocateNode(const NODE_INDEX parent, const KEY_INDEX parentKey) override;
+  virtual void FreeNode(const NODE_INDEX node) override;
+  virtual NODE_INDEX RootNodeId() override;
+  virtual void RootNodeId(const NODE_INDEX node) override;
+  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* const from) override;
+  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* const to) override;
+  virtual FIELD_INDEX FieldsCount() override;
+  virtual FIELD_INDEX RetrieveField(const char* name) override;
+  virtual DBSFieldDescriptor DescribeField(const FIELD_INDEX field) override;
+  virtual ROW_INDEX AllocatedRows() override;
+  virtual ROW_INDEX AddRow(const bool skipThreadSafety = false) override;
+  virtual ROW_INDEX GetReusableRow(const bool forceAdd) override;
+  virtual ROW_INDEX ReusableRowsCount() override;
+  virtual void MarkRowForReuse(const ROW_INDEX row) override;
   virtual void CreateIndex(const FIELD_INDEX                   field,
                            CREATE_INDEX_CALLBACK_FUNC* const   cbFunc,
                            CreateIndexCallbackContext* const   cbContext);
-  virtual void RemoveIndex(const FIELD_INDEX field);
-  virtual bool IsIndexed(const FIELD_INDEX field) const;
+  virtual void RemoveIndex(const FIELD_INDEX field) override;
+  virtual bool IsIndexed(const FIELD_INDEX field) const override;
 
   virtual void Set(const ROW_INDEX row,
                    const FIELD_INDEX field,
@@ -386,9 +386,9 @@ public:
                            const ROW_INDEX fromRow,
                            const ROW_INDEX toRow,
                            const FIELD_INDEX field);
-  virtual void LockTable();
-  virtual void UnlockTable();
-  virtual void Flush();
+  virtual void LockTable() override;
+  virtual void UnlockTable() override;
+  virtual void Flush() override;
 
   //Followings declarations shouldn't be public,
   //but kept here to ease the testing procedures.
@@ -445,9 +445,9 @@ private:
   void AcquireFieldIndex(FieldDescriptor* const field);
   void ReleaseIndexField(FieldDescriptor* const field);
 
-  virtual uint_t MaxCachedNodes();
-  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId);
-  virtual void SaveNode(IBTreeNode* const node);
+  virtual uint_t MaxCachedNodes() override;
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId) override;
+  virtual void SaveNode(IBTreeNode* const node) override;
 
 };
 
@@ -470,17 +470,17 @@ class TableRmNode : public IBTreeNode
 public:
   TableRmNode(PrototypeTable& table, const NODE_INDEX nodeId);
 
-  virtual uint_t KeysPerNode() const;
-  virtual KEY_INDEX GetParentKeyIndex(const IBTreeNode& parent) const;
-  virtual NODE_INDEX NodeIdOfKey(const KEY_INDEX keyIndex) const;
-  virtual void AdjustKeyNode(const IBTreeNode& childNode, const KEY_INDEX keyIndex);
-  virtual void SetNodeOfKey(const KEY_INDEX keyIndex, const NODE_INDEX childNode);
-  virtual KEY_INDEX InsertKey(const IBTreeKey& key);
-  virtual void RemoveKey(const KEY_INDEX keyIndex);
-  virtual void Split(const NODE_INDEX parentId);
-  virtual void Join(const bool toRight);
-  virtual int CompareKey(const IBTreeKey& key, const KEY_INDEX nodeKeyIndex) const;
-  virtual const IBTreeKey& SentinelKey() const;
+  virtual uint_t KeysPerNode() const override;
+  virtual KEY_INDEX GetParentKeyIndex(const IBTreeNode& parent) const override;
+  virtual NODE_INDEX NodeIdOfKey(const KEY_INDEX keyIndex) const override;
+  virtual void AdjustKeyNode(const IBTreeNode& childNode, const KEY_INDEX keyIndex) override;
+  virtual void SetNodeOfKey(const KEY_INDEX keyIndex, const NODE_INDEX childNode) override;
+  virtual KEY_INDEX InsertKey(const IBTreeKey& key) override;
+  virtual void RemoveKey(const KEY_INDEX keyIndex) override;
+  virtual void Split(const NODE_INDEX parentId) override;
+  virtual void Join(const bool toRight) override;
+  virtual int CompareKey(const IBTreeKey& key, const KEY_INDEX nodeKeyIndex) const override;
+  virtual const IBTreeKey& SentinelKey() const override;
 
   static const uint_t RAW_NODE_SIZE = 16384;
 };

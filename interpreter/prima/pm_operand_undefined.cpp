@@ -830,7 +830,7 @@ NativeObjectOperand::Duplicate() const
 
 
 bool
-NativeObjectOperand::DoneCustomCopy(void* const)
+NativeObjectOperand::DoSimpleCopy(void* const)
 {
   Initialise();
 

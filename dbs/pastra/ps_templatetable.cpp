@@ -1046,19 +1046,18 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   MarkRowModification();
   LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
 
-  DText::StrategyRAII sMgr = value.GetStrategyRAII();
-  ITextStrategy& s = sMgr;
-  LockRAII<Lock> _l(s.mLock);
+  shared_ptr<ITextStrategy> s = value.GetStrategy();
+  LockRAII<Lock> _l(s->mLock);
 
   uint64_t newFirstEntry = ~0ull;
   uint64_t newFieldValueSize = 0;
-  const bool skipVariableStore = s.Utf8CountU() < (2 * sizeof(uint64_t));
+  const bool skipVariableStore = s->Utf8CountU() < (2 * sizeof(uint64_t));
 
   if ( !skipVariableStore)
   {
-    if (s.GetTemporalContainer().Size() == 0)
+    if (s->GetTemporalContainer().Size() == 0)
     {
-      RowFieldText& r = _SC(RowFieldText&, s);
+      RowFieldText& r = _SC(RowFieldText&, *s);
       newFieldValueSize = r.Utf8CountU() + RowFieldText::CACHE_META_DATA_SIZE;
 
       if ( &r.GetRowStorage() != &VSStore())
@@ -1072,7 +1071,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
     }
     else
     {
-      if (s.Utf8CountU() >= RowFieldText::MAX_BYTES_COUNT)
+      if (s->Utf8CountU() >= RowFieldText::MAX_BYTES_COUNT)
       {
         throw DBSException(_EXTRA(DBSException::OPER_NOT_SUPPORTED),
                            "This implementation does not support text"
@@ -1080,22 +1079,22 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
                            _SC(long, RowFieldText::MAX_BYTES_COUNT));
       }
 
-      newFieldValueSize = s.Utf8CountU() + RowFieldText::CACHE_META_DATA_SIZE;
+      newFieldValueSize = s->Utf8CountU() + RowFieldText::CACHE_META_DATA_SIZE;
 
-      assert(s.mCachedCharsCount <= RowFieldText::MAX_CHARS_COUNT);
+      assert(s->mCachedCharsCount <= RowFieldText::MAX_CHARS_COUNT);
 
       uint8_t headerData[RowFieldText::CACHE_META_DATA_SIZE];
 
-      store_le_int32(s.mCachedCharsCount, headerData);
-      store_le_int32(s.mCachedCharIndex, headerData + sizeof(uint32_t));
-      store_le_int32(s.mCachedCharIndexOffset, headerData + 2 * sizeof(uint32_t));
+      store_le_int32(s->mCachedCharsCount, headerData);
+      store_le_int32(s->mCachedCharIndex, headerData + sizeof(uint32_t));
+      store_le_int32(s->mCachedCharIndexOffset, headerData + 2 * sizeof(uint32_t));
 
       newFirstEntry = VSStore().AddRecord(headerData, sizeof headerData);
       VSStore().UpdateRecord(newFirstEntry,
                              sizeof headerData,
-                             s.GetTemporalContainer(),
+                             s->GetTemporalContainer(),
                              0,
-                             s.Utf8CountU());
+                             s->Utf8CountU());
     }
   }
 
@@ -1116,17 +1115,17 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   if ((rowData[byteOff] & (1 << bitOff)) != 0)
     fieldValueWasNull = true;
 
-  if (fieldValueWasNull && (s.mCachedCharsCount == 0))
+  if (fieldValueWasNull && (s->mCachedCharsCount == 0))
     return;
 
-  else if ((fieldValueWasNull == false) && (s.mCachedCharsCount == 0))
+  else if ((fieldValueWasNull == false) && (s->mCachedCharsCount == 0))
   {
     rowData[byteOff] |= (1 << bitOff);
 
     if (rowData[byteOff] == bitsSet)
       CheckRowToDelete(row);
   }
-  else if (s.mCachedCharsCount != 0)
+  else if (s->mCachedCharsCount != 0)
   {
     if (rowData[byteOff] == bitsSet)
     {
@@ -1145,12 +1144,12 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
 
   if (skipVariableStore)
   {
-    assert(s.Utf8CountU() < _SC(uint_t, Serializer::Size(T_TEXT, false)));
+    assert(s->Utf8CountU() < _SC(uint_t, Serializer::Size(T_TEXT, false)));
 
-    fieldValueSize[sizeof(uint64_t) - 1] = s.Utf8CountU();
+    fieldValueSize[sizeof(uint64_t) - 1] = s->Utf8CountU();
     fieldValueSize[sizeof(uint64_t) - 1] |= 0x80;
 
-    s.ReadUtf8U(0, s.Utf8CountU(), rowData + desc.RowDataOff());
+    s->ReadUtf8U(0, s->Utf8CountU(), rowData + desc.RowDataOff());
   }
   else
   {
@@ -1452,12 +1451,15 @@ PrototypeTable::Set(const ROW_INDEX      row,
 }
 
 
-static ITextStrategy*
+shared_ptr<ITextStrategy>
 allocate_row_field_text(VariableSizeStore&   store,
                         const uint64_t       firstRecordEntry,
                         const uint64_t       valueSize)
 {
-  return new RowFieldText(store, firstRecordEntry, valueSize);
+  shared_ptr<ITextStrategy> result = shared_make(RowFieldText, store, firstRecordEntry, valueSize);
+  result->SetSelfReference(result);
+
+  return result;
 }
 
 
@@ -1546,7 +1548,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
   else
   {
     const uint64_t fieldFirstEntry = load_le_int64(rowData + desc.RowDataOff());
-    outValue = DText( *allocate_row_field_text(VSStore(), fieldFirstEntry, fieldValueSize));
+    outValue = DText(allocate_row_field_text(VSStore(), fieldFirstEntry, fieldValueSize));
   }
 }
 

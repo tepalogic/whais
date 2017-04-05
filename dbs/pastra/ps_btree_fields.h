@@ -504,23 +504,23 @@ public:
                         const DBS_FIELD_TYPE               nodeType,
                         const bool                         create);
 
-  virtual ~FieldIndexNodeManager();
+  virtual ~FieldIndexNodeManager() override;
 
   FieldIndexNodeManager(const FieldIndexNodeManager&) = delete;
   FieldIndexNodeManager& operator= (const FieldIndexNodeManager&) = delete;
 
   void MarkForRemoval();
   uint64_t IndexRawSize() const;
-  virtual uint64_t NodeRawSize() const;
-  virtual NODE_INDEX AllocateNode(const NODE_INDEX parent, const KEY_INDEX  parentKey);
-  virtual void FreeNode(const NODE_INDEX nodeId);
-  virtual NODE_INDEX RootNodeId();
-  virtual void RootNodeId(const NODE_INDEX nodeId);
+  virtual uint64_t NodeRawSize() const override;
+  virtual NODE_INDEX AllocateNode(const NODE_INDEX parent, const KEY_INDEX  parentKey) override;
+  virtual void FreeNode(const NODE_INDEX nodeId) override;
+  virtual NODE_INDEX RootNodeId() override;
+  virtual void RootNodeId(const NODE_INDEX nodeId) override;
 
 protected:
-  virtual uint_t MaxCachedNodes();
-  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId);
-  virtual void SaveNode(IBTreeNode* const nodeId);
+  virtual uint_t MaxCachedNodes() override;
+  virtual std::shared_ptr<IBTreeNode> LoadNode(const NODE_INDEX nodeId) override;
+  virtual void SaveNode(IBTreeNode* const nodeId) override;
 
   void InitContainer();
   void UpdateContainer();

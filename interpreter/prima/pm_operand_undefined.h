@@ -69,63 +69,63 @@ public:
                                const uint_t type);
 
   NativeObjectOperand(const NativeObjectOperand& source);
-  virtual ~NativeObjectOperand();
+  virtual ~NativeObjectOperand() override;
 
   NativeObjectOperand& operator=(const NativeObjectOperand& source);
 
-  virtual bool IsNull() const;
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
-  virtual void GetValue(DArray& outValue) const;
+  virtual bool IsNull() const override;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DBool& value) override;
+  virtual void SetValue(const DChar& value) override;
   virtual void SetValue(const DDate& value);
   virtual void SetValue(const DDateTime& value);
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
   virtual void SetValue(const DInt8& value);
   virtual void SetValue(const DInt16& value);
   virtual void SetValue(const DInt32& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DInt64& value) override;
   virtual void SetValue(const DReal& value);
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
   virtual void SetValue(const DUInt8& value);
   virtual void SetValue(const DUInt16& value);
   virtual void SetValue(const DUInt32& value);
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DText& value);
-  virtual void SetValue(const DArray& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DText& value) override;
+  virtual void SetValue(const DArray& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual FIELD_INDEX GetField();
+  virtual FIELD_INDEX GetField() override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
+  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
 
-  virtual void NativeObject(INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual void NativeObject(INativeObject* const value) override;
+  virtual INativeObject& NativeObject() override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference() override;
 
 private:
   struct RealValue

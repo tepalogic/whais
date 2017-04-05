@@ -1363,12 +1363,10 @@ class DBS_SHL DText
 public:
   explicit DText(const char* text = nullptr);
   explicit DText(const uint8_t* utf8Src, const uint_t unitsCount = ~0x0);
-  explicit DText(ITextStrategy& text);
+  explicit DText(std::shared_ptr<ITextStrategy> strategy);
 
   DText(const DText& source);
   DText& operator= (const DText& source);
-
-  ~DText();
 
   bool IsNull() const;
   uint64_t Count() const;
@@ -1379,8 +1377,8 @@ public:
   uint64_t OffsetOfChar(const uint64_t chIndex) const;
   uint64_t CharsUntilOffset(const uint64_t offset) const;
 
-  void Append(const DChar& ch);
-  void Append(const DText& text);
+  DText& Append(const DChar& ch);
+  DText& Append(const DText& text);
 
   DChar CharAt(const uint64_t index) const;
   void  CharAt(const uint64_t index, const DChar& c);
@@ -1394,55 +1392,16 @@ public:
                         const bool       ignoreCase = false,
                         const uint64_t   from = 0,
                         const uint64_t   to = 0xFFFFFFFFFFFFFFFFull);
-  DText ReplaceSubstring(const DText&     substr,
-                         const DText&     newSubstr,
-                         const bool       ignoreCase = false,
-                         const uint64_t   from = 0,
-                         const uint64_t   to = 0xFFFFFFFFFFFFFFFFull);
+  DText& ReplaceSubstring(const DText&     substr,
+                          const DText&     newSubstr,
+                          const bool       ignoreCase = false,
+                          const uint64_t   from = 0,
+                          const uint64_t   to = 0xFFFFFFFFFFFFFFFFull);
 
-  DText LowerCase() const;
-  DText UpperCase() const;
-
-  void MakeMirror(DText& mirror);
+  DText& LowerCase();
+  DText& UpperCase();
 
   DBS_FIELD_TYPE DBSType() const { return T_TEXT; }
-
-  class StrategyRAII
-  {
-  public:
-    StrategyRAII(DText& source)
-      : mText(source),
-        mStrategy(nullptr)
-    {
-    }
-
-    ~StrategyRAII()
-    {
-      if (mStrategy != nullptr)
-        mText.ReleaseStrategy();
-    }
-
-    operator ITextStrategy&()
-    {
-      if (mStrategy == nullptr)
-        mStrategy = &mText.GetStrategy();
-
-      return *mStrategy;
-    }
-
-    void Release()
-    {
-      if (mStrategy != nullptr)
-      {
-        mStrategy = nullptr;
-        mText.ReleaseStrategy();
-      }
-    }
-
-  private:
-    DText&          mText;
-    ITextStrategy  *mStrategy;
-  };
 
   bool operator< (const DText& second) const { return CompareTo(second) < 0; }
   bool operator== (const DText& second) const { return CompareTo(second) == 0; }
@@ -1451,18 +1410,18 @@ public:
   bool operator> (const DText& second) const { return CompareTo(second) > 0; }
   bool operator>= (const DText& second) const { return CompareTo(second) >= 0; }
 
-  ITextStrategy& GetStrategy();
-  StrategyRAII   GetStrategyRAII() const;
-  void           ReleaseStrategy();
-  void           ReplaceStrategy(ITextStrategy* const strategy);
+  std::shared_ptr<ITextStrategy> GetStrategy() const;
+  void ReplaceStrategy(std::shared_ptr<ITextStrategy> s);
+
+  operator std::string();
 
 private:
   int CompareTo(const DText& second) const;
 
-  ITextStrategy* volatile  mText;
-  volatile uint32_t        mTextRefs;
-  SpinLock                 mLock;
+  std::shared_ptr<ITextStrategy> mText;
+  mutable Lock mLock;
 };
+
 
 class IArrayStrategy;
 class DBS_SHL DArray
@@ -1554,7 +1513,7 @@ private:
   template<class T> void set_array_element(const T& value, const uint64_t index);
 
   std::shared_ptr<IArrayStrategy> mArray;
-  mutable whais::Lock         mLock;
+  mutable Lock mLock;
 };
 
 

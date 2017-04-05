@@ -38,13 +38,11 @@ using namespace std;
 namespace whais {
 
 
-ITextStrategy::ITextStrategy(uint32_t charsCount)
+ITextStrategy::ITextStrategy()
   : mMatcher(nullptr),
-    mCachedCharsCount(charsCount),
+    mCachedCharsCount(0),
     mCachedCharIndex(0),
-    mCachedCharIndexOffset(0),
-    mMirrorsCount(0),
-    mCopyReferences(1)
+    mCachedCharIndexOffset(0)
 {
 }
 
@@ -54,7 +52,7 @@ ITextStrategy::~ITextStrategy()
 };
 
 bool
-ITextStrategy::operator== (ITextStrategy& o)
+ITextStrategy::operator==(ITextStrategy& o)
 {
   if (this == &o)
     return true;
@@ -91,8 +89,7 @@ ITextStrategy::CharsCount()
 {
   LockRAII<Lock> _l(mLock);
 
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert (mSelfShare.lock().get() == this);
 
   return mCachedCharsCount;
 }
@@ -107,8 +104,7 @@ ITextStrategy::CharsUntilOffset(const uint64_t offset)
 uint64_t
 ITextStrategy::CharsUntilOffsetU(const uint64_t offset)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert (mSelfShare.lock().get() == this);
 
   const uint64_t maxOffset = MIN(offset, Utf8CountU());
 
@@ -150,8 +146,7 @@ ITextStrategy::OffsetOfChar(const uint64_t index)
 uint64_t
 ITextStrategy::OffsetOfCharU(const uint64_t index)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert (mSelfShare.lock().get() == this);
 
   if (index == mCachedCharsCount)
     return Utf8CountU();
@@ -224,6 +219,8 @@ ITextStrategy::OffsetOfCharU(const uint64_t index)
 DChar
 ITextStrategy::CharAt(const uint64_t index)
 {
+  assert (mSelfShare.lock().get() == this);
+
   LockRAII<Lock> _l(mLock);
 
   if (index > mCachedCharsCount)
@@ -235,9 +232,7 @@ ITextStrategy::CharAt(const uint64_t index)
 DChar
 ITextStrategy::CharAtU(const uint64_t index)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
+  assert (mSelfShare.lock().get() == this);
   assert(index <= mCachedCharsCount);
 
   if (index == mCachedCharsCount)
@@ -347,13 +342,13 @@ ITextStrategy::CharAtU(const uint64_t index)
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::DuplicateU()
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
 
-  unique_ptr<ITextStrategy> result(new pastra::TemporalText());
+  shared_ptr<ITextStrategy> result = shared_make(pastra::TemporalText);
+  result->SetSelfReference(result);
 
   const uint64_t utf8Count = Utf8CountU();
   uint64_t offset = 0;
@@ -374,25 +369,27 @@ ITextStrategy::DuplicateU()
   result->mCachedCharIndexOffset = mCachedCharIndexOffset;
   result->mCachedCharIndex = mCachedCharIndex;
 
-  return result.release();
+  return result;
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::ToCase(const bool toLower)
 {
+  assert(mSelfShare.lock().get() == this);
+
   LockRAII<Lock> _l(mLock);
   return ToCaseU(toLower);
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::ToCaseU(const bool toLower)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
 
-  unique_ptr<ITextStrategy> result(new pastra::TemporalText());
+  shared_ptr<ITextStrategy> result = shared_make(pastra::TemporalText);
+  result->SetSelfReference(result);
 
   const uint64_t utf8Count = Utf8CountU();
   uint64_t offset = 0, charsRemained = mCachedCharsCount;
@@ -434,34 +431,30 @@ ITextStrategy::ToCaseU(const bool toLower)
   result->mCachedCharIndexOffset = mCachedCharIndex;
   result->mCachedCharIndex = mCachedCharIndexOffset;
 
-  return result.release();
+  return result;
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::Append(const uint32_t ch)
 {
+  assert(mSelfShare.lock().get() == this);
+
   LockRAII<Lock> _l(mLock);
   return AppendU(ch);
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::AppendU(const uint32_t ch)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
   assert(ch != 0);
 
-  unique_ptr<ITextStrategy> keeper;
-  ;
-  ITextStrategy* result = this;
+  shared_ptr<ITextStrategy> result = mSelfShare.lock();
 
-  if (ReferenceCount() > 1)
-  {
-    keeper.reset(DuplicateU());
-    result = keeper.get();
-  }
+  if (IsShared())
+    result = DuplicateU();
 
   assert(result->mCachedCharsCount == mCachedCharsCount);
   assert(result->Utf8CountU() == Utf8CountU());
@@ -474,41 +467,36 @@ ITextStrategy::AppendU(const uint32_t ch)
   result->WriteUtf8U(result->Utf8CountU(), cuCount, buffer);
   result->mCachedCharsCount++;
 
-  if (result == this)
+  if (result.get() == this)
   {
     delete mMatcher;
     mMatcher = nullptr;
   }
-
-  keeper.release();
   return result;
 }
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::Append(ITextStrategy& text)
 {
+  assert(mSelfShare.lock().get() == this);
+
   DoubleLockRAII<Lock> _l(text.mLock, mLock);
   return AppendU(text);
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::AppendU(ITextStrategy& text)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
 
   if (text.Utf8CountU() == 0)
-    return this;
+    return mSelfShare.lock();
 
-  unique_ptr<ITextStrategy> keeper;
-  ITextStrategy* result = this;
+  shared_ptr<ITextStrategy> result = mSelfShare.lock();
 
-  if (ReferenceCount() > 1)
-  {
-    keeper.reset(DuplicateU());
-    result = keeper.get();
-  }
+  if (IsShared())
+    result = DuplicateU();
 
   assert(result->mCachedCharsCount == mCachedCharsCount);
   assert(result->Utf8CountU() == Utf8CountU());
@@ -532,44 +520,38 @@ ITextStrategy::AppendU(ITextStrategy& text)
 
   assert(offset == utf8Count);
 
-  if (result == this)
+  if (result.get() == this)
   {
     delete mMatcher;
     mMatcher = nullptr;
   }
 
-  keeper.release();
   return result;
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::Append(ITextStrategy& text, const uint64_t utf8OffFrom, const uint64_t utf8OffTo)
 {
+  assert(mSelfShare.lock().get() == this);
+
   DoubleLockRAII<Lock> _l(text.mLock, mLock);
   return AppendU(text, utf8OffFrom, utf8OffTo);
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::AppendU(ITextStrategy& text, const uint64_t utf8OffFrom, const uint64_t utf8OffTo)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
 
-  if ((utf8OffFrom >= text.Utf8CountU()) || (utf8OffTo <= utf8OffFrom))
-  {
-    return this;
-  }
+  if (utf8OffFrom >= text.Utf8CountU() || utf8OffTo <= utf8OffFrom)
+    return mSelfShare.lock();
 
-  unique_ptr<ITextStrategy> keeper;
-  ITextStrategy* result = this;
+  shared_ptr<ITextStrategy> result = mSelfShare.lock();
 
-  if (ReferenceCount() > 1)
-  {
-    keeper.reset(DuplicateU());
-    result = keeper.get();
-  }
+  if (IsShared())
+    result = DuplicateU();
 
   assert(result->mCachedCharsCount == mCachedCharsCount);
   assert(result->Utf8CountU() == Utf8CountU());
@@ -606,22 +588,24 @@ ITextStrategy::AppendU(ITextStrategy& text, const uint64_t utf8OffFrom, const ui
 
   assert(offset == utf8To);
 
-  if (result == this)
+  if (result.get() == this)
   {
     delete mMatcher;
     mMatcher = nullptr;
   }
 
-  keeper.release();
   return result;
 }
 
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::UpdateCharAt(const uint32_t newCh, const uint64_t index)
 {
+  assert(mSelfShare.lock().get() == this);
+
   LockRAII<Lock> _l(mLock);
+
   return UpdateCharAtU(newCh, index);
 }
 
@@ -653,11 +637,10 @@ ITextStrategy::CompareTo(ITextStrategy& s)
 }
 
 
-ITextStrategy*
+shared_ptr<ITextStrategy>
 ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
 {
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
+  assert(mSelfShare.lock().get() == this);
 
   if (index == mCachedCharsCount)
     return AppendU(newCh);
@@ -665,20 +648,16 @@ ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
   const DChar oldCh = CharAtU(index);
 
   if (DChar(newCh) == oldCh)
-    return this;
+    return mSelfShare.lock();
 
   uint8_t newBuff[8];
   const uint_t oldCUCnt = wh_utf8_store_size(oldCh.mValue);
   const uint_t newCUCnt = wh_store_utf8_cp(newCh, newBuff);
 
-  unique_ptr<ITextStrategy> keeper;
-  ITextStrategy* result = this;
+  shared_ptr<ITextStrategy> result = mSelfShare.lock();
 
-  if (ReferenceCount() > 1)
-  {
-    keeper.reset(DuplicateU());
-    result = keeper.get();
-  }
+  if (IsShared())
+    result = DuplicateU();
 
   assert(result->mCachedCharIndex == mCachedCharIndex);
   assert(result->mCachedCharIndexOffset == mCachedCharIndexOffset);
@@ -687,7 +666,6 @@ ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
 
   if (newCh == 0)
   {
-    assert(result == this);
     assert(result->mCachedCharIndex == index);
 
     result->TruncateUtf8U(mCachedCharIndexOffset);
@@ -696,7 +674,7 @@ ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
     result->mCachedCharIndex = result->mCachedCharIndexOffset = 0;
 
   }
-  else if ((oldCUCnt == newCUCnt) || (oldCh.IsNull()))
+  else if (oldCUCnt == newCUCnt || oldCh.IsNull())
   {
     if (oldCh.IsNull())
     {
@@ -750,23 +728,24 @@ ITextStrategy::UpdateCharAtU(const uint32_t newCh, const uint64_t index)
     result->TruncateUtf8U(result->Utf8CountU() - (oldCUCnt - newCUCnt));
   }
 
-  if (result == this)
+  if (result.get() == this)
   {
     delete mMatcher;
     mMatcher = nullptr;
   }
 
-  keeper.release();
   return result;
 }
 
 
 DUInt64
-ITextStrategy::FindMatch(ITextStrategy& text,
-                                 const uint64_t fromCh,
-                                 const uint64_t toCh,
-                                 const bool ignoreCase)
+ITextStrategy::FindMatchInText(ITextStrategy& text,
+                         const uint64_t fromCh,
+                         const uint64_t toCh,
+                         const bool ignoreCase)
 {
+  assert(mSelfShare.lock().get() == this);
+
   DoubleLockRAII<Lock> _l(mLock, text.mLock);
 
   if ((mCachedCharsCount == 0) || (toCh <= fromCh) || (toCh - fromCh < mCachedCharsCount))
@@ -784,54 +763,53 @@ ITextStrategy::FindMatch(ITextStrategy& text,
 }
 
 
-ITextStrategy*
-ITextStrategy::Replace(ITextStrategy&   text,
-                        ITextStrategy&   newSubstr,
-                        const uint64_t   fromCh,
-                        const uint64_t   toCh,
-                        const bool       ignoreCase)
+shared_ptr<ITextStrategy>
+ITextStrategy::ReplaceInText(shared_ptr<ITextStrategy> text,
+                       shared_ptr<ITextStrategy> newSubstr,
+                       const uint64_t fromCh,
+                       const uint64_t toCh,
+                       const bool ignoreCase)
 {
-  TripleLockRAII<Lock> _l(mLock, text.mLock, newSubstr.mLock);
+  assert(mSelfShare.lock().get() == this);
 
-  std::unique_ptr<ITextStrategy> _ns;
-  ITextStrategy* ns = &newSubstr;
+  if (this == newSubstr.get() || this == text.get())
+    return newSubstr;
 
-  if (this == ns)
-    return text.DuplicateU();
+  else if (text == newSubstr)
+    return mSelfShare.lock();
 
-  else if ( &text == ns)
-  {
-    _ns.reset(newSubstr.DuplicateU());
-    ns = _ns.get();
-  }
+  TripleLockRAII<Lock> _l(mLock, text->mLock, newSubstr->mLock);
+
+  shared_ptr<ITextStrategy> ns = newSubstr;
 
   const uint64_t subStrSize = Utf8CountU();
-  std::unique_ptr<ITextStrategy> result(new pastra::TemporalText());
+  shared_ptr<ITextStrategy> result = shared_make(pastra::TemporalText);
+  result->SetSelfReference(result);
 
   if (mMatcher == nullptr)
-    mMatcher = new pastra::StringMatcher( *this);
+    mMatcher = new pastra::StringMatcher(*this);
 
   int64_t lastMatchPos = 0;
-  int64_t matchPos = mMatcher->FindMatchRaw(text, fromCh, toCh, ignoreCase);
+  int64_t matchPos = mMatcher->FindMatchRaw(*text, fromCh, toCh, ignoreCase);
   while (matchPos >= 0)
   {
-    result->AppendU(text, lastMatchPos, matchPos);
-    result->AppendU( *ns);
+    result->AppendU(*text, lastMatchPos, matchPos);
+    result->AppendU(*ns);
 
     lastMatchPos = matchPos + subStrSize;
-    assert(lastMatchPos <= _SC(int64_t, text.Utf8CountU()));
+    assert(lastMatchPos <= _SC(int64_t, text->Utf8CountU()));
 
-    matchPos = mMatcher->FindMatchRaw(text, text.CharsUntilOffsetU(lastMatchPos), toCh, ignoreCase);
+    matchPos = mMatcher->FindMatchRaw(*text, text->CharsUntilOffsetU(lastMatchPos), toCh, ignoreCase);
 
     assert((matchPos < 0) || (lastMatchPos <= matchPos));
   }
 
   if (matchPos < 0)
-    matchPos = text.Utf8CountU();
+    matchPos = text->Utf8CountU();
 
-  result->AppendU(text, lastMatchPos, matchPos);
+  result->AppendU(*text, lastMatchPos, matchPos);
 
-  return result.release();
+  return result;
 }
 
 uint64_t
@@ -868,72 +846,6 @@ ITextStrategy::TruncateUtf8(const uint64_t offset)
 {
   LockRAII<Lock> _l(mLock);
   return TruncateUtf8U(offset);
-}
-
-void
-ITextStrategy::ReleaseReference()
-{
-  LockRAII<Lock> _l(mLock);
-
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (MirrorsCount() > 0)
-    --mMirrorsCount;
-
-  else
-    --mCopyReferences;
-
-  if (ReferenceCount() == 0)
-  {
-    _l.Release();
-    delete this;
-  }
-}
-
-uint32_t
-ITextStrategy::ReferenceCount() const
-{
-  return mCopyReferences;
-}
-
-uint32_t
-ITextStrategy::MirrorsCount() const
-{
-  return mMirrorsCount;
-}
-
-ITextStrategy*
-ITextStrategy::MakeMirrorCopy()
-{
-  LockRAII<Lock> _l(mLock);
-
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (ReferenceCount() > 1)
-    return DuplicateU()->MakeMirrorCopy();
-
-  ++mMirrorsCount;
-  return this;
-}
-
-ITextStrategy*
-ITextStrategy::MakeClone()
-{
-  LockRAII<Lock> _l(mLock);
-
-  assert((MirrorsCount() == 0) || (ReferenceCount() == 1));
-  assert(ReferenceCount() > 0);
-
-  if (MirrorsCount() > 0)
-  {
-    ++mMirrorsCount;
-    return this;
-  }
-
-  ++mCopyReferences;
-  return this;
 }
 
 pastra::TemporalContainer&
@@ -994,6 +906,12 @@ get_utf8_string_length(const uint8_t* utf8Str,
 }
 
 
+bool
+NullText::IsShared () const
+{
+  return true;
+}
+
 uint64_t
 NullText::Utf8CountU()
 {
@@ -1021,29 +939,16 @@ NullText::TruncateUtf8U(const uint64_t offset)
     throw DBSException(_EXTRA(DBSException::GENERAL_CONTROL_ERROR));
 }
 
-uint32_t
-NullText::ReferenceCount() const
-{
-  return 8; //Enough not to allow to change use
-}
-
-uint32_t
-NullText::MirrorsCount() const
-{
-  return 0;
-}
-
-void
-NullText::ReleaseReference()
-{
-  //This is a singleton. Do nothing!
-}
-
-
-NullText&
+shared_ptr<ITextStrategy>
 NullText::GetSingletoneInstace()
 {
-  static NullText nullTextInstance;
+  static shared_ptr<ITextStrategy> nullTextInstance;
+
+  if (nullTextInstance == nullptr)
+  {
+    nullTextInstance = shared_make(NullText);
+    nullTextInstance->SetSelfReference(nullTextInstance);
+  }
 
   return nullTextInstance;
 }
@@ -1057,6 +962,12 @@ TemporalText::TemporalText(const uint8_t* const utf8Str, const uint64_t unitsCou
 
   const uint64_t bytesCount = get_utf8_string_length(utf8Str, unitsCount, &mCachedCharsCount);
   mStorage.Write(0, bytesCount, utf8Str);
+}
+
+bool
+TemporalText::IsShared () const
+{
+  return mSelfShare.use_count() > 3;
 }
 
 uint64_t
@@ -1143,6 +1054,12 @@ RowFieldText::~RowFieldText()
     mStorage.DecrementRecordRef(mFirstEntry);
     mStorage.ReleaseReference();
   }
+}
+
+bool
+RowFieldText::IsShared () const
+{
+  return true;
 }
 
 uint64_t

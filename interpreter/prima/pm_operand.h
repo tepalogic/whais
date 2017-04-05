@@ -126,75 +126,76 @@ class GlobalOperand;
 class BaseOperand : public IOperand
 {
 public:
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
-  virtual void GetValue(DArray& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
-  virtual void SetValue(const DChar& value);
-  virtual void SetValue(const DHiresTime& value);
-  virtual void SetValue(const DInt64& value);
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DRichReal& value);
-  virtual void SetValue(const DText& value);
-  virtual void SetValue(const DArray& value);
+  virtual void SetValue(const DBool& value) override;
+  virtual void SetValue(const DChar& value) override;
+  virtual void SetValue(const DHiresTime& value) override;
+  virtual void SetValue(const DInt64& value) override;
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DRichReal& value) override;
+  virtual void SetValue(const DText& value) override;
+  virtual void SetValue(const DArray& value) override;
 
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
-  virtual void SelfAdd(const DChar& value);
-  virtual void SelfAdd(const DText& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
+  virtual void SelfAdd(const DChar& value) override;
+  virtual void SelfAdd(const DText& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DInt64& value) override;
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DInt64& value);
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DInt64& value) override;
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DInt64& value);
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DInt64& value) override;
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual FIELD_INDEX GetField();
+  virtual FIELD_INDEX GetField() override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue GetTableValue();
-  virtual StackValue GetFieldAt(const FIELD_INDEX field);
-  virtual StackValue GetValueAt(const uint64_t index);
+  virtual StackValue GetTableValue() override;
+  virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
+  virtual StackValue GetValueAt(const uint64_t index) override;
 
-  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem);
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
+  virtual bool DoSimpleCopy(void* const dest) override;
 
   virtual TableOperand GetTableOp();
   virtual void CopyTableOp(const TableOperand& source);
@@ -204,11 +205,8 @@ public:
 
   virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
 
-  virtual void           NativeObject(INativeObject* const value);
-  virtual INativeObject& NativeObject();
-
-  virtual bool DoSimpleCopy(void* const dest);
-
+  virtual void           NativeObject(INativeObject* const value) override;
+  virtual INativeObject& NativeObject() override;
   virtual TableReference& GetTableReference();
 };
 
@@ -219,29 +217,29 @@ public:
   NullOperand() = default;
   virtual ~NullOperand() = default;
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
-  virtual void GetValue(DArray& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -253,22 +251,22 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
+  virtual void SetValue(const DBool& value) override;
 
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DBool mValue;
@@ -283,16 +281,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DChar& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DChar mValue;
@@ -307,18 +305,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DDate mValue;
@@ -333,18 +331,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DDateTime mValue;
@@ -359,18 +357,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DHiresTime mValue;
@@ -385,45 +383,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DUInt8 mValue;
@@ -438,43 +436,43 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
-  virtual void SelfXor(const DInt64& value);
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
+  virtual void SelfXor(const DInt64& value) override;
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DUInt16 mValue;
@@ -489,45 +487,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DUInt32 mValue;
@@ -542,45 +540,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DUInt64 mValue;
@@ -595,45 +593,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DInt8 mValue;
@@ -648,45 +646,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DInt16 mValue;
@@ -701,45 +699,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DInt32 mValue;
@@ -754,45 +752,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DInt64 mValue;
@@ -807,29 +805,29 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DReal mValue;
@@ -844,29 +842,29 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
 private:
   DRichReal mValue;
@@ -877,68 +875,101 @@ class TextOperand : public BaseOperand
 {
 public:
   explicit TextOperand(const DText& value)
-    : mValue(value)
-  {}
+    : mValue(SharedTextStore::Instance().Alloc())
+  {
+    *mValue = shared_make(DText, value);
+  }
 
-  virtual bool IsNull() const;
+  TextOperand(const TextOperand& source)
+    : mValue(SharedTextStore::Instance().Alloc())
+  {
+    *mValue = *source.mValue;
+  }
 
-  virtual void GetValue(DText& outValue) const;
+  TextOperand(TextOperand&& source)
+      : mValue(source.mValue)
+  {
+    source.mValue = nullptr;
+  }
 
-  virtual void SetValue(const DText& value);
+  ~TextOperand()
+  {
+    if (mValue)
+      SharedTextStore::Instance().Free(mValue);
+  }
 
-  virtual void SelfAdd(const DChar& value);
-  virtual void SelfAdd(const DText& value);
+  virtual bool IsNull() const override;
 
-  virtual uint_t GetType();
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual void SetValue(const DText& value) override;
 
-  virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
+  virtual void SelfAdd(const DChar& value) override;
+  virtual void SelfAdd(const DText& value) override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual uint_t GetType() override;
+
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
+
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
+
+  virtual bool DoSimpleCopy(void* const dest) override;
 
 private:
-  DText mValue;
+  std::shared_ptr<DText>* mValue;
 };
 
 
 class CharTextElOperand : public BaseOperand
 {
 public:
-  CharTextElOperand(DText &text, const uint64_t index)
+  CharTextElOperand(std::shared_ptr<DText> text, const uint64_t index)
     : mIndex(index),
-      mText()
+      mText(SharedTextStore::Instance().Alloc())
   {
-    text.MakeMirror(mText);
+    *mText = text;
   }
 
   CharTextElOperand(const CharTextElOperand& source)
     : mIndex(source.mIndex),
-      mText()
+      mText(SharedTextStore::Instance().Alloc())
   {
-    _CC(DText&, source.mText).MakeMirror(mText);
+    *mText = *source.mText;
   }
 
-  virtual bool IsNull() const;
+  CharTextElOperand(CharTextElOperand&& source)
+    : mIndex(source.mIndex),
+      mText(source.mText)
+  {
+    source.mText = nullptr;
+  }
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  ~CharTextElOperand()
+  {
+    if (mText)
+      SharedTextStore::Instance().Free(mText);
+  }
 
-  virtual void SetValue(const DChar& value);
+  virtual bool IsNull() const override;
 
-  virtual uint_t GetType();
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual StackValue Duplicate() const;
+  virtual void SetValue(const DChar& value) override;
 
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual uint_t GetType() override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual StackValue Duplicate() const override;
+
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
+
+  virtual bool DoSimpleCopy(void* const dest) override;
 
 private:
   const uint64_t mIndex;
-  DText          mText;
+  std::shared_ptr<DText>* mText;
 };
 
 
@@ -972,20 +1003,20 @@ public:
       SharedArrayStore::Instance().Free(mValue);
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DArray& outValue) const;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual void SetValue(const DArray& value);
+  virtual void SetValue(const DArray& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
-  virtual bool DoSimpleCopy(void* const);
+  virtual bool DoSimpleCopy(void* const) override;
 
 private:
   std::shared_ptr<DArray>* mValue;
@@ -1025,9 +1056,9 @@ protected:
     (*mArray)->Set(mIndex, value);
   }
 
-  virtual bool IsNull() const;
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool IsNull() const override;
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
 
 private:
   const uint64_t                 mIndex;
@@ -1043,22 +1074,22 @@ public:
   {
   }
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
+  virtual void SetValue(const DBool& value) override;
 
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1070,16 +1101,16 @@ public:
   {
   }
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DChar& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1091,18 +1122,18 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1114,18 +1145,18 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1137,18 +1168,18 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1160,46 +1191,46 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1211,45 +1242,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1261,45 +1292,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1311,45 +1342,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1361,45 +1392,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 class Int16ArrayElOperand : public BaseArrayElOperand
@@ -1410,45 +1441,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1460,45 +1491,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1510,45 +1541,45 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1560,29 +1591,29 @@ public:
   {
   }
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1594,29 +1625,29 @@ public:
   {
   }
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 };
 
 
@@ -1644,7 +1675,7 @@ public:
     mTableRef->IncrementRefCount();
   }
 
-  virtual ~TableOperand();
+  virtual ~TableOperand() override;
 
   const TableOperand& operator= (const TableOperand& source)
   {
@@ -1659,23 +1690,23 @@ public:
     return *this;
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue GetFieldAt(const FIELD_INDEX field);
+  virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp() override;
 
-  virtual void CopyTableOp(const TableOperand& source);
+  virtual void CopyTableOp(const TableOperand& source) override;
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference() override;
 
 private:
   TableReference* mTableRef;
@@ -1698,30 +1729,30 @@ public:
   FieldOperand(TableOperand& tableOp, const FIELD_INDEX field);
   FieldOperand(TableReference& tableRef, const FIELD_INDEX field);
   FieldOperand(const FieldOperand& source);
-  virtual ~FieldOperand();
+  virtual ~FieldOperand() override;
 
   const FieldOperand& operator= (const FieldOperand& source);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual FIELD_INDEX GetField();
+  virtual FIELD_INDEX GetField() override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp() override;
 
-  virtual void CopyFieldOp(const FieldOperand& source);
+  virtual void CopyFieldOp(const FieldOperand& source) override;
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference() override;
 
 private:
   TableReference*   mTableRef;
@@ -1754,7 +1785,7 @@ protected:
     mTableRef->IncrementRefCount();
   }
 
-  virtual ~BaseFieldElOperand();
+  virtual ~BaseFieldElOperand() override;
 
   template<typename DBS_T> void Get(DBS_T& out) const
   {
@@ -1776,10 +1807,10 @@ protected:
     table.Set(mRow, mField, value);
   }
 
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 
 private:
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
@@ -1798,22 +1829,22 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
+  virtual void SetValue(const DBool& value) override;
 
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1825,16 +1856,16 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DChar& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1846,18 +1877,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1872,18 +1903,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1897,18 +1928,18 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1920,45 +1951,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -1970,45 +2001,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2020,45 +2051,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2070,45 +2101,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2120,45 +2151,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2170,45 +2201,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2220,45 +2251,45 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2270,46 +2301,46 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2321,29 +2352,29 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2357,29 +2388,29 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2391,20 +2422,20 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DText& outValue) const;
-  virtual void SetValue(const DText& value);
+  virtual void GetValue(DText& outValue) const override;
+  virtual void SetValue(const DText& value) override;
 
-  virtual void SelfAdd(const DChar& value);
-  virtual void SelfAdd(const DText& value);
+  virtual void SelfAdd(const DChar& value) override;
+  virtual void SelfAdd(const DText& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 };
 
 
@@ -2416,17 +2447,17 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DArray& outValue) const;
-  virtual void SetValue(const DArray& value);
+  virtual void GetValue(DArray& outValue) const override;
+  virtual void SetValue(const DArray& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool reverse, StackValue& outStartItem);
+  virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 };
 
 
@@ -2442,19 +2473,19 @@ public:
   {
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DChar& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
 
 private:
   const uint64_t    mIndex;
@@ -2485,7 +2516,7 @@ protected:
     mTableRef->IncrementRefCount();
   }
 
-  virtual ~BaseArrayFieldElOperand();
+  virtual ~BaseArrayFieldElOperand() override;
 
   template <typename DBS_T> void Get(DBS_T& outValue) const
   {
@@ -2524,12 +2555,12 @@ protected:
     table.Set(mRow, mField, array);
   }
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
 
-  virtual bool DoneCustomCopy(void* const dest);
+  virtual bool DoSimpleCopy(void* const dest) override;
 
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
@@ -2552,20 +2583,20 @@ public:
   {
   }
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
+  virtual void SetValue(const DBool& value) override;
 
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2580,14 +2611,14 @@ public:
   {
   }
 
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DChar& value);
+  virtual void SetValue(const DChar& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2602,16 +2633,16 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2625,16 +2656,16 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2648,16 +2679,16 @@ public:
   {
   }
 
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DHiresTime& value);
+  virtual void SetValue(const DHiresTime& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2671,43 +2702,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2722,41 +2753,41 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
-  virtual void SelfXor(const DInt64& value);
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
+  virtual void SelfXor(const DInt64& value) override;
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2771,43 +2802,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2822,43 +2853,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2872,43 +2903,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2923,43 +2954,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -2974,43 +3005,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -3025,43 +3056,43 @@ public:
   {
   }
 
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DInt64& value);
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DInt64& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
+  virtual void SelfAdd(const DInt64& value) override;
 
-  virtual void SelfSub(const DInt64& value);
+  virtual void SelfSub(const DInt64& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
+  virtual void SelfAnd(const DInt64& value) override;
 
-  virtual void SelfXor(const DInt64& value);
+  virtual void SelfXor(const DInt64& value) override;
 
-  virtual void SelfOr(const DInt64& value);
+  virtual void SelfOr(const DInt64& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -3076,27 +3107,27 @@ public:
   {
   }
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -3111,27 +3142,27 @@ public:
   {
   }
 
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DText& outValue) const;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
 
-  virtual void SetValue(const DRichReal& value);
+  virtual void SetValue(const DRichReal& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const;
+  virtual StackValue Duplicate() const override;
 };
 
 
@@ -3385,91 +3416,91 @@ class GlobalOperand : public BaseOperand
 public:
   GlobalOperand(GlobalValue& global);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
-  virtual void GetValue(DArray& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
-  virtual void SetValue(const DChar& value);
-  virtual void SetValue(const DHiresTime& value);
-  virtual void SetValue(const DInt64& value);
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DRichReal& value);
-  virtual void SetValue(const DText& value);
-  virtual void SetValue(const DArray& value);
+  virtual void SetValue(const DBool& value) override;
+  virtual void SetValue(const DChar& value) override;
+  virtual void SetValue(const DHiresTime& value) override;
+  virtual void SetValue(const DInt64& value) override;
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DRichReal& value) override;
+  virtual void SetValue(const DText& value) override;
+  virtual void SetValue(const DArray& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
-  virtual void SelfAdd(const DChar& value);
-  virtual void SelfAdd(const DText& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
+  virtual void SelfAdd(const DChar& value) override;
+  virtual void SelfAdd(const DText& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DInt64& value) override;
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DInt64& value);
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DInt64& value) override;
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DInt64& value);
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DInt64& value) override;
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual FIELD_INDEX GetField();
+  virtual FIELD_INDEX GetField() override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue GetFieldAt(const FIELD_INDEX field);
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem);
+  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
 
-  virtual bool DoneCustomCopy(void* const);
+  virtual bool DoSimpleCopy(void* const) override;
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp() override;
 
-  virtual void CopyTableOp(const TableOperand& source);
+  virtual void CopyTableOp(const TableOperand& source) override;
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp() override;
 
-  virtual void CopyFieldOp(const FieldOperand& source);
+  virtual void CopyFieldOp(const FieldOperand& source) override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
+  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
 
-  virtual void           NativeObject(INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual void           NativeObject(INativeObject* const value) override;
+  virtual INativeObject& NativeObject() override;
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference() override;
 
 private:
   GlobalValue&    mValue;
@@ -3481,91 +3512,91 @@ class LocalOperand : public BaseOperand
 public:
   LocalOperand(SessionStack& stack, const uint64_t index);
 
-  virtual bool IsNull() const;
+  virtual bool IsNull() const override;
 
-  virtual void GetValue(DBool& outValue) const;
-  virtual void GetValue(DChar& outValue) const;
-  virtual void GetValue(DDate& outValue) const;
-  virtual void GetValue(DDateTime& outValue) const;
-  virtual void GetValue(DHiresTime& outValue) const;
-  virtual void GetValue(DInt8& outValue) const;
-  virtual void GetValue(DInt16& outValue) const;
-  virtual void GetValue(DInt32& outValue) const;
-  virtual void GetValue(DInt64& outValue) const;
-  virtual void GetValue(DReal& outValue) const;
-  virtual void GetValue(DRichReal& outValue) const;
-  virtual void GetValue(DUInt8& outValue) const;
-  virtual void GetValue(DUInt16& outValue) const;
-  virtual void GetValue(DUInt32& outValue) const;
-  virtual void GetValue(DUInt64& outValue) const;
-  virtual void GetValue(DText& outValue) const;
-  virtual void GetValue(DArray& outValue) const;
+  virtual void GetValue(DBool& outValue) const override;
+  virtual void GetValue(DChar& outValue) const override;
+  virtual void GetValue(DDate& outValue) const override;
+  virtual void GetValue(DDateTime& outValue) const override;
+  virtual void GetValue(DHiresTime& outValue) const override;
+  virtual void GetValue(DInt8& outValue) const override;
+  virtual void GetValue(DInt16& outValue) const override;
+  virtual void GetValue(DInt32& outValue) const override;
+  virtual void GetValue(DInt64& outValue) const override;
+  virtual void GetValue(DReal& outValue) const override;
+  virtual void GetValue(DRichReal& outValue) const override;
+  virtual void GetValue(DUInt8& outValue) const override;
+  virtual void GetValue(DUInt16& outValue) const override;
+  virtual void GetValue(DUInt32& outValue) const override;
+  virtual void GetValue(DUInt64& outValue) const override;
+  virtual void GetValue(DText& outValue) const override;
+  virtual void GetValue(DArray& outValue) const override;
 
-  virtual void SetValue(const DBool& value);
-  virtual void SetValue(const DChar& value);
-  virtual void SetValue(const DHiresTime& value);
-  virtual void SetValue(const DInt64& value);
-  virtual void SetValue(const DUInt64& value);
-  virtual void SetValue(const DRichReal& value);
-  virtual void SetValue(const DText& value);
-  virtual void SetValue(const DArray& value);
+  virtual void SetValue(const DBool& value) override;
+  virtual void SetValue(const DChar& value) override;
+  virtual void SetValue(const DHiresTime& value) override;
+  virtual void SetValue(const DInt64& value) override;
+  virtual void SetValue(const DUInt64& value) override;
+  virtual void SetValue(const DRichReal& value) override;
+  virtual void SetValue(const DText& value) override;
+  virtual void SetValue(const DArray& value) override;
 
-  virtual void SelfAdd(const DInt64& value);
-  virtual void SelfAdd(const DRichReal& value);
-  virtual void SelfAdd(const DChar& value);
-  virtual void SelfAdd(const DText& value);
+  virtual void SelfAdd(const DInt64& value) override;
+  virtual void SelfAdd(const DRichReal& value) override;
+  virtual void SelfAdd(const DChar& value) override;
+  virtual void SelfAdd(const DText& value) override;
 
-  virtual void SelfSub(const DInt64& value);
-  virtual void SelfSub(const DRichReal& value);
+  virtual void SelfSub(const DInt64& value) override;
+  virtual void SelfSub(const DRichReal& value) override;
 
-  virtual void SelfMul(const DInt64& value);
-  virtual void SelfMul(const DUInt64& value);
-  virtual void SelfMul(const DRichReal& value);
+  virtual void SelfMul(const DInt64& value) override;
+  virtual void SelfMul(const DUInt64& value) override;
+  virtual void SelfMul(const DRichReal& value) override;
 
-  virtual void SelfDiv(const DInt64& value);
-  virtual void SelfDiv(const DUInt64& value);
-  virtual void SelfDiv(const DRichReal& value);
+  virtual void SelfDiv(const DInt64& value) override;
+  virtual void SelfDiv(const DUInt64& value) override;
+  virtual void SelfDiv(const DRichReal& value) override;
 
-  virtual void SelfMod(const DInt64& value);
-  virtual void SelfMod(const DUInt64& value);
+  virtual void SelfMod(const DInt64& value) override;
+  virtual void SelfMod(const DUInt64& value) override;
 
-  virtual void SelfAnd(const DInt64& value);
-  virtual void SelfAnd(const DBool& value);
+  virtual void SelfAnd(const DInt64& value) override;
+  virtual void SelfAnd(const DBool& value) override;
 
-  virtual void SelfXor(const DInt64& value);
-  virtual void SelfXor(const DBool& value);
+  virtual void SelfXor(const DInt64& value) override;
+  virtual void SelfXor(const DBool& value) override;
 
-  virtual void SelfOr(const DInt64& value);
-  virtual void SelfOr(const DBool& value);
+  virtual void SelfOr(const DInt64& value) override;
+  virtual void SelfOr(const DBool& value) override;
 
-  virtual uint_t GetType();
+  virtual uint_t GetType() override;
 
-  virtual FIELD_INDEX GetField();
+  virtual FIELD_INDEX GetField() override;
 
-  virtual ITable& GetTable();
+  virtual ITable& GetTable() override;
 
-  virtual StackValue GetFieldAt(const FIELD_INDEX field);
-  virtual StackValue GetValueAt(const uint64_t index);
-  virtual StackValue Duplicate() const;
+  virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
+  virtual StackValue GetValueAt(const uint64_t index) override;
+  virtual StackValue Duplicate() const override;
 
-  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem);
-  virtual bool Iterate(const bool reverse);
-  virtual uint64_t IteratorOffset();
+  virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
+  virtual bool Iterate(const bool reverse) override;
+  virtual uint64_t IteratorOffset() override;
 
-  virtual TableOperand GetTableOp();
+  virtual TableOperand GetTableOp() override;
 
-  virtual void CopyTableOp(const TableOperand& source);
+  virtual void CopyTableOp(const TableOperand& source) override;
 
-  virtual FieldOperand GetFieldOp();
+  virtual FieldOperand GetFieldOp() override;
 
-  virtual void CopyFieldOp(const FieldOperand& source);
+  virtual void CopyFieldOp(const FieldOperand& source) override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
+  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
 
-  virtual void           NativeObject(INativeObject* const value);
-  virtual INativeObject& NativeObject();
+  virtual void           NativeObject(INativeObject* const value) override;
+  virtual INativeObject& NativeObject() override;
 
-  virtual TableReference& GetTableReference();
+  virtual TableReference& GetTableReference() override;
 
 private:
   const uint64_t      mIndex;

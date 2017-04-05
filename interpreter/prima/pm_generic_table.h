@@ -36,24 +36,24 @@ namespace prima {
 class GenericTable : public ITable
 {
 public:
-  virtual bool IsTemporal() const;
-  virtual ITable& Spawn() const;
+  virtual bool IsTemporal() const override;
+  virtual ITable& Spawn() const override;
 
-  virtual FIELD_INDEX FieldsCount();
-  virtual FIELD_INDEX RetrieveField(const char* field);
-  virtual DBSFieldDescriptor DescribeField(const FIELD_INDEX field);
+  virtual FIELD_INDEX FieldsCount() override;
+  virtual FIELD_INDEX RetrieveField(const char* field) override;
+  virtual DBSFieldDescriptor DescribeField(const FIELD_INDEX field) override;
 
-  virtual ROW_INDEX AllocatedRows();
-  virtual ROW_INDEX AddRow(const bool skipThreadSafety);
-  virtual ROW_INDEX GetReusableRow(const bool forceAdd);
-  virtual ROW_INDEX ReusableRowsCount();
-  virtual void MarkRowForReuse(const ROW_INDEX row);
+  virtual ROW_INDEX AllocatedRows() override;
+  virtual ROW_INDEX AddRow(const bool skipThreadSafety) override;
+  virtual ROW_INDEX GetReusableRow(const bool forceAdd) override;
+  virtual ROW_INDEX ReusableRowsCount() override;
+  virtual void MarkRowForReuse(const ROW_INDEX row) override;
 
   virtual void CreateIndex(const FIELD_INDEX field,
                            CREATE_INDEX_CALLBACK_FUNC* const cbFunc,
                            CreateIndexCallbackContext* const cbCotext);
-  virtual void RemoveIndex(const FIELD_INDEX field);
-  virtual bool IsIndexed(const FIELD_INDEX field) const;
+  virtual void RemoveIndex(const FIELD_INDEX field) override;
+  virtual bool IsIndexed(const FIELD_INDEX field) const override;
 
   virtual void Set(const ROW_INDEX   row,
                    const FIELD_INDEX field,
@@ -323,9 +323,9 @@ public:
                            const ROW_INDEX       fromRow,
                            const ROW_INDEX       toRow,
                            const FIELD_INDEX     field);
-  virtual void Flush();
-  virtual void LockTable();
-  virtual void UnlockTable();
+  virtual void Flush() override;
+  virtual void LockTable() override;
+  virtual void UnlockTable() override;
 
   static GenericTable& Instance();
 

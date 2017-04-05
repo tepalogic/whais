@@ -66,9 +66,9 @@ public:
                           const char      *fmtMsg = nullptr,
                           ...);
 
-  virtual Exception* Clone() const;
-  virtual EXCEPTION_TYPE Type() const;
-  virtual const char* Description() const;
+  virtual Exception* Clone() const override;
+  virtual EXCEPTION_TYPE Type() const override;
+  virtual const char* Description() const override;
 
   enum
   {
@@ -104,16 +104,16 @@ public:
                 const uint64_t   unitsCount,
                 const bool       ignoreExistingData);
 
-  virtual ~FileContainer();
+  virtual ~FileContainer() override;
 
-  virtual void Write(uint64_t to, uint64_t size, const uint8_t* buffer);
-  virtual void Read(uint64_t from, uint64_t size, uint8_t* buffer);
-  virtual void Colapse(uint64_t from, uint64_t to);
+  virtual void Write(uint64_t to, uint64_t size, const uint8_t* buffer) override;
+  virtual void Read(uint64_t from, uint64_t size, uint8_t* buffer) override;
+  virtual void Colapse(uint64_t from, uint64_t to) override;
 
-  virtual uint64_t Size() const;
+  virtual uint64_t Size() const override;
 
-  virtual void MarkForRemoval();
-  virtual void Flush();
+  virtual void MarkForRemoval() override;
+  virtual void Flush() override;
 
   static void Fix(const char* const   baseFile,
                   const uint64_t      maxFileSize,
@@ -141,13 +141,13 @@ class TemporalContainer : public IDataContainer
 public:
   explicit TemporalContainer(const uint_t reservedMemory = DEFAULT_TEMP_MEM_RESERVED);
 
-  virtual void Write(uint64_t to, uint64_t size, const uint8_t* buffer);
-  virtual void Read(uint64_t from, uint64_t size, uint8_t* buffer);
-  virtual void Colapse(uint64_t from, uint64_t to);
-  virtual uint64_t Size() const;
+  virtual void Write(uint64_t to, uint64_t size, const uint8_t* buffer) override;
+  virtual void Read(uint64_t from, uint64_t size, uint8_t* buffer) override;
+  virtual void Colapse(uint64_t from, uint64_t to) override;
+  virtual uint64_t Size() const override;
 
-  virtual void MarkForRemoval();
-  virtual void Flush();
+  virtual void MarkForRemoval() override;
+  virtual void Flush() override;
 
 private:
   void  FillCache(uint64_t position);

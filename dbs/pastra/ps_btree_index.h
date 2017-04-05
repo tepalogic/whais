@@ -137,37 +137,6 @@ private:
 };
 
 
-#if 0
-class BTreeNodeRAII
-{
-public:
-  BTreeNodeRAII(IBTreeNode* node)
-    : mTreeNode(node)
-  {
-  }
-
-  BTreeNodeRAII(IBTreeNode& node)
-    : mTreeNode(&node)
-  {
-  }
-
-  ~BTreeNodeRAII() { mTreeNode->Release(); }
-
-  BTreeNodeRAII(const BTreeNodeRAII &) = delete;
-  BTreeNodeRAII& operator= (const BTreeNodeRAII &) = delete;
-
-  void operator= (IBTreeNode& node) { mTreeNode->Release(); mTreeNode = &node; }
-  void operator= (IBTreeNode* node) { mTreeNode->Release(); mTreeNode = node; }
-
-  IBTreeNode* operator->() { return mTreeNode;}
-  operator IBTreeNode*() { return mTreeNode; }
-
-private:
-  std::mTreeNode;
-};
-#endif
-
-
 class IBTreeNodeManager
 {
 public:

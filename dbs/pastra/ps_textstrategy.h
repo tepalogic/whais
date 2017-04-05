@@ -60,49 +60,51 @@ public:
   uint64_t OffsetOfChar(const uint64_t index);
   DChar CharAt(const uint64_t index);
 
-  ITextStrategy* ToCase(const bool toLower);
-  ITextStrategy* Append(const uint32_t ch);
-  ITextStrategy* Append(ITextStrategy& text);
-  ITextStrategy* Append(ITextStrategy& text, const uint64_t fromOff, const uint64_t toOff);
-  ITextStrategy* UpdateCharAt(const uint32_t ch, const uint64_t index);
+  std::shared_ptr<ITextStrategy> ToCase(const bool toLower);
+  std::shared_ptr<ITextStrategy> Append(const uint32_t ch);
+  std::shared_ptr<ITextStrategy> Append(ITextStrategy& text);
+  std::shared_ptr<ITextStrategy> Append(ITextStrategy& text,
+                                        const uint64_t fromOff,
+                                        const uint64_t toOff);
+  std::shared_ptr<ITextStrategy> UpdateCharAt(const uint32_t ch, const uint64_t index);
 
   int CompareTo(ITextStrategy& second);
-  DUInt64 FindMatch(ITextStrategy& text,
-                    const uint64_t fromCh,
-                    const uint64_t toCh,
-                    const bool ignoreCase);
-  ITextStrategy* Replace(ITextStrategy& text,
-                         ITextStrategy& newSubstr,
-                         const uint64_t fromCh,
-                         const uint64_t toCh,
-                         const bool ignoreCase);
+  DUInt64 FindMatchInText(ITextStrategy& text,
+                          const uint64_t fromCh,
+                          const uint64_t toCh,
+                          const bool ignoreCase);
+  std::shared_ptr<ITextStrategy> ReplaceInText(std::shared_ptr<ITextStrategy> text,
+                                               std::shared_ptr<ITextStrategy> newSubstr,
+                                               const uint64_t fromCh,
+                                               const uint64_t toCh,
+                                               const bool ignoreCase);
   uint64_t Utf8Count();
   void ReadUtf8(const uint64_t offset, const uint64_t count, uint8_t * const buffer);
   void WriteUtf8(const uint64_t offset, const uint64_t count, const uint8_t* const buffer);
   void TruncateUtf8(const uint64_t offset);
 
-  ITextStrategy* MakeMirrorCopy();
-  ITextStrategy* MakeClone();
-
-  virtual void ReleaseReference();
+  void SetSelfReference(std::shared_ptr<ITextStrategy>& self) { mSelfShare = self; }
 
   virtual pastra::TemporalContainer& GetTemporalContainer();
   virtual pastra::VariableSizeStore& GetRowStorage();
 
 protected:
+  ITextStrategy();
+
   uint64_t CharsUntilOffsetU(const uint64_t offset);
   uint64_t OffsetOfCharU(const uint64_t index);
   DChar CharAtU(const uint64_t index);
 
-  ITextStrategy* DuplicateU();
-  ITextStrategy* ToCaseU(const bool toLower);
+  std::shared_ptr<ITextStrategy> DuplicateU();
+  std::shared_ptr<ITextStrategy> ToCaseU(const bool toLower);
 
-  ITextStrategy* AppendU(const uint32_t ch);
-  ITextStrategy* AppendU(ITextStrategy& text);
-  ITextStrategy* AppendU(ITextStrategy& text, const uint64_t fromOff, const uint64_t toOff);
+  std::shared_ptr<ITextStrategy> AppendU(const uint32_t ch);
+  std::shared_ptr<ITextStrategy> AppendU(ITextStrategy& text);
+  std::shared_ptr<ITextStrategy> AppendU(ITextStrategy& text, const uint64_t fromOff, const uint64_t toOff);
 
-  ITextStrategy* UpdateCharAtU(const uint32_t ch, const uint64_t index);
+  std::shared_ptr<ITextStrategy> UpdateCharAtU(const uint32_t ch, const uint64_t index);
 
+  virtual bool IsShared() const = 0;
   virtual uint64_t Utf8CountU() = 0;
   virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer) = 0;
   virtual void WriteUtf8U(const uint64_t offset,
@@ -110,18 +112,12 @@ protected:
                           const uint8_t* const buffer) = 0;
   virtual void TruncateUtf8U(const uint64_t offset) = 0;
 
-  ITextStrategy(uint32_t charsCount = 0);
-
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
-
-  pastra::StringMatcher*  mMatcher;
-  uint64_t                mCachedCharsCount;
-  uint64_t                mCachedCharIndex;
-  uint64_t                mCachedCharIndexOffset;
-  uint32_t                mMirrorsCount;
-  uint32_t                mCopyReferences;
-  Lock                    mLock;
+  pastra::StringMatcher* mMatcher;
+  uint64_t mCachedCharsCount;
+  uint64_t mCachedCharIndex;
+  uint64_t mCachedCharIndexOffset;
+  std::weak_ptr<ITextStrategy> mSelfShare;
+  Lock mLock;
 };
 
 
@@ -134,19 +130,14 @@ class NullText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  static NullText& GetSingletoneInstace();
+  static std::shared_ptr<ITextStrategy> GetSingletoneInstace();
 
 protected:
-  NullText() = default;
-
-  virtual uint64_t Utf8CountU();
-  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer);
-  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer);
-  virtual void TruncateUtf8U(const uint64_t offset);
-
-  virtual uint32_t ReferenceCount() const;
-  virtual uint32_t MirrorsCount() const;
-  virtual void ReleaseReference();
+  bool IsShared() const override;
+  virtual uint64_t Utf8CountU() override;
+  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer) override;
+  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer) override;
+  virtual void TruncateUtf8U(const uint64_t offset) override;
 };
 
 
@@ -157,19 +148,19 @@ class TemporalText : public ITextStrategy
 public:
   TemporalText(const uint8_t* const utf8Str = nullptr, const uint64_t unitsCount = ~0);
 
-  virtual TemporalContainer& GetTemporalContainer();
+  TemporalText(const TemporalText&) = delete;
+  TemporalText operator=(const TemporalText&) = delete;
+
+  virtual TemporalContainer& GetTemporalContainer() override;
 
 protected:
-  virtual uint64_t Utf8CountU();
-  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer);
-  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer);
-  virtual void TruncateUtf8U(const uint64_t offset);
+  bool IsShared() const override;
+  virtual uint64_t Utf8CountU() override;
+  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer) override;
+  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer) override;
+  virtual void TruncateUtf8U(const uint64_t offset) override;
 
   TemporalContainer mStorage;
-
-private:
-  TemporalText(const TemporalText&);
-  TemporalText operator=(const TemporalText&);
 };
 
 
@@ -181,16 +172,20 @@ class RowFieldText : public ITextStrategy
 public:
   RowFieldText(VariableSizeStore& storage, const uint64_t firstEntry, const uint64_t bytesSize);
 
-  virtual TemporalContainer& GetTemporalContainer();
-  virtual VariableSizeStore& GetRowStorage();
+  RowFieldText(const RowFieldText&) = delete;
+  RowFieldText operator=(const RowFieldText&) = delete;
+
+  virtual ~RowFieldText() override;
+
+  virtual TemporalContainer& GetTemporalContainer() override;
+  virtual VariableSizeStore& GetRowStorage() override;
 
 protected:
-  virtual ~RowFieldText();
-
-  virtual uint64_t Utf8CountU();
-  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer);
-  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer);
-  virtual void TruncateUtf8U(const uint64_t offset);
+  bool IsShared() const override;
+  virtual uint64_t Utf8CountU() override;
+  virtual void ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t * const buffer) override;
+  virtual void WriteUtf8U(const uint64_t offset, const uint64_t count, const uint8_t* const buffer) override;
+  virtual void TruncateUtf8U(const uint64_t offset) override;
 
   const uint64_t mFirstEntry;
   const uint64_t mUtf8Count;
@@ -200,10 +195,6 @@ protected:
   static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof(uint32_t);
   static const uint32_t MAX_CHARS_COUNT = 0xFFFFFFFF;
   static const uint32_t MAX_BYTES_COUNT = 0xFFFFFFFF;
-
-private:
-  RowFieldText(const RowFieldText&);
-  RowFieldText operator=(const RowFieldText&);
 };
 
 class StringMatcher

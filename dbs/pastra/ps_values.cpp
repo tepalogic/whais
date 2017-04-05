@@ -28,6 +28,7 @@
 
 #include "dbs/dbs_values.h"
 #include "dbs/dbs_mgr.h"
+#include "dbs/dbs_valtranslator.h"
 #include "utils/wrandom.h"
 #include "utils/date.h"
 #include "utils/wutf.h"
@@ -559,73 +560,53 @@ DRichReal::Next() const
 
 
 DText::DText(const char* text)
-  : mText(&pastra::NullText::GetSingletoneInstace()),
-    mTextRefs(0)
-
 {
-  if ((text != nullptr) && (text[0] != 0))
-    mText = new TemporalText(_RC(const uint8_t*, text));
+  if (text != nullptr && text[0] != 0)
+  {
+    mText = shared_make(TemporalText, _RC(const uint8_t*, text));
+    mText->SetSelfReference(mText);
+  }
+  else
+    mText = NullText::GetSingletoneInstace();
 }
 
 
 DText::DText(const uint8_t *utf8Src, uint_t unitsCount)
-  : mText(& NullText::GetSingletoneInstace()),
-    mTextRefs(0)
-
 {
   if ((utf8Src != nullptr) && (utf8Src[0] != 0) && (unitsCount > 0))
-    mText = new TemporalText(utf8Src, unitsCount);
+  {
+    mText = shared_make(TemporalText, utf8Src, unitsCount);
+    mText->SetSelfReference(mText);
+  }
+  else
+    mText = NullText::GetSingletoneInstace();
 }
 
 
-DText::DText(ITextStrategy& text)
-  : mText(&text),
-    mTextRefs(0)
+DText::DText(shared_ptr<ITextStrategy> strategy)
+  : mText(strategy)
 {
 }
 
 
 DText::DText(const DText& source)
-  : mText(nullptr),
-    mTextRefs(0)
+  : mText(source.GetStrategy())
 {
-  StrategyRAII s = source.GetStrategyRAII();
-
-  mText = _SC(ITextStrategy&, s).MakeClone();
-
-  assert(mText == source.mText);
-}
-
-
-DText::~DText()
-{
-  assert(mTextRefs == 0);
-
-  mText->ReleaseReference();
 }
 
 
 bool
 DText::IsNull() const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).CharsCount() == 0;
+  return GetStrategy()->CharsCount() == 0;
 }
 
 
 DText&
 DText::operator= (const DText& source)
 {
-  if (this == &source)
-    return *this;
-
-  StrategyRAII s = source.GetStrategyRAII();
-  StrategyRAII t = GetStrategyRAII();
-
-  if (&_SC(ITextStrategy&, s) != &_SC(ITextStrategy&, t))
-    {
-      t.Release();
-      ReplaceStrategy(_SC(ITextStrategy&, s).MakeClone());
-    }
+  if (this != &source)
+    ReplaceStrategy(source.GetStrategy());
 
   return *this;
 }
@@ -634,99 +615,69 @@ DText::operator= (const DText& source)
 uint64_t
 DText::Count() const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).CharsCount();
+  return GetStrategy()->CharsCount();
 }
 
 
 uint64_t
 DText::RawSize() const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).Utf8Count();
+  return GetStrategy()->Utf8Count();
 }
 
 
 void
-DText::RawRead(uint64_t        offset,
-                uint64_t        count,
-                uint8_t* const  dest) const
+DText::RawRead(uint64_t offset, uint64_t count, uint8_t* const dest) const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).ReadUtf8(offset, count, dest);
+  return GetStrategy()->ReadUtf8(offset, count, dest);
 }
 
 
 uint64_t
 DText::OffsetOfChar(const uint64_t chIndex) const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).OffsetOfChar(chIndex);
+  return GetStrategy()->OffsetOfChar(chIndex);
 }
 
 
 uint64_t
 DText::CharsUntilOffset(const uint64_t offset) const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).CharsUntilOffset(offset);
+  return GetStrategy()->CharsUntilOffset(offset);
 }
 
 
-void
+DText&
 DText::Append(const DChar& ch)
 {
-  if (ch.IsNull())
-    return ;
+  if (! ch.IsNull())
+    ReplaceStrategy(GetStrategy()->Append(ch.mValue));
 
-  StrategyRAII    t = GetStrategyRAII();
-  ITextStrategy&  s = t;
-
-  ITextStrategy* const newText = s.Append(ch.mValue);
-
-  if (newText != &s)
-  {
-    t.Release();
-    ReplaceStrategy(newText);
-  }
+  return *this;
 }
 
 
-void
+DText&
 DText::Append(const DText& text)
 {
-  if (text.IsNull())
-    return ;
-
-  StrategyRAII    t   = GetStrategyRAII();
-  StrategyRAII    src = text.GetStrategyRAII();
-  ITextStrategy&  s   = t;
-
-  ITextStrategy* const newText = s.Append(src);
-  src.Release();
-  if (newText != &s)
-  {
-    t.Release();
-    ReplaceStrategy(newText);
-  }
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->Append(*text.GetStrategy()));
+  return *this;
 }
 
 
 DChar
 DText::CharAt(const uint64_t index) const
 {
-  return _SC(ITextStrategy&, GetStrategyRAII()).CharAt(index);
+  return GetStrategy()->CharAt(index);
 }
 
 
 void
 DText::CharAt(const uint64_t index, const DChar& ch)
 {
-  StrategyRAII    t = GetStrategyRAII();
-  ITextStrategy&  s = t;
-
-  ITextStrategy* const newText = s.UpdateCharAt(ch.mValue, index);
-
-  if (newText != &s)
-  {
-    t.Release();
-    ReplaceStrategy(newText);
-  }
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->UpdateCharAt(ch.mValue, index));
 }
 
 
@@ -736,10 +687,8 @@ DText::FindInText(const DText&      text,
                   const uint64_t    fromCh,
                   const uint64_t    toCh)
 {
-  StrategyRAII    s = GetStrategyRAII();
-  ITextStrategy&  t = s;
-
-  return t.FindMatch(text.GetStrategyRAII(), fromCh, toCh, ignoreCase);
+  const auto s = GetStrategy();
+  return s->FindMatchInText(*text.GetStrategy(), fromCh, toCh, ignoreCase);
 }
 
 
@@ -753,118 +702,52 @@ DText::FindSubstring(const DText&      substr,
 }
 
 
-DText
+DText&
 DText::ReplaceSubstring(const DText&    substr,
                         const DText&    newSubstr,
                         const bool      ignoreCase,
                         const uint64_t  fromCh,
                         const uint64_t  toCh)
 {
-  StrategyRAII    s = substr.GetStrategyRAII();
-  ITextStrategy&  t = s;
-
-  ITextStrategy* const result = t.Replace(GetStrategyRAII(),
-                                          newSubstr.GetStrategyRAII(),
-                                          fromCh,
-                                          toCh,
-                                          ignoreCase);
-  return DText(*result);
+  ReplaceStrategy(substr.GetStrategy()->ReplaceInText(GetStrategy(),
+                                                newSubstr.GetStrategy(),
+                                                fromCh,
+                                                toCh,
+                                                ignoreCase));
+  return *this;
 }
 
-DText
-DText::LowerCase() const
+DText&
+DText::LowerCase()
 {
-  return DText(*_SC(ITextStrategy&, GetStrategyRAII()).ToCase(true));
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->ToCase(true));
+  return *this;
 }
 
-DText
-DText::UpperCase() const
+DText&
+DText::UpperCase()
 {
-  return DText(*_SC(ITextStrategy&, GetStrategyRAII()).ToCase(false));
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->ToCase(false));
+  return *this;
 }
 
-void
-DText::MakeMirror(DText& inoutText)
+shared_ptr<ITextStrategy>
+DText::GetStrategy() const
 {
-  if (this == &inoutText)
-    return;
-
-  StrategyRAII s = GetStrategyRAII();
-  ITextStrategy& t = s;
-
-  StrategyRAII s2 = inoutText.GetStrategyRAII();
-  ITextStrategy& t2 = s2;
-
-  if (( &t != &NullText::GetSingletoneInstace()) && ( &t == &t2))
-  {
-    return;
-  }
-
-  ITextStrategy* const newText = t.MakeMirrorCopy();
-
-  if (newText != &t)
-  {
-    s.Release();
-    ReplaceStrategy(newText);
-  }
-  s.Release();
-
-  if (newText != &t2)
-  {
-    s2.Release();
-    inoutText.ReplaceStrategy(newText);
-  }
-}
-
-
-ITextStrategy&
-DText::GetStrategy()
-{
-  LockRAII<SpinLock> _l(mLock);
-
-  ++mTextRefs;
-  return *mText;
-}
-
-DText::StrategyRAII
-DText::GetStrategyRAII() const
-{
-  return StrategyRAII( _CC(DText&, *this));
+  LockRAII<decltype(mLock)> _l(mLock);
+  return mText;
 }
 
 
 void
-DText::ReleaseStrategy()
+DText::ReplaceStrategy(shared_ptr<ITextStrategy> s)
 {
-  LockRAII<SpinLock> _l(mLock);
+  LockRAII<decltype(mLock)> _l(mLock);
 
-  assert(mTextRefs > 0);
-
-  --mTextRefs;
-}
-
-
-void
-DText::ReplaceStrategy(ITextStrategy* const strategy)
-{
-  assert(strategy != nullptr);
-  assert(mText != strategy);
-
-  LockRAII<SpinLock> _l(mLock);
-
-  do
-  {
-    if (mTextRefs == 0)
-    {
-      mText->ReleaseReference();
-      mText = strategy;
-      return;
-    }
-
-    _l.Release();
-    wh_yield();
-    _l.Acquire();
-  } while (true);
+  if (mText != s)
+      mText = s;
 }
 
 
@@ -874,18 +757,32 @@ DText::CompareTo(const DText& second) const
   if (this == &second)
     return 0;
 
-  StrategyRAII    s = GetStrategyRAII();
-  ITextStrategy&  t = s;
 
-  StrategyRAII    s2 = second.GetStrategyRAII();
-  ITextStrategy&  t2 = s2;
+  shared_ptr<ITextStrategy> this_s = GetStrategy();
+  shared_ptr<ITextStrategy> second_s = second.GetStrategy();
 
-  if (&t == &t2)
+  if (this_s == second_s)
     return 0;
 
-  return t.CompareTo(t2);
+  return this_s->CompareTo(*second_s);
 }
 
+
+DText::operator string()
+{
+  string result;
+
+  auto s = GetStrategy();
+  for (uint32_t i = 0; i < s->CharsCount(); ++i)
+  {
+    uint8_t utfChar[8] = {0, };
+    Utf8Translator::Write(utfChar, sizeof utfChar, false, s->CharAt(i));
+
+    result += _RC(char*, utfChar);
+  }
+
+  return move(result);
+}
 
 
 template <class T> void
@@ -1412,14 +1309,16 @@ DArray::Set(const uint64_t index, const DInt64& newValue)
 void
 DArray::Remove(const uint64_t index)
 {
-  ReplaceStrategy(GetStrategy()->Remove(index));
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->Remove(index));
 }
 
 
 void
 DArray::Sort(bool reverse)
 {
-  ReplaceStrategy(GetStrategy()->Sort(reverse));
+  const auto s = GetStrategy();
+  ReplaceStrategy(s->Sort(reverse));
 }
 
 

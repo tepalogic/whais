@@ -50,23 +50,23 @@ public:
   DbsHandler(const DBSSettings& settings, const std::string& directory, const std::string& name);
   DbsHandler(const DbsHandler& source);
 
-  virtual ~DbsHandler();
+  virtual ~DbsHandler() override;
 
-  virtual TABLE_INDEX PersistentTablesCount();
-  virtual ITable& RetrievePersistentTable(const TABLE_INDEX index);
-  virtual ITable& RetrievePersistentTable(const char* const name);
-  virtual void ReleaseTable(ITable&);
+  virtual TABLE_INDEX PersistentTablesCount() override;
+  virtual ITable& RetrievePersistentTable(const TABLE_INDEX index) override;
+  virtual ITable& RetrievePersistentTable(const char* const name) override;
+  virtual void ReleaseTable(ITable&) override;
 
   virtual void AddTable(const char* const          name,
                        const FIELD_INDEX           fieldsCount,
                        DBSFieldDescriptor* const   inoutFields);
-  virtual void DeleteTable(const char* const name);
-  virtual void SyncAllTablesContent();
-  virtual void SyncTableContent(const TABLE_INDEX index);
-  virtual void NotifyDatabaseUpdate();
+  virtual void DeleteTable(const char* const name) override;
+  virtual void SyncAllTablesContent() override;
+  virtual void SyncTableContent(const TABLE_INDEX index) override;
+  virtual void NotifyDatabaseUpdate() override;
 
-  virtual ITable& CreateTempTable(const FIELD_INDEX fieldsCount, DBSFieldDescriptor* inoutFields);
-  virtual const char* TableName(const TABLE_INDEX index);
+  virtual ITable& CreateTempTable(const FIELD_INDEX fieldsCount, DBSFieldDescriptor* inoutFields) override;
+  virtual const char* TableName(const TABLE_INDEX index) override;
 
   void Discard();
   void RemoveFromStorage();

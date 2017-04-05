@@ -77,9 +77,9 @@ public:
                           const char      *fmtMsg = nullptr,
                           ...);
 
-  virtual Exception*     Clone() const;
-  virtual EXCEPTION_TYPE Type() const;
-  virtual const char*    Description() const;
+  virtual Exception*     Clone() const override;
+  virtual EXCEPTION_TYPE Type() const override;
+  virtual const char*    Description() const override;
 };
 
 class COMPILER_SHL
@@ -90,33 +90,33 @@ public:
                      uint_t             bufferSize,
                      WH_MESSENGER       messenger,
                      WH_MESSENGER_CTXT  messengerContext);
-  virtual ~CompiledBufferUnit();
+  virtual ~CompiledBufferUnit() override;
 
   CompiledBufferUnit(CompiledBufferUnit&) = delete;
   CompiledBufferUnit& operator= (CompiledBufferUnit&) = delete;
 
-  virtual uint_t         TypeAreaSize();
-  virtual const uint8_t* RetriveTypeArea();
-  virtual uint_t         ConstsAreaSize();
-  virtual const uint8_t* RetrieveConstArea();
+  virtual uint_t         TypeAreaSize() override;
+  virtual const uint8_t* RetriveTypeArea() override;
+  virtual uint_t         ConstsAreaSize() override;
+  virtual const uint8_t* RetrieveConstArea() override;
 
-  virtual uint_t         GlobalsCount();
-  virtual uint_t         GlobalNameLength(const uint_t id);
-  virtual const char*    RetriveGlobalName(const uint_t id);
-  virtual uint_t         GlobalTypeOff(const uint_t id);
-  virtual bool_t         IsGlobalExternal(const uint_t id);
+  virtual uint_t         GlobalsCount() override;
+  virtual uint_t         GlobalNameLength(const uint_t id) override;
+  virtual const char*    RetriveGlobalName(const uint_t id) override;
+  virtual uint_t         GlobalTypeOff(const uint_t id) override;
+  virtual bool_t         IsGlobalExternal(const uint_t id) override;
 
-  virtual uint_t         ProceduresCount();
-  virtual uint_t         ProcSyncStatementsCount(const uint_t id);
-  virtual uint_t         ProcCodeAreaSize(const uint_t id);
-  virtual const uint8_t* RetriveProcCodeArea(const uint_t id);
-  virtual uint_t         ProcLocalsCount(const uint_t id);
-  virtual uint_t         ProcParametersCount(const uint_t id);
-  virtual uint_t         GetProcReturnTypeOff(const uint_t id);
-  virtual uint_t         GetProcNameSize(const uint_t id);
-  virtual const char*    RetriveProcName(const uint_t id);
-  virtual uint_t         GetProcLocalTypeOff(uint_t procId, uint_t localId);
-  virtual bool_t         IsProcExternal(uint_t procId);
+  virtual uint_t         ProceduresCount() override;
+  virtual uint_t         ProcSyncStatementsCount(const uint_t id) override;
+  virtual uint_t         ProcCodeAreaSize(const uint_t id) override;
+  virtual const uint8_t* RetriveProcCodeArea(const uint_t id) override;
+  virtual uint_t         ProcLocalsCount(const uint_t id) override;
+  virtual uint_t         ProcParametersCount(const uint_t id) override;
+  virtual uint_t         GetProcReturnTypeOff(const uint_t id) override;
+  virtual uint_t         GetProcNameSize(const uint_t id) override;
+  virtual const char*    RetriveProcName(const uint_t id) override;
+  virtual uint_t         GetProcLocalTypeOff(uint_t procId, uint_t localId) override;
+  virtual bool_t         IsProcExternal(uint_t procId) override;
 
 private:
   WH_COMPILED_UNIT mHandler;
@@ -128,33 +128,33 @@ CompiledFileUnit : public WIFunctionalUnit
 
 public:
   explicit CompiledFileUnit(const char *file);
-  virtual ~CompiledFileUnit();
+  virtual ~CompiledFileUnit() override;
 
   CompiledFileUnit(CompiledFileUnit&) = delete;
   CompiledFileUnit& operator= (CompiledFileUnit&) = delete;
 
-  virtual uint_t         TypeAreaSize();
-  virtual const uint8_t* RetriveTypeArea();
+  virtual uint_t         TypeAreaSize() override;
+  virtual const uint8_t* RetriveTypeArea() override;
 
-  virtual uint_t         GlobalsCount();
-  virtual uint_t         GlobalNameLength(const uint_t id);
-  virtual const char*    RetriveGlobalName(const uint_t id);
-  virtual uint_t         GlobalTypeOff(const uint_t id);
-  virtual bool_t         IsGlobalExternal(const uint_t id);
-  virtual uint_t         ConstsAreaSize();
-  virtual const uint8_t* RetrieveConstArea();
+  virtual uint_t         GlobalsCount() override;
+  virtual uint_t         GlobalNameLength(const uint_t id) override;
+  virtual const char*    RetriveGlobalName(const uint_t id) override;
+  virtual uint_t         GlobalTypeOff(const uint_t id) override;
+  virtual bool_t         IsGlobalExternal(const uint_t id) override;
+  virtual uint_t         ConstsAreaSize() override;
+  virtual const uint8_t* RetrieveConstArea() override;
 
-  virtual uint_t         ProceduresCount();
-  virtual uint_t         ProcSyncStatementsCount(const uint_t id);
-  virtual uint_t         ProcCodeAreaSize(const uint_t id);
-  virtual const uint8_t* RetriveProcCodeArea(const uint_t id);
-  virtual uint_t         ProcLocalsCount(const uint_t id);
-  virtual uint_t         ProcParametersCount(const uint_t id);
-  virtual uint_t         GetProcReturnTypeOff(const uint_t id);
-  virtual uint_t         GetProcNameSize(const uint_t id);
-  virtual const char*    RetriveProcName(const uint_t id);
-  virtual uint_t         GetProcLocalTypeOff(uint_t procId, uint_t localId);
-  virtual bool_t         IsProcExternal(uint_t procId);
+  virtual uint_t         ProceduresCount() override;
+  virtual uint_t         ProcSyncStatementsCount(const uint_t id) override;
+  virtual uint_t         ProcCodeAreaSize(const uint_t id) override;
+  virtual const uint8_t* RetriveProcCodeArea(const uint_t id) override;
+  virtual uint_t         ProcLocalsCount(const uint_t id) override;
+  virtual uint_t         ProcParametersCount(const uint_t id) override;
+  virtual uint_t         GetProcReturnTypeOff(const uint_t id) override;
+  virtual uint_t         GetProcNameSize(const uint_t id) override;
+  virtual const char*    RetriveProcName(const uint_t id) override;
+  virtual uint_t         GetProcLocalTypeOff(uint_t procId, uint_t localId) override;
+  virtual bool_t         IsProcExternal(uint_t procId) override;
 
 private:
   void ProcessHeader();

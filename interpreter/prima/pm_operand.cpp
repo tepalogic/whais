@@ -2658,42 +2658,42 @@ RichRealOperand::Duplicate() const
 bool
 TextOperand::IsNull() const
 {
-  return mValue.IsNull();
+  return (*mValue)->IsNull();
 }
 
 
 void
 TextOperand::GetValue(DText& outValue) const
 {
-  outValue = mValue;
+  outValue = **mValue;
 }
 
 
 void
 TextOperand::SetValue(const DText& value)
 {
-  mValue = value;
+  **mValue = value;
 }
 
 
 void
 TextOperand::SelfAdd(const DChar& value)
 {
-  mValue.Append(value);
+  (*mValue)->Append(value);
 }
 
 
 void
 TextOperand::SelfAdd(const DText& value)
 {
-  mValue.Append(value);
+  (*mValue)->Append(value);
 }
 
 
 StackValue
 TextOperand::GetValueAt(const uint64_t index)
 {
-  return StackValue(CharTextElOperand(mValue, index));
+  return StackValue(CharTextElOperand(*mValue, index));
 }
 
 
@@ -2717,17 +2717,17 @@ TextOperand::StartIterate(const bool reverse, StackValue& outStartItem)
   if (IsNull())
     return false;
 
-  assert(mValue.Count() > 0);
+  assert((*mValue)->Count() > 0);
 
-  outStartItem = GetValueAt(reverse ? mValue.Count() - 1 : 0);
+  outStartItem = GetValueAt(reverse ? (*mValue)->Count() - 1 : 0);
   return true;
 }
 
 
 bool
-TextOperand::DoneCustomCopy(void* const dest)
+TextOperand::DoSimpleCopy(void* const dest)
 {
-  _placement_new(dest, TextOperand(mValue));
+  _placement_new(dest, *this);
   return false;
 }
 
@@ -2737,23 +2737,21 @@ TextOperand::DoneCustomCopy(void* const dest)
 bool
 CharTextElOperand::IsNull() const
 {
-  return(mText.Count() <= mIndex) ? true : false;
+  return (*mText)->Count() <= mIndex ? true : false;
 }
 
 
 void
 CharTextElOperand::GetValue(DChar& outValue) const
 {
-  outValue = (mText.Count() <= mIndex) ?
-               DChar() :
-               mText.CharAt(mIndex);
+  outValue = ((*mText)->Count() <= mIndex) ? DChar() : (*mText)->CharAt(mIndex);
 }
 
 
 void
 CharTextElOperand::GetValue(DText& outValue) const
 {
-  DChar ch = mText.CharAt(mIndex);
+  DChar ch = (*mText)->CharAt(mIndex);
   DText text;
 
   text.Append(ch);
@@ -2764,7 +2762,7 @@ CharTextElOperand::GetValue(DText& outValue) const
 void
 CharTextElOperand::SetValue(const DChar& value)
 {
-  mText.CharAt(mIndex, value);
+  (*mText)->CharAt(mIndex, value);
 }
 
 
@@ -2797,7 +2795,7 @@ CharTextElOperand::Iterate(const bool reverse)
       return true;
     }
 
-  if (mIndex >= mText.Count() - 1)
+  if (mIndex >= (*mText)->Count() - 1)
     return false;
 
   _CC(uint64_t&, mIndex)++;
@@ -2812,9 +2810,9 @@ CharTextElOperand::IteratorOffset()
 }
 
 bool
-CharTextElOperand::DoneCustomCopy(void* const dest)
+CharTextElOperand::DoSimpleCopy(void* const dest)
 {
-  _placement_new(dest, CharTextElOperand(mText, mIndex));
+  _placement_new(dest, *this);
 
   return false;
 }
@@ -3216,7 +3214,7 @@ GlobalOperand::GetTableReference()
 
 
 bool
-GlobalOperand::DoneCustomCopy(void* const)
+GlobalOperand::DoSimpleCopy(void* const)
 {
   return true;
 }

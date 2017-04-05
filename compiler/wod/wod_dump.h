@@ -62,7 +62,7 @@ public:
 
   virtual ~DumpException() {};
 
-  virtual Exception* Clone() const { return new DumpException(*this); }
+  virtual Exception* Clone() const override { return new DumpException(*this); }
   virtual EXCEPTION_TYPE Type() const { return DUMP_EXCEPTION; }
   virtual const char* Description() const
   {

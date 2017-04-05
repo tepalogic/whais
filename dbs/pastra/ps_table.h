@@ -47,13 +47,13 @@ public:
                   const DBSFieldDescriptor* const   inoutFields,
                   const uint_t                      fieldsCount);
   PersistentTable(const PrototypeTable& prototype);
-  virtual ~PersistentTable();
+  virtual ~PersistentTable() override;
 
   void RemoveFromDatabase();
 
-  virtual bool IsTemporal() const;
-  virtual ITable& Spawn() const;
-  virtual void FlushEpilog();
+  virtual bool IsTemporal() const override;
+  virtual ITable& Spawn() const override;
+  virtual void FlushEpilog() override;
 
 public:
   static bool ValidateTable(const std::string& path, const std::string& name);
@@ -63,11 +63,11 @@ public:
                           FIX_ERROR_CALLBACK   fixCallback);
 
 protected:
-  virtual void MakeHeaderPersistent();
-  virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field);
-  virtual IDataContainer& RowsContainer();
-  virtual IDataContainer& TableContainer();
-  virtual VariableSizeStore& VSStore();
+  virtual void MakeHeaderPersistent() override;
+  virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field) override;
+  virtual IDataContainer& RowsContainer() override;
+  virtual IDataContainer& TableContainer() override;
+  virtual VariableSizeStore& VSStore() override;
 
   const DBSSettings&               mDbsSettings;
   uint64_t                         mMaxFileSize;
@@ -94,18 +94,18 @@ public:
                 const DBSFieldDescriptor* const   inoutFields,
                 const FIELD_INDEX                 fieldsCount);
   TemporalTable(const PrototypeTable& protoype);
-  virtual ~TemporalTable();
+  virtual ~TemporalTable() override;
 
-  virtual bool IsTemporal() const;
-  virtual ITable& Spawn() const;
-  virtual void FlushEpilog();
+  virtual bool IsTemporal() const override;
+  virtual ITable& Spawn() const override;
+  virtual void FlushEpilog() override;
 
 protected:
-  virtual void MakeHeaderPersistent();
-  virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field);
-  virtual IDataContainer& RowsContainer();
-  virtual IDataContainer& TableContainer();
-  virtual VariableSizeStore& VSStore();
+  virtual void MakeHeaderPersistent() override;
+  virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field) override;
+  virtual IDataContainer& RowsContainer() override;
+  virtual IDataContainer& TableContainer() override;
+  virtual VariableSizeStore& VSStore() override;
 
   std::unique_ptr<TemporalContainer>   mTableData;
   std::unique_ptr<TemporalContainer>   mRowsData;

@@ -150,8 +150,8 @@ public:
 
   uint64_t Size() const;
 
-  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* from);
-  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* to);
+  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* from) override;
+  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* to) override;
 
   void PrepareToCheckStorage();
   bool CheckArrayEntry(const uint64_t recordFirstEntry,

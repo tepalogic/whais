@@ -63,42 +63,42 @@ class Session : public ISession
 {
 public:
   Session(Logger& log, NameSpaceHolder& globalNames, NameSpaceHolder& privateNames);
-  virtual ~Session();
+  virtual ~Session() override;
 
-  virtual void LoadCompiledUnit(WIFunctionalUnit& unit);
-  virtual bool LoadSharedLib(WH_SHLIB shl);
+  virtual void LoadCompiledUnit(WIFunctionalUnit& unit) override;
+  virtual bool LoadSharedLib(WH_SHLIB shl) override;
 
   virtual void ExecuteProcedure(const char* const   procedure,
                                  SessionStack&       stack);
 
-  virtual uint_t GlobalValuesCount() const;
+  virtual uint_t GlobalValuesCount() const override;
 
-  virtual uint_t ProceduresCount() const;
+  virtual uint_t ProceduresCount() const override;
 
-  virtual const char* GlobalValueName(const uint_t index) const;
+  virtual const char* GlobalValueName(const uint_t index) const override;
 
-  virtual const char* ProcedureName(const uint_t index) const;
+  virtual const char* ProcedureName(const uint_t index) const override;
 
-  virtual uint_t GlobalValueRawType(const uint32_t index);
-  virtual uint_t GlobalValueRawType(const char* const name);
+  virtual uint_t GlobalValueRawType(const uint32_t index) override;
+  virtual uint_t GlobalValueRawType(const char* const name) override;
 
-  virtual uint_t GlobalValueFieldsCount(const uint32_t index);
-  virtual uint_t GlobalValueFieldsCount(const char* const name);
+  virtual uint_t GlobalValueFieldsCount(const uint32_t index) override;
+  virtual uint_t GlobalValueFieldsCount(const char* const name) override;
 
-  virtual const char* GlobalValueFieldName(const uint32_t index, const uint32_t field);
-  virtual const char* GlobalValueFieldName(const char* const name, const uint32_t field);
+  virtual const char* GlobalValueFieldName(const uint32_t index, const uint32_t field) override;
+  virtual const char* GlobalValueFieldName(const char* const name, const uint32_t field) override;
 
-  virtual uint_t GlobalValueFieldType(const uint32_t index, const uint32_t field);
-  virtual uint_t GlobalValueFieldType(const char* const name, const uint32_t field);
+  virtual uint_t GlobalValueFieldType(const uint32_t index, const uint32_t field) override;
+  virtual uint_t GlobalValueFieldType(const char* const name, const uint32_t field) override;
 
-  virtual uint_t ProcedureParametersCount(const uint_t id) const;
-  virtual uint_t ProcedureParametersCount(const char* const name) const;
+  virtual uint_t ProcedureParametersCount(const uint_t id) const override;
+  virtual uint_t ProcedureParametersCount(const char* const name) const override;
 
-  virtual uint_t ProcedurePameterRawType(const uint_t id, const uint_t param);
-  virtual uint_t ProcedurePameterRawType(const char* const name, const uint_t param);
+  virtual uint_t ProcedurePameterRawType(const uint_t id, const uint_t param) override;
+  virtual uint_t ProcedurePameterRawType(const char* const name, const uint_t param) override;
 
-  virtual uint_t ProcedurePameterFieldsCount(const uint_t id, const uint_t param);
-  virtual uint_t ProcedurePameterFieldsCount(const char* const name, const uint_t param);
+  virtual uint_t ProcedurePameterFieldsCount(const uint_t id, const uint_t param) override;
+  virtual uint_t ProcedurePameterFieldsCount(const char* const name, const uint_t param) override;
 
   virtual const char* ProcedurePameterFieldName(const uint_t id,
                                                 const uint_t param,
@@ -107,12 +107,12 @@ public:
                                                 const uint_t param,
                                                 const uint_t field);
 
-  virtual uint_t ProcedurePameterFieldType(const uint_t id, const uint_t param, const uint_t field);
+  virtual uint_t ProcedurePameterFieldType(const uint_t id, const uint_t param, const uint_t field) override;
   virtual uint_t ProcedurePameterFieldType(const char* const name,
                                            const uint_t param,
                                            const uint_t field);
 
-  virtual bool NotifyEvent(const uint_t event, uint64_t* const extra);
+  virtual bool NotifyEvent(const uint_t event, uint64_t* const extra) override;
 
   uint32_t FindGlobal(const uint8_t* name, const uint_t nameLength);
 

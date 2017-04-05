@@ -331,7 +331,7 @@ test_mirror(void* )
         const uint_t j = wh_rnd() % TEST_VALUES_COUNT;
         const uint_t z = wh_rnd() % TEST_VALUES_COUNT;
 
-        testValues[j].MakeMirror(testValues[z]);
+        testValues[j] = testValues[z];
 
         while (resetStart)
           wh_sleep(1);

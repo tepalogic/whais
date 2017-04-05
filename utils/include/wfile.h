@@ -42,9 +42,9 @@ public:
                 const char*       fmtMsg,
                 ...);
 
-  virtual Exception* Clone() const;
-  virtual EXCEPTION_TYPE Type() const;
-  virtual const char* Description() const;
+  virtual Exception* Clone() const override;
+  virtual EXCEPTION_TYPE Type() const override;
+  virtual const char* Description() const override;
 };
 
 
