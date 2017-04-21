@@ -431,8 +431,8 @@ test_op_stta(Session& session)
   w_encode_opcode(W_RET, testCode + opSize);
 
 
-  stack.Push(session.DBSHandler(), firstTable);
-  stack.Push(session.DBSHandler(), secondTable);
+  stack.Push(firstTable);
+  stack.Push(secondTable);
 
   if (stack[0].Operand().IsNull() == false)
     return false;
@@ -475,7 +475,7 @@ test_op_stf(Session& session)
   DBSFieldDescriptor fd = {"first_field",  T_UINT32, false};
 
   ITable& firstTable = session.DBSHandler().CreateTempTable(1, &fd);
-  TableOperand tableOp(session.DBSHandler(), firstTable, true);
+  TableOperand tableOp(firstTable, true);
 
   FieldOperand op;
   FieldOperand op2(tableOp, 0);

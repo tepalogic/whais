@@ -138,7 +138,7 @@ main()
   success &= test_stack_type<GlobalOperand> ("GlobalOperand");
   success &= test_stack_type<LocalOperand> ("LocalOperand");
 
-  success &= test_stack_type<NativeObjectOperand> ("NativeObjectOperand");
+  success &= test_stack_type<UndefinedOperand> ("NativeObjectOperand");
 
   success &= (sgMaxValue == sizeof(StackValue));
 

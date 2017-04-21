@@ -118,7 +118,7 @@ number_convert(const T_SRC& from, T_DEST& to)
 
 class TableOperand;
 class FieldOperand;
-class NativeObjectOperand;
+class UndefinedOperand;
 class LocalOperand;
 class GlobalOperand;
 
@@ -154,7 +154,6 @@ public:
   virtual void SetValue(const DRichReal& value) override;
   virtual void SetValue(const DText& value) override;
   virtual void SetValue(const DArray& value) override;
-
 
   virtual void SelfAdd(const DInt64& value) override;
   virtual void SelfAdd(const DRichReal& value) override;
@@ -195,19 +194,16 @@ public:
   virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override { return true; }
+  virtual void NativeObject(INativeObject* const value) override;
+  virtual INativeObject& NativeObject() override;
 
   virtual TableOperand GetTableOp();
   virtual void CopyTableOp(const TableOperand& source);
-
   virtual FieldOperand GetFieldOp();
   virtual void CopyFieldOp(const FieldOperand& source);
-
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source);
-
-  virtual void           NativeObject(INativeObject* const value) override;
-  virtual INativeObject& NativeObject() override;
   virtual TableReference& GetTableReference();
+  virtual void CopyUndefinedOperand(const UndefinedOperand& source);
 };
 
 
@@ -914,7 +910,7 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
 private:
   std::shared_ptr<DText>* mValue;
@@ -965,7 +961,7 @@ public:
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
 private:
   const uint64_t mIndex;
@@ -1016,7 +1012,7 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
-  virtual bool DoSimpleCopy(void* const) override;
+  virtual bool CustomCopyIncomplete(void* const) override;
 
 private:
   std::shared_ptr<DArray>* mValue;
@@ -1089,7 +1085,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1110,7 +1106,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1133,7 +1129,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1156,7 +1152,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1179,7 +1175,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1230,7 +1226,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1280,7 +1276,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1330,7 +1326,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1380,7 +1376,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1430,7 +1426,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 class Int16ArrayElOperand : public BaseArrayElOperand
@@ -1479,7 +1475,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1529,7 +1525,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1579,7 +1575,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1613,7 +1609,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
@@ -1647,15 +1643,15 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 };
 
 
 class TableOperand : public BaseOperand
 {
 public:
-  TableOperand(IDBSHandler& dbsHnd, ITable& table, const bool changeable)
-    : mTableRef(new TableReference(dbsHnd, table)),
+  TableOperand(ITable& table, const bool changeable)
+    : mTableRef(new TableReference(table)),
       mChangeable(changeable)
   {
     mTableRef->IncrementRefCount();
@@ -1700,7 +1696,7 @@ public:
 
   virtual StackValue Duplicate() const override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
   virtual TableOperand GetTableOp() override;
 
@@ -1746,7 +1742,7 @@ public:
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
   virtual FieldOperand GetFieldOp() override;
 
@@ -1810,7 +1806,7 @@ protected:
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
 private:
   BaseFieldElOperand& operator= (const BaseFieldElOperand* source);
@@ -2560,7 +2556,7 @@ protected:
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
 private:
   BaseArrayFieldElOperand& operator= (const BaseArrayFieldElOperand&);
@@ -3341,7 +3337,7 @@ public:
   {
     LockRAII<Lock> dummy(mSync);
 
-    return Operand().DoSimpleCopy(dest);
+    return Operand().CustomCopyIncomplete(dest);
   }
 
   TableOperand GetTableOp()
@@ -3372,11 +3368,11 @@ public:
     return Operand().CopyFieldOp(source);
   }
 
-  void CopyNativeObjectOperand(const NativeObjectOperand& source)
+  void CopyNativeObjectOperand(const UndefinedOperand& source)
   {
     LockRAII<Lock> dummy(mSync);
 
-    return Operand().CopyNativeObjectOperand(source);
+    return Operand().CopyUndefinedOperand(source);
   }
 
   void NativeObject(INativeObject* const value)
@@ -3485,7 +3481,7 @@ public:
 
   virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
 
-  virtual bool DoSimpleCopy(void* const) override;
+  virtual bool CustomCopyIncomplete(void* const) override;
 
   virtual TableOperand GetTableOp() override;
 
@@ -3495,7 +3491,7 @@ public:
 
   virtual void CopyFieldOp(const FieldOperand& source) override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
+  virtual void CopyUndefinedOperand(const UndefinedOperand& source) override;
 
   virtual void           NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;
@@ -3591,7 +3587,7 @@ public:
 
   virtual void CopyFieldOp(const FieldOperand& source) override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
+  virtual void CopyUndefinedOperand(const UndefinedOperand& source) override;
 
   virtual void           NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;

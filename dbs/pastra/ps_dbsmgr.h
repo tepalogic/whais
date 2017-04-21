@@ -48,7 +48,7 @@ class DbsHandler : public IDBSHandler
 {
 public:
   DbsHandler(const DBSSettings& settings, const std::string& directory, const std::string& name);
-  DbsHandler(const DbsHandler& source);
+  DbsHandler(DbsHandler&& source);
 
   virtual ~DbsHandler() override;
 
@@ -98,11 +98,10 @@ private:
 
 struct DbsElement
 {
-  DbsElement(const DbsHandler& dbs)
+  DbsElement(DbsHandler&& dbs)
     : mRefCount(0),
-      mDbs(dbs)
-  {
-  }
+      mDbs(std::move(dbs))
+  {}
 
   uint64_t   mRefCount;
   DbsHandler mDbs;

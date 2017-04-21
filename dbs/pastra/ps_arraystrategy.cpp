@@ -31,7 +31,6 @@
 #include "dbs/dbs_exception.h"
 #include "ps_arraystrategy.h"
 
-
 using namespace std;
 
 
@@ -452,42 +451,29 @@ NullArray::RawSize() const
 shared_ptr<IArrayStrategy>
 NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
 {
-  static shared_ptr<IArrayStrategy> _boolInstance;
-  static shared_ptr<IArrayStrategy> _charInstance;
-  static shared_ptr<IArrayStrategy> _dateInstance;
-  static shared_ptr<IArrayStrategy> _datetimeInstance;
-  static shared_ptr<IArrayStrategy> _hirestimeInstance;
-  static shared_ptr<IArrayStrategy> _uint8Instance;
-  static shared_ptr<IArrayStrategy> _uint16Instance;
-  static shared_ptr<IArrayStrategy> _uint32Instance;
-  static shared_ptr<IArrayStrategy> _uint64Instance;
-  static shared_ptr<IArrayStrategy> _realInstance;
-  static shared_ptr<IArrayStrategy> _richrealInstance;
-  static shared_ptr<IArrayStrategy> _int8Instance;
-  static shared_ptr<IArrayStrategy> _int16Instance;
-  static shared_ptr<IArrayStrategy> _int32Instance;
-  static shared_ptr<IArrayStrategy> _int64Instance;
-  static shared_ptr<IArrayStrategy> _genericInstance;
+  static shared_ptr<IArrayStrategy> _boolInstance = shared_make(NullArray, T_BOOL);
+  static shared_ptr<IArrayStrategy> _charInstance = shared_make(NullArray, T_CHAR);
+  static shared_ptr<IArrayStrategy> _dateInstance = shared_make(NullArray, T_DATE);
+  static shared_ptr<IArrayStrategy> _datetimeInstance = shared_make(NullArray, T_DATETIME);
+  static shared_ptr<IArrayStrategy> _hirestimeInstance = shared_make(NullArray, T_HIRESTIME);
+  static shared_ptr<IArrayStrategy> _uint8Instance = shared_make(NullArray, T_UINT8);
+  static shared_ptr<IArrayStrategy> _uint16Instance = shared_make(NullArray, T_UINT16);
+  static shared_ptr<IArrayStrategy> _uint32Instance = shared_make(NullArray, T_UINT32);
+  static shared_ptr<IArrayStrategy> _uint64Instance = shared_make(NullArray, T_UINT64);
+  static shared_ptr<IArrayStrategy> _realInstance = shared_make(NullArray, T_REAL);
+  static shared_ptr<IArrayStrategy> _richrealInstance = shared_make(NullArray, T_RICHREAL);
+  static shared_ptr<IArrayStrategy> _int8Instance = shared_make(NullArray, T_INT8);
+  static shared_ptr<IArrayStrategy> _int16Instance = shared_make(NullArray, T_INT16);
+  static shared_ptr<IArrayStrategy> _int32Instance = shared_make(NullArray, T_INT32);
+  static shared_ptr<IArrayStrategy> _int64Instance = shared_make(NullArray, T_INT64);
+  static shared_ptr<IArrayStrategy> _genericInstance = shared_make(NullArray, T_UNDETERMINED);
+  static bool inited = false;
+  static SpinLock initLock;
 
-  if (_boolInstance == nullptr)
+  LockRAII<decltype(initLock)> _l(initLock);
+
+  if ( ! inited)
   {
-    _boolInstance = shared_make(NullArray, T_BOOL);
-    _charInstance = shared_make(NullArray, T_CHAR);
-    _dateInstance = shared_make(NullArray, T_DATE);
-    _datetimeInstance = shared_make(NullArray, T_DATETIME);
-    _hirestimeInstance = shared_make(NullArray, T_HIRESTIME);
-    _uint8Instance = shared_make(NullArray, T_UINT8);
-    _uint16Instance = shared_make(NullArray, T_UINT16);
-    _uint32Instance = shared_make(NullArray, T_UINT32);
-    _uint64Instance = shared_make(NullArray, T_UINT64);
-    _realInstance = shared_make(NullArray, T_REAL);
-    _richrealInstance = shared_make(NullArray, T_RICHREAL);
-    _int8Instance = shared_make(NullArray, T_INT8);
-    _int16Instance = shared_make(NullArray, T_INT16);
-    _int32Instance = shared_make(NullArray, T_INT32);
-    _int64Instance = shared_make(NullArray, T_INT64);
-    _genericInstance = shared_make(NullArray, T_UNDETERMINED);
-
     _boolInstance->SetSelfReference(_boolInstance);
     _charInstance->SetSelfReference(_charInstance);
     _dateInstance->SetSelfReference(_dateInstance);
@@ -504,7 +490,11 @@ NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
     _int32Instance->SetSelfReference(_int32Instance);
     _int64Instance->SetSelfReference(_int64Instance);
     _genericInstance->SetSelfReference(_genericInstance);
+
+    inited = true;
   }
+  _l.Release();
+
 
   switch(type)
   {

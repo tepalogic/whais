@@ -142,14 +142,14 @@ DbsHandler::DbsHandler(const DBSSettings&   settings,
   }
 }
 
-DbsHandler::DbsHandler(const DbsHandler& source)
-  : mGlbSettings(source.mGlbSettings),
-    mDbsLocationDir(source.mDbsLocationDir),
-    mFileName(source.mFileName),
-    mFile(source.mFile),
-    mTables(source.mTables),
-    mCreatedTemporalTables(source.mCreatedTemporalTables),
-    mNeedsSync(source.mNeedsSync)
+DbsHandler::DbsHandler(DbsHandler&& source)
+  : mGlbSettings(move(source.mGlbSettings)),
+    mDbsLocationDir(move(source.mDbsLocationDir)),
+    mFileName(move(source.mFileName)),
+    mFile(move(source.mFile)),
+    mTables(move(source.mTables)),
+    mCreatedTemporalTables(move(source.mCreatedTemporalTables)),
+    mNeedsSync(move(source.mNeedsSync))
 {
   assert(mCreatedTemporalTables == 0);
 }
@@ -271,7 +271,7 @@ DbsHandler::ReleaseTable(ITable& hndTable)
 {
   assert(mCreatedTemporalTables >= 0);
 
-  if (& _SC(PrototypeTable&, hndTable).GetDBSHandler() != this)
+  if (& _SC(PrototypeTable&, hndTable).GetDbsHandler() != this)
   {
     throw DBSException(_EXTRA(DBSException::TABLE_INVALID),
                        "Cannot release a table that was created on a different database.");

@@ -326,6 +326,7 @@ public:
   virtual void Flush() override;
   virtual void LockTable() override;
   virtual void UnlockTable() override;
+  virtual void ReleaseFromDbs() final override;
 
   static GenericTable& Instance();
 

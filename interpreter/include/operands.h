@@ -134,11 +134,11 @@ public:
   virtual bool Iterate(const bool reverse) = 0;
   virtual uint64_t IteratorOffset() = 0;
 
-  virtual void           NativeObject(INativeObject* const value) = 0;
+  virtual void NativeObject(INativeObject* const value) = 0;
   virtual INativeObject& NativeObject() = 0;
 
 protected:
-  virtual bool DoSimpleCopy(void* const dest) = 0;
+  virtual bool CustomCopyIncomplete(void* const dest) = 0;
 };
 
 
@@ -162,7 +162,7 @@ public:
   {
     IOperand& op = _CC(StackValue&, source).Operand();
 
-    if (op.DoSimpleCopy(mStorage))
+    if (op.CustomCopyIncomplete(mStorage))
       memcpy(mStorage, &source.mStorage, sizeof mStorage);
   }
 
@@ -241,7 +241,7 @@ public:
   void  Push(const DUInt64& value);
   void  Push(const DText& value);
   void  Push(const DArray& value);
-  void  Push(IDBSHandler& dbs, ITable& table);
+  void  Push(ITable& table);
   void  Push(INativeObject& object);
   void  Push(StackValue&& value);
 

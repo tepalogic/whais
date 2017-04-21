@@ -39,16 +39,14 @@ namespace prima {
 class TableReference
 {
 public:
-  TableReference(IDBSHandler& dbs, ITable& table)
-    : mDbsHnd(dbs),
-      mTable(table),
+  TableReference(ITable& table)
+    : mTable(table),
       mRefCount(0)
-  {
-  }
+  {}
 
   TableReference* const Spawn()
   {
-    return new TableReference(mDbsHnd, mTable.Spawn());
+    return new TableReference(mTable.Spawn());
   }
 
   void IncrementRefCount()
@@ -73,25 +71,15 @@ public:
   ITable& GetTable()
   {
     assert(mRefCount > 0);
-
     return mTable;
-  }
-
-  IDBSHandler& GetDBSHandler()
-  {
-    assert(mRefCount > 0);
-
-    return mDbsHnd;
   }
 
 private:
   ~TableReference()
   {
-    if (&mTable != &GenericTable::Instance())
-      mDbsHnd.ReleaseTable(mTable);
+    mTable.ReleaseFromDbs();
   }
 
-  IDBSHandler&     mDbsHnd;
   ITable&          mTable;
   uint64_t         mRefCount;
   Lock             mLock;

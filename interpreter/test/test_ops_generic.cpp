@@ -381,7 +381,7 @@ test_op_table_index(Session& session)
   tempTable.GetReusableRow(true);
   tempTable.Set(0, 0, value);
 
-  stack.Push(session.DBSHandler(), tempTable);
+  stack.Push(tempTable);
   stack.Push(StackValue(localOp));
 
   session.ExecuteProcedure("table_index", stack);
@@ -421,7 +421,7 @@ test_op_field_index(Session& session)
   tempTable.GetReusableRow(true);
   tempTable.Set(0, 0, value);
 
-  stack.Push(session.DBSHandler(), tempTable);
+  stack.Push(tempTable);
   stack.Push(StackValue(localOp));
 
   session.ExecuteProcedure("field_index", stack);

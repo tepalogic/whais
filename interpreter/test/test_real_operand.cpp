@@ -617,7 +617,7 @@ test_array_tableread_value(IDBSHandler& dbsHnd,
   fd[1].name = "simple_type";
 
   ITable& testTable = dbsHnd.CreateTempTable(2, fd);
-  TableOperand tableOp(dbsHnd, testTable, true);
+  TableOperand tableOp(testTable, true);
   const ROW_INDEX row = testTable.GetReusableRow(true);
   {
     FieldOperand fieldArrayOp(tableOp, testTable.RetrieveField("array_type"));

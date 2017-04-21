@@ -389,14 +389,14 @@ public:
   virtual void LockTable() override;
   virtual void UnlockTable() override;
   virtual void Flush() override;
+  virtual void ReleaseFromDbs() final override { mDbs.ReleaseTable(*this); }
+
+  DbsHandler& GetDbsHandler() { return mDbs; };
 
   //Followings declarations shouldn't be public,
   //but kept here to ease the testing procedures.
   uint_t RowSize() const;
   FieldDescriptor& GetFieldDescriptorInternal(const FIELD_INDEX fieldIndex) const;
-
-  DbsHandler& GetDBSHandler() { return mDbs; }
-
 
 protected:
   virtual void MakeHeaderPersistent() = 0;

@@ -53,7 +53,6 @@ uint_t
 TableOperand::GetType()
 {
   uint_t type = 0;
-
   MARK_TABLE(type);
 
   return type;
@@ -82,7 +81,7 @@ TableOperand::Duplicate() const
 
 
 bool
-TableOperand::DoSimpleCopy(void* const)
+TableOperand::CustomCopyIncomplete(void* const)
 {
   mTableRef->IncrementRefCount();
   return true;
@@ -327,7 +326,7 @@ FieldOperand::StartIterate(const bool reverse, StackValue& outStartItem)
 
 
 bool
-FieldOperand::DoSimpleCopy(void *const )
+FieldOperand::CustomCopyIncomplete(void *const )
 {
   if (mTableRef)
     mTableRef->IncrementRefCount();
@@ -396,7 +395,7 @@ BaseFieldElOperand::IteratorOffset()
 
 
 bool
-BaseFieldElOperand::DoSimpleCopy(void* const)
+BaseFieldElOperand::CustomCopyIncomplete(void* const)
 {
   mTableRef->IncrementRefCount();
   return true;

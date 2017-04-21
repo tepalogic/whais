@@ -1326,9 +1326,7 @@ shared_ptr<IArrayStrategy>
 DArray::GetStrategy() const
 {
   LockRAII<decltype(mLock)> _l(mLock);
-  auto result = mArray;
-
-  return result;
+  return mArray;
 }
 
 void

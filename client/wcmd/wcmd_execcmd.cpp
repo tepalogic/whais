@@ -948,75 +948,72 @@ fetch_execution_simple_result(WH_CONNECTION         hnd,
   const char*  retValue;
 
   if (type != WHC_TYPE_TEXT)
+  {
+    wcs = WValueEntry(hnd, field, row, WIGNORE_OFF, WIGNORE_OFF, &retValue);
+    if (wcs != WCS_OK)
+      goto fetch_result_fail;
+
+    if (strcmp(retValue, NULL_VALUE) == 0)
+      cout << NULL_LABEL;
+
+    else if (type == WHC_TYPE_CHAR)
     {
-      wcs = WValueEntry(hnd, field, row, WIGNORE_OFF, WIGNORE_OFF, &retValue);
-      if (wcs != WCS_OK)
-        goto fetch_result_fail;
+      uint32_t cp;
+      char temp[8];
 
-      if (strcmp(retValue, NULL_VALUE) == 0)
-        cout << NULL_LABEL;
+      [[gnu::unused]] const auto cpLen = wh_load_utf8_cp(_RC(const uint8_t*, retValue), &cp);
+      assert(cpLen > 0);
+      assert(cpLen == strlen(retValue));
 
-      else if (type == WHC_TYPE_CHAR)
+      Utf8Translator::Write(_RC(uint8_t*, temp), sizeof temp, true, whais::DChar(cp));
+      cout << '\'' << temp << '\'';
+    }
+    else
+      cout << '\'' << retValue << '\'';
+  }
+  else
+  {
+    unsigned long long length = 0;
+    uint64_t offset = 0;
+
+    wcs = WValueTextLength(hnd, field, row, WIGNORE_OFF, &length);
+    if (wcs != WCS_OK)
+      goto fetch_result_fail;
+
+    if (length > 0)
+    {
+      cout << '\'';
+      while (offset < length)
+      {
+        wcs = WValueEntry(hnd, field, row, WIGNORE_OFF, offset, &retValue);
+        if (wcs != WCS_OK)
+          goto fetch_result_fail;
+
+        offset += wh_utf8_strlen(_RC(const uint8_t*, retValue));
+
+        for (size_t i = 0; i < strlen(retValue);)
         {
-          uint32_t cp, cpLen;
+          uint32_t cp;
           char temp[8];
 
-          cpLen = wh_load_utf8_cp(_RC(const uint8_t*, retValue), &cp);
+          [[gnu::unused]]
+          auto const cpLen = wh_load_utf8_cp(_RC(const uint8_t*, retValue + i), &cp);
 
           assert(cpLen > 0);
-          assert(cpLen == strlen(retValue));
+          assert((i + cpLen) <= strlen(retValue));
 
           Utf8Translator::Write(_RC(uint8_t*, temp), sizeof temp, true, whais::DChar(cp));
-          cout << '\'' << temp << '\'';
+          cout << temp;
+          i += cpLen;
         }
-      else
-        cout << '\'' << retValue << '\'';
+      }
+      cout << '\'';
     }
-  else
-    {
-      unsigned long long length  = 0;
-      uint64_t           offset  = 0;
+    else
+      cout << NULL_LABEL;
 
-      wcs = WValueTextLength(hnd, field, row, WIGNORE_OFF, &length);
-      if (wcs != WCS_OK)
-        goto fetch_result_fail;
-
-      if (length > 0)
-        {
-          cout << '\'';
-          while (offset < length)
-            {
-              wcs = WValueEntry(hnd, field, row, WIGNORE_OFF, offset, &retValue);
-              if (wcs != WCS_OK)
-                goto fetch_result_fail;
-
-              offset += wh_utf8_strlen(_RC(const uint8_t*, retValue));
-
-              for (size_t i = 0; i < strlen(retValue);)
-                {
-                  uint32_t cp, cpLen;
-                  char temp[8];
-
-                  cpLen = wh_load_utf8_cp(_RC(const uint8_t*, retValue + i),
-                                           &cp);
-                  assert(cpLen > 0);
-                  assert((i + cpLen) <= strlen(retValue));
-
-                  Utf8Translator::Write(_RC(uint8_t*, temp),
-                                         sizeof temp,
-                                         true,
-                                         whais::DChar(cp));
-                  cout << temp;
-                  i += cpLen;
-                }
-            }
-          cout << '\'';
-        }
-      else
-        cout << NULL_LABEL;
-
-      assert(offset == length);
-    }
+    assert(offset == length);
+  }
 
   assert(wcs == WCS_OK);
 

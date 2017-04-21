@@ -36,42 +36,36 @@ namespace whais {
 namespace prima {
 
 
-class NativeObjectOperand : public BaseOperand
+class UndefinedOperand final : public BaseOperand
 {
 public:
-  NativeObjectOperand();
-  explicit NativeObjectOperand(INativeObject& object);
-  explicit NativeObjectOperand(const DArray& array);
-  explicit NativeObjectOperand(const DText& text);
+  UndefinedOperand();
+  explicit UndefinedOperand(INativeObject& object);
+  explicit UndefinedOperand(const DArray& array);
+  explicit UndefinedOperand(const DText& text);
 
-  NativeObjectOperand(const bool nullValue, const bool value);
+  UndefinedOperand(const bool nullValue, const bool value);
+  UndefinedOperand(const bool nullValue, const uint32_t value);
+  UndefinedOperand(const bool nullValue, const int64_t value);
+  UndefinedOperand(const bool nullValue, const uint64_t value);
+  UndefinedOperand(const bool nullValue, const int64_t valIntPart, const int64_t valFracPart);
+  UndefinedOperand(const bool nullValue,
+                   const uint16_t year,
+                   const uint8_t month,
+                   const uint8_t day,
+                   const uint8_t hours = 0,
+                   const uint8_t mins = 0,
+                   const uint8_t secs = 0,
+                   const uint32_t microsec = 0);
 
-  NativeObjectOperand(const bool nullValue, const uint32_t value);
+  explicit UndefinedOperand(TableReference& tableRef);
+  UndefinedOperand(TableReference& tableRef, const uint_t fieldIndex, const uint_t type);
+  UndefinedOperand(TableReference* const tableRef, const uint_t fieldIndex, const uint_t type);
 
-  NativeObjectOperand(const bool nullValue, const int64_t value);
-  NativeObjectOperand(const bool nullValue, const uint64_t value);
+  UndefinedOperand(const UndefinedOperand& source);
+  virtual ~UndefinedOperand() override;
 
-  NativeObjectOperand(const bool nullValue, const int64_t valIntPart, const int64_t valFracPart);
-
-  NativeObjectOperand(const bool nullValue,
-                      const uint16_t year,
-                      const uint8_t month,
-                      const uint8_t day,
-                      const uint8_t hours = 0,
-                      const uint8_t mins = 0,
-                      const uint8_t secs = 0,
-                      const uint32_t microsec = 0);
-
-  explicit NativeObjectOperand(TableReference& tableRef);
-
-  explicit NativeObjectOperand(TableReference* const tableRef,
-                               const uint_t fieldIndex,
-                               const uint_t type);
-
-  NativeObjectOperand(const NativeObjectOperand& source);
-  virtual ~NativeObjectOperand() override;
-
-  NativeObjectOperand& operator=(const NativeObjectOperand& source);
+  UndefinedOperand& operator=(const UndefinedOperand& source);
 
   virtual bool IsNull() const override;
   virtual void GetValue(DBool& outValue) const override;
@@ -111,19 +105,16 @@ public:
   virtual void SetValue(const DArray& value) override;
 
   virtual uint_t GetType() override;
-
   virtual FIELD_INDEX GetField() override;
-
   virtual ITable& GetTable() override;
-
   virtual StackValue Duplicate() const override;
 
-  virtual void CopyNativeObjectOperand(const NativeObjectOperand& source) override;
+  virtual void CopyUndefinedOperand(const UndefinedOperand& source) override;
 
   virtual void NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;
 
-  virtual bool DoSimpleCopy(void* const dest) override;
+  virtual bool CustomCopyIncomplete(void* const dest) override;
 
   virtual TableReference& GetTableReference() override;
 

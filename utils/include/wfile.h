@@ -53,8 +53,8 @@ class EXCEP_SHL File
 public:
   explicit File(const char* name, uint_t mode = 0);
 
-  File(const File& src);
-  File& operator= (const File& src);
+  File(File&& src);
+  File& operator= (File&& src);
 
   ~File();
 

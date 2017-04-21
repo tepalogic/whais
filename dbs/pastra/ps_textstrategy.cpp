@@ -765,10 +765,10 @@ ITextStrategy::FindMatchInText(ITextStrategy& text,
 
 shared_ptr<ITextStrategy>
 ITextStrategy::ReplaceInText(shared_ptr<ITextStrategy> text,
-                       shared_ptr<ITextStrategy> newSubstr,
-                       const uint64_t fromCh,
-                       const uint64_t toCh,
-                       const bool ignoreCase)
+                             shared_ptr<ITextStrategy> newSubstr,
+                             const uint64_t fromCh,
+                             const uint64_t toCh,
+                             const bool ignoreCase)
 {
   assert(mSelfShare.lock().get() == this);
 

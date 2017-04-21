@@ -113,7 +113,7 @@ test_basic_value()
 {
   std::cout << "Test basic values ...\n";
 
-  NativeObjectOperand op;
+  UndefinedOperand op;
 
   bool success = true;
 
@@ -153,7 +153,7 @@ test_array_value_stored(const T&       val1,
                          uint_t         arrayType)
 {
 
-  NativeObjectOperand op;
+  UndefinedOperand op;
 
   assert(val1 != val2);
   assert(val2 != val3);
@@ -282,32 +282,30 @@ test_table_value(IDBSHandler&            dbsHnd,
 {
 
   ITable*               refTable = nullptr;
-  NativeObjectOperand   nativeOp;
+  UndefinedOperand   nativeOp;
 
-    {
-      DBSFieldDescriptor fd[2];
+  {
+    DBSFieldDescriptor fd[2];
 
-      fd[0].isArray   = false;
-      fd[0].type      = val1Type;
-      fd[0].name      = "field1";
+    fd[0].isArray = false;
+    fd[0].type = val1Type;
+    fd[0].name = "field1";
 
-      fd[1].isArray   = false;
-      fd[1].type      = val2Type;
-      fd[1].name      = "field2";
+    fd[1].isArray = false;
+    fd[1].type = val2Type;
+    fd[1].name = "field2";
 
-      refTable = &dbsHnd.CreateTempTable(2, fd);
+    refTable = &dbsHnd.CreateTempTable(2, fd);
 
-      if (refTable == nullptr)
-        return false;
+    if (refTable == nullptr)
+      return false;
 
-      //This op should take the table ownership!
-      TableOperand tableOp(dbsHnd, *refTable, true);
+    //This op should take the table ownership!
+    TableOperand tableOp(*refTable, true);
 
-      //The table owner ship should be shared with this.
-      nativeOp.CopyNativeObjectOperand(
-                        NativeObjectOperand(tableOp.GetTableReference())
-                                       );
-    }
+    //The table owner ship should be shared with this.
+    nativeOp.CopyUndefinedOperand(UndefinedOperand(tableOp.GetTableReference()));
+  }
 
   if ((refTable != &nativeOp.GetTable())
       || ! nativeOp.IsNull()
@@ -395,7 +393,7 @@ test_table_alias(IDBSHandler& dbsHnd)
 
   success = success & test_table_value(dbsHnd, DChar('a'), T_CHAR, DInt64(1), T_INT64);
   success = success & test_table_value(dbsHnd, DBool(false), T_BOOL, DText("Iulian este un programator bun!"), T_TEXT);
-  success = success & test_table_value(dbsHnd, DDate(1900,10,11), T_DATE, DText("Vasile este si el un proframator bun!"), T_TEXT);
+  success = success & test_table_value(dbsHnd, DDate(1900,10,11), T_DATE, DText("Vasile este si el un programator bun!"), T_TEXT);
   success = success & test_table_value(dbsHnd, DDateTime(1900,10,11, 0, 1, 1), T_DATETIME, DUInt8(10), T_UINT8);
   success = success & test_table_value(dbsHnd, DHiresTime(1900,10,11, 0, 1, 1, 0), T_HIRESTIME, DUInt16(32), T_UINT16);
   success = success & test_table_value(dbsHnd, DRichReal(RICHREAL_T(10, 10, 100)), T_RICHREAL, DInt32(-1), T_INT32);
@@ -413,37 +411,35 @@ test_field_value(IDBSHandler&            dbsHnd,
                   const DBS_FIELD_TYPE    val2Type)
 {
   FieldOperand          op1, op2;
-  NativeObjectOperand   nativeOp;
+  UndefinedOperand   nativeOp;
 
   ITable* refTable = nullptr;
 
-    {
-      DBSFieldDescriptor fd[2];
+  {
+    DBSFieldDescriptor fd[2];
 
-      fd[0].isArray   = false;
-      fd[0].type      = val1Type;
-      fd[0].name      = "field1";
+    fd[0].isArray = false;
+    fd[0].type = val1Type;
+    fd[0].name = "field1";
 
-      fd[1].isArray   = false;
-      fd[1].type      = val2Type;
-      fd[1].name      = "field2";
+    fd[1].isArray = false;
+    fd[1].type = val2Type;
+    fd[1].name = "field2";
 
-      refTable = &dbsHnd.CreateTempTable(2, fd);
+    refTable = &dbsHnd.CreateTempTable(2, fd);
 
-      if (refTable == nullptr)
-        return false;
+    if (refTable == nullptr)
+      return false;
 
-      //This op should take the table ownership!
-      TableOperand tableOp(dbsHnd, *refTable, true);
+    //This op should take the table ownership!
+    TableOperand tableOp( *refTable, true);
 
-      op1 = FieldOperand(tableOp.GetTableReference(), 0);
-      op2 = FieldOperand(tableOp.GetTableReference(), 1);
+    op1 = FieldOperand(tableOp.GetTableReference(), 0);
+    op2 = FieldOperand(tableOp.GetTableReference(), 1);
 
-      //The table owner ship should be shared with this.
-      nativeOp.CopyNativeObjectOperand(
-                        NativeObjectOperand(tableOp.GetTableReference())
-                                       );
-    }
+    //The table owner ship should be shared with this.
+    nativeOp.CopyUndefinedOperand(UndefinedOperand(tableOp.GetTableReference()));
+  }
 
   if ((&op1.GetTableReference() != &nativeOp.GetTableReference())
       || (&op2.GetTableReference() != &op1.GetTableReference())
@@ -459,7 +455,7 @@ test_field_value(IDBSHandler&            dbsHnd,
     }
 
     {
-      NativeObjectOperand nField1(&op1.GetTableReference(),
+      UndefinedOperand nField1(&op1.GetTableReference(),
                                    op1.GetField(),
                                    op1.GetType());
 
@@ -493,7 +489,7 @@ test_field_value(IDBSHandler&            dbsHnd,
     }
 
     {
-      NativeObjectOperand nField2(&op2.GetTableReference(),
+      UndefinedOperand nField2(&op2.GetTableReference(),
                                    op2.GetField(),
                                    op2.GetType());
 
@@ -591,8 +587,8 @@ test_native_obj()
   std::cout << "Testing native object handling ...\n";
 
   TestNativeObj         nativeObj, nativeObj2;
-  NativeObjectOperand   op1(nativeObj);
-  NativeObjectOperand   op2;
+  UndefinedOperand   op1(nativeObj);
+  UndefinedOperand   op2;
 
   if ((op2.GetType() != op1.GetType())
       && (op1.GetType() != T_UNDETERMINED)
@@ -609,7 +605,7 @@ test_native_obj()
       return false;
     }
 
-  op2.CopyNativeObjectOperand(op1);
+  op2.CopyUndefinedOperand(op1);
 
   if ((&t != &op2.NativeObject())
       || (&t != & op1.NativeObject())

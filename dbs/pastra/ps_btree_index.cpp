@@ -164,10 +164,9 @@ IBTreeNodeManager::IBTreeNodeManager()
 
 IBTreeNodeManager::~IBTreeNodeManager()
 {
-  for (auto& node : mNodesKeeper)
+  for ([[gnu::unused]] auto& node : mNodesKeeper)
   {
     assert ( ! node.second.IsUsed());
-//    delete node.second.mNode;
   }
 }
 
@@ -299,10 +298,13 @@ void
 IBTreeNodeManager::ReleaseNode(const NODE_INDEX nodeId)
 {
   LockRAII<Lock> syncHolder(mSync);
-  auto it = mNodesKeeper.find(nodeId);
+  const auto it = mNodesKeeper.find(nodeId);
 
   assert(it != mNodesKeeper.end());
   assert(it->second.IsUsed());
+
+  SaveNode(it->second.mNode.get());
+  it->second.mNode->MarkClean();
 }
 
 void

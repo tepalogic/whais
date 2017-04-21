@@ -347,12 +347,10 @@ TypeManager::CreateGlobalValue(uint8_t* inoutTypeDesc, ITable* persitentTable)
     if (persitentTable == nullptr)
     {
       ITable& table = create_non_persistent_table(mNameSpace.GetDBSHandler(), inoutTypeDesc);
-      return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(), table, true));
+      return GlobalValue(TableOperand(table, true));
     }
     else
-    {
-      return GlobalValue(TableOperand(mNameSpace.GetDBSHandler(), *persitentTable, true));
-    }
+      return GlobalValue(TableOperand(*persitentTable, true));
   }
 
   assert(false);
@@ -420,7 +418,7 @@ StackValue TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
       return StackValue(UInt64Operand(DUInt64()));
 
     case T_UNDETERMINED:
-      return StackValue(NativeObjectOperand());
+      return StackValue(UndefinedOperand());
 
     default:
       assert(false);
@@ -500,7 +498,7 @@ StackValue TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
   {
     ITable& table = create_non_persistent_table(mNameSpace.GetDBSHandler(), inoutTypeDesc);
 
-    return StackValue(TableOperand(mNameSpace.GetDBSHandler(), table, false));
+    return StackValue(TableOperand(table, false));
   }
 
   assert(false);

@@ -596,9 +596,7 @@ test_table_value(TableOperand&  tableOp,
 }
 
 template <typename DBS_T> bool
-test_array_tableread_value(IDBSHandler& dbsHnd,
-                            DArray array,
-                            const DBS_T testVal)
+test_array_tableread_value(IDBSHandler& dbsHnd, DArray array, const DBS_T testVal)
 {
   bool  result = true;
   const NullOperand nullOp;
@@ -617,7 +615,7 @@ test_array_tableread_value(IDBSHandler& dbsHnd,
   fd[1].name = "simple_type";
 
   ITable& testTable = dbsHnd.CreateTempTable(2, fd);
-  TableOperand tableOp(dbsHnd, testTable, true);
+  TableOperand tableOp(testTable, true);
   const ROW_INDEX row = testTable.GetReusableRow(true);
   {
     FieldOperand fieldArrayOp(tableOp, testTable.RetrieveField("array_type"));

@@ -554,6 +554,13 @@ GenericTable::UnlockTable()
   throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
 }
 
+
+void
+GenericTable::ReleaseFromDbs()
+{
+  //Do nothing!
+}
+
 GenericTable&
 GenericTable::Instance()
 {

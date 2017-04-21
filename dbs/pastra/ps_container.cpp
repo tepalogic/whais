@@ -429,9 +429,7 @@ FileContainer::ExtendContainer()
   const uint_t openMode = mIgnoreExistingData
                             ? WH_FILECREATE | WH_FILETRUNC | WH_FILERDWR
                             : WH_FILECREATE_NEW | WH_FILERDWR;
-
-  File unitFile(baseName.c_str(), openMode);
-  mFilesHandles.push_back(unitFile);
+  mFilesHandles.push_back(File(baseName.c_str(), openMode));
 }
 
 

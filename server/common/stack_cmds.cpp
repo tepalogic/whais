@@ -311,7 +311,7 @@ cmd_push_stack(ClientConnection& conn, uint_t* const inoutDataOff)
     IDBSHandler& dbs = *conn.Dbs().mDbs;
     ITable& table = dbs.CreateTempTable(fieldsCount, fields_);
 
-    stack.Push(dbs, table);
+    stack.Push(table);
   }
 
   return WCS_OK;

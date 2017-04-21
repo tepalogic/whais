@@ -436,7 +436,7 @@ BaseOperand::CopyFieldOp(const FieldOperand& fieldOp)
 
 
 void
-BaseOperand::CopyNativeObjectOperand(const NativeObjectOperand& source)
+BaseOperand::CopyUndefinedOperand(const UndefinedOperand& source)
 {
   throw InterException(_EXTRA(InterException::INVALID_OP_REQ));
 }
@@ -453,13 +453,6 @@ INativeObject&
 BaseOperand::NativeObject()
 {
   throw InterException(_EXTRA(InterException::INVALID_OP_REQ));
-}
-
-
-bool
-BaseOperand::DoSimpleCopy(void* const)
-{
-  return true;
 }
 
 
@@ -2725,7 +2718,7 @@ TextOperand::StartIterate(const bool reverse, StackValue& outStartItem)
 
 
 bool
-TextOperand::DoSimpleCopy(void* const dest)
+TextOperand::CustomCopyIncomplete(void* const dest)
 {
   _placement_new(dest, *this);
   return false;
@@ -2810,7 +2803,7 @@ CharTextElOperand::IteratorOffset()
 }
 
 bool
-CharTextElOperand::DoSimpleCopy(void* const dest)
+CharTextElOperand::CustomCopyIncomplete(void* const dest)
 {
   _placement_new(dest, *this);
 
@@ -3214,7 +3207,7 @@ GlobalOperand::GetTableReference()
 
 
 bool
-GlobalOperand::DoSimpleCopy(void* const)
+GlobalOperand::CustomCopyIncomplete(void* const)
 {
   return true;
 }
@@ -3249,7 +3242,7 @@ GlobalOperand::CopyFieldOp(const FieldOperand& fieldOp)
 
 
 void
-GlobalOperand::CopyNativeObjectOperand(const NativeObjectOperand& source)
+GlobalOperand::CopyUndefinedOperand(const UndefinedOperand& source)
 {
   mValue.CopyNativeObjectOperand(source);
 }
@@ -3694,10 +3687,10 @@ LocalOperand::CopyFieldOp(const FieldOperand& fieldOp)
 
 
 void
-LocalOperand::CopyNativeObjectOperand(const NativeObjectOperand& source)
+LocalOperand::CopyUndefinedOperand(const UndefinedOperand& source)
 {
   BaseOperand& op = _SC(BaseOperand&, mStack[mIndex].Operand());
-  op.CopyNativeObjectOperand(source);
+  op.CopyUndefinedOperand(source);
 }
 
 
@@ -3966,20 +3959,20 @@ SessionStack::Push(const DArray& value)
 
 
 void
-SessionStack::Push(IDBSHandler& dbsHnd, ITable& table)
+SessionStack::Push(ITable& table)
 {
-  Push(StackValue(TableOperand(dbsHnd, table, true)));
+  Push(StackValue(TableOperand(table, true)));
 }
 
 
 void
 SessionStack::Push(INativeObject& object)
 {
-  NativeObjectOperand stackOp(object);
+  UndefinedOperand stackOp(object);
 
   StackValue stackValue(stackOp);
 
-  Push(StackValue(NativeObjectOperand(object)));
+  Push(StackValue(UndefinedOperand(object)));
 }
 
 void

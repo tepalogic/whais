@@ -336,7 +336,7 @@ op_func_stta(ProcedureCall& call, int64_t& offset)
     assert(IS_TABLE(dest.GetType()));
 
     TableReference& ref = dest.GetTableReference();
-    dest.CopyTableOp(TableOperand(ref.GetDBSHandler(), ref.GetTable().Spawn(), true));
+    dest.CopyTableOp(TableOperand(ref.GetTable().Spawn(), true));
   }
   else
     dest.CopyTableOp(src.GetTableOp());
@@ -396,13 +396,13 @@ op_func_stud(ProcedureCall& call, int64_t& offset)
   if (srcType == T_UNDETERMINED)
   {
     if (src.IsNull())
-      dest.CopyNativeObjectOperand(NativeObjectOperand());
+      dest.CopyUndefinedOperand(UndefinedOperand());
 
     else
-      dest.CopyNativeObjectOperand(NativeObjectOperand(src.NativeObject()));
+      dest.CopyUndefinedOperand(UndefinedOperand(src.NativeObject()));
   }
   else if (IS_TABLE(srcType))
-    dest.CopyNativeObjectOperand(NativeObjectOperand(src.GetTableReference()));
+    dest.CopyUndefinedOperand(UndefinedOperand(src.GetTableReference()));
 
   else if (IS_FIELD(srcType))
   {
@@ -411,7 +411,7 @@ op_func_stud(ProcedureCall& call, int64_t& offset)
     const uint_t type = src.GetType();
     const FIELD_INDEX fieldIndex = src.GetField();
 
-    dest.CopyNativeObjectOperand(NativeObjectOperand(temp, fieldIndex, type));
+    dest.CopyUndefinedOperand(UndefinedOperand(temp, fieldIndex, type));
   }
   else if (IS_ARRAY(srcType))
     transfer_undef_value<DArray>(dest, src);
