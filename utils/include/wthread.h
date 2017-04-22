@@ -64,7 +64,7 @@ private:
   SpinLock(const SpinLock&);
   SpinLock& operator= (const SpinLock&);
 
-  volatile int32_t mLock;
+  volatile int16_t mLock;
 };
 
 

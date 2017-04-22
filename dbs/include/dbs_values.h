@@ -44,7 +44,7 @@ typedef DBS_RICHREAL_T RICHREAL_T;
 #endif
 
 
-struct DBool
+struct DBool final
 {
   DBool()
     : mValue(),
@@ -130,7 +130,7 @@ struct DBool
 };
 
 
-struct DBS_SHL DChar
+struct DBS_SHL DChar final
 {
   DChar()
     : mValue(),
@@ -198,7 +198,7 @@ private:
 };
 
 
-struct DBS_SHL DDate
+struct DBS_SHL DDate final
 {
   DDate()
     : mYear(),
@@ -274,7 +274,7 @@ struct DBS_SHL DDate
 };
 
 
-struct DBS_SHL DDateTime
+struct DBS_SHL DDateTime final
 {
   DDateTime()
     : mYear(),
@@ -398,7 +398,7 @@ struct DBS_SHL DDateTime
 };
 
 
-struct DBS_SHL DHiresTime
+struct DBS_SHL DHiresTime final
 {
 
   DHiresTime()
@@ -548,7 +548,7 @@ struct DBS_SHL DHiresTime
 };
 
 
-struct DBS_SHL DUInt8
+struct DBS_SHL DUInt8 final
 {
   DUInt8()
     : mValue(),
@@ -624,7 +624,7 @@ struct DBS_SHL DUInt8
 };
 
 
-struct DBS_SHL DUInt16
+struct DBS_SHL DUInt16 final
 {
   DUInt16()
     : mValue(),
@@ -705,7 +705,7 @@ struct DBS_SHL DUInt16
 };
 
 
-struct DBS_SHL DUInt32
+struct DBS_SHL DUInt32 final
 {
   DUInt32()
     : mValue(),
@@ -793,7 +793,7 @@ struct DBS_SHL DUInt32
 };
 
 
-struct DBS_SHL DUInt64
+struct DBS_SHL DUInt64 final
 {
   DUInt64()
     : mValue(),
@@ -886,7 +886,7 @@ struct DBS_SHL DUInt64
 };
 
 
-struct DBS_SHL DInt8
+struct DBS_SHL DInt8 final
 {
   DInt8()
     : mValue(),
@@ -961,7 +961,7 @@ struct DBS_SHL DInt8
 };
 
 
-struct DBS_SHL DInt16
+struct DBS_SHL DInt16 final
 {
   DInt16()
     : mValue(),
@@ -1042,7 +1042,7 @@ struct DBS_SHL DInt16
 };
 
 
-struct DBS_SHL DInt32
+struct DBS_SHL DInt32 final
 {
   DInt32()
     : mValue(),
@@ -1129,7 +1129,7 @@ struct DBS_SHL DInt32
 };
 
 
-struct DBS_SHL DInt64
+struct DBS_SHL DInt64 final
 {
   DInt64()
     : mValue(),
@@ -1222,7 +1222,7 @@ struct DBS_SHL DInt64
 };
 
 
-struct DBS_SHL DReal
+struct DBS_SHL DReal final
 {
   DReal() :
     mValue(),
@@ -1287,7 +1287,7 @@ struct DBS_SHL DReal
 };
 
 
-struct DBS_SHL DRichReal
+struct DBS_SHL DRichReal final
 {
   DRichReal()
     : mValue(),
@@ -1358,7 +1358,7 @@ struct DBS_SHL DRichReal
 
 
 class ITextStrategy;
-class DBS_SHL DText
+class DBS_SHL DText final
 {
 public:
   explicit DText(const char* text = nullptr);
@@ -1367,6 +1367,8 @@ public:
 
   DText(const DText& source);
   DText& operator= (const DText& source);
+
+  ~DText() = default;
 
   bool IsNull() const;
   uint64_t Count() const;
@@ -1422,11 +1424,11 @@ private:
   std::shared_ptr<ITextStrategy> mText;
 #pragma warning(default:4251)
 
-  mutable Lock mLock;
+  mutable SpinLock mLock;
 };
 
 class IArrayStrategy;
-class DBS_SHL DArray
+class DBS_SHL DArray final
 {
 public:
   DArray();
@@ -1450,6 +1452,8 @@ public:
 
   DArray(const DArray& source);
   DArray& operator= (const DArray& source);
+
+  ~DArray() = default;
 
   bool IsNull() const { return Count() == 0; }
   uint64_t Count() const;
@@ -1517,7 +1521,8 @@ private:
 #pragma warning(disable:4251)
   std::shared_ptr<IArrayStrategy> mArray;
 #pragma warning(default:4251)
-  mutable Lock mLock;
+
+  mutable SpinLock mLock;
 };
 
 

@@ -581,7 +581,7 @@ private:
 };
 
 
-class Int8Operand : public BaseOperand, public DInt8
+class Int8Operand : public BaseOperand
 {
 public:
   explicit Int8Operand(const DInt8& value)
@@ -634,7 +634,7 @@ private:
 };
 
 
-class Int16Operand : public BaseOperand, public DInt16
+class Int16Operand : public BaseOperand
 {
 public:
   explicit Int16Operand(const DInt16& value)

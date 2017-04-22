@@ -101,10 +101,10 @@ SpinLock::Acquire()
     {
       assert(mLock >= 0);
 
-      if (wh_atomic_fetch_inc32(&mLock) == 0)
+      if (wh_atomic_fetch_inc16(&mLock) == 0)
         break;
 
-      wh_atomic_fetch_dec32(&mLock);
+      wh_atomic_fetch_dec16(&mLock);
       wh_yield();
     }
 }
@@ -115,10 +115,10 @@ SpinLock::TryAcquire()
 {
   assert(mLock >= 0);
 
-  if (wh_atomic_fetch_inc32(&mLock) == 0)
+  if (wh_atomic_fetch_inc16(&mLock) == 0)
     return true;
 
-  wh_atomic_fetch_dec32(&mLock);
+  wh_atomic_fetch_dec16(&mLock);
   return false;
 }
 
@@ -126,7 +126,7 @@ void
 SpinLock::Release()
 {
   assert(mLock > 0);
-  wh_atomic_fetch_dec32(&mLock);
+  wh_atomic_fetch_dec16(&mLock);
 }
 
 
