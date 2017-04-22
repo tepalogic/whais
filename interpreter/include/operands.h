@@ -182,14 +182,25 @@ public:
   {
     Clear();
 
-    memcpy(mStorage, &source.mStorage, sizeof mStorage);
+    memcpy(mStorage, source.mStorage, sizeof mStorage);
     source.mStorage[0] = 0;
 
     return *this;
   }
 
-  IOperand& Operand() { return *_RC(IOperand*, mStorage); }
+  StackValue&
+  operator= (const StackValue& source)
+  {
+    Clear();
 
+    IOperand& op = _CC(StackValue&, source).Operand();
+    if (op.CustomCopyIncomplete(mStorage))
+      memcpy(mStorage, &source.mStorage, sizeof mStorage);
+
+    return *this;
+  }
+
+  IOperand& Operand() { return *_RC(IOperand*, mStorage); }
 
   static StackValue Create(const DBool& value);
   static StackValue Create(const DChar& value);

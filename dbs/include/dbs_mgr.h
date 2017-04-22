@@ -63,7 +63,7 @@ public:
   virtual ITable& RetrievePersistentTable(const char* const name) = 0;
   virtual void AddTable(const char* const   name,
                         const FIELD_INDEX   fieldsCount,
-                        DBSFieldDescriptor* inoutFields) = 0;
+                        DBSFieldDescriptor* const inoutFields) = 0;
   virtual void DeleteTable(const char* const name) = 0;
   virtual void SyncAllTablesContent() = 0;
   virtual void SyncTableContent(const TABLE_INDEX index) = 0;

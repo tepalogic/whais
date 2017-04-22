@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cdtprojectproperties>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.IncludePaths">
+<language name="Assembly Source File">
+<includepath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include</includepath>
+<includepath workspace_path="true">/whais</includepath>
+<includepath workspace_path="true">/whais/whisper/compiler/parser</includepath>
+<includepath>C:\work</includepath>
+
+</language>
+<language name="C++ Source File">
+<includepath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include</includepath>
+<includepath workspace_path="true">/whais</includepath>
+<includepath workspace_path="true">/whais/whisper/compiler/parser</includepath>
+<includepath>C:\work</includepath>
+
+</language>
+<language name="C Source File">
+<includepath>C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\include</includepath>
+<includepath workspace_path="true">/whais</includepath>
+<includepath workspace_path="true">/whais/whisper/compiler/parser</includepath>
+<includepath>C:\work</includepath>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+<section name="org.eclipse.cdt.internal.ui.wizards.settingswizards.Macros">
+<language name="Assembly Source File">
+
+</language>
+<language name="C++ Source File">
+<macro>
+<name>ARCH_WINDOWS_VC</name><value/>
+</macro>
+<macro>
+<name>INLINE</name><value>__inline</value>
+</macro>
+<macro>
+<name>QWORDS_PER_OP</name><value>4</value>
+</macro>
+<macro>
+<name>WOS</name><value>Windows</value>
+</macro>
+<macro>
+<name>WARCH</name><value>x86_32</value>
+</macro>
+<macro>
+<name>WVER_MAJ</name><value>1</value>
+</macro>
+<macro>
+<name>WVER_MIN</name><value>1</value>
+</macro>
+<macro>
+<name>YYSTYPE</name><value>struct SemValue*</value>
+</macro>
+
+</language>
+<language name="C Source File">
+<macro>
+<name>ARCH_WINDOWS_VC</name><value/>
+</macro>
+<macro>
+<name>INLINE</name><value>__inline</value>
+</macro>
+<macro>
+<name>QWORDS_PER_OP</name><value>4</value>
+</macro>
+<macro>
+<name>WOS</name><value>Windows</value>
+</macro>
+<macro>
+<name>WARCH</name><value>x86_32</value>
+</macro>
+<macro>
+<name>WVER_MAJ</name><value>1</value>
+</macro>
+<macro>
+<name>WVER_MIN</name><value>1</value>
+</macro>
+<macro>
+<name>YYSTYPE</name><value>struct SemValue*</value>
+</macro>
+
+</language>
+<language name="Object File">
+
+</language>
+</section>
+</cdtprojectproperties>

@@ -341,7 +341,7 @@ void
 begin_foreach_stmt(struct ParserState* const   parser,
                    YYSTYPE                     id,
                    YYSTYPE                     exp,
-                   bool_t                      reverse)
+                   const bool_t                reverse)
 {
   struct Statement* const     stmt       = parser->pCurrentStmt;
   struct WOutputStream* const code       = stmt_query_instrs(stmt);

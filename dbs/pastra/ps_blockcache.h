@@ -42,8 +42,8 @@ class IBlocksManager
 public:
   virtual ~IBlocksManager() = default;
 
-  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* from) = 0;
-  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* to) = 0;
+  virtual void StoreItems(uint64_t firstItem, uint_t itemsCount, const uint8_t* const from) = 0;
+  virtual void RetrieveItems(uint64_t firstItem, uint_t itemsCount, uint8_t* const to) = 0;
 };
 
 

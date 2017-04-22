@@ -164,10 +164,12 @@ IBTreeNodeManager::IBTreeNodeManager()
 
 IBTreeNodeManager::~IBTreeNodeManager()
 {
-  for ([[gnu::unused]] auto& node : mNodesKeeper)
+#ifndef NDEBUG
+  for (auto& node : mNodesKeeper)
   {
     assert ( ! node.second.IsUsed());
   }
+#endif
 }
 
 void

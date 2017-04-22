@@ -1418,10 +1418,12 @@ public:
 private:
   int CompareTo(const DText& second) const;
 
+#pragma warning(disable:4251)
   std::shared_ptr<ITextStrategy> mText;
+#pragma warning(default:4251)
+
   mutable Lock mLock;
 };
-
 
 class IArrayStrategy;
 class DBS_SHL DArray
@@ -1512,7 +1514,9 @@ private:
   template<class T> void get_array_element(const uint64_t index, T& outElement) const;
   template<class T> void set_array_element(const T& value, const uint64_t index);
 
+#pragma warning(disable:4251)
   std::shared_ptr<IArrayStrategy> mArray;
+#pragma warning(default:4251)
   mutable Lock mLock;
 };
 

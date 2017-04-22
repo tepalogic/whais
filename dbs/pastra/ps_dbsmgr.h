@@ -59,7 +59,7 @@ public:
 
   virtual void AddTable(const char* const          name,
                        const FIELD_INDEX           fieldsCount,
-                       DBSFieldDescriptor* const   inoutFields);
+                       DBSFieldDescriptor* const   inoutFields) override;
   virtual void DeleteTable(const char* const name) override;
   virtual void SyncAllTablesContent() override;
   virtual void SyncTableContent(const TABLE_INDEX index) override;

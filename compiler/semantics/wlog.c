@@ -209,9 +209,9 @@ find_string(uint_t msgCode)
 }
 
 void
-log_message(struct ParserState* const   parser,
-            const uint_t                buffPos,
-            const uint_t                msgCode,
+log_message(struct ParserState* const parser,
+            const uint_t              buffPos,
+            const uint_t              msgCode,
             ...)
 {
   const struct MsgCodeEntry* entry = find_string(msgCode);
