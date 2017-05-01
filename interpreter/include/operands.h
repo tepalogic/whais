@@ -49,6 +49,7 @@ class INTERP_SHL INativeObject
 public:
   virtual ~INativeObject() = default;
 
+  /* This should be modify mutable objects */
   virtual void RegisterUser() = 0;
   virtual void ReleaseUser() = 0;
 };
@@ -145,12 +146,11 @@ protected:
 class INTERP_SHL StackValue
 {
 public:
+  StackValue();
+
   template <class OP_T>
   explicit StackValue(const OP_T& op)
   {
-    const IOperand& compileTest = op;
-    (void)compileTest;  //Just to make sure the right type is used.
-
     static_assert(sizeof(OP_T) <= sizeof(mStorage), "Stack value storage not big enough!");
 
     _placement_new(mStorage, op);
@@ -219,6 +219,7 @@ public:
   static StackValue Create(const DUInt64& value);
   static StackValue Create(const DText& value);
   static StackValue Create(const DArray& value);
+  static StackValue Create(INativeObject& value);
 
 private:
   void Clear() { if (mStorage[0] != 0) Operand().~IOperand(); }

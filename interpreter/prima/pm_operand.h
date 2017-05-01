@@ -203,7 +203,7 @@ public:
   virtual FieldOperand GetFieldOp();
   virtual void CopyFieldOp(const FieldOperand& source);
   virtual TableReference& GetTableReference();
-  virtual void CopyUndefinedOperand(const UndefinedOperand& source);
+  virtual void RedifineValue(StackValue& source);
 };
 
 
@@ -3201,7 +3201,6 @@ public:
   bool IsNull()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().IsNull();
   }
 
@@ -3209,7 +3208,6 @@ public:
   void GetValue(DBS_T& outValue)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().GetValue(outValue);
   }
 
@@ -3217,7 +3215,6 @@ public:
   void SetValue(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SetValue(value);
   }
 
@@ -3225,7 +3222,6 @@ public:
   void SelfAdd(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfAdd(value);
   }
 
@@ -3233,7 +3229,6 @@ public:
   void SelfSub(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfSub(value);
   }
 
@@ -3241,7 +3236,6 @@ public:
   void SelfMul(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfMul(value);
   }
 
@@ -3249,7 +3243,6 @@ public:
   void SelfDiv(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfDiv(value);
   }
 
@@ -3257,7 +3250,6 @@ public:
   void SelfMod(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfMod(value);
   }
 
@@ -3265,7 +3257,6 @@ public:
   void SelfAnd(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfAnd(value);
   }
 
@@ -3273,7 +3264,6 @@ public:
   void SelfXor(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfXor(value);
   }
 
@@ -3281,7 +3271,6 @@ public:
   void SelfOr(const DBS_T& value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().SelfOr(value);
   }
 
@@ -3294,14 +3283,12 @@ public:
   FIELD_INDEX GetField()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetField();
   }
 
   ITable& GetTable()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetTable();
   }
 
@@ -3315,85 +3302,74 @@ public:
   StackValue GetValueAt(const uint64_t index)
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetValueAt(index);
   }
 
   StackValue Duplicate()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().Duplicate();
   }
 
   bool StartIterate(const bool  reverse, StackValue& outStartItem)
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().StartIterate(reverse, outStartItem);
   }
 
   bool PrepareToCopy(void* const dest)
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().CustomCopyIncomplete(dest);
   }
 
   TableOperand GetTableOp()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetTableOp();
   }
 
   void CopyTableOp(const TableOperand& source)
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().CopyTableOp(source);
   }
 
   FieldOperand  GetFieldOp()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetFieldOp();
   }
 
   void CopyFieldOp(const FieldOperand& source)
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().CopyFieldOp(source);
-  }
-
-  void CopyNativeObjectOperand(const UndefinedOperand& source)
-  {
-    LockRAII<Lock> dummy(mSync);
-
-    return Operand().CopyUndefinedOperand(source);
   }
 
   void NativeObject(INativeObject* const value)
   {
     LockRAII<Lock> dummy(mSync);
-
     Operand().NativeObject(value);
   }
 
   INativeObject& NativeObject()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().NativeObject();
   }
 
   TableReference& GetTableReference()
   {
     LockRAII<Lock> dummy(mSync);
-
     return Operand().GetTableReference();
+  }
+
+
+  void RedfineValue(StackValue& source)
+  {
+    LockRAII<Lock> dummy(mSync);
+    Operand().RedifineValue(source);
   }
 
   BaseOperand& Operand()
@@ -3483,20 +3459,16 @@ public:
 
   virtual bool CustomCopyIncomplete(void* const) override;
 
+  virtual TableReference& GetTableReference() override;
   virtual TableOperand GetTableOp() override;
-
   virtual void CopyTableOp(const TableOperand& source) override;
-
   virtual FieldOperand GetFieldOp() override;
-
   virtual void CopyFieldOp(const FieldOperand& source) override;
+  virtual void RedifineValue(StackValue& source) override;
 
-  virtual void CopyUndefinedOperand(const UndefinedOperand& source) override;
 
   virtual void           NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;
-
-  virtual TableReference& GetTableReference() override;
 
 private:
   GlobalValue&    mValue;
@@ -3581,18 +3553,14 @@ public:
 
   virtual TableOperand GetTableOp() override;
 
+  virtual TableReference& GetTableReference() override;
   virtual void CopyTableOp(const TableOperand& source) override;
-
   virtual FieldOperand GetFieldOp() override;
-
   virtual void CopyFieldOp(const FieldOperand& source) override;
+  virtual void RedifineValue(StackValue& source) override;
 
-  virtual void CopyUndefinedOperand(const UndefinedOperand& source) override;
-
-  virtual void           NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;
 
-  virtual TableReference& GetTableReference() override;
 
 private:
   const uint64_t      mIndex;

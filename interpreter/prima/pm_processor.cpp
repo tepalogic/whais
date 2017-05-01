@@ -370,16 +370,6 @@ op_func_stf(ProcedureCall& call, int64_t& offset)
 }
 
 
-template<typename T> static void
-transfer_undef_value(IOperand& dest, IOperand& src)
-{
-  T value;
-
-  src.GetValue(value);
-  dest.SetValue(value);
-}
-
-
 static void
 op_func_stud(ProcedureCall& call, int64_t& offset)
 {
@@ -388,79 +378,9 @@ op_func_stud(ProcedureCall& call, int64_t& offset)
 
   assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
-  BaseOperand& src = _SC(BaseOperand&, stack[stackSize - 1].Operand());
-  BaseOperand& dest = _SC(BaseOperand&, stack[stackSize - 2].Operand());
-
-  const uint_t srcType = src.GetType();
-
-  if (srcType == T_UNDETERMINED)
-  {
-    if (src.IsNull())
-      dest.CopyUndefinedOperand(UndefinedOperand());
-
-    else
-      dest.CopyUndefinedOperand(UndefinedOperand(src.NativeObject()));
-  }
-  else if (IS_TABLE(srcType))
-    dest.CopyUndefinedOperand(UndefinedOperand(src.GetTableReference()));
-
-  else if (IS_FIELD(srcType))
-  {
-    TableReference* const temp = src.IsNull() ? nullptr : &src.GetTableReference();
-
-    const uint_t type = src.GetType();
-    const FIELD_INDEX fieldIndex = src.GetField();
-
-    dest.CopyUndefinedOperand(UndefinedOperand(temp, fieldIndex, type));
-  }
-  else if (IS_ARRAY(srcType))
-    transfer_undef_value<DArray>(dest, src);
-
-  else
-  {
-    switch (srcType)
-    {
-    case T_BOOL:
-      transfer_undef_value<DBool>(dest, src);
-      break;
-
-    case T_CHAR:
-      transfer_undef_value<DChar>(dest, src);
-      break;
-
-    case T_DATE:
-    case T_DATETIME:
-    case T_HIRESTIME:
-      transfer_undef_value<DHiresTime>(dest, src);
-      break;
-
-    case T_INT8:
-    case T_INT16:
-    case T_INT32:
-    case T_INT64:
-      transfer_undef_value<DInt64>(dest, src);
-      break;
-
-    case T_UINT8:
-    case T_UINT16:
-    case T_UINT32:
-    case T_UINT64:
-      transfer_undef_value<DUInt64>(dest, src);
-      break;
-
-    case T_REAL:
-    case T_RICHREAL:
-      transfer_undef_value<DRichReal>(dest, src);
-      break;
-
-    case T_TEXT:
-      transfer_undef_value<DText>(dest, src);
-      break;
-
-    default:
-      throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
-    }
-  }
+  auto& op = _SC(BaseOperand&, stack[stackSize-2].Operand());
+  StackValue source = stack[stackSize-1].Operand().Duplicate();
+  op.RedifineValue(source);
 
   stack.Pop(1);
 }

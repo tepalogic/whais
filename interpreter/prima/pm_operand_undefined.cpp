@@ -30,155 +30,15 @@ namespace whais {
 namespace prima {
 
 
-UndefinedOperand::UndefinedOperand()
-  : mType(T_UNDETERMINED)
-{
-  mNativeValue = nullptr;
-}
-
-
 UndefinedOperand::UndefinedOperand(INativeObject& object)
-  : mType(T_UNDETERMINED)
+  : mNativeValue{&object}
 {
-  mNativeValue = &object;
-
   Initialise();
 }
-
-
-UndefinedOperand::UndefinedOperand(const DArray& array)
-  : mType(array.Type())
-{
-  MARK_ARRAY(mType);
-  _placement_new(mArrayValue, array);
-
-  Initialise();
-}
-
-
-UndefinedOperand::UndefinedOperand(const DText& text)
-  : mType(T_TEXT)
-{
-  _placement_new(mTextValue, text);
-
-  Initialise();
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue, const bool value)
-  : mType(T_BOOL)
-{
-  mUIntValue.mValue = value ? 1 : 0;
-  mUIntValue.mNull  = nullValue;
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue, const uint32_t value)
-  : mType(T_CHAR)
-{
-  mUIntValue.mValue = value;
-  mUIntValue.mNull  = nullValue;
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue, const int64_t value)
-  : mType(T_INT64)
-{
-  mIntValue.mValue = value;
-  mIntValue.mNull  = nullValue;
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue, const uint64_t value)
-  : mType(T_UINT64)
-{
-  mUIntValue.mValue = value;
-  mUIntValue.mNull  = nullValue;
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue,
-                                         const int64_t valIntPart,
-                                         const int64_t valFracPart)
-  : mType(T_RICHREAL)
-{
-  mRealValue.mIntPart   = valIntPart;
-  mRealValue.mFracPart  = valFracPart;
-  mRealValue.mNull      = nullValue;
-}
-
-
-UndefinedOperand::UndefinedOperand(const bool nullValue,
-                                         const uint16_t year,
-                                         const uint8_t month,
-                                         const uint8_t day,
-                                         const uint8_t hours,
-                                         const uint8_t mins,
-                                         const uint8_t secs,
-                                         const uint32_t microsec)
-  : mType(T_HIRESTIME)
-{
-  mTimeValue.mMicrosec    = microsec;
-  mTimeValue.mYear        = year;
-  mTimeValue.mMonth       = month;
-  mTimeValue.mDay         = day;
-  mTimeValue.mHours       = hours;
-  mTimeValue.mMins        = mins;
-  mTimeValue.mSecs        = secs;
-  mTimeValue.mNull        = nullValue;
-}
-
-
-
-UndefinedOperand::UndefinedOperand(TableReference& tableRef)
-  : mType(T_UNDETERMINED)
-{
-  MARK_TABLE(mType);
-  mTableValue = &tableRef;
-  Initialise();
-}
-
-
-UndefinedOperand::UndefinedOperand(TableReference& tableRef,
-                                         const uint_t fieldIndex,
-                                         const uint_t type)
-  : UndefinedOperand(&tableRef, fieldIndex, type)
-{
-}
-
-UndefinedOperand::UndefinedOperand(TableReference* const tableRef,
-                                         const uint_t fieldIndex,
-                                         const uint_t type)
-  : mType(type)
-{
-  assert(IS_FIELD(mType));
-
-  mFieldValue.mTableRef   = tableRef;
-  mFieldValue.mFieldIndex = fieldIndex;
-  Initialise();
-}
-
 
 UndefinedOperand::UndefinedOperand(const UndefinedOperand& source)
 {
-  if (IS_TABLE(source.mType) || IS_FIELD(source.mType))
-    memcpy(this, &source, sizeof( *this));
-
-  else if (IS_ARRAY(source.mType))
-  {
-    mType = source.mType;
-
-    _placement_new(mArrayValue, *_RC(const DArray*, source.mArrayValue));
-  }
-  else if (source.mType == T_TEXT)
-  {
-    mType = T_TEXT;
-
-    _placement_new(mTextValue, *_RC(const DText*, source.mTextValue));
-  }
-  else
-    memcpy(this, &source, sizeof(*this));
-
+  memcpy(this, &source, sizeof(*this));
   Initialise();
 }
 
@@ -196,22 +56,8 @@ UndefinedOperand::operator=(const UndefinedOperand& source)
     return *this;
 
   Cleanup();
-
-  mType = source.mType;
-  if (IS_TABLE(source.mType) || IS_FIELD(source.mType))
-    mTableValue = source.mTableValue;
-
-  else if (IS_ARRAY(source.mType))
-    _placement_new(mArrayValue, *_RC(const DArray*, source.mArrayValue));
-
-  else if (source.mType == T_TEXT)
-    _placement_new(mTextValue, *_RC(const DText*, source.mTextValue));
-
-  else
-    memcpy(this, &source, sizeof(*this));
-
+  memcpy(this, &source, sizeof(*this));
   Initialise();
-
   return *this;
 }
 
@@ -219,47 +65,14 @@ UndefinedOperand::operator=(const UndefinedOperand& source)
 void
 UndefinedOperand::Initialise()
 {
-  if (mType == T_UNDETERMINED)
+  if (mNativeValue)
   {
-    if (mNativeValue)
-    {
-      assert(IsNull() == false);
-
-      mNativeValue->RegisterUser();
-    }
-    else
-    {
-      assert(IsNull());
-    }
-  }
-  else if (IS_TABLE(mType))
-  {
-    assert(mTableValue != nullptr);
-
-    mTableValue->IncrementRefCount();
-  }
-  else if (IS_FIELD(mType))
-  {
-    if (mFieldValue.mTableRef)
-    {
-      assert(IsNull() == false);
-
-      mFieldValue.mTableRef->IncrementRefCount();
-    }
-    else
-    {
-      assert(IsNull());
-    }
-  }
-  else if (IS_ARRAY(mType))
-  {
-    assert(GET_BASIC_TYPE(mType) >= T_BOOL
-           && (GET_BASIC_TYPE(mType) < T_TEXT || GET_BASIC_TYPE(mType) == T_UNDETERMINED));
+    assert(IsNull() == false);
+    mNativeValue->RegisterUser();
   }
   else
   {
-    assert((mType == T_BOOL) || (mType == T_CHAR) || (mType == T_HIRESTIME) || (mType == T_INT64)
-        || (mType == T_UINT64) || (mType == T_RICHREAL));
+    assert(IsNull());
   }
 }
 
@@ -267,57 +80,15 @@ UndefinedOperand::Initialise()
 void
 UndefinedOperand::Cleanup()
 {
-  if (mType == T_UNDETERMINED)
+  if (mNativeValue)
   {
-    if (mNativeValue)
-    {
-      assert(IsNull() == false);
-
-      mNativeValue->ReleaseUser();
-    }
-    else
-    {
-      assert(IsNull());
-    }
-  }
-  else if (IS_TABLE(mType))
-  {
-    assert(mTableValue != nullptr);
-
-    mTableValue->DecrementRefCount();
-  }
-  else if (IS_FIELD(mType))
-  {
-    if (mFieldValue.mTableRef)
-    {
-      assert(IsNull() == false);
-
-      mFieldValue.mTableRef->DecrementRefCount();
-    }
-    else
-    {
-      assert(IsNull());
-    }
-  }
-  else if (IS_ARRAY(mType))
-  {
-    DArray* const array = _RC(DArray*, mArrayValue);
-
-    array->~DArray();
-
-    assert(GET_BASIC_TYPE(mType) >= T_BOOL
-           && (GET_BASIC_TYPE(mType) < T_TEXT || GET_BASIC_TYPE(mType) == T_UNDETERMINED));
-  }
-  else if (mType == T_TEXT)
-  {
-    DText* const text = _RC(DText*, mTextValue);
-
-    text->~DText();
+    assert(IsNull() == false);
+    mNativeValue->ReleaseUser();
+    mNativeValue = nullptr;
   }
   else
   {
-    assert((mType == T_BOOL) || (mType == T_CHAR) || (mType == T_HIRESTIME) || (mType == T_INT64)
-        || (mType == T_UINT64) || (mType == T_RICHREAL));
+    assert(IsNull());
   }
 }
 
@@ -325,496 +96,28 @@ UndefinedOperand::Cleanup()
 bool
 UndefinedOperand::IsNull() const
 {
-  if (mType == T_UNDETERMINED)
-    return mNativeValue == nullptr;
-
-  else if (IS_TABLE(mType))
-    return mTableValue->GetTable().AllocatedRows() == 0;
-
-  else if (IS_FIELD(mType))
-    return mFieldValue.mTableRef == nullptr;
-
-  else if (IS_ARRAY(mType))
-  {
-    const auto array = _RC(const DArray*, mArrayValue);
-    return array->Count() == 0;
-  }
-  else if (mType == T_TEXT)
-  {
-    const auto text = _RC(const DText*, mTextValue);
-    return text->RawSize() == 0;
-  }
-  else
-  {
-    switch (mType)
-    {
-    case T_BOOL:
-    case T_CHAR:
-    case T_UINT64:
-      return mUIntValue.mNull;
-
-    case T_INT64:
-      return mIntValue.mNull;
-
-    case T_RICHREAL:
-      return mRealValue.mNull;
-
-    case T_HIRESTIME:
-      return mTimeValue.mNull;
-
-    default:
-      assert(false);
-    }
-  }
-
-  throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+  return mNativeValue == nullptr;
 }
-
-
-void
-UndefinedOperand::GetValue(DBool& outValue) const
-{
-  if (mType != T_BOOL)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DBool();
-
-  else
-    outValue = DBool(mUIntValue.mValue != 0);
-}
-
-
-void
-UndefinedOperand::GetValue(DChar& outValue) const
-{
-  if (mType != T_CHAR)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DChar();
-
-  else
-    outValue = DChar(mUIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DDate& outValue) const
-{
-  if (mType != T_HIRESTIME)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DDate();
-
-  else
-    outValue = DDate(mTimeValue.mYear, mTimeValue.mMonth, mTimeValue.mDay);
-}
-
-
-void
-UndefinedOperand::GetValue(DDateTime& outValue) const
-{
-  if (mType != T_HIRESTIME)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DDateTime();
-
-  else
-  {
-    outValue = DDateTime(mTimeValue.mYear,
-                         mTimeValue.mMonth,
-                         mTimeValue.mDay,
-                         mTimeValue.mHours,
-                         mTimeValue.mMins,
-                         mTimeValue.mSecs);
-  }
-}
-
-
-void
-UndefinedOperand::GetValue(DHiresTime& outValue) const
-{
-  if (mType != T_HIRESTIME)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DHiresTime();
-
-  else
-  {
-    outValue = DHiresTime(mTimeValue.mYear,
-                          mTimeValue.mMonth,
-                          mTimeValue.mDay,
-                          mTimeValue.mHours,
-                          mTimeValue.mMins,
-                          mTimeValue.mSecs,
-                          mTimeValue.mMicrosec);
-  }
-}
-
-
-void
-UndefinedOperand::GetValue(DInt8& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DInt8();
-
-  else
-    outValue = DInt8(mIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DInt16& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DInt16();
-
-  else
-    outValue = DInt16(mIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DInt32& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DInt32();
-
-  else
-    outValue = DInt32(mIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DInt64& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DInt64();
-
-  else
-    outValue = DInt64(mIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DUInt8& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DUInt8();
-
-  else
-    outValue = DUInt8(mUIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DUInt16& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DUInt16();
-
-  else
-    outValue = DUInt16(mUIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DUInt32& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DUInt32();
-
-  else
-    outValue = DUInt32(mUIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DUInt64& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DUInt64();
-
-  else
-    outValue = DUInt64(mUIntValue.mValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DReal& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DReal();
-
-  else if (mType == T_RICHREAL)
-    outValue = DReal(REAL_T(mRealValue.mIntPart, mRealValue.mFracPart, DBS_RICHREAL_PREC));
-
-  else
-    outValue = DReal(REAL_T(mIntValue.mValue, 0, DBS_REAL_PREC));
-}
-
-
-void
-UndefinedOperand::GetValue(DRichReal& outValue) const
-{
-  if ((mType != T_INT64) && (mType != T_UINT64) && (mType != T_RICHREAL))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  if (IsNull())
-    outValue = DRichReal();
-
-  else if (mType == T_RICHREAL)
-    outValue = DRichReal(RICHREAL_T(mRealValue.mIntPart, mRealValue.mFracPart, DBS_RICHREAL_PREC));
-
-  else
-    outValue = DRichReal(RICHREAL_T(mIntValue.mValue, 0, DBS_RICHREAL_PREC));
-}
-
-
-void
-UndefinedOperand::GetValue(DText& outValue) const
-{
-  if (mType != T_TEXT)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  outValue = *_RC(const DText*, mTextValue);
-}
-
-
-void
-UndefinedOperand::GetValue(DArray& outValue) const
-{
-  if ( ! IS_ARRAY(mType))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  outValue = *_RC(const DArray*, mArrayValue);
-}
-
-
-void
-UndefinedOperand::SetValue(const DBool& value)
-{
-  *this = UndefinedOperand(value.IsNull(), value.mValue);
-}
-
-
-void
-UndefinedOperand::SetValue(const DChar& value)
-{
-  *this = UndefinedOperand(value.IsNull(), value.mValue);
-}
-
-
-void
-UndefinedOperand::SetValue(const DDate& value)
-{
-  *this = UndefinedOperand(value.IsNull(), value.mYear, value.mMonth, value.mDay);
-}
-
-
-void
-UndefinedOperand::SetValue(const DDateTime& value)
-{
-  *this = UndefinedOperand(value.IsNull(),
-                              value.mYear,
-                              value.mMonth,
-                              value.mDay,
-                              value.mHour,
-                              value.mMinutes,
-                              value.mSeconds);
-}
-
-
-void
-UndefinedOperand::SetValue(const DHiresTime& value)
-{
-  *this = UndefinedOperand(value.IsNull(),
-                              value.mYear,
-                              value.mMonth,
-                              value.mDay,
-                              value.mHour,
-                              value.mMinutes,
-                              value.mSeconds,
-                              value.mMicrosec);
-}
-
-
-void
-UndefinedOperand::SetValue(const DInt8& value)
-{
-  *this = UndefinedOperand (value.IsNull(), _SC(int64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DInt16& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(int64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DInt32& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(int64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DInt64& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(int64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DUInt8& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(uint64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DUInt16& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(uint64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DUInt32& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(uint64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DUInt64& value)
-{
-  *this = UndefinedOperand(value.IsNull(), _SC(uint64_t, value.mValue));
-}
-
-
-void
-UndefinedOperand::SetValue(const DReal& value)
-{
-  *this = UndefinedOperand(value.IsNull(),
-                              value.mValue.Integer(),
-                              value.mValue.Fractional() * (DBS_RICHREAL_PREC / DBS_REAL_PREC));
-
-}
-
-
-void
-UndefinedOperand::SetValue(const DText& text)
-{
-  *this = UndefinedOperand(text);
-}
-
-
-void
-UndefinedOperand::SetValue(const DArray& array)
-{
-  *this = UndefinedOperand(array);
-}
-
-
-void
-UndefinedOperand::SetValue(const DRichReal& value)
-{
-  *this = UndefinedOperand(value.IsNull(), value.mValue.Integer(), value.mValue.Fractional());
-}
-
 
 uint_t
 UndefinedOperand::GetType()
 {
-  return mType;
+  return T_UNDETERMINED;
 }
-
-
-FIELD_INDEX
-UndefinedOperand::GetField()
-{
-  if ( IS_FIELD(mType))
-    return mFieldValue.mFieldIndex;
-
-  throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-}
-
-
-ITable&
-UndefinedOperand::GetTable()
-{
-  if (IS_TABLE(mType))
-    return mTableValue->GetTable();
-
-  else if (IS_FIELD(mType))
-  {
-    if (IsNull())
-      throw InterException(_EXTRA(InterException::NATIVE_NULL_DEREFERENCE));
-
-    return mFieldValue.mTableRef->GetTable();
-  }
-
-  throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-}
-
 
 void
 UndefinedOperand::NativeObject(INativeObject* const object)
 {
-  *this = (object == nullptr) ? UndefinedOperand() : UndefinedOperand(*object);
-}
-
-
-void
-UndefinedOperand::CopyUndefinedOperand(const UndefinedOperand& source)
-{
-  *this = source;
+  Cleanup();
+  mNativeValue = object;
+  Initialise();
 }
 
 INativeObject&
 UndefinedOperand::NativeObject()
 {
-  if (mType != T_UNDETERMINED)
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  else if (IsNull())
+  if (mNativeValue == nullptr)
     throw InterException(_EXTRA(InterException::NATIVE_NULL_DEREFERENCE));
-
-  assert(mNativeValue != nullptr);
 
   return *mNativeValue;
 }
@@ -835,24 +138,6 @@ UndefinedOperand::CustomCopyIncomplete(void* const)
   Initialise();
 
   return true;
-}
-
-
-TableReference&
-UndefinedOperand::GetTableReference()
-{
-  if ( ! (IS_TABLE(mType) || IS_FIELD(mType)))
-    throw InterException(_EXTRA(InterException::INVALID_NATIVE_OP_REQ));
-
-  else if (IS_FIELD(mType) && IsNull())
-    throw InterException(_EXTRA(InterException::NATIVE_NULL_DEREFERENCE));
-
-  if (IS_TABLE(mType))
-    return *mTableValue;
-
-  assert(IS_FIELD(mType));
-
-  return *mFieldValue.mTableRef;
 }
 
 

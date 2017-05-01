@@ -309,16 +309,12 @@ test_op_stht(Session& session)
 }
 
 template <typename DBS_T> bool
-test_op_stXX(Session&       session,
-              const W_OPCODE code,
-              const char*  pText)
+test_op_stXX(Session& session, const W_OPCODE code, const char*  pText)
 {
   std::cout << "Testing " << pText << " assignment...\n";
 
-  const uint32_t procId = session.FindProcedure(
-                                              _RC(const uint8_t*, procName),
-                                              sizeof procName - 1
-                                                );
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, procName),
+                                                sizeof procName - 1);
   const Procedure& proc   = session.GetProcedure(procId);
   uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
   SessionStack stack;
@@ -353,6 +349,167 @@ test_op_stXX(Session&       session,
 
   return true;
 }
+
+template <typename DBS_T> bool
+test_op_stud(Session& session, const DBS_T refValue, const char*  pText)
+{
+  std::cout << "Testing " << pText << " undefined assignments...\n";
+
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, procName),
+                                                sizeof procName - 1);
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
+  SessionStack stack;
+
+  uint8_t opSize = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode(W_STUD, testCode + opSize);
+  opSize += w_encode_opcode(W_CTS, testCode + opSize);
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 0;
+  w_encode_opcode(W_RET, testCode + opSize);
+
+  stack.Push();
+  stack.Push(StackValue::Create(refValue));
+
+
+  session.ExecuteProcedure(procName, stack);
+
+  if (stack.Size() != 1)
+    return false;
+
+  if (stack[0].Operand().IsNull())
+    return false;
+
+  DBS_T result;
+  stack[0].Operand().GetValue(result);
+
+  if (result != refValue)
+    return false;
+
+  return true;
+}
+
+
+template <typename DBS_T> bool
+test_op_stud_array(Session& session, const DBS_T refValue, const char*  pText)
+{
+  std::cout << "Testing " << pText << " array undefined assignments...\n";
+
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, procName),
+                                                sizeof procName - 1);
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
+  SessionStack stack;
+
+  uint8_t opSize = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode(W_STUD, testCode + opSize);
+  w_encode_opcode(W_RET, testCode + opSize);
+
+  DArray ref(_SC(DBS_T*, nullptr));
+  stack.Push(StackValue::Create(ref));
+
+  ref.Add(refValue);
+  stack.Push(StackValue::Create(ref));
+
+  DArray temp0, temp1;
+  stack[0].Operand().GetValue(temp0);
+  stack[1].Operand().GetValue(temp1);
+
+  if (!temp0.IsNull()
+      || temp1.IsNull())
+  {
+    return false;
+  }
+
+  DBS_T tempVal;
+  temp1.Get(0, tempVal);
+  if (tempVal != refValue)
+    return false;
+
+  session.ExecuteProcedure(procName, stack);
+
+  if (stack.Size() != 1)
+    return false;
+
+  if (stack[0].Operand().IsNull())
+    return false;
+
+  stack[0].Operand().GetValue(temp0);
+  if (temp0.IsNull())
+  {
+    return false;
+  }
+
+  tempVal = DBS_T();
+  temp0.Get(0, tempVal);
+  if (tempVal != refValue)
+    return false;
+
+  return true;
+}
+
+
+bool
+test_op_stud_text(Session& session, const DText& refValue)
+{
+  std::cout << "Testing text undefined assignments...\n";
+
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, procName),
+                                                sizeof procName - 1);
+  const Procedure& proc   = session.GetProcedure(procId);
+  uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
+  SessionStack stack;
+
+  uint8_t opSize = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode);
+  testCode[opSize++] = 0;
+  opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
+  testCode[opSize++] = 1;
+  opSize += w_encode_opcode(W_STUD, testCode + opSize);
+  w_encode_opcode(W_RET, testCode + opSize);
+
+  GlobalValue gtext(TextOperand{DText{}});
+  stack.Push(StackValue{GlobalOperand{gtext}});
+  stack.Push(StackValue::Create(refValue));
+
+  DText temp0, temp1;
+  stack[0].Operand().GetValue(temp0);
+  stack[1].Operand().GetValue(temp1);
+
+  if (!temp0.IsNull()
+      || temp1.IsNull())
+  {
+    return false;
+  }
+
+  session.ExecuteProcedure(procName, stack);
+
+  if (stack.Size() != 1)
+    return false;
+
+  if (stack[0].Operand().IsNull())
+    return false;
+
+  stack[0].Operand().GetValue(temp0);
+  if (temp0.IsNull())
+    return false;
+
+  else if (temp0 != refValue)
+    return false;
+
+  return true;
+}
+
+
+
 
 static bool
 test_op_stt(Session& session)
@@ -519,7 +676,7 @@ test_op_stf(Session& session)
 static bool
 test_op_sta(Session& session)
 {
-  std::cout << "Testing attay assignment...\n";
+  std::cout << "Testing array assignment...\n";
 
   const uint32_t procId = session.FindProcedure(
                                               _RC(const uint8_t*, procName),
@@ -657,6 +814,131 @@ main()
     success = success && test_op_stta(_SC(Session&, commonSession));
     success = success && test_op_stf(_SC(Session&, commonSession));
     success = success && test_op_sta(_SC(Session&, commonSession));
+
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DBool(true),
+                                      "bool");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DChar(true),
+                                      "char");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DDate(1989,12,24),
+                                      "date");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DDateTime(1996, 9, 15, 9, 30, 0),
+                                      "datetime");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DHiresTime(1944,8,23,10,11,10,12334),
+                                      "hirestime");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DInt8(-3),
+                                      "int8");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DInt16(-8900),
+                                      "int16");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DInt32(-9901223),
+                                      "int32");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DInt64(-9000129901223),
+                                      "int64");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DUInt8(3),
+                                      "uint8");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DUInt16(8900),
+                                      "uint16");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DUInt32(9901223),
+                                      "uint32");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DUInt64(9000129901223),
+                                      "uint64");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DReal(0.1),
+                                      "real");
+
+    success = success && test_op_stud(_SC(Session&, commonSession),
+                                      DRichReal(-0.122231123341),
+                                      "richreal");
+
+    success = success && test_op_stud_text(_SC(Session&, commonSession), DText("Simple test!"));
+
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DBool(true),
+                                      "bool");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DChar(true),
+                                      "char");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DDate(1989,12,24),
+                                      "date");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DDateTime(1996, 9, 15, 9, 30, 0),
+                                      "datetime");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DHiresTime(1944,8,23,10,11,10,12334),
+                                      "hirestime");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DInt8(-3),
+                                      "int8");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DInt16(-8900),
+                                      "int16");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DInt32(-9901223),
+                                      "int32");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DInt64(-9000129901223),
+                                      "int64");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DUInt8(3),
+                                      "uint8");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DUInt16(8900),
+                                      "uint16");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DUInt32(9901223),
+                                      "uint32");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DUInt64(9000129901223),
+                                      "uint64");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DReal(0.1),
+                                      "real");
+
+    success = success && test_op_stud_array(_SC(Session&, commonSession),
+                                      DRichReal(-0.122231123341),
+                                      "richreal");
+
 
     ReleaseInstance(commonSession);
   }

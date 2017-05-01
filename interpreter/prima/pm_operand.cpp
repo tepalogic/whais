@@ -436,13 +436,6 @@ BaseOperand::CopyFieldOp(const FieldOperand& fieldOp)
 
 
 void
-BaseOperand::CopyUndefinedOperand(const UndefinedOperand& source)
-{
-  throw InterException(_EXTRA(InterException::INVALID_OP_REQ));
-}
-
-
-void
 BaseOperand::NativeObject(INativeObject* const)
 {
   throw InterException(_EXTRA(InterException::INVALID_OP_REQ));
@@ -461,6 +454,23 @@ BaseOperand::GetTableReference()
 {
   throw InterException(_EXTRA(InterException::INVALID_OP_REQ));
 }
+
+
+
+void
+BaseOperand::RedifineValue(StackValue& source)
+{
+  if (_SC(void*, this) == _SC(void*, &source))
+    return;
+
+  this->~IOperand();
+  _RC(uint64_t*, this)[0] = 0;
+
+  auto& op = _SC(BaseOperand&, source.Operand());
+  if (op.CustomCopyIncomplete(this))
+    memcpy(this, &source, sizeof source);
+}
+
 
 
 template <typename T>
@@ -609,8 +619,6 @@ NullOperand::Duplicate() const
 {
   return StackValue(*this);
 }
-
-
 
 
 bool
@@ -3242,9 +3250,9 @@ GlobalOperand::CopyFieldOp(const FieldOperand& fieldOp)
 
 
 void
-GlobalOperand::CopyUndefinedOperand(const UndefinedOperand& source)
+GlobalOperand::RedifineValue(StackValue& source)
 {
-  mValue.CopyNativeObjectOperand(source);
+  mValue.RedfineValue(source);
 }
 
 
@@ -3606,13 +3614,6 @@ LocalOperand::GetValueAt(const uint64_t index)
 }
 
 
-void
-LocalOperand::NativeObject(INativeObject* const value)
-{
-  mStack[mIndex].Operand().NativeObject(value);
-}
-
-
 INativeObject&
 LocalOperand::NativeObject()
 {
@@ -3686,13 +3687,13 @@ LocalOperand::CopyFieldOp(const FieldOperand& fieldOp)
 }
 
 
+
 void
-LocalOperand::CopyUndefinedOperand(const UndefinedOperand& source)
+LocalOperand::RedifineValue(StackValue& source)
 {
   BaseOperand& op = _SC(BaseOperand&, mStack[mIndex].Operand());
-  op.CopyUndefinedOperand(source);
+  op.RedifineValue(source);
 }
-
 
 
 } //namespace prima
@@ -3700,6 +3701,11 @@ LocalOperand::CopyUndefinedOperand(const UndefinedOperand& source)
 
 
 using namespace prima;
+
+StackValue::StackValue()
+  : StackValue{UndefinedOperand{}}
+{
+}
 
 StackValue
 StackValue::Create(const DBool& value)
@@ -3819,6 +3825,11 @@ StackValue::Create(const DArray& value)
 }
 
 
+StackValue
+StackValue::Create(INativeObject& value)
+{
+  return StackValue(UndefinedOperand(value));
+}
 
 
 SessionStack::SessionStack()
