@@ -544,8 +544,7 @@ DBSShoutdown()
   if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
-  //~DbsManager() will be called automatically!
-  dbsMgrs_.reset(nullptr);
+   dbsMgrs_.release();
 }
 
 

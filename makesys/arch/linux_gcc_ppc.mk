@@ -7,10 +7,10 @@ ARCH_SHL_PREFIX:=lib
 ARCH_SHL_EXT:=.so
 ARCH_LIB_PREFIX:=lib
 ARCH_LIB_EXT:=.a
-CC:=gcc
-CXX:=g++
-LD:=g++
-AR:=ar
+CC?=gcc
+CXX?=g++
+AR?=ar
+LD:=$(CXX)
 
 #Default output directories
 ifneq ($(WHAIS_OUT_DIR),)
@@ -92,6 +92,6 @@ arch_linker_flags:=$(EXT_LD_FLAGS) -m32 -pthread -ldl
 ifeq ($(PROFILE),yes)
 arch_linker_flags+= -pg
 endif
-arch_shl_linker_flags= -shared -Wl,-Bsymbolic,-soname,lib$(1).so$(2) $(arch_linker_flags)
+arch_shl_linker_flags= -shared -Wl,--exclude-libs,ALL,-Bsymbolic,-soname,lib$(1).so$(2) $(arch_linker_flags)
 arch_archiver_flags=rcs
 

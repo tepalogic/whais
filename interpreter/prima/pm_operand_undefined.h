@@ -48,7 +48,7 @@ public:
 
   virtual bool IsNull() const override;
   virtual uint_t GetType() override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual void NativeObject(INativeObject* const value) override;
   virtual INativeObject& NativeObject() override;

@@ -74,7 +74,7 @@ TableOperand::GetTable()
 
 
 StackValue
-TableOperand::Duplicate() const
+TableOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -304,7 +304,7 @@ FieldOperand::GetValueAt(const uint64_t index)
 
 
 StackValue
-FieldOperand::Duplicate() const
+FieldOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -485,7 +485,7 @@ BoolFieldElOperand::GetType()
 
 
 StackValue
-BoolFieldElOperand::Duplicate() const
+BoolFieldElOperand::Clone() const
 {
   DBool value;
   Get(value);
@@ -538,7 +538,7 @@ CharFieldElOperand::GetType()
 
 
 StackValue
-CharFieldElOperand::Duplicate() const
+CharFieldElOperand::Clone() const
 {
   DChar ch;
   Get(ch);
@@ -620,7 +620,7 @@ DateFieldElOperand::GetType()
 
 
 StackValue
-DateFieldElOperand::Duplicate() const
+DateFieldElOperand::Clone() const
 {
   DDate value;
 
@@ -709,7 +709,7 @@ DateTimeFieldElOperand::GetType()
 
 
 StackValue
-DateTimeFieldElOperand::Duplicate() const
+DateTimeFieldElOperand::Clone() const
 {
   DDateTime value;
 
@@ -794,7 +794,7 @@ HiresTimeFieldElOperand::GetType()
 
 
 StackValue
-HiresTimeFieldElOperand::Duplicate() const
+HiresTimeFieldElOperand::Clone() const
 {
   DHiresTime value;
   Get(value);
@@ -1077,7 +1077,7 @@ UInt8FieldElOperand::GetType()
 
 
 StackValue
-UInt8FieldElOperand::Duplicate() const
+UInt8FieldElOperand::Clone() const
 {
   DUInt8 value;
   Get(value);
@@ -1363,7 +1363,7 @@ UInt16FieldElOperand::GetType()
 
 
 StackValue
-UInt16FieldElOperand::Duplicate() const
+UInt16FieldElOperand::Clone() const
 {
   DUInt16 value;
   Get(value);
@@ -1647,7 +1647,7 @@ UInt32FieldElOperand::GetType()
 
 
 StackValue
-UInt32FieldElOperand::Duplicate() const
+UInt32FieldElOperand::Clone() const
 {
   DUInt32 value;
   Get(value);
@@ -1923,7 +1923,7 @@ UInt64FieldElOperand::GetType()
 
 
 StackValue
-UInt64FieldElOperand::Duplicate() const
+UInt64FieldElOperand::Clone() const
 {
   DUInt64 value;
   Get(value);
@@ -2211,7 +2211,7 @@ Int8FieldElOperand::GetType()
 
 
 StackValue
-Int8FieldElOperand::Duplicate() const
+Int8FieldElOperand::Clone() const
 {
   DInt8 value;
   Get(value);
@@ -2498,7 +2498,7 @@ Int16FieldElOperand::GetType()
 
 
 StackValue
-Int16FieldElOperand::Duplicate() const
+Int16FieldElOperand::Clone() const
 {
   DInt16 value;
 
@@ -2786,7 +2786,7 @@ Int32FieldElOperand::GetType()
 
 
 StackValue
-Int32FieldElOperand::Duplicate() const
+Int32FieldElOperand::Clone() const
 {
   DInt32 value;
   Get(value);
@@ -3074,7 +3074,7 @@ Int64FieldElOperand::GetType()
 
 
 StackValue
-Int64FieldElOperand::Duplicate() const
+Int64FieldElOperand::Clone() const
 {
   DInt64 value;
   Get(value);
@@ -3234,7 +3234,7 @@ RealFieldElOperand::GetType()
 }
 
 StackValue
-RealFieldElOperand::Duplicate() const
+RealFieldElOperand::Clone() const
 {
   DReal value;
 
@@ -3380,7 +3380,7 @@ RichRealFieldElOperand::GetType()
 }
 
 StackValue
-RichRealFieldElOperand::Duplicate() const
+RichRealFieldElOperand::Clone() const
 {
   DRichReal value;
   Get(value);
@@ -3444,7 +3444,7 @@ TextFieldElOperand::GetValueAt(const uint64_t index)
 }
 
 StackValue
-TextFieldElOperand::Duplicate() const
+TextFieldElOperand::Clone() const
 {
   DText value;
   GetValue(value);
@@ -3563,7 +3563,7 @@ ArrayFieldElOperand::GetValueAt(const uint64_t index)
 }
 
 StackValue
-ArrayFieldElOperand::Duplicate() const
+ArrayFieldElOperand::Clone() const
 {
   DArray value;
 

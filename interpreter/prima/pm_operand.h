@@ -235,7 +235,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -262,7 +262,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DBool mValue;
@@ -286,7 +286,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DChar mValue;
@@ -312,7 +312,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DDate mValue;
@@ -338,7 +338,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DDateTime mValue;
@@ -364,7 +364,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DHiresTime mValue;
@@ -417,7 +417,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DUInt8 mValue;
@@ -468,7 +468,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DUInt16 mValue;
@@ -521,7 +521,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DUInt32 mValue;
@@ -574,7 +574,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DUInt64 mValue;
@@ -627,7 +627,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DInt8 mValue;
@@ -680,7 +680,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DInt16 mValue;
@@ -733,7 +733,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DInt32 mValue;
@@ -786,7 +786,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DInt64 mValue;
@@ -823,7 +823,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DReal mValue;
@@ -860,7 +860,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
 private:
   DRichReal mValue;
@@ -906,7 +906,7 @@ public:
   virtual uint_t GetType() override;
 
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
@@ -956,7 +956,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
@@ -1008,7 +1008,7 @@ public:
   virtual uint_t GetType() override;
 
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
@@ -1083,7 +1083,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1104,7 +1104,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1127,7 +1127,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1150,7 +1150,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1173,7 +1173,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1224,7 +1224,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1274,7 +1274,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1324,7 +1324,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1374,7 +1374,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1424,7 +1424,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1473,7 +1473,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1523,7 +1523,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1573,7 +1573,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1607,7 +1607,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1641,7 +1641,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 };
@@ -1694,7 +1694,7 @@ public:
 
   virtual ITable& GetTable() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool CustomCopyIncomplete(void* const dest) override;
 
@@ -1738,7 +1738,7 @@ public:
   virtual ITable& GetTable() override;
 
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 
@@ -1840,7 +1840,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -1861,7 +1861,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -1884,7 +1884,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -1910,7 +1910,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -1935,7 +1935,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -1985,7 +1985,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2035,7 +2035,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2085,7 +2085,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2135,7 +2135,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2185,7 +2185,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2235,7 +2235,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2285,7 +2285,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2336,7 +2336,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2370,7 +2370,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2406,7 +2406,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2429,7 +2429,7 @@ public:
   virtual uint_t GetType() override;
 
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 };
@@ -2451,7 +2451,7 @@ public:
   virtual uint_t GetType() override;
 
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
 };
@@ -2478,7 +2478,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool Iterate(const bool reverse) override;
   virtual uint64_t IteratorOffset() override;
@@ -2592,7 +2592,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2614,7 +2614,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2638,7 +2638,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 class DateTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2661,7 +2661,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 class HiresTimeArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2684,7 +2684,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 class UInt8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2734,7 +2734,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2783,7 +2783,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2834,7 +2834,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2885,7 +2885,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 class Int8ArrayFieldElOperand : public BaseArrayFieldElOperand
@@ -2935,7 +2935,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -2986,7 +2986,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -3037,7 +3037,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -3088,7 +3088,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -3123,7 +3123,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -3158,7 +3158,7 @@ public:
 
   virtual uint_t GetType() override;
 
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 };
 
 
@@ -3305,10 +3305,10 @@ public:
     return Operand().GetValueAt(index);
   }
 
-  StackValue Duplicate()
+  StackValue Clone()
   {
     LockRAII<Lock> dummy(mSync);
-    return Operand().Duplicate();
+    return Operand().Clone();
   }
 
   bool StartIterate(const bool  reverse, StackValue& outStartItem)
@@ -3453,7 +3453,7 @@ public:
 
   virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
 
@@ -3545,7 +3545,7 @@ public:
 
   virtual StackValue GetFieldAt(const FIELD_INDEX field) override;
   virtual StackValue GetValueAt(const uint64_t index) override;
-  virtual StackValue Duplicate() const override;
+  virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool  reverse, StackValue& outStartItem) override;
   virtual bool Iterate(const bool reverse) override;

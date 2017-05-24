@@ -390,41 +390,39 @@ ExecuteInteractively(istream& is)
 static void
 InitDBS()
 {
-
   if (IsOnlineDatabase())
+  {
+    if (GetVerbosityLevel() >= VL_INFO)
     {
-      if (GetVerbosityLevel() >= VL_INFO)
-        {
-          cout << "Connecting to a remote database as ";
-          cout << (GetUserId() == 0 ? "administrator" : "default user")
-               << ".\n";
-        }
-
-      if (GetVerbosityLevel() >= VL_DEBUG)
-        {
-          cout << " remote host:     " << GetRemoteHostName() << endl;
-          cout << " port:            " << GetConnectionPort() << endl;
-          cout << " database:        " << GetWorkingDB() << endl;
-          cout << " user id:         " << GetUserId() << endl;
-          cout << " password:        " << GetUserPassword() << endl;
-        }
+      cout << "Connecting to a remote database as ";
+      cout << (GetUserId() == 0 ? "administrator" : "default user") << ".\n";
     }
+
+    if (GetVerbosityLevel() >= VL_DEBUG)
+    {
+      cout << " remote host:     " << GetRemoteHostName() << endl;
+      cout << " port:            " << GetConnectionPort() << endl;
+      cout << " database:        " << GetWorkingDB() << endl;
+      cout << " user id:         " << GetUserId() << endl;
+      cout << " password:        " << GetUserPassword() << endl;
+    }
+  }
   else
+  {
+    const string& workDir = GetWorkingDirectory();
+    const uint64_t maxFileSize = GetMaximumFileSize();
+
+    if (GetVerbosityLevel() >= VL_DEBUG)
     {
-      const string&  workDir     = GetWorkingDirectory();
-      const uint64_t maxFileSize = GetMaximumFileSize();
-
-      if (GetVerbosityLevel() >= VL_DEBUG)
-        {
-          cout << "Starting the DBS framework: " << endl;
-          cout << " directory: " << workDir << endl;
-          cout << " file_size: " << maxFileSize << endl;
-        }
-
-      DBSSettings settings;
-      settings.mWorkDir = settings.mTempDir = workDir;
-      DBSInit(settings);
+      cout << "Starting the DBS framework: " << endl;
+      cout << " directory: " << workDir << endl;
+      cout << " file_size: " << maxFileSize << endl;
     }
+
+    DBSSettings settings;
+    settings.mWorkDir = settings.mTempDir = workDir;
+    DBSInit(settings);
+  }
 }
 
 

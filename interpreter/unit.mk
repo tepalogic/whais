@@ -17,8 +17,8 @@ wprima_SRC:=prima/pm_globals.cpp prima/pm_operand.cpp prima/pm_interpreter.cpp\
 
 wprima_cmn_DEF=WVER_MAJ=1 WVER_MIN=0
 wprima_DEF:=USE_INTERP_SHL USE_DBS_SHL INTERP_EXPORTING $(wprima_cmn_DEF)
-wprima_LIB:=utils/wslutils custom/wslcustom
-wprima_SHL:=dbs/wpastra compiler/wcompiler custom/wcommon
+wprima_LIB:=utils/wslutils custom/wslcustom 
+wprima_SHL:=dbs/wpastra compiler/wcompiler
 
 wslprima_SRC=$(wprima_SRC)
 wslprima_INC=$(wprima_INC)

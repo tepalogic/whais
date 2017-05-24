@@ -615,7 +615,7 @@ NullOperand::GetType()
 
 
 StackValue
-NullOperand::Duplicate() const
+NullOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -685,7 +685,7 @@ BoolOperand::GetType()
 
 
 StackValue
-BoolOperand::Duplicate() const
+BoolOperand::Clone() const
 {
   return  StackValue(*this);
 }
@@ -732,7 +732,7 @@ CharOperand::GetType()
 
 
 StackValue
-CharOperand::Duplicate() const
+CharOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -795,7 +795,7 @@ DateOperand::GetType()
 
 
 StackValue
-DateOperand::Duplicate() const
+DateOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -864,7 +864,7 @@ DateTimeOperand::GetType()
 
 
 StackValue
-DateTimeOperand::Duplicate() const
+DateTimeOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -932,7 +932,7 @@ HiresTimeOperand::GetType()
 
 
 StackValue
-HiresTimeOperand::Duplicate() const
+HiresTimeOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -1116,7 +1116,7 @@ UInt8Operand::GetType()
 
 
 StackValue
-UInt8Operand::Duplicate() const
+UInt8Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -1303,7 +1303,7 @@ UInt16Operand::GetType()
 
 
 StackValue
-UInt16Operand::Duplicate() const
+UInt16Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -1492,7 +1492,7 @@ UInt32Operand::GetType()
 
 
 StackValue
-UInt32Operand::Duplicate() const
+UInt32Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -1676,7 +1676,7 @@ UInt64Operand::GetType()
 
 
 StackValue
-UInt64Operand::Duplicate() const
+UInt64Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -1862,7 +1862,7 @@ Int8Operand::GetType()
 
 
 StackValue
-Int8Operand::Duplicate() const
+Int8Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2054,7 +2054,7 @@ Int16Operand::GetType()
 
 
 StackValue
-Int16Operand::Duplicate() const
+Int16Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2244,7 +2244,7 @@ Int32Operand::GetType()
 
 
 StackValue
-Int32Operand::Duplicate() const
+Int32Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2431,7 +2431,7 @@ Int64Operand::GetType()
 
 
 StackValue
-Int64Operand::Duplicate() const
+Int64Operand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2539,7 +2539,7 @@ RealOperand::GetType()
 
 
 StackValue
-RealOperand::Duplicate() const
+RealOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2648,7 +2648,7 @@ RichRealOperand::GetType()
 
 
 StackValue
-RichRealOperand::Duplicate() const
+RichRealOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2706,7 +2706,7 @@ TextOperand::GetType()
 
 
 StackValue
-TextOperand::Duplicate() const
+TextOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -2775,7 +2775,7 @@ CharTextElOperand::GetType()
 
 
 StackValue
-CharTextElOperand::Duplicate() const
+CharTextElOperand::Clone() const
 {
   DChar ch;
   GetValue(ch);
@@ -3181,9 +3181,9 @@ GlobalOperand::GetValueAt(const uint64_t index)
 
 
 StackValue
-GlobalOperand::Duplicate() const
+GlobalOperand::Clone() const
 {
-  return mValue.Duplicate();
+  return mValue.Clone();
 }
 
 
@@ -3629,9 +3629,9 @@ LocalOperand::GetTableReference()
 
 
 StackValue
-LocalOperand::Duplicate() const
+LocalOperand::Clone() const
 {
-  return mStack[mIndex].Operand().Duplicate();
+  return mStack[mIndex].Operand().Clone();
 }
 
 

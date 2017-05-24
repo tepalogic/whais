@@ -124,7 +124,7 @@ UndefinedOperand::NativeObject()
 
 
 StackValue
-UndefinedOperand::Duplicate() const
+UndefinedOperand::Clone() const
 {
   return StackValue(*this);
 }

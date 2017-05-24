@@ -12,19 +12,17 @@ wcompiler_MAJ=.1
 wcompiler_MIN=.0
 
 
-whc_SRC=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp \
+whc_SRC:=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp \
 		whc/whc_preprocess.cpp
+whc_DEF:=USE_COMPILER_SHL WVER_MAJ=1 WVER_MIN=2
+whc_LIB:=utils/wslutils custom/wslcustom 
+whc_SHL:=compiler/wcompiler
 
-whc_DEF=USE_COMPILER_SHL WVER_MAJ=1 WVER_MIN=0
-whc_LIB=utils/wslutils custom/wslcustom
-whc_SHL=compiler/wcompiler custom/wcommon
-
-
-wod_SRC=wod/wod_main.cpp wod/wod_cmdline.cpp wod/wod_dump.cpp \
+wod_SRC:=wod/wod_main.cpp wod/wod_cmdline.cpp wod/wod_dump.cpp \
 		wod/wod_decoder.cpp
-wod_DEF=USE_COMPILER_SHL WVER_MAJ=1 WVER_MIN=0
-wod_LIB=utils/wslutils custom/wslcustom
-wod_SHL=compiler/wcompiler custom/wcommon
+wod_DEF:=USE_COMPILER_SHL WVER_MAJ=1 WVER_MIN=2
+wod_LIB:=$(whc_LIB)
+wod_SHL:=$(whc_SHL)
  
 
 wcompiler_INC=
@@ -33,8 +31,8 @@ wcompiler_SRC=parser/whais.tab.c parser/parser.c parser/yy.c parser/whaisc.c par
 			 semantics/statement.c semantics/vardecl.c semantics/wlog.c \
 			 semantics/brlo_stmts.c wraper_cpp/compiledunit.cpp
 wcompiler_DEF=COMPILER_EXPORTING=1 USE_COMPILER_SHL WVER_MAJ=1 WVER_MIN=0
-wcompiler_LIB=utils/wslutils custom/wslcustom 
-wcompiler_SHL=custom/wcommon
+wcompiler_LIB=utils/wslutils custom/wslcustom   
+wcompiler_SHL=
 
 wslcompiler_SRC=$(wcompiler_SRC)
 wslcompiler_INC=$(wcompiler_INC)

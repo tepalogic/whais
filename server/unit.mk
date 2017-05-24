@@ -3,7 +3,7 @@ UNIT:=server
 
 UNIT_EXES:=whais
 UNIT_SHLS:=
-UNIT_LIBS:=whais_cmn
+UNIT_LIBS:=wslsrv_cmn
 
 ifneq ($(findstring windows,$(ARCH)),)
 UNIT_EXES+=whais_srv
@@ -14,24 +14,23 @@ UNIT_EXES+=whaisd
 endif
 
 
-whais_cmn_SRC=common/configuration.cpp common/loader.cpp common/server.cpp\
+wslsrv_cmn_SRC:=common/configuration.cpp common/loader.cpp common/server.cpp\
 			common/connection.cpp common/commands.cpp common/stack_cmds.cpp
-whais_cmn_DEF=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL\
-				WVER_MAJ=1 WVER_MIN=1
 
+wslsrv_cmn_DEF:=WVER_MAJ=1 WVER_MIN=2
 
 whais_SRC:=common/server_main.cpp
-whais_DEF=$(whais_cmn_DEF)
-whais_LIB=utils/wslutils custom/wslcustom server/whais_cmn
-whais_SHL=custom/wcommon dbs/wpastra compiler/wcompiler interpreter/wprima
+whais_DEF:=USE_DBS_SHL USE_INTERP_SHL USE_COMPILER_SHL $(wslsrv_cmn_DEF) 
+whais_LIB:=server/wslsrv_cmn utils/wslutils custom/wslcustom  
+whais_SHL:=dbs/wpastra compiler/wcompiler interpreter/wprima
 
 whais_srv_SRC:=windows/service.cpp
-whais_srv_DEF:=$(whais_cmn_DEF)
+whais_srv_DEF:=$(whais_DEF)
 whais_srv_LIB:=$(whais_LIB)
 whais_srv_SHL:=$(whais_SHL)
 
 whaisd_SRC:=linux/daemon.cpp
-whaisd_DEF:=$(whais_cmn_DEF)
+whaisd_DEF:=$(whais_DEF)
 whaisd_LIB:=$(whais_LIB)
 whaisd_SHL:=$(whais_SHL)
 

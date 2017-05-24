@@ -7,16 +7,16 @@ UNIT_LIBS:=wslconnector
 
 wslconnector_SRC:=src/connector.c src/client_connection.c
 wslconnector_DEF:=
-wslconnector_LIB:=utils/wutils custom/wcustom
+wslconnector_LIB:=utils/wslutils custom/wslcustom
 wslconnector_SHL:=
 
 wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp wcmd/wcmd_execcmd.cpp\
 		 wcmd/wcmd_valparser.cpp wcmd/wcmd_dbcheck.cpp wcmd/wcmd_altertable.cpp
 		 
-wcmd_DEF:=USE_DBS_SHL USE_INTERP_SHL WVER_MAJ=1 WVER_MIN=1
+wcmd_DEF:=USE_DBS_SHL USE_INTERP_SHL WVER_MAJ=1 WVER_MIN=2
 wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcustom 
-wcmd_SHL:=custom/wcommon dbs/wpastra compiler/wcompiler interpreter/wprima
+wcmd_SHL:=dbs/wpastra compiler/wcompiler interpreter/wprima
 wcmd_INC:=
 
 

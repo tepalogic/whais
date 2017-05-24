@@ -86,7 +86,7 @@ test_native_obj()
       return false;
     }
 
-  StackValue sv = op1.Duplicate();
+  StackValue sv = op1.Clone();
 
   if ((&t != &op1.NativeObject())
       || (&t != &sv.Operand().NativeObject())

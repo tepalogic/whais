@@ -31,7 +31,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whais {
 
 
-class EXCEP_SHL SocketException : public Exception
+class SocketException : public Exception
 {
 public:
   SocketException(const uint32_t code,
@@ -46,7 +46,7 @@ public:
 };
 
 
-class EXCEP_SHL Socket
+class Socket
 {
 public:
   //Client server constructors

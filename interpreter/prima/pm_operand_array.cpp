@@ -120,7 +120,7 @@ ArrayOperand::GetValueAt(const uint64_t index)
 }
 
 StackValue
-ArrayOperand::Duplicate() const
+ArrayOperand::Clone() const
 {
   return StackValue(*this);
 }
@@ -247,7 +247,7 @@ BoolArrayElOperand::GetType()
 }
 
 StackValue
-BoolArrayElOperand::Duplicate() const
+BoolArrayElOperand::Clone() const
 {
   DBool value;
   Get(value);
@@ -292,7 +292,7 @@ CharArrayElOperand::GetType()
 }
 
 StackValue
-CharArrayElOperand::Duplicate() const
+CharArrayElOperand::Clone() const
 {
   DChar ch;
   Get(ch);
@@ -364,7 +364,7 @@ DateArrayElOperand::GetType()
 }
 
 StackValue
-DateArrayElOperand::Duplicate() const
+DateArrayElOperand::Clone() const
 {
   DDate value;
 
@@ -443,7 +443,7 @@ DateTimeArrayElOperand::GetType()
 }
 
 StackValue
-DateTimeArrayElOperand::Duplicate() const
+DateTimeArrayElOperand::Clone() const
 {
   DDateTime value;
 
@@ -519,7 +519,7 @@ HiresTimeArrayElOperand::GetType()
 
 
 StackValue
-HiresTimeArrayElOperand::Duplicate() const
+HiresTimeArrayElOperand::Clone() const
 {
   DHiresTime value;
   Get(value);
@@ -781,7 +781,7 @@ UInt8ArrayElOperand::GetType()
 }
 
 StackValue
-UInt8ArrayElOperand::Duplicate() const
+UInt8ArrayElOperand::Clone() const
 {
   DUInt8 value;
   Get(value);
@@ -1060,7 +1060,7 @@ UInt16ArrayElOperand::GetType()
 
 
 StackValue
-UInt16ArrayElOperand::Duplicate() const
+UInt16ArrayElOperand::Clone() const
 {
   DUInt16 value;
   Get(value);
@@ -1341,7 +1341,7 @@ UInt32ArrayElOperand::GetType()
 
 
 StackValue
-UInt32ArrayElOperand::Duplicate() const
+UInt32ArrayElOperand::Clone() const
 {
   DUInt32 value;
   Get(value);
@@ -1614,7 +1614,7 @@ UInt64ArrayElOperand::GetType()
 
 
 StackValue
-UInt64ArrayElOperand::Duplicate() const
+UInt64ArrayElOperand::Clone() const
 {
   DUInt64 value;
   Get(value);
@@ -1894,7 +1894,7 @@ Int8ArrayElOperand::GetType()
 
 
 StackValue
-Int8ArrayElOperand::Duplicate() const
+Int8ArrayElOperand::Clone() const
 {
   DInt8 value;
   Get(value);
@@ -2176,7 +2176,7 @@ Int16ArrayElOperand::GetType()
 
 
 StackValue
-Int16ArrayElOperand::Duplicate() const
+Int16ArrayElOperand::Clone() const
 {
   DInt16 value;
 
@@ -2459,7 +2459,7 @@ Int32ArrayElOperand::GetType()
 
 
 StackValue
-Int32ArrayElOperand::Duplicate() const
+Int32ArrayElOperand::Clone() const
 {
   DInt32 value;
   Get(value);
@@ -2742,7 +2742,7 @@ Int64ArrayElOperand::GetType()
 
 
 StackValue
-Int64ArrayElOperand::Duplicate() const
+Int64ArrayElOperand::Clone() const
 {
   DInt64 value;
   Get(value);
@@ -2901,7 +2901,7 @@ RealArrayElOperand::GetType()
 
 
 StackValue
-RealArrayElOperand::Duplicate() const
+RealArrayElOperand::Clone() const
 {
   DReal value;
 
@@ -3059,7 +3059,7 @@ RichRealArrayElOperand::GetType()
 
 
 StackValue
-RichRealArrayElOperand::Duplicate() const
+RichRealArrayElOperand::Clone() const
 {
   DRichReal value;
   Get(value);

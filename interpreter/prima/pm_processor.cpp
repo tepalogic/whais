@@ -379,7 +379,7 @@ op_func_stud(ProcedureCall& call, int64_t& offset)
   assert((call.StackBegin() + call.LocalsCount() - 1 + 2) <= stackSize);
 
   auto& op = _SC(BaseOperand&, stack[stackSize-2].Operand());
-  StackValue source = stack[stackSize-1].Operand().Duplicate();
+  StackValue source = stack[stackSize-1].Operand().Clone();
   op.RedifineValue(source);
 
   stack.Pop(1);
@@ -443,7 +443,7 @@ op_func_ret(ProcedureCall& call, int64_t& offset)
 
   assert((call.StackBegin() + call.LocalsCount()) <= stackSize);
 
-  StackValue result = stack[stackSize - 1].Operand().Duplicate();
+  StackValue result = stack[stackSize - 1].Operand().Clone();
 
   stack.Pop(stackSize - call.StackBegin());
 

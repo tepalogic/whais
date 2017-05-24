@@ -2,23 +2,11 @@
 UNIT:=custom
 
 UNIT_EXES:=
-UNIT_SHLS:=wcommon
+UNIT_SHLS:=
 UNIT_LIBS:=wslcustom
-ifeq ($(EXTRA_LIBS),yes)
-UNIT_LIBS+=wslcommon
-endif
 
-wslcommon_SRC=cpp_support/exception.cpp cpp_support/wthread.cpp\
-	         cpp_support/wfile.cpp cpp_support/wsocket.cpp
-
-wcommon_SRC=$(wslcommon_SRC) cpp_support/wmemtracker.cpp 
-
-wcommon_DEF=USE_SHL EXPORT_EXCEP_SHL
-wcommon_MAJ=.1
-wcommon_MIN=.0
-wcommon_LIB=custom/wslcustom
-
-wslcustom_SRC=
+wslcustom_SRC:=cpp_support/exception.cpp cpp_support/wthread.cpp\
+			cpp_support/wfile.cpp cpp_support/wsocket.cpp cpp_support/wmemtracker.cpp
 
 ifeq ($(ARCH),linux_gcc_x86_64)
 SRC_FOLDER:=posix

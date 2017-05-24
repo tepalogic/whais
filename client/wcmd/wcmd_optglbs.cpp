@@ -244,9 +244,6 @@ GetDBSHandler()
 bool
 IsOnlineDatabase()
 {
-  if ( ! GetRemoteHostName().empty())
-    return true;
-
-  return false;
+  return GetRemoteHostName().empty() ? false : true;
 }
 

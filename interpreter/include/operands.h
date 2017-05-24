@@ -129,7 +129,7 @@ public:
   virtual StackValue GetTableValue() = 0;
   virtual StackValue GetFieldAt(const FIELD_INDEX field) = 0;
   virtual StackValue GetValueAt(const uint64_t index) = 0;
-  virtual StackValue Duplicate() const = 0;
+  virtual StackValue Clone() const = 0;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) = 0;
   virtual bool Iterate(const bool reverse) = 0;
