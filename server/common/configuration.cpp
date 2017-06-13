@@ -1,26 +1,26 @@
 /******************************************************************************
-WHAIS - An advanced database system
-Copyright(C) 2008  Iulian Popa
+ WHAIS - An advanced database system
+ Copyright(C) 2008  Iulian Popa
 
-Address: Str Olimp nr. 6
-         Pantelimon Ilfov,
-         Romania
-Phone:   +40721939650
-e-mail:  popaiulian@gmail.com
+ Address: Str Olimp nr. 6
+ Pantelimon Ilfov,
+ Romania
+ Phone:   +40721939650
+ e-mail:  popaiulian@gmail.com
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-******************************************************************************/
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 
 #include <stdlib.h>
 #include <iostream>
@@ -37,31 +37,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 using namespace whais;
 
-static const char COMMENT_CHAR                      = '#';
-static const char DEFAULT_LISTEN_PORT[]             = "1761";
-static const char CLEAR_LOG_STREAM[]                = "";
+static const char COMMENT_CHAR = '#';
+static const char DEFAULT_LISTEN_PORT[] = "1761";
+static const char CLEAR_LOG_STREAM[] = "";
 
-static const char CIPHER_PLAIN[]                    = "plain";
-static const char CIPHER_3K[]                       = "3k";
-static const char CIPHER_DES[]                      = "des";
-static const char CIPHER_3DES[]                     = "3des";
+static const char CIPHER_PLAIN[] = "plain";
+static const char CIPHER_3K[] = "3k";
+static const char CIPHER_DES[] = "des";
+static const char CIPHER_3DES[] = "3des";
 
-static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE      = 1024;
-static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT     = 128;
-static const uint_t MIN_VL_BLOCK_SIZE               = 1024;
-static const uint_t MIN_VL_BLOCK_COUNT              = 128;
-static const uint_t MIN_TEMP_CACHE                  = 128;
+static const uint_t MIN_TABLE_CACHE_BLOCK_SIZE = 1024;
+static const uint_t MIN_TABLE_CACHE_BLOCK_COUNT = 128;
+static const uint_t MIN_VL_BLOCK_SIZE = 1024;
+static const uint_t MIN_VL_BLOCK_COUNT = 128;
+static const uint_t MIN_TEMP_CACHE = 128;
 
-static const uint_t DEFAULT_MAX_CONNS               = 64;
-static const uint_t DEFAULT_TABLE_CACHE_BLOCK_SIZE  = 4098;
+static const uint_t DEFAULT_MAX_CONNS = 64;
+static const uint_t DEFAULT_TABLE_CACHE_BLOCK_SIZE = 4098;
 static const uint_t DEFAULT_TABLE_CACHE_BLOCK_COUNT = 1024;
-static const uint_t DEFAULT_VL_BLOCK_SIZE           = 1024;
-static const uint_t DEFAULT_VL_BLOCK_COUNT          = 4098;
-static const uint_t DEFAULT_TEMP_CACHE              = 512;
-static const uint_t DEFAULT_WAIT_TMO_MS             = 60 * 1000;
-static const uint_t DEFAULT_SYNC_INTERVAL_MS        = 0;
-static const uint_t DEFAULT_SYNC_WAKEUP_MS          = 1000;
-static const uint_t DEFAULT_AUTH_TMO_MS             = 1000;
+static const uint_t DEFAULT_VL_BLOCK_SIZE = 1024;
+static const uint_t DEFAULT_VL_BLOCK_COUNT = 4098;
+static const uint_t DEFAULT_TEMP_CACHE = 512;
+static const uint_t DEFAULT_WAIT_TMO_MS = 60 * 1000;
+static const uint_t DEFAULT_SYNC_INTERVAL_MS = 0;
+static const uint_t DEFAULT_SYNC_WAKEUP_MS = 1000;
+static const uint_t DEFAULT_AUTH_TMO_MS = 1000;
 
 static const string gEntPort("listen");
 static const string gEntMaxConnections("max_connections");
@@ -89,17 +89,14 @@ static const string gEntStackCount("max_stack_count");
 
 static ServerSettings gMainSettings;
 
-
-
 // Helper function to retrieve '...' or "..." text entries.
-static bool
-get_enclose_entry(ostream& os, const string& line, const char encChar, string& output)
+static bool get_enclosed_entry(ostream& os, const string& line, const char encChar, string& output)
 {
   assert(line.at(0) == encChar);
 
   bool encEnded = false;
 
-  for (auto ch : line)
+  for (auto ch : line.substr(1))
   {
     if (ch == encChar)
     {
@@ -112,7 +109,6 @@ get_enclose_entry(ostream& os, const string& line, const char encChar, string& o
   return encEnded;
 }
 
-
 const string&
 GlobalContextDatabase()
 {
@@ -120,16 +116,13 @@ GlobalContextDatabase()
   return dbsName;
 }
 
-
 const ServerSettings&
 GetAdminSettings()
 {
   return gMainSettings;
 }
 
-
-bool
-SeekAtConfigurationSection(ifstream& config, uint_t& outConfigLine)
+bool SeekAtConfigurationSection(ifstream& config, uint_t& outConfigLine)
 {
   static const string identifier("[CONFIG]");
   static const string delimiters(" \t");
@@ -143,7 +136,7 @@ SeekAtConfigurationSection(ifstream& config, uint_t& outConfigLine)
     getline(config, line);
     ++outConfigLine;
 
-    size_t pos   = 0;
+    size_t pos = 0;
     string token = NextToken(line, pos, delimiters);
     if ((token.length() > 0) && (token.at(0) == COMMENT_CHAR))
       continue;
@@ -154,9 +147,7 @@ SeekAtConfigurationSection(ifstream& config, uint_t& outConfigLine)
   return false;
 }
 
-
-bool
-FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine)
+bool FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine)
 {
   static const string identifier("[DATABASE]");
   static const string delimiters(" \t");
@@ -167,7 +158,7 @@ FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine)
     getline(config, line);
     ++inoutConfigLine;
 
-    size_t pos   = 0;
+    size_t pos = 0;
     string token = NextToken(line, pos, delimiters);
     if ((token.length() > 0) && (token.at(0) == COMMENT_CHAR))
       continue;
@@ -179,13 +170,11 @@ FindNextContextSection(std::ifstream& config, uint_t& inoutConfigLine)
   return false;
 }
 
-
-bool
-ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& errOut)
+bool ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& errOut)
 {
   static const string delimiters(" \t=");
 
-  while ( ! config.eof())
+  while ( !config.eof())
   {
     const streampos lastPos = config.tellg();
 
@@ -254,9 +243,9 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
 
       else
       {
-        errOut << "The cipher '" << token << "' is not supported. "
-               << "Allowed ciphers are " << CIPHER_PLAIN << ", " << CIPHER_DES << ", "
-               << CIPHER_3DES << " and " << CIPHER_3K << ".\n";
+        errOut << "The cipher '" << token << "' is not supported. " << "Allowed ciphers are "
+            << CIPHER_PLAIN << ", " << CIPHER_DES << ", " << CIPHER_3DES << " and " << CIPHER_3K
+            << ".\n";
 
         return false;
       }
@@ -329,8 +318,8 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       if (gMainSettings.mAuthTMO <= 0)
       {
         errOut << "At line " << inoutConfigLine << "the connection timeout parameter "
-                  " should be an integer value bigger than 0(currently set to "
-               << gMainSettings.mAuthTMO << " ).\n";
+            " should be an integer value bigger than 0(currently set to " << gMainSettings.mAuthTMO
+            << " ).\n";
 
         return false;
       }
@@ -348,8 +337,8 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       if (gMainSettings.mWaitReqTmo <= 0)
       {
         errOut << "At line " << inoutConfigLine << "the request waiting timeout parameter should"
-                  " be an integer value bigger than 0(currently set to "
-               << gMainSettings.mWaitReqTmo << " ).\n";
+            " be an integer value bigger than 0(currently set to " << gMainSettings.mWaitReqTmo
+            << " ).\n";
         return false;
       }
     }
@@ -366,8 +355,8 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       if (gMainSettings.mSyncInterval < -1)
       {
         errOut << "At line " << inoutConfigLine << "the data sync interval timeout parameter"
-                  " should be a positive integer value(was set to "
-               << gMainSettings.mSyncInterval << " ).\n";
+            " should be a positive integer value(was set to " << gMainSettings.mSyncInterval
+            << " ).\n";
         return false;
       }
     }
@@ -384,12 +373,12 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       if (gMainSettings.mSyncWakeup <= 0)
       {
         errOut << "At line " << inoutConfigLine << "the data sync interval timeout parameter"
-                  " should be an integer value bigger than 0(was set to "
-               << gMainSettings.mSyncWakeup << " ).\n";
+            " should be an integer value bigger than 0(was set to " << gMainSettings.mSyncWakeup
+            << " ).\n";
         return false;
       }
     }
-    else if (token == gEntLogFile)
+     else if (token == gEntLogFile)
     {
       token = NextToken(line, pos, delimiters);
 
@@ -403,10 +392,10 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(errOut, entry, token.at(0), gMainSettings.mLogFile) == false)
+        if (get_enclosed_entry(errOut, entry, token.at(0), gMainSettings.mLogFile) == false)
         {
           errOut << "Unmatched " << token.at(0) << " in configuration file at line "
-                 << inoutConfigLine << ".\n";
+              << inoutConfigLine << ".\n";
           return false;
         }
 
@@ -428,10 +417,10 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(errOut, entry, token.at(0), gMainSettings.mTempDirectory) == false)
+        if (get_enclosed_entry(errOut, entry, token.at(0), gMainSettings.mTempDirectory) == false)
         {
           errOut << "Unmatched " << token.at(0) << " in configuration file at line "
-                 << inoutConfigLine << ".\n";
+              << inoutConfigLine << ".\n";
           return false;
         }
       }
@@ -455,10 +444,10 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(errOut, entry, token.at(0), gMainSettings.mWorkDirectory) == false)
+        if (get_enclosed_entry(errOut, entry, token.at(0), gMainSettings.mWorkDirectory) == false)
         {
           errOut << "Unmatched " << token.at(0) << " in configuration file at line "
-                 << inoutConfigLine << ".\n";
+              << inoutConfigLine << ".\n";
           return false;
         }
       }
@@ -469,8 +458,8 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
 
       if ((dir.length() != 0) && !whf_is_absolute(dir.c_str()))
       {
-        errOut << "Error: The configured working directory cannot be a relative path('"
-               << dir << "').\n";
+        errOut << "Error: The configured working directory cannot be a relative path('" << dir
+            << "').\n";
         return false;
       }
     }
@@ -486,15 +475,15 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
 
       else
       {
-        errOut << "Cannot assign '" << token << "\' to 'show_debug' at line "
-               << inoutConfigLine << ". Valid value are only 'true' or 'false'.\n";
+        errOut << "Cannot assign '" << token << "\' to 'show_debug' at line " << inoutConfigLine
+            << ". Valid value are only 'true' or 'false'.\n";
         return false;
       }
     }
     else
     {
-      errOut << "At line " << inoutConfigLine << ": Don't know what to do with '"
-             << token << "'.\n";
+      errOut << "At line " << inoutConfigLine << ": Don't know what to do with '" << token
+          << "'.\n";
       return false;
     }
   }
@@ -510,7 +499,7 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
   else
     gMainSettings.mTempDirectory = gMainSettings.mWorkDirectory;
 
-  if ( ! whf_file_exists(gMainSettings.mWorkDirectory.c_str()))
+  if ( !whf_file_exists(gMainSettings.mWorkDirectory.c_str()))
   {
     errOut << "The working directory does not exists('" << gMainSettings.mWorkDirectory << "')!\n";
     return false;
@@ -519,7 +508,7 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
   if ( !whf_file_exists(gMainSettings.mTempDirectory.c_str()))
   {
     errOut << "The directory to hold temporal values does not exists('"
-           << gMainSettings.mTempDirectory << "')!\n";
+        << gMainSettings.mTempDirectory << "')!\n";
     return false;
   }
 
@@ -532,9 +521,10 @@ ParseConfigurationSection(ifstream& config, uint_t& inoutConfigLine, ostream& er
   return true;
 }
 
-
-bool
-ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSDescriptors& output)
+bool ParseContextSection(Logger& log,
+                         ifstream& config,
+                         uint_t& inoutConfigLine,
+                         DBSDescriptors& output)
 {
   ostringstream logEntry;
   static const string delimiters = " \t=";
@@ -577,10 +567,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(logEntry, entry, token.at(0), output.mDbsName) == false)
+        if (get_enclosed_entry(logEntry, entry, token.at(0), output.mDbsName) == false)
         {
           logEntry << "Unmatched " << token.at(0) << " in configuration file at line "
-                   << inoutConfigLine << '.';
+              << inoutConfigLine << '.';
           log.Log(LT_CRITICAL, logEntry.str());
 
           return false;
@@ -602,8 +592,7 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       if (output.mWaitReqTmo <= 0)
       {
         cerr << "At line " << inoutConfigLine << "the request waiting timeout parameter should be"
-                " an integer value bigger than 0(was set to "
-             << gMainSettings.mWaitReqTmo << " ).\n";
+            " an integer value bigger than 0(was set to " << gMainSettings.mWaitReqTmo << " ).\n";
         return false;
       }
     }
@@ -620,8 +609,7 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       if (output.mSyncInterval < -1)
       {
         cerr << "At line " << inoutConfigLine << "the data sync interval timeout parameter should"
-                " be a positive integer value (was set to "
-             << gMainSettings.mSyncInterval << " ).\n";
+            " be a positive integer value (was set to " << gMainSettings.mSyncInterval << " ).\n";
         return false;
       }
     }
@@ -639,10 +627,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(cerr, entry, token.at(0), output.mDbsDirectory) == false)
+        if (get_enclosed_entry(cerr, entry, token.at(0), output.mDbsDirectory) == false)
         {
           cerr << "Unmatched " << token.at(0) << " in configuration file at line "
-               << inoutConfigLine << ".\n";
+              << inoutConfigLine << ".\n";
           return false;
         }
       }
@@ -668,10 +656,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(cerr, entry, token.at(0), output.mDbsLogFile) == false)
+        if (get_enclosed_entry(cerr, entry, token.at(0), output.mDbsLogFile) == false)
         {
           cerr << "Unmatched " << token.at(0) << " in configuration file at line "
-               << inoutConfigLine << ".\n";
+              << inoutConfigLine << ".\n";
           return false;
         }
       }
@@ -697,10 +685,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(logEntry, entry, token.at(0), entryValue) == false)
+        if (get_enclosed_entry(logEntry, entry, token.at(0), entryValue) == false)
         {
           logEntry << "Unmatched " << token.at(0) << " in configuration file at line "
-                   << inoutConfigLine << '.';
+              << inoutConfigLine << '.';
           log.Log(LT_CRITICAL, logEntry.str());
           return false;
         }
@@ -732,10 +720,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(logEntry, entry, token.at(0), libEntry) == false)
+        if (get_enclosed_entry(logEntry, entry, token.at(0), libEntry) == false)
         {
           logEntry << "Unmatched " << token.at(0) << " in configuration file at line "
-                   << inoutConfigLine << '.';
+              << inoutConfigLine << '.';
           log.Log(LT_CRITICAL, logEntry.str());
 
           return false;
@@ -765,7 +753,7 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       if ( !output.mRootPass.empty())
       {
         logEntry << "Configuration error at line " << inoutConfigLine << ". The root password for"
-                    " this database was already set.";
+            " this database was already set.";
         log.Log(LT_CRITICAL, logEntry.str());
 
         return false;
@@ -784,10 +772,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(logEntry, entry, token.at(0), output.mRootPass) == false)
+        if (get_enclosed_entry(logEntry, entry, token.at(0), output.mRootPass) == false)
         {
           logEntry << "Unmatched " << token.at(0) << " in configuration file at line "
-                   << inoutConfigLine << '.';
+              << inoutConfigLine << '.';
           log.Log(LT_CRITICAL, logEntry.str());
 
           return false;
@@ -801,7 +789,7 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       if ( !output.mUserPasswd.empty())
       {
         logEntry << "Configuration error at line " << inoutConfigLine << ". The user password for"
-                    " this database was already set.";
+            " this database was already set.";
         log.Log(LT_CRITICAL, logEntry.str());
 
         return false;
@@ -821,10 +809,10 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       {
         const string entry = line.c_str() + pos - token.length();
 
-        if (get_enclose_entry(logEntry, entry, token.at(0), output.mUserPasswd) == false)
+        if (get_enclosed_entry(logEntry, entry, token.at(0), output.mUserPasswd) == false)
         {
           logEntry << "Unmatched " << token.at(0) << " in configuration file at line "
-                   << inoutConfigLine << '.';
+              << inoutConfigLine << '.';
           log.Log(LT_CRITICAL, logEntry.str());
 
           return false;
@@ -847,15 +835,15 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
       if (output.mStackCount <= 0)
       {
         cerr << "At line " << inoutConfigLine << "the request waiting timeout parameter should be"
-                " an integer value bigger than 0(currently set to "
-             << gMainSettings.mWaitReqTmo << " ).\n";
+            " an integer value bigger than 0(currently set to " << gMainSettings.mWaitReqTmo
+            << " ).\n";
         return false;
       }
     }
     else
     {
-      logEntry << "At line " << inoutConfigLine << ": Don't know what to do " << "with '"
-               << token << '.';
+      logEntry << "At line " << inoutConfigLine << ": Don't know what to do " << "with '" << token
+          << '.';
       log.Log(LT_CRITICAL, logEntry.str());
 
       return false;
@@ -865,14 +853,14 @@ ParseContextSection(Logger& log, ifstream& config, uint_t& inoutConfigLine, DBSD
   return true;
 }
 
-bool
-PrepareConfigurationSection(Logger& log)
+bool PrepareConfigurationSection(Logger& log)
 {
   ostringstream logStream;
 
   if (gMainSettings.mListens.size() == 0)
   {
-    ListenEntry defaultEnt {"", DEFAULT_LISTEN_PORT};
+    ListenEntry defaultEnt
+    { "", DEFAULT_LISTEN_PORT };
     gMainSettings.mListens.push_back(defaultEnt);
   }
 
@@ -887,7 +875,7 @@ PrepareConfigurationSection(Logger& log)
   }
 
   logStream << "Maximum simultaneous connections per interface set at "
-            << gMainSettings.mMaxConnections << '.';
+      << gMainSettings.mMaxConnections << '.';
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
@@ -936,14 +924,14 @@ PrepareConfigurationSection(Logger& log)
       || (MAX_FRAME_SIZE < gMainSettings.mMaxFrameSize))
   {
     logStream << "The maximum frame size set to a invalid value. The value should be set between "
-              << MIN_FRAME_SIZE << " and " << MAX_FRAME_SIZE << " bytes.";
+        << MIN_FRAME_SIZE << " and " << MAX_FRAME_SIZE << " bytes.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;
   }
 
-  logStream << "Maximum communication frame size set to "
-            << gMainSettings.mMaxFrameSize <<" bytes.";
+  logStream << "Maximum communication frame size set to " << gMainSettings.mMaxFrameSize
+      << " bytes.";
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
@@ -1038,8 +1026,8 @@ PrepareConfigurationSection(Logger& log)
       log.Log(LT_DEBUG, "The authentication timeout value is set by default.");
   }
 
-  logStream << "The authentication timeout value is set at "
-            << gMainSettings.mAuthTMO << " milliseconds.";
+  logStream << "The authentication timeout value is set at " << gMainSettings.mAuthTMO
+      << " milliseconds.";
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
@@ -1051,14 +1039,14 @@ PrepareConfigurationSection(Logger& log)
       log.Log(LT_DEBUG, "The data syncer wake up interval is set by default value.");
   }
 
-  logStream << "The data syncer wake up interval is set at "
-            << gMainSettings.mSyncWakeup << " milliseconds.";
+  logStream << "The data syncer wake up interval is set at " << gMainSettings.mSyncWakeup
+      << " milliseconds.";
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
   //Sync data valid interval
-  logStream << "The default data flush interval interval is set at "
-            << gMainSettings.mSyncInterval << " milliseconds.";
+  logStream << "The default data flush interval interval is set at " << gMainSettings.mSyncInterval
+      << " milliseconds.";
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
@@ -1070,17 +1058,15 @@ PrepareConfigurationSection(Logger& log)
       log.Log(LT_DEBUG, "The request waiting timeout is set by default.");
   }
 
-  logStream << "The request waiting timeout is set at "
-            << gMainSettings.mWaitReqTmo << " milliseconds.";
+  logStream << "The request waiting timeout is set at " << gMainSettings.mWaitReqTmo
+      << " milliseconds.";
   log.Log(LT_INFO, logStream.str());
   logStream.str(CLEAR_LOG_STREAM);
 
   return true;
 }
 
-
-bool
-PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
+bool PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
 {
   assert(inoutDesc.mConfigLine != 0);
 
@@ -1089,7 +1075,7 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   if (inoutDesc.mUserPasswd.empty())
   {
     logStream << "A user password for the database  section starting at line "
-              << inoutDesc.mConfigLine << " was not set.";
+        << inoutDesc.mConfigLine << " was not set.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;
@@ -1098,7 +1084,7 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   if (inoutDesc.mRootPass.empty())
   {
     logStream << "A root password for the database section starting at line "
-              << inoutDesc.mConfigLine << " was not set.";
+        << inoutDesc.mConfigLine << " was not set.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;
@@ -1107,7 +1093,7 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   if (inoutDesc.mDbsName.empty())
   {
     logStream << "Database section starting line " << inoutDesc.mConfigLine << " does not have a '"
-              << gEntDBSName << "' entry.";
+        << gEntDBSName << "' entry.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;
@@ -1116,7 +1102,7 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   if (inoutDesc.mDbsDirectory.empty())
   {
     logStream << "Database section starting line " << inoutDesc.mConfigLine << " does not have a '"
-              << gEntWorkDir << "' entry.";
+        << gEntWorkDir << "' entry.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;
@@ -1124,8 +1110,8 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   else if ( !whf_file_exists(inoutDesc.mDbsDirectory.c_str()))
   {
     logStream << "Database section starting line " << inoutDesc.mConfigLine << " entry '"
-              << gEntWorkDir << "' points to an inexistent directory '"
-              << inoutDesc.mDbsDirectory << "'.";
+        << gEntWorkDir << "' points to an inexistent directory '" << inoutDesc.mDbsDirectory
+        << "'.";
 
     log.Log(LT_ERROR, logStream.str());
 
@@ -1135,7 +1121,7 @@ PrepareContextSection(Logger& log, DBSDescriptors& inoutDesc)
   if (inoutDesc.mDbsLogFile.length() == 0)
   {
     logStream << "Database section starting line " << inoutDesc.mConfigLine << " does not have a '"
-              << gEntLogFile << "' entry.";
+        << gEntLogFile << "' entry.";
     log.Log(LT_ERROR, logStream.str());
 
     return false;

@@ -32,7 +32,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef ENABLE_MEMORY_TRACE
 extern "C"
 {
-
 void*
 custom_mem_alloc(size_t size)
 {

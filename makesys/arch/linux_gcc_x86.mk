@@ -54,7 +54,7 @@ CC_FLAGS+=$(EXT_CC_FLAGS)
 DEFINES+=ARCH_LINUX_GCC
 DEFINES+=INLINE=__inline__
 DEFINES+=_GNU_SOURCE
-DEFINES+=QWORDS_PER_OP=4
+DEFINES+=QWORDS_PER_OP=3
 DEFINES+=WOS=GNU/Linux
 DEFINES+=WARCH=x86_32
 
@@ -75,7 +75,7 @@ arch_add_defines=$(foreach _def, $(sort $($(1)_DEF) $(DEFINES)),-D$(_def))
 arch_add_lib_dirs=$(foreach _dir,$($(1)_LIB_DIR), -L./bin/$(ARCH)/$(_dir))
 
 #set the right libraries adds
-arch_handle_import_libs=$(foreach _lib,$($(1)_LIB),-l$(notdir $(_lib))) $(foreach _lib, $($(1)_SHL),-l$(notdir $(_lib)))
+arch_handle_import_libs=-Wl,--start-group $(foreach _lib, $($(1)_SHL),-l$(notdir $(_lib))) $(foreach _lib,$($(1)_LIB),-l$(notdir $(_lib))) -Wl,--end-group
 
 #set the right argument to output executables
 arch_set_output_executable=-o ./bin/$(ARCH)/$(1)
@@ -86,11 +86,11 @@ arch_set_output_sharedlib=-o ./bin/$(ARCH)/$(2)/$(ARCH_SHL_PREFIX)$(1)$(ARCH_SHL
 #set the right argument to output static libraries
 arch_set_output_library=./bin/$(ARCH)/$(2)/$(ARCH_LIB_PREFIX)$(1)$(ARCH_LIB_EXT)
 
-#set the right  flags for the linker
-arch_linker_flags:=$(EXT_LD_FLAGS) -m32 -pthread -ldl
+arch_linker_flags:=$(EXT_LD_FLAGS) -static-libstdc++ -m32 -pthread -ldl -Wl,-Bsymbolic,-Bsymbolic-functions,-z,defs -fvisibility=hidden
 ifeq ($(PROFILE),yes)
 arch_linker_flags+= -pg
 endif
-arch_shl_linker_flags= -shared -Wl,--exclude-libs,ALL,-Bsymbolic,-soname,lib$(1).so$(2) $(arch_linker_flags)
+
+arch_shl_linker_flags=-static-libstdc++ -fvisibility=hidden -m32 -pthread -ldl -shared -Wl,-z,defs,-Bsymbolic,-Bsymbolic-functions,--exclude-libs,ALL,-soname,lib$(1).so$(2)
 arch_archiver_flags=rcs
 

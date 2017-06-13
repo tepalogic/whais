@@ -43,6 +43,14 @@ if [ "$1" = "-l" ]; then
         if [ ! -n "$TEST_FILES" ]; then
                 TEST_FILES=`find ./ -name 'l_test_*' -type f -perm -u+x`
         fi
+	shift
+elif [ "$1" = "-c" ]; then
+	echo "Executing client tests!"
+	TEST_FILES=`find ./ -name 'c_test_*.exe'`
+        if [ ! -n "$TEST_FILES" ]; then
+                TEST_FILES=`find ./ -name 'c_test_*' -type f -perm -u+x`
+        fi
+	shift
 else
 	echo "Executing tests that does not last long!"
 	TEST_FILES=`find ./ -name 'test_*.exe'`

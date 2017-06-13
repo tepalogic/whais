@@ -271,22 +271,19 @@ DbsHandler::ReleaseTable(ITable& hndTable)
 {
   assert(mCreatedTemporalTables >= 0);
 
-  if (& _SC(PrototypeTable&, hndTable).GetDbsHandler() != this)
+  if (&_SC(PrototypeTable&, hndTable).GetDbsHandler() != this)
   {
     throw DBSException(_EXTRA(DBSException::TABLE_INVALID),
                        "Cannot release a table that was created on a different database.");
   }
 
   LockRAII<Lock> syncHolder(mSync);
-
   if (hndTable.IsTemporal())
   {
     assert(mCreatedTemporalTables > 0);
 
     --mCreatedTemporalTables;
-
-    delete &_SC(TemporalTable&, hndTable);
-
+    delete &hndTable;
     return;
   }
 
@@ -296,7 +293,6 @@ DbsHandler::ReleaseTable(ITable& hndTable)
     {
       delete it->second;
       it->second = nullptr;
-
       return;
     }
   }
@@ -321,10 +317,8 @@ DbsHandler::TableName(const TABLE_INDEX index)
   while (iterator-- > 0)
   {
     assert(it != mTables.end());
-
     ++it;
   }
-
   return it->first.c_str();
 }
 
@@ -345,10 +339,11 @@ DbsHandler::DeleteTable(const char* const name)
   if (it->second == nullptr)
     it->second = new PersistentTable(*this, it->first);
 
-  PersistentTable* const table = it->second;
-  table->RemoveFromDatabase();
-  delete table;
+  unique_ptr<PersistentTable> table {it->second};
+  it->second = nullptr;
 
+  table->RemoveFromDatabase();
+  table.reset();
   mTables.erase(it);
 
   SyncToFile();

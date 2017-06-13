@@ -278,10 +278,8 @@ wh_compiler_libver(uint_t* const   outMajor,
 }
 
 void
-wh_compiler_language_ver(uint_t* const   outMajor,
-                         uint_t* const   outMinor)
+wh_compiler_language_ver(uint_t* const outMajor, uint_t* const outMinor)
 {
   *outMajor = 2;
   *outMinor = 2;
 }
-
