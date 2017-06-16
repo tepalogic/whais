@@ -39,8 +39,9 @@ print_usage(const char* cmd)
   cout << ARG_HOST_NAME << " hostname ";
   cout << ARG_PORT << " port ";
   cout << ARG_DATABASE << " databasename ";
-  cout << ARG_ROOT << endl;
+  cout << ARG_ROOT;
   cout << ARG_PASSWORD << " password ";
+  cout << ARG_FRAMESIZE << " framesize " << endl;
 }
 
 bool

@@ -8,107 +8,98 @@ using namespace std;
 
 static string sDbName;
 
-static const bool
-check_type(const WH_CONNECTION          hnd,
-            const string&                glbName,
-            const string&                glbType)
+static const bool check_type(const WH_CONNECTION hnd, const string& glbName, const string& glbType)
 {
   uint_t type;
   if (WDescribeGlobal(hnd, glbName.c_str(), &type) != WCS_OK)
-    {
-      cout << "Failed to describe global " << glbName << "\n.";
-      return false;
-    }
+  {
+    cout << "Failed to describe global " << glbName << "\n.";
+    return false;
+  }
 
   if (type != T_TABLE_MASK)
-    {
-
-      return glbType == decode_typeinfo(type);
-    }
+    return glbType == decode_typeinfo(type);
 
   //Count the ',' and '(' to get the number of table fields.
   uint_t fieldsCount = 0;
   for (size_t i = 0; i < glbType.size(); ++i)
-    {
-      if ((glbType[i] == ',') || (glbType[i] == '('))
-        ++fieldsCount;
-    }
+  {
+    if ((glbType[i] == ',') || (glbType[i] == '('))
+      ++fieldsCount;
+  }
 
   uint_t temp;
   if (WValueFieldsCount(hnd, &temp) != WCS_OK)
-    {
-      cout << "Failed to retrieve the fields count.\n";
-      return false;
-    }
+  {
+    cout << "Failed to retrieve the fields count.\n";
+    return false;
+  }
   else if (temp != fieldsCount)
-    {
-      cout << "Fields count mismatch.\n";
-      return false;
-    }
+  {
+    cout << "Fields count mismatch.\n";
+    return false;
+  }
   else if (fieldsCount == 0)
     return glbType == string("TABLE");
 
-
   vector<size_t> offsets;
   while (temp < 900000)
+  {
+    const char* fieldName;
+    uint_t fieldType;
+
+    if (WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
     {
-      const char*     fieldName;
-      uint_t          fieldType;
-
-      if (WValueFetchField(hnd, &fieldName, &fieldType) != WCS_OK)
-        {
-          cout << "Failed to retrieve field type.\n";
-          return false;
-        }
-
-      if (fieldName == nullptr)
-        {
-          for (int dummy = 0; dummy < 1024; ++dummy)
-            {
-              if (WValueFetchField(hnd, &fieldName, &type) != WCS_OK)
-                {
-                  cout << "Error encountered during the field fetch end condition.\n";
-                  return false;
-                }
-              else if (fieldName != nullptr)
-                {
-                  cout << "Invalid field fetch end condition ...\n";
-                  return false;
-                }
-            }
-          break;
-        }
-
-      const string fieldText = string(fieldName)                +
-                               " "                            +
-                               decode_typeinfo(fieldType);
-      const size_t offset = glbType.find(fieldText);
-
-      if (offset == string::npos)
-        {
-          cout << "Cannot find '" << fieldText << "' field description.\n";
-          return false;
-        }
-      else
-        {
-          for (temp = 0; temp < offsets.size(); temp++)
-            {
-              if (offset == offsets[temp])
-                {
-                  cout << "Retrieved the same a field declaration twice.\n";
-                  return false;
-                }
-            }
-
-          offsets.push_back(offset);
-        }
-    }
-
-  if (fieldsCount != offsets.size())
-    {
-      cout << "Found fields count does not match.\n";
+      cout << "Failed to retrieve field type.\n";
       return false;
     }
+
+    if (fieldName == nullptr)
+    {
+      for (int dummy = 0; dummy < 1024; ++dummy)
+      {
+        if (WValueFetchField(hnd, &fieldName, &type) != WCS_OK)
+        {
+          cout << "Error encountered during the field fetch end condition.\n";
+          return false;
+        }
+        else if (fieldName != nullptr)
+        {
+          cout << "Invalid field fetch end condition ...\n";
+          return false;
+        }
+      }
+      break;
+    }
+
+    const string fieldText = string(fieldName) + " " + decode_typeinfo(fieldType);
+    const size_t offset = glbType.find(fieldText);
+
+    if (offset == string::npos)
+    {
+      cout << "Cannot find '" << fieldText << "' field description.\n";
+      return false;
+    }
+    else
+    {
+      for (temp = 0; temp < offsets.size(); temp++)
+      {
+        if (offset == offsets[temp])
+        {
+          cout << "Retrieved the same a field declaration twice.\n";
+          return false;
+        }
+      }
+
+      offsets.push_back(offset);
+    }
+  }
+
+  if (fieldsCount != offsets.size())
+  {
+    cout << "Found fields count does not match.\n";
+    return false;
+  }
 
   return true;
 }
@@ -120,79 +111,78 @@ test_global_variables(WH_CONNECTION hnd, vector<string> glbNames, vector<string>
   uint_t glbsCount = 0;
   if ((WStartGlobalsList(hnd, &glbsCount) != WCS_OK)
       || (glbsCount != glbNames.size()))
-    {
-      cout << "Globals count mismatch: "
-           << glbsCount << " vs. " << glbNames.size() << endl;
-      return false;
-    }
+  {
+    cout << "Globals count mismatch: " << glbsCount << " vs. " << glbNames.size() << endl;
+    return false;
+  }
   vector<bool> foundGlbs(glbsCount, false);
 
   const char* name = nullptr;
   uint_t i = 0;
   while (i < 9999999)
+  {
+    if (WFetchGlobal(hnd, &name) != WCS_OK)
     {
-      if (WFetchGlobal(hnd, &name) != WCS_OK)
-        {
-          cout << "Failed to fetch " << i + 1 << "(th) global.\n";
-          return false;
-        }
-
-      if (name == nullptr)
-        break;
-
-      size_t index;
-      for (index = 0; index < glbNames.size(); ++index)
-        {
-          if (glbNames[index] == string(name))
-            break;
-        }
-
-      if (index >= glbNames.size())
-        {
-          cout << "Found global '" << name << "' that we don't know it.\n";
-          return false;
-        }
-
-      if (foundGlbs[i])
-        {
-          cout << "Global '" << name << "' was already retrieved.";
-          return false;
-        }
-      else
-        foundGlbs[i] = true;
-
-      ++i;
-    }
-
-  for (int dummy = 0; dummy < 1024; ++dummy)
-    {
-      if (WFetchGlobal(hnd, &name) != WCS_OK)
-        {
-          cout << "Error encountered during global fetch end condition.\n";
-          return false;
-        }
-      else if (name != nullptr)
-        {
-          cout << "Invalid global name end condition ...\n";
-          return false;
-        }
-    }
-
-  cout << "Fetched " << i << " global(s).\n";
-  if (i != glbsCount)
-    {
-      cout << "Those globals were less than " << glbsCount << ".\n";
+      cout << "Failed to fetch " << i + 1 << "(th) global.\n";
       return false;
     }
 
-  for (i = 0; i < glbsCount; ++i)
+    if (name == nullptr)
+      break;
+
+    size_t index;
+    for (index = 0; index < glbNames.size(); ++index)
     {
-      if ( ! check_type(hnd, glbNames[i], glbTypes[i]))
-        {
-          cout << "Type mismatch at variable " << i << ".\n";
-          return false;
-        }
+      if (glbNames[index] == string(name))
+        break;
     }
+
+    if (index >= glbNames.size())
+    {
+      cout << "Found global '" << name << "' that we don't know it.\n";
+      return false;
+    }
+
+    if (foundGlbs[i])
+    {
+      cout << "Global '" << name << "' was already retrieved.";
+      return false;
+    }
+    else
+      foundGlbs[i] = true;
+
+    ++i;
+  }
+
+  for (int dummy = 0; dummy < 1024; ++dummy)
+  {
+    if (WFetchGlobal(hnd, &name) != WCS_OK)
+    {
+      cout << "Error encountered during global fetch end condition.\n";
+      return false;
+    }
+    else if (name != nullptr)
+    {
+      cout << "Invalid global name end condition ...\n";
+      return false;
+    }
+  }
+
+  cout << "Fetched " << i << " global(s).\n";
+  if (i != glbsCount)
+  {
+    cout << "Those globals were less than " << glbsCount << ".\n";
+    return false;
+  }
+
+  for (i = 0; i < glbsCount; ++i)
+  {
+    if ( !check_type(hnd, glbNames[i], glbTypes[i]))
+    {
+      cout << "Type mismatch at variable " << i << ".\n";
+      return false;
+    }
+  }
 
   return true;
 }
@@ -1361,305 +1351,305 @@ setup_database(const string& db, vector<string>& glbNames, vector<string>& glbTy
       /* 98 */ glbTypes.push_back("INT64");
       /* 99 */ glbTypes.push_back("UINT32");
       /* 100 */ glbTypes.push_back("ARRAY");
-      /* 101 */ glbTypes.push_back("ARRAY INT8");
-      /* 102 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 103 */ glbTypes.push_back("ARRAY BOOL");
-      /* 104 */ glbTypes.push_back("ARRAY DATETIME");
+      /* 101 */ glbTypes.push_back("INT8 ARRAY");
+      /* 102 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 103 */ glbTypes.push_back("BOOL ARRAY");
+      /* 104 */ glbTypes.push_back("DATETIME ARRAY");
       /* 105 */ glbTypes.push_back("ARRAY");
-      /* 106 */ glbTypes.push_back("ARRAY UINT64");
+      /* 106 */ glbTypes.push_back("UINT64 ARRAY");
       /* 107 */ glbTypes.push_back("ARRAY");
-      /* 108 */ glbTypes.push_back("ARRAY BOOL");
-      /* 109 */ glbTypes.push_back("ARRAY INT32");
-      /* 110 */ glbTypes.push_back("ARRAY INT8");
-      /* 111 */ glbTypes.push_back("ARRAY INT64");
-      /* 112 */ glbTypes.push_back("ARRAY RICHREAL");
-      /* 113 */ glbTypes.push_back("ARRAY CHAR");
-      /* 114 */ glbTypes.push_back("ARRAY INT8");
+      /* 108 */ glbTypes.push_back("BOOL ARRAY");
+      /* 109 */ glbTypes.push_back("INT32 ARRAY");
+      /* 110 */ glbTypes.push_back("INT8 ARRAY");
+      /* 111 */ glbTypes.push_back("INT64 ARRAY");
+      /* 112 */ glbTypes.push_back("RICHREAL ARRAY");
+      /* 113 */ glbTypes.push_back("CHAR ARRAY");
+      /* 114 */ glbTypes.push_back("INT8 ARRAY");
       /* 115 */ glbTypes.push_back("ARRAY");
-      /* 116 */ glbTypes.push_back("ARRAY CHAR");
-      /* 117 */ glbTypes.push_back("ARRAY UINT8");
-      /* 118 */ glbTypes.push_back("ARRAY INT32");
-      /* 119 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 120 */ glbTypes.push_back("ARRAY HIRESTIME");
+      /* 116 */ glbTypes.push_back("CHAR ARRAY");
+      /* 117 */ glbTypes.push_back("UINT8 ARRAY");
+      /* 118 */ glbTypes.push_back("INT32 ARRAY");
+      /* 119 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 120 */ glbTypes.push_back("HIRESTIME ARRAY");
       /* 121 */ glbTypes.push_back("ARRAY");
-      /* 122 */ glbTypes.push_back("ARRAY INT64");
-      /* 123 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 124 */ glbTypes.push_back("ARRAY UINT8");
+      /* 122 */ glbTypes.push_back("INT64 ARRAY");
+      /* 123 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 124 */ glbTypes.push_back("UINT8 ARRAY");
       /* 125 */ glbTypes.push_back("ARRAY");
-      /* 126 */ glbTypes.push_back("ARRAY RICHREAL");
-      /* 127 */ glbTypes.push_back("ARRAY BOOL");
-      /* 128 */ glbTypes.push_back("ARRAY INT8");
-      /* 129 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 130 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 131 */ glbTypes.push_back("ARRAY INT32");
-      /* 132 */ glbTypes.push_back("ARRAY BOOL");
-      /* 133 */ glbTypes.push_back("ARRAY INT16");
-      /* 134 */ glbTypes.push_back("ARRAY INT16");
-      /* 135 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 136 */ glbTypes.push_back("ARRAY REAL");
-      /* 137 */ glbTypes.push_back("ARRAY CHAR");
-      /* 138 */ glbTypes.push_back("ARRAY INT16");
+      /* 126 */ glbTypes.push_back("RICHREAL ARRAY");
+      /* 127 */ glbTypes.push_back("BOOL ARRAY");
+      /* 128 */ glbTypes.push_back("INT8 ARRAY");
+      /* 129 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 130 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 131 */ glbTypes.push_back("INT32 ARRAY");
+      /* 132 */ glbTypes.push_back("BOOL ARRAY");
+      /* 133 */ glbTypes.push_back("INT16 ARRAY");
+      /* 134 */ glbTypes.push_back("INT16 ARRAY");
+      /* 135 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 136 */ glbTypes.push_back("REAL ARRAY");
+      /* 137 */ glbTypes.push_back("CHAR ARRAY");
+      /* 138 */ glbTypes.push_back("INT16 ARRAY");
       /* 139 */ glbTypes.push_back("ARRAY");
-      /* 140 */ glbTypes.push_back("ARRAY RICHREAL");
-      /* 141 */ glbTypes.push_back("ARRAY UINT8");
-      /* 142 */ glbTypes.push_back("ARRAY INT8");
-      /* 143 */ glbTypes.push_back("ARRAY UINT32");
-      /* 144 */ glbTypes.push_back("ARRAY INT8");
+      /* 140 */ glbTypes.push_back("RICHREAL ARRAY");
+      /* 141 */ glbTypes.push_back("UINT8 ARRAY");
+      /* 142 */ glbTypes.push_back("INT8 ARRAY");
+      /* 143 */ glbTypes.push_back("UINT32 ARRAY");
+      /* 144 */ glbTypes.push_back("INT8 ARRAY");
       /* 145 */ glbTypes.push_back("ARRAY");
-      /* 146 */ glbTypes.push_back("ARRAY BOOL");
-      /* 147 */ glbTypes.push_back("ARRAY INT16");
-      /* 148 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 149 */ glbTypes.push_back("ARRAY BOOL");
-      /* 150 */ glbTypes.push_back("ARRAY CHAR");
-      /* 151 */ glbTypes.push_back("ARRAY UINT16");
-      /* 152 */ glbTypes.push_back("ARRAY DATE");
+      /* 146 */ glbTypes.push_back("BOOL ARRAY");
+      /* 147 */ glbTypes.push_back("INT16 ARRAY");
+      /* 148 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 149 */ glbTypes.push_back("BOOL ARRAY");
+      /* 150 */ glbTypes.push_back("CHAR ARRAY");
+      /* 151 */ glbTypes.push_back("UINT16 ARRAY");
+      /* 152 */ glbTypes.push_back("DATE ARRAY");
       /* 153 */ glbTypes.push_back("ARRAY");
-      /* 154 */ glbTypes.push_back("ARRAY INT32");
+      /* 154 */ glbTypes.push_back("INT32 ARRAY");
       /* 155 */ glbTypes.push_back("ARRAY");
       /* 156 */ glbTypes.push_back("ARRAY");
-      /* 157 */ glbTypes.push_back("ARRAY DATE");
-      /* 158 */ glbTypes.push_back("ARRAY UINT32");
-      /* 159 */ glbTypes.push_back("ARRAY RICHREAL");
-      /* 160 */ glbTypes.push_back("ARRAY INT8");
-      /* 161 */ glbTypes.push_back("ARRAY UINT64");
-      /* 162 */ glbTypes.push_back("ARRAY INT16");
-      /* 163 */ glbTypes.push_back("ARRAY INT8");
-      /* 164 */ glbTypes.push_back("ARRAY CHAR");
-      /* 165 */ glbTypes.push_back("ARRAY INT16");
-      /* 166 */ glbTypes.push_back("ARRAY DATE");
-      /* 167 */ glbTypes.push_back("ARRAY INT8");
-      /* 168 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 169 */ glbTypes.push_back("ARRAY DATETIME");
+      /* 157 */ glbTypes.push_back("DATE ARRAY");
+      /* 158 */ glbTypes.push_back("UINT32 ARRAY");
+      /* 159 */ glbTypes.push_back("RICHREAL ARRAY");
+      /* 160 */ glbTypes.push_back("INT8 ARRAY");
+      /* 161 */ glbTypes.push_back("UINT64 ARRAY");
+      /* 162 */ glbTypes.push_back("INT16 ARRAY");
+      /* 163 */ glbTypes.push_back("INT8 ARRAY");
+      /* 164 */ glbTypes.push_back("CHAR ARRAY");
+      /* 165 */ glbTypes.push_back("INT16 ARRAY");
+      /* 166 */ glbTypes.push_back("DATE ARRAY");
+      /* 167 */ glbTypes.push_back("INT8 ARRAY");
+      /* 168 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 169 */ glbTypes.push_back("DATETIME ARRAY");
       /* 170 */ glbTypes.push_back("ARRAY");
-      /* 171 */ glbTypes.push_back("ARRAY INT8");
-      /* 172 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 173 */ glbTypes.push_back("ARRAY INT32");
-      /* 174 */ glbTypes.push_back("ARRAY REAL");
-      /* 175 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 176 */ glbTypes.push_back("ARRAY UINT32");
-      /* 177 */ glbTypes.push_back("ARRAY INT16");
-      /* 178 */ glbTypes.push_back("ARRAY REAL");
-      /* 179 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 180 */ glbTypes.push_back("ARRAY DATE");
-      /* 181 */ glbTypes.push_back("ARRAY BOOL");
-      /* 182 */ glbTypes.push_back("ARRAY REAL");
-      /* 183 */ glbTypes.push_back("ARRAY UINT64");
-      /* 184 */ glbTypes.push_back("ARRAY UINT32");
-      /* 185 */ glbTypes.push_back("ARRAY INT16");
-      /* 186 */ glbTypes.push_back("ARRAY UINT64");
-      /* 187 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 188 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 189 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 190 */ glbTypes.push_back("ARRAY INT64");
-      /* 191 */ glbTypes.push_back("ARRAY INT8");
-      /* 192 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 193 */ glbTypes.push_back("ARRAY INT16");
-      /* 194 */ glbTypes.push_back("ARRAY UINT16");
-      /* 195 */ glbTypes.push_back("ARRAY DATETIME");
-      /* 196 */ glbTypes.push_back("ARRAY INT32");
-      /* 197 */ glbTypes.push_back("ARRAY UINT8");
-      /* 198 */ glbTypes.push_back("ARRAY HIRESTIME");
-      /* 199 */ glbTypes.push_back("ARRAY INT8");
-      /* 200 */ glbTypes.push_back("FIELD DATETIME");
-      /* 201 */ glbTypes.push_back("FIELD INT64");
-      /* 202 */ glbTypes.push_back("FIELD REAL");
-      /* 203 */ glbTypes.push_back("FIELD INT16");
-      /* 204 */ glbTypes.push_back("FIELD INT64");
-      /* 205 */ glbTypes.push_back("FIELD UINT8");
-      /* 206 */ glbTypes.push_back("FIELD UINT32");
-      /* 207 */ glbTypes.push_back("FIELD CHAR");
+      /* 171 */ glbTypes.push_back("INT8 ARRAY");
+      /* 172 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 173 */ glbTypes.push_back("INT32 ARRAY");
+      /* 174 */ glbTypes.push_back("REAL ARRAY");
+      /* 175 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 176 */ glbTypes.push_back("UINT32 ARRAY");
+      /* 177 */ glbTypes.push_back("INT16 ARRAY");
+      /* 178 */ glbTypes.push_back("REAL ARRAY");
+      /* 179 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 180 */ glbTypes.push_back("DATE ARRAY");
+      /* 181 */ glbTypes.push_back("BOOL ARRAY");
+      /* 182 */ glbTypes.push_back("REAL ARRAY");
+      /* 183 */ glbTypes.push_back("UINT64 ARRAY");
+      /* 184 */ glbTypes.push_back("UINT32 ARRAY");
+      /* 185 */ glbTypes.push_back("INT16 ARRAY");
+      /* 186 */ glbTypes.push_back("UINT64 ARRAY");
+      /* 187 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 188 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 189 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 190 */ glbTypes.push_back("INT64 ARRAY");
+      /* 191 */ glbTypes.push_back("INT8 ARRAY");
+      /* 192 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 193 */ glbTypes.push_back("INT16 ARRAY");
+      /* 194 */ glbTypes.push_back("UINT16 ARRAY");
+      /* 195 */ glbTypes.push_back("DATETIME ARRAY");
+      /* 196 */ glbTypes.push_back("INT32 ARRAY");
+      /* 197 */ glbTypes.push_back("UINT8 ARRAY");
+      /* 198 */ glbTypes.push_back("HIRESTIME ARRAY");
+      /* 199 */ glbTypes.push_back("INT8 ARRAY");
+      /* 200 */ glbTypes.push_back("DATETIME FIELD");
+      /* 201 */ glbTypes.push_back("INT64 FIELD");
+      /* 202 */ glbTypes.push_back("REAL FIELD");
+      /* 203 */ glbTypes.push_back("INT16 FIELD");
+      /* 204 */ glbTypes.push_back("INT64 FIELD");
+      /* 205 */ glbTypes.push_back("UINT8 FIELD");
+      /* 206 */ glbTypes.push_back("UINT32 FIELD");
+      /* 207 */ glbTypes.push_back("CHAR FIELD");
       /* 208 */ glbTypes.push_back("FIELD");
-      /* 209 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 210 */ glbTypes.push_back("FIELD UINT64");
-      /* 211 */ glbTypes.push_back("FIELD INT64");
-      /* 212 */ glbTypes.push_back("FIELD INT32");
+      /* 209 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 210 */ glbTypes.push_back("UINT64 FIELD");
+      /* 211 */ glbTypes.push_back("INT64 FIELD");
+      /* 212 */ glbTypes.push_back("INT32 FIELD");
       /* 213 */ glbTypes.push_back("FIELD");
-      /* 214 */ glbTypes.push_back("FIELD BOOL");
-      /* 215 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 216 */ glbTypes.push_back("FIELD INT32");
-      /* 217 */ glbTypes.push_back("FIELD RICHREAL");
-      /* 218 */ glbTypes.push_back("FIELD CHAR");
-      /* 219 */ glbTypes.push_back("FIELD CHAR");
-      /* 220 */ glbTypes.push_back("FIELD INT16");
-      /* 221 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 222 */ glbTypes.push_back("FIELD INT32");
+      /* 214 */ glbTypes.push_back("BOOL FIELD");
+      /* 215 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 216 */ glbTypes.push_back("INT32 FIELD");
+      /* 217 */ glbTypes.push_back("RICHREAL FIELD");
+      /* 218 */ glbTypes.push_back("CHAR FIELD");
+      /* 219 */ glbTypes.push_back("CHAR FIELD");
+      /* 220 */ glbTypes.push_back("INT16 FIELD");
+      /* 221 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 222 */ glbTypes.push_back("INT32 FIELD");
       /* 223 */ glbTypes.push_back("FIELD");
-      /* 224 */ glbTypes.push_back("FIELD BOOL");
-      /* 225 */ glbTypes.push_back("FIELD INT8");
-      /* 226 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 227 */ glbTypes.push_back("FIELD BOOL");
-      /* 228 */ glbTypes.push_back("FIELD HIRESTIME");
+      /* 224 */ glbTypes.push_back("BOOL FIELD");
+      /* 225 */ glbTypes.push_back("INT8 FIELD");
+      /* 226 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 227 */ glbTypes.push_back("BOOL FIELD");
+      /* 228 */ glbTypes.push_back("HIRESTIME FIELD");
       /* 229 */ glbTypes.push_back("FIELD");
-      /* 230 */ glbTypes.push_back("FIELD UINT64");
-      /* 231 */ glbTypes.push_back("FIELD REAL");
-      /* 232 */ glbTypes.push_back("FIELD INT8");
-      /* 233 */ glbTypes.push_back("FIELD CHAR");
-      /* 234 */ glbTypes.push_back("FIELD UINT8");
-      /* 235 */ glbTypes.push_back("FIELD RICHREAL");
-      /* 236 */ glbTypes.push_back("FIELD DATE");
-      /* 237 */ glbTypes.push_back("FIELD REAL");
-      /* 238 */ glbTypes.push_back("FIELD UINT64");
-      /* 239 */ glbTypes.push_back("FIELD INT32");
-      /* 240 */ glbTypes.push_back("FIELD DATETIME");
-      /* 241 */ glbTypes.push_back("FIELD DATETIME");
-      /* 242 */ glbTypes.push_back("FIELD INT16");
-      /* 243 */ glbTypes.push_back("FIELD CHAR");
-      /* 244 */ glbTypes.push_back("FIELD BOOL");
-      /* 245 */ glbTypes.push_back("FIELD BOOL");
-      /* 246 */ glbTypes.push_back("FIELD RICHREAL");
-      /* 247 */ glbTypes.push_back("FIELD INT32");
-      /* 248 */ glbTypes.push_back("FIELD UINT32");
-      /* 249 */ glbTypes.push_back("FIELD DATETIME");
+      /* 230 */ glbTypes.push_back("UINT64 FIELD");
+      /* 231 */ glbTypes.push_back("REAL FIELD");
+      /* 232 */ glbTypes.push_back("INT8 FIELD");
+      /* 233 */ glbTypes.push_back("CHAR FIELD");
+      /* 234 */ glbTypes.push_back("UINT8 FIELD");
+      /* 235 */ glbTypes.push_back("RICHREAL FIELD");
+      /* 236 */ glbTypes.push_back("DATE FIELD");
+      /* 237 */ glbTypes.push_back("REAL FIELD");
+      /* 238 */ glbTypes.push_back("UINT64 FIELD");
+      /* 239 */ glbTypes.push_back("INT32 FIELD");
+      /* 240 */ glbTypes.push_back("DATETIME FIELD");
+      /* 241 */ glbTypes.push_back("DATETIME FIELD");
+      /* 242 */ glbTypes.push_back("INT16 FIELD");
+      /* 243 */ glbTypes.push_back("CHAR FIELD");
+      /* 244 */ glbTypes.push_back("BOOL FIELD");
+      /* 245 */ glbTypes.push_back("BOOL FIELD");
+      /* 246 */ glbTypes.push_back("RICHREAL FIELD");
+      /* 247 */ glbTypes.push_back("INT32 FIELD");
+      /* 248 */ glbTypes.push_back("UINT32 FIELD");
+      /* 249 */ glbTypes.push_back("DATETIME FIELD");
       /* 250 */ glbTypes.push_back("FIELD");
-      /* 251 */ glbTypes.push_back("FIELD INT8");
-      /* 252 */ glbTypes.push_back("FIELD INT64");
-      /* 253 */ glbTypes.push_back("FIELD DATETIME");
-      /* 254 */ glbTypes.push_back("FIELD DATE");
+      /* 251 */ glbTypes.push_back("INT8 FIELD");
+      /* 252 */ glbTypes.push_back("INT64 FIELD");
+      /* 253 */ glbTypes.push_back("DATETIME FIELD");
+      /* 254 */ glbTypes.push_back("DATE FIELD");
       /* 255 */ glbTypes.push_back("FIELD");
-      /* 256 */ glbTypes.push_back("FIELD INT16");
-      /* 257 */ glbTypes.push_back("FIELD DATE");
-      /* 258 */ glbTypes.push_back("FIELD UINT64");
-      /* 259 */ glbTypes.push_back("FIELD UINT8");
-      /* 260 */ glbTypes.push_back("FIELD UINT64");
-      /* 261 */ glbTypes.push_back("FIELD DATE");
-      /* 262 */ glbTypes.push_back("FIELD INT32");
-      /* 263 */ glbTypes.push_back("FIELD DATE");
+      /* 256 */ glbTypes.push_back("INT16 FIELD");
+      /* 257 */ glbTypes.push_back("DATE FIELD");
+      /* 258 */ glbTypes.push_back("UINT64 FIELD");
+      /* 259 */ glbTypes.push_back("UINT8 FIELD");
+      /* 260 */ glbTypes.push_back("UINT64 FIELD");
+      /* 261 */ glbTypes.push_back("DATE FIELD");
+      /* 262 */ glbTypes.push_back("INT32 FIELD");
+      /* 263 */ glbTypes.push_back("DATE FIELD");
       /* 264 */ glbTypes.push_back("FIELD");
-      /* 265 */ glbTypes.push_back("FIELD UINT64");
+      /* 265 */ glbTypes.push_back("UINT64 FIELD");
       /* 266 */ glbTypes.push_back("FIELD");
-      /* 267 */ glbTypes.push_back("FIELD INT16");
-      /* 268 */ glbTypes.push_back("FIELD INT8");
-      /* 269 */ glbTypes.push_back("FIELD UINT8");
-      /* 270 */ glbTypes.push_back("FIELD DATETIME");
-      /* 271 */ glbTypes.push_back("FIELD UINT32");
-      /* 272 */ glbTypes.push_back("FIELD UINT64");
-      /* 273 */ glbTypes.push_back("FIELD INT16");
-      /* 274 */ glbTypes.push_back("FIELD UINT16");
+      /* 267 */ glbTypes.push_back("INT16 FIELD");
+      /* 268 */ glbTypes.push_back("INT8 FIELD");
+      /* 269 */ glbTypes.push_back("UINT8 FIELD");
+      /* 270 */ glbTypes.push_back("DATETIME FIELD");
+      /* 271 */ glbTypes.push_back("UINT32 FIELD");
+      /* 272 */ glbTypes.push_back("UINT64 FIELD");
+      /* 273 */ glbTypes.push_back("INT16 FIELD");
+      /* 274 */ glbTypes.push_back("UINT16 FIELD");
       /* 275 */ glbTypes.push_back("FIELD");
-      /* 276 */ glbTypes.push_back("FIELD CHAR");
-      /* 277 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 278 */ glbTypes.push_back("FIELD UINT32");
-      /* 279 */ glbTypes.push_back("FIELD UINT64");
-      /* 280 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 281 */ glbTypes.push_back("FIELD UINT64");
-      /* 282 */ glbTypes.push_back("FIELD UINT16");
-      /* 283 */ glbTypes.push_back("FIELD INT16");
-      /* 284 */ glbTypes.push_back("FIELD RICHREAL");
+      /* 276 */ glbTypes.push_back("CHAR FIELD");
+      /* 277 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 278 */ glbTypes.push_back("UINT32 FIELD");
+      /* 279 */ glbTypes.push_back("UINT64 FIELD");
+      /* 280 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 281 */ glbTypes.push_back("UINT64 FIELD");
+      /* 282 */ glbTypes.push_back("UINT16 FIELD");
+      /* 283 */ glbTypes.push_back("INT16 FIELD");
+      /* 284 */ glbTypes.push_back("RICHREAL FIELD");
       /* 285 */ glbTypes.push_back("FIELD");
-      /* 286 */ glbTypes.push_back("FIELD HIRESTIME");
-      /* 287 */ glbTypes.push_back("FIELD UINT16");
-      /* 288 */ glbTypes.push_back("FIELD RICHREAL");
-      /* 289 */ glbTypes.push_back("FIELD BOOL");
-      /* 290 */ glbTypes.push_back("FIELD INT64");
-      /* 291 */ glbTypes.push_back("FIELD REAL");
-      /* 292 */ glbTypes.push_back("FIELD INT64");
-      /* 293 */ glbTypes.push_back("FIELD INT64");
-      /* 294 */ glbTypes.push_back("FIELD UINT16");
-      /* 295 */ glbTypes.push_back("FIELD REAL");
-      /* 296 */ glbTypes.push_back("FIELD REAL");
-      /* 297 */ glbTypes.push_back("FIELD CHAR");
+      /* 286 */ glbTypes.push_back("HIRESTIME FIELD");
+      /* 287 */ glbTypes.push_back("UINT16 FIELD");
+      /* 288 */ glbTypes.push_back("RICHREAL FIELD");
+      /* 289 */ glbTypes.push_back("BOOL FIELD");
+      /* 290 */ glbTypes.push_back("INT64 FIELD");
+      /* 291 */ glbTypes.push_back("REAL FIELD");
+      /* 292 */ glbTypes.push_back("INT64 FIELD");
+      /* 293 */ glbTypes.push_back("INT64 FIELD");
+      /* 294 */ glbTypes.push_back("UINT16 FIELD");
+      /* 295 */ glbTypes.push_back("REAL FIELD");
+      /* 296 */ glbTypes.push_back("REAL FIELD");
+      /* 297 */ glbTypes.push_back("CHAR FIELD");
       /* 298 */ glbTypes.push_back("FIELD");
-      /* 299 */ glbTypes.push_back("FIELD UINT64");
-      /* 300 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 301 */ glbTypes.push_back("FIELD ARRAY CHAR");
-      /* 302 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 303 */ glbTypes.push_back("FIELD ARRAY CHAR");
-      /* 304 */ glbTypes.push_back("FIELD ARRAY DATE");
-      /* 305 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 306 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 307 */ glbTypes.push_back("FIELD ARRAY");
-      /* 308 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 309 */ glbTypes.push_back("FIELD ARRAY BOOL");
-      /* 310 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 311 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 312 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 313 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 314 */ glbTypes.push_back("FIELD ARRAY INT32");
-      /* 315 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 316 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 317 */ glbTypes.push_back("FIELD ARRAY BOOL");
-      /* 318 */ glbTypes.push_back("FIELD ARRAY DATE");
-      /* 319 */ glbTypes.push_back("FIELD ARRAY");
-      /* 320 */ glbTypes.push_back("FIELD ARRAY CHAR");
-      /* 321 */ glbTypes.push_back("FIELD ARRAY");
-      /* 322 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 323 */ glbTypes.push_back("FIELD ARRAY");
-      /* 324 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 325 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 326 */ glbTypes.push_back("FIELD ARRAY RICHREAL");
-      /* 327 */ glbTypes.push_back("FIELD ARRAY DATE");
-      /* 328 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 329 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 330 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 331 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 332 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 333 */ glbTypes.push_back("FIELD ARRAY INT64");
-      /* 334 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 335 */ glbTypes.push_back("FIELD ARRAY INT32");
-      /* 336 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 337 */ glbTypes.push_back("FIELD ARRAY INT64");
-      /* 338 */ glbTypes.push_back("FIELD ARRAY DATETIME");
-      /* 339 */ glbTypes.push_back("FIELD ARRAY DATETIME");
-      /* 340 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 341 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 342 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 343 */ glbTypes.push_back("FIELD ARRAY UINT16");
-      /* 344 */ glbTypes.push_back("FIELD ARRAY");
-      /* 345 */ glbTypes.push_back("FIELD ARRAY UINT16");
-      /* 346 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 347 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 348 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 349 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 350 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 351 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 352 */ glbTypes.push_back("FIELD ARRAY BOOL");
-      /* 353 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 354 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 355 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 356 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 357 */ glbTypes.push_back("FIELD ARRAY DATETIME");
-      /* 358 */ glbTypes.push_back("FIELD ARRAY RICHREAL");
-      /* 359 */ glbTypes.push_back("FIELD ARRAY DATE");
-      /* 360 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 361 */ glbTypes.push_back("FIELD ARRAY INT64");
-      /* 362 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 363 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 364 */ glbTypes.push_back("FIELD ARRAY");
-      /* 365 */ glbTypes.push_back("FIELD ARRAY");
-      /* 366 */ glbTypes.push_back("FIELD ARRAY CHAR");
-      /* 367 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 368 */ glbTypes.push_back("FIELD ARRAY DATETIME");
-      /* 369 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 370 */ glbTypes.push_back("FIELD ARRAY RICHREAL");
-      /* 371 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 372 */ glbTypes.push_back("FIELD ARRAY DATETIME");
-      /* 373 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 374 */ glbTypes.push_back("FIELD ARRAY HIRESTIME");
-      /* 375 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 376 */ glbTypes.push_back("FIELD ARRAY INT64");
-      /* 377 */ glbTypes.push_back("FIELD ARRAY UINT16");
-      /* 378 */ glbTypes.push_back("FIELD ARRAY UINT8");
-      /* 379 */ glbTypes.push_back("FIELD ARRAY UINT64");
-      /* 380 */ glbTypes.push_back("FIELD ARRAY INT32");
-      /* 381 */ glbTypes.push_back("FIELD ARRAY INT32");
-      /* 382 */ glbTypes.push_back("FIELD ARRAY REAL");
-      /* 383 */ glbTypes.push_back("FIELD ARRAY UINT16");
-      /* 384 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 385 */ glbTypes.push_back("FIELD ARRAY");
-      /* 386 */ glbTypes.push_back("FIELD ARRAY");
-      /* 387 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 388 */ glbTypes.push_back("FIELD ARRAY UINT16");
-      /* 389 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 390 */ glbTypes.push_back("FIELD ARRAY DATE");
-      /* 391 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 392 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 393 */ glbTypes.push_back("FIELD ARRAY");
-      /* 394 */ glbTypes.push_back("FIELD ARRAY BOOL");
-      /* 395 */ glbTypes.push_back("FIELD ARRAY");
-      /* 396 */ glbTypes.push_back("FIELD ARRAY INT8");
-      /* 397 */ glbTypes.push_back("FIELD ARRAY INT16");
-      /* 398 */ glbTypes.push_back("FIELD ARRAY UINT32");
-      /* 399 */ glbTypes.push_back("FIELD ARRAY INT32");
+      /* 299 */ glbTypes.push_back("UINT64 FIELD");
+      /* 300 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 301 */ glbTypes.push_back("CHAR ARRAY FIELD");
+      /* 302 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 303 */ glbTypes.push_back("CHAR ARRAY FIELD");
+      /* 304 */ glbTypes.push_back("DATE ARRAY FIELD");
+      /* 305 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 306 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 307 */ glbTypes.push_back("ARRAY FIELD");
+      /* 308 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 309 */ glbTypes.push_back("BOOL ARRAY FIELD");
+      /* 310 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 311 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 312 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 313 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 314 */ glbTypes.push_back("INT32 ARRAY FIELD");
+      /* 315 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 316 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 317 */ glbTypes.push_back("BOOL ARRAY FIELD");
+      /* 318 */ glbTypes.push_back("DATE ARRAY FIELD");
+      /* 319 */ glbTypes.push_back("ARRAY FIELD");
+      /* 320 */ glbTypes.push_back("CHAR ARRAY FIELD");
+      /* 321 */ glbTypes.push_back("ARRAY FIELD");
+      /* 322 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 323 */ glbTypes.push_back("ARRAY FIELD");
+      /* 324 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 325 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 326 */ glbTypes.push_back("RICHREAL ARRAY FIELD");
+      /* 327 */ glbTypes.push_back("DATE ARRAY FIELD");
+      /* 328 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 329 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 330 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 331 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 332 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 333 */ glbTypes.push_back("INT64 ARRAY FIELD");
+      /* 334 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 335 */ glbTypes.push_back("INT32 ARRAY FIELD");
+      /* 336 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 337 */ glbTypes.push_back("INT64 ARRAY FIELD");
+      /* 338 */ glbTypes.push_back("DATETIME ARRAY FIELD");
+      /* 339 */ glbTypes.push_back("DATETIME ARRAY FIELD");
+      /* 340 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 341 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 342 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 343 */ glbTypes.push_back("UINT16 ARRAY FIELD");
+      /* 344 */ glbTypes.push_back("ARRAY FIELD");
+      /* 345 */ glbTypes.push_back("UINT16 ARRAY FIELD");
+      /* 346 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 347 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 348 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 349 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 350 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 351 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 352 */ glbTypes.push_back("BOOL ARRAY FIELD");
+      /* 353 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 354 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 355 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 356 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 357 */ glbTypes.push_back("DATETIME ARRAY FIELD");
+      /* 358 */ glbTypes.push_back("RICHREAL ARRAY FIELD");
+      /* 359 */ glbTypes.push_back("DATE ARRAY FIELD");
+      /* 360 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 361 */ glbTypes.push_back("INT64 ARRAY FIELD");
+      /* 362 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 363 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 364 */ glbTypes.push_back("ARRAY FIELD");
+      /* 365 */ glbTypes.push_back("ARRAY FIELD");
+      /* 366 */ glbTypes.push_back("CHAR ARRAY FIELD");
+      /* 367 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 368 */ glbTypes.push_back("DATETIME ARRAY FIELD");
+      /* 369 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 370 */ glbTypes.push_back("RICHREAL ARRAY FIELD");
+      /* 371 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 372 */ glbTypes.push_back("DATETIME ARRAY FIELD");
+      /* 373 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 374 */ glbTypes.push_back("HIRESTIME ARRAY FIELD");
+      /* 375 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 376 */ glbTypes.push_back("INT64 ARRAY FIELD");
+      /* 377 */ glbTypes.push_back("UINT16 ARRAY FIELD");
+      /* 378 */ glbTypes.push_back("UINT8 ARRAY FIELD");
+      /* 379 */ glbTypes.push_back("UINT64 ARRAY FIELD");
+      /* 380 */ glbTypes.push_back("INT32 ARRAY FIELD");
+      /* 381 */ glbTypes.push_back("INT32 ARRAY FIELD");
+      /* 382 */ glbTypes.push_back("REAL ARRAY FIELD");
+      /* 383 */ glbTypes.push_back("UINT16 ARRAY FIELD");
+      /* 384 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 385 */ glbTypes.push_back("ARRAY FIELD");
+      /* 386 */ glbTypes.push_back("ARRAY FIELD");
+      /* 387 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 388 */ glbTypes.push_back("UINT16 ARRAY FIELD");
+      /* 389 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 390 */ glbTypes.push_back("DATE ARRAY FIELD");
+      /* 391 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 392 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 393 */ glbTypes.push_back("ARRAY FIELD");
+      /* 394 */ glbTypes.push_back("BOOL ARRAY FIELD");
+      /* 395 */ glbTypes.push_back("ARRAY FIELD");
+      /* 396 */ glbTypes.push_back("INT8 ARRAY FIELD");
+      /* 397 */ glbTypes.push_back("INT16 ARRAY FIELD");
+      /* 398 */ glbTypes.push_back("UINT32 ARRAY FIELD");
+      /* 399 */ glbTypes.push_back("INT32 ARRAY FIELD");
       /* 400 */ glbTypes.push_back("TABLE(field_1_01 REAL, field_2_012 RICHREAL, field_3_0123 INT64, field_4_01234 UINT64, field_5_012345 INT32, field_6_0123456 UINT32, field_7_01234567 UINT8 ARRAY, field_8_012345678 INT8, field_9_0123456789 UINT8, field_10_0 RICHREAL, field_11_01 INT32, field_12_012 UINT64, field_13_0123 INT32, field_14_01234 UINT16, field_15_012345 UINT8, field_16_0123456 REAL, field_17_01234567 INT8, field_18_012345678 HIRESTIME, field_19_0123456789 REAL, field_20_0 UINT8, field_21_01 BOOL, field_22_012 UINT32, field_23_0123 HIRESTIME, field_24_01234 BOOL, field_25_012345 CHAR, field_26_0123456 UINT16, field_27_01234567 UINT64, field_28_012345678 INT32 ARRAY, field_29_0123456789 CHAR, field_30_0 INT8 ARRAY, field_31_01 UINT16, field_32_012 HIRESTIME ARRAY, field_33_0123 CHAR ARRAY, field_34_01234 CHAR, field_35_012345 BOOL, field_36_0123456 HIRESTIME, field_37_01234567 UINT16, field_38_012345678 UINT64, field_39_0123456789 UINT64, field_40_0 INT8, field_41_01 INT16, field_42_012 CHAR, field_43_0123 UINT32 ARRAY, field_44_01234 UINT32, field_45_012345 UINT8, field_46_0123456 BOOL ARRAY, field_47_01234567 UINT32, field_48_012345678 DATETIME, field_49_0123456789 REAL, field_50_0 INT16, field_51_01 RICHREAL, field_52_012 BOOL, field_53_0123 DATE, field_54_01234 UINT8 ARRAY, field_55_012345 UINT16, field_56_0123456 CHAR)");
       /* 401 */ glbTypes.push_back("TABLE(field_1_01 UINT64, field_2_012 DATE, field_3_0123 DATETIME, field_4_01234 INT64, field_5_012345 HIRESTIME, field_6_0123456 CHAR, field_7_01234567 DATETIME, field_8_012345678 INT64, field_9_0123456789 HIRESTIME ARRAY, field_10_0 BOOL, field_11_01 RICHREAL ARRAY, field_12_012 UINT32 ARRAY, field_13_0123 UINT64, field_14_01234 BOOL, field_15_012345 HIRESTIME, field_16_0123456 HIRESTIME, field_17_01234567 UINT16 ARRAY, field_18_012345678 BOOL, field_19_0123456789 RICHREAL, field_20_0 INT16 ARRAY, field_21_01 RICHREAL, field_22_012 HIRESTIME, field_23_0123 DATETIME, field_24_01234 UINT8 ARRAY, field_25_012345 BOOL, field_26_0123456 HIRESTIME, field_27_01234567 INT16, field_28_012345678 INT64, field_29_0123456789 INT16, field_30_0 DATE, field_31_01 RICHREAL, field_32_012 INT16 ARRAY, field_33_0123 RICHREAL, field_34_01234 UINT16, field_35_012345 UINT8, field_36_0123456 INT16, field_37_01234567 REAL, field_38_012345678 REAL, field_39_0123456789 UINT8, field_40_0 INT8, field_41_01 INT64, field_42_012 DATETIME ARRAY, field_43_0123 INT64, field_44_01234 REAL, field_45_012345 INT64 ARRAY, field_46_0123456 UINT32, field_47_01234567 INT16, field_48_012345678 REAL ARRAY, field_49_0123456789 UINT32)");
       /* 402 */ glbTypes.push_back("TABLE(field_1_01 UINT64, field_2_012 INT64 ARRAY, field_3_0123 CHAR ARRAY, field_4_01234 INT64, field_5_012345 INT16, field_6_0123456 INT16, field_7_01234567 UINT16, field_8_012345678 CHAR, field_9_0123456789 INT64 ARRAY, field_10_0 INT32, field_11_01 INT8, field_12_012 UINT8 ARRAY, field_13_0123 UINT32, field_14_01234 UINT8, field_15_012345 DATE ARRAY, field_16_0123456 REAL, field_17_01234567 REAL, field_18_012345678 UINT8, field_19_0123456789 RICHREAL, field_20_0 UINT8, field_21_01 UINT16, field_22_012 UINT8, field_23_0123 UINT64, field_24_01234 DATETIME, field_25_012345 UINT64, field_26_0123456 DATE, field_27_01234567 INT32, field_28_012345678 INT16, field_29_0123456789 UINT8, field_30_0 UINT32, field_31_01 UINT8, field_32_012 INT64, field_33_0123 DATE, field_34_01234 INT16, field_35_012345 DATETIME ARRAY, field_36_0123456 UINT64, field_37_01234567 DATETIME, field_38_012345678 INT32 ARRAY, field_39_0123456789 BOOL, field_40_0 RICHREAL, field_41_01 INT16, field_42_012 INT8)");

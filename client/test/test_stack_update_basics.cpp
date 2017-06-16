@@ -33,9 +33,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -59,9 +59,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -85,9 +85,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -111,9 +111,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -137,9 +137,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -163,9 +163,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -189,9 +189,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -215,9 +215,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -241,9 +241,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -267,9 +267,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -293,9 +293,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -319,9 +319,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -345,9 +345,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -371,9 +371,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -397,9 +397,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -423,9 +423,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -449,9 +449,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
         /* Repeat */
 
         {WHC_TYPE_BOOL, "0"},
@@ -474,35 +474,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
-
-        /* Repeat */
-
-        {WHC_TYPE_BOOL, "0"},
-        {WHC_TYPE_CHAR, "h"},
-        {WHC_TYPE_DATE, "1201/12/10"},
-        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
-        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
-        {WHC_TYPE_INT8, "-67"},
-        {WHC_TYPE_INT16, "-10234"},
-        {WHC_TYPE_INT32, "-34125"},
-        {WHC_TYPE_INT64, "-1233411244563200"},
-        {WHC_TYPE_UINT8, "245"},
-        {WHC_TYPE_UINT16, "45678"},
-        {WHC_TYPE_UINT32, "3099012231"},
-        {WHC_TYPE_UINT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "-122.123"},
-        {WHC_TYPE_RICHREAL, "538.154454223"},
-        {WHC_TYPE_INT8, "123"},
-        {WHC_TYPE_INT16, "561"},
-        {WHC_TYPE_INT32, "134512334"},
-        {WHC_TYPE_INT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
-        {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -526,9 +500,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -552,9 +526,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -578,33 +552,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
-
-        {WHC_TYPE_BOOL, "0"},
-        {WHC_TYPE_CHAR, "h"},
-        {WHC_TYPE_DATE, "1201/12/10"},
-        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
-        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
-        {WHC_TYPE_INT8, "-67"},
-        {WHC_TYPE_INT16, "-10234"},
-        {WHC_TYPE_INT32, "-34125"},
-        {WHC_TYPE_INT64, "-1233411244563200"},
-        {WHC_TYPE_UINT8, "245"},
-        {WHC_TYPE_UINT16, "45678"},
-        {WHC_TYPE_UINT32, "3099012231"},
-        {WHC_TYPE_UINT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "-122.123"},
-        {WHC_TYPE_RICHREAL, "538.154454223"},
-        {WHC_TYPE_INT8, "123"},
-        {WHC_TYPE_INT16, "561"},
-        {WHC_TYPE_INT32, "134512334"},
-        {WHC_TYPE_INT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
-        {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -628,9 +578,33 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
+
+        {WHC_TYPE_BOOL, "0"},
+        {WHC_TYPE_CHAR, "h"},
+        {WHC_TYPE_DATE, "1201/12/10"},
+        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
+        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
+        {WHC_TYPE_INT8, "-67"},
+        {WHC_TYPE_INT16, "-10234"},
+        {WHC_TYPE_INT32, "-34125"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "245"},
+        {WHC_TYPE_UINT16, "45678"},
+        {WHC_TYPE_UINT32, "3099012231"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-122.123"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
+        {WHC_TYPE_INT8, "123"},
+        {WHC_TYPE_INT16, "561"},
+        {WHC_TYPE_INT32, "134512334"},
+        {WHC_TYPE_INT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "0.1"},
+        {WHC_TYPE_REAL, "1.0"},
+        {WHC_TYPE_RICHREAL, "-0.1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -654,9 +628,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -680,9 +654,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -706,9 +680,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -732,9 +706,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -758,9 +732,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -784,9 +758,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -810,9 +784,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -836,9 +810,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -862,9 +836,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -888,9 +862,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -914,9 +888,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -940,9 +914,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -966,9 +940,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -992,9 +966,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -1018,34 +992,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
-        /* Repeat */
-
-        {WHC_TYPE_BOOL, "0"},
-        {WHC_TYPE_CHAR, "h"},
-        {WHC_TYPE_DATE, "1201/12/10"},
-        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
-        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
-        {WHC_TYPE_INT8, "-67"},
-        {WHC_TYPE_INT16, "-10234"},
-        {WHC_TYPE_INT32, "-34125"},
-        {WHC_TYPE_INT64, "-1233411244563200"},
-        {WHC_TYPE_UINT8, "245"},
-        {WHC_TYPE_UINT16, "45678"},
-        {WHC_TYPE_UINT32, "3099012231"},
-        {WHC_TYPE_UINT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "-122.123"},
-        {WHC_TYPE_RICHREAL, "538.154454223"},
-        {WHC_TYPE_INT8, "123"},
-        {WHC_TYPE_INT16, "561"},
-        {WHC_TYPE_INT32, "134512334"},
-        {WHC_TYPE_INT64, "923341124456320012"},
-        {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
-        {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -1069,9 +1018,34 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
+        /* Repeat */
+
+        {WHC_TYPE_BOOL, "0"},
+        {WHC_TYPE_CHAR, "h"},
+        {WHC_TYPE_DATE, "1201/12/10"},
+        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
+        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
+        {WHC_TYPE_INT8, "-67"},
+        {WHC_TYPE_INT16, "-10234"},
+        {WHC_TYPE_INT32, "-34125"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "245"},
+        {WHC_TYPE_UINT16, "45678"},
+        {WHC_TYPE_UINT32, "3099012231"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-122.123"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
+        {WHC_TYPE_INT8, "123"},
+        {WHC_TYPE_INT16, "561"},
+        {WHC_TYPE_INT32, "134512334"},
+        {WHC_TYPE_INT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "0.1"},
+        {WHC_TYPE_REAL, "1.0"},
+        {WHC_TYPE_RICHREAL, "-0.1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -1095,9 +1069,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -1121,9 +1095,9 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"},
+        {WHC_TYPE_RICHREAL, "-1.0"},
 
         /* Repeat */
 
@@ -1147,9 +1121,35 @@ BasicValueEntry _values[] =
         {WHC_TYPE_INT32, "134512334"},
         {WHC_TYPE_INT64, "923341124456320012"},
         {WHC_TYPE_REAL, "0.1"},
-        {WHC_TYPE_REAL, "1"},
+        {WHC_TYPE_REAL, "1.0"},
         {WHC_TYPE_RICHREAL, "-0.1"},
-        {WHC_TYPE_RICHREAL, "-1"}
+        {WHC_TYPE_RICHREAL, "-1.0"},
+
+        /* Repeat */
+
+        {WHC_TYPE_BOOL, "0"},
+        {WHC_TYPE_CHAR, "h"},
+        {WHC_TYPE_DATE, "1201/12/10"},
+        {WHC_TYPE_DATETIME, "2091/10/11 14:23:12"},
+        {WHC_TYPE_HIRESTIME, "7812/2/3 14:31:12.901240"},
+        {WHC_TYPE_INT8, "-67"},
+        {WHC_TYPE_INT16, "-10234"},
+        {WHC_TYPE_INT32, "-34125"},
+        {WHC_TYPE_INT64, "-1233411244563200"},
+        {WHC_TYPE_UINT8, "245"},
+        {WHC_TYPE_UINT16, "45678"},
+        {WHC_TYPE_UINT32, "3099012231"},
+        {WHC_TYPE_UINT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "-122.123"},
+        {WHC_TYPE_RICHREAL, "538.154454223"},
+        {WHC_TYPE_INT8, "123"},
+        {WHC_TYPE_INT16, "561"},
+        {WHC_TYPE_INT32, "134512334"},
+        {WHC_TYPE_INT64, "923341124456320012"},
+        {WHC_TYPE_REAL, "0.1"},
+        {WHC_TYPE_REAL, "1.0"},
+        {WHC_TYPE_RICHREAL, "-0.1"},
+        {WHC_TYPE_RICHREAL, "-1.0"}
     };
 
 static const uint_t _valuesCount = sizeof(_values) / sizeof(_values[0]);

@@ -192,4 +192,3 @@ DescribeInterpreterEngineVersion();
 } // namespace whais
 
 #endif /* INTERPRETER_H_ */
-

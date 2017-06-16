@@ -4274,7 +4274,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("CHAR");
       proc.mParameters.push_back("INT8");
       proc.mParameters.push_back("UINT16");
-      proc.mParameters.push_back("FIELD ARRAY UINT16");
+      proc.mParameters.push_back("UINT16 ARRAY FIELD");
       proc.mParameters.push_back("HIRESTIME");
       proc.mParameters.push_back("DATETIME");
       proc.mParameters.push_back("INT8");
@@ -5193,7 +5193,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("UINT16");
-      proc.mParameters.push_back("FIELD ARRAY RICHREAL");
+      proc.mParameters.push_back("RICHREAL ARRAY FIELD");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("DATETIME");
@@ -8738,7 +8738,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("TABLE(field_1_01 HIRESTIME, field_2_012 HIRESTIME, field_3_0123 HIRESTIME, field_4_01234 DATE, field_5_012345 RICHREAL, field_6_0123456 CHAR, field_7_01234567 RICHREAL, field_8_012345678 UINT16 ARRAY, field_9_0123456789 INT8, field_10_0 INT8, field_11_01 DATE, field_12_012 DATE ARRAY, field_13_0123 UINT32 ARRAY, field_14_01234 INT8, field_15_012345 UINT64, field_16_0123456 UINT8, field_17_01234567 DATE, field_18_012345678 BOOL, field_19_0123456789 INT16, field_20_0 DATE, field_21_01 CHAR ARRAY, field_22_012 RICHREAL, field_23_0123 RICHREAL ARRAY, field_24_01234 UINT8, field_25_012345 UINT64, field_26_0123456 RICHREAL, field_27_01234567 UINT8, field_28_012345678 REAL, field_29_0123456789 DATETIME, field_30_0 DATE, field_31_01 HIRESTIME, field_32_012 RICHREAL, field_33_0123 INT16, field_34_01234 UINT64, field_35_012345 INT64, field_36_0123456 RICHREAL, field_37_01234567 BOOL, field_38_012345678 INT16, field_39_0123456789 REAL, field_40_0 INT32, field_41_01 BOOL ARRAY, field_42_012 INT32, field_43_0123 INT32, field_44_01234 HIRESTIME, field_45_012345 UINT16, field_46_0123456 BOOL, field_47_01234567 REAL ARRAY, field_48_012345678 INT64, field_49_0123456789 UINT32, field_50_0 BOOL, field_51_01 INT32 ARRAY, field_52_012 INT8, field_53_0123 UINT8, field_54_01234 REAL, field_55_012345 DATE ARRAY, field_56_0123456 INT8 ARRAY, field_57_01234567 DATETIME, field_58_012345678 DATE, field_59_0123456789 CHAR, field_60_0 DATETIME, field_61_01 HIRESTIME, field_62_012 CHAR, field_63_0123 INT8 ARRAY, field_64_01234 INT64, field_65_012345 INT8, field_66_0123456 BOOL, field_67_01234567 UINT8, field_68_012345678 HIRESTIME, field_69_0123456789 REAL, field_70_0 INT8 ARRAY, field_71_01 BOOL ARRAY, field_72_012 DATE, field_73_0123 UINT8, field_74_01234 INT8 ARRAY, field_75_012345 UINT8 ARRAY, field_76_0123456 BOOL, field_77_01234567 UINT16, field_78_012345678 INT8, field_79_0123456789 INT64, field_80_0 RICHREAL, field_81_01 INT16, field_82_012 REAL, field_83_0123 UINT32, field_84_01234 CHAR, field_85_012345 DATETIME, field_86_0123456 INT64, field_87_01234567 DATE, field_88_012345678 HIRESTIME)");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("INT32");
-      proc.mParameters.push_back("FIELD ARRAY INT64");
+      proc.mParameters.push_back("INT64 ARRAY FIELD");
       proc.mParameters.push_back("CHAR");
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("HIRESTIME");
@@ -8814,7 +8814,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("RICHREAL");
-      proc.mParameters.push_back("FIELD ARRAY UINT8");
+      proc.mParameters.push_back("UINT8 ARRAY FIELD");
       proc.mParameters.push_back("TABLE");
       proc.mParameters.push_back("UNDEFINED");
       proc.mParameters.push_back("UINT8");
@@ -9324,7 +9324,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("CHAR");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("INT32");
-      proc.mParameters.push_back("FIELD ARRAY BOOL");
+      proc.mParameters.push_back("BOOL ARRAY FIELD");
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("INT16");
       proc.mParameters.push_back("INT16");
@@ -9342,7 +9342,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("TEXT");
       proc.mParameters.push_back("UNDEFINED");
       proc.mParameters.push_back("CHAR");
-      proc.mParameters.push_back("FIELD ARRAY UINT32");
+      proc.mParameters.push_back("UINT32 ARRAY FIELD");
       proc.mParameters.push_back("INT8");
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("INT32");
@@ -13422,7 +13422,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("UINT8");
       proc.mParameters.push_back("UINT32");
-      proc.mParameters.push_back("FIELD ARRAY BOOL");
+      proc.mParameters.push_back("BOOL ARRAY FIELD");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("UINT64");
       proc.mParameters.push_back("UINT16");
@@ -15710,7 +15710,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("INT64");
       proc.mParameters.push_back("INT16");
       proc.mParameters.push_back("UINT64");
-      proc.mParameters.push_back("FIELD ARRAY");
+      proc.mParameters.push_back("ARRAY FIELD");
       procs.push_back(proc);
 
 
@@ -16060,7 +16060,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
 
       proc.mName = "proc_480_0";
       proc.mParameters.clear();
-      proc.mParameters.push_back("FIELD ARRAY REAL");
+      proc.mParameters.push_back("REAL ARRAY FIELD");
       proc.mParameters.push_back("TEXT");
       proc.mParameters.push_back("INT64");
       proc.mParameters.push_back("UINT32");
@@ -19145,7 +19145,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("DATETIME");
       proc.mParameters.push_back("TABLE(field_1_01 UINT8, field_2_012 REAL, field_3_0123 CHAR, field_4_01234 RICHREAL, field_5_012345 RICHREAL, field_6_0123456 UINT32 ARRAY, field_7_01234567 CHAR, field_8_012345678 INT64, field_9_0123456789 INT16 ARRAY, field_10_0 UINT8 ARRAY, field_11_01 INT8, field_12_012 INT16 ARRAY, field_13_0123 BOOL ARRAY, field_14_01234 DATE, field_15_012345 RICHREAL, field_16_0123456 UINT16 ARRAY, field_17_01234567 INT32 ARRAY, field_18_012345678 REAL, field_19_0123456789 UINT64, field_20_0 DATETIME, field_21_01 UINT32, field_22_012 BOOL ARRAY, field_23_0123 INT8)");
-      proc.mParameters.push_back("FIELD ARRAY INT32");
+      proc.mParameters.push_back("INT32 ARRAY FIELD");
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("CHAR");
       proc.mParameters.push_back("RICHREAL");
@@ -19538,7 +19538,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("TEXT");
-      proc.mParameters.push_back("FIELD ARRAY CHAR");
+      proc.mParameters.push_back("CHAR ARRAY FIELD");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("UINT8 FIELD");
       proc.mParameters.push_back("TEXT");
@@ -19995,7 +19995,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("UINT64");
       proc.mParameters.push_back("UINT8");
       proc.mParameters.push_back("TEXT");
-      proc.mParameters.push_back("FIELD ARRAY HIRESTIME");
+      proc.mParameters.push_back("HIRESTIME ARRAY FIELD");
       procs.push_back(proc);
 
 
@@ -20448,7 +20448,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("DATETIME");
       proc.mParameters.push_back("INT8");
       proc.mParameters.push_back("UINT64");
-      proc.mParameters.push_back("FIELD ARRAY INT16");
+      proc.mParameters.push_back("INT16 ARRAY FIELD");
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("INT16");
       proc.mParameters.push_back("TEXT");
@@ -23205,7 +23205,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("UINT8");
       proc.mParameters.push_back("UNDEFINED");
       proc.mParameters.push_back("DATETIME");
-      proc.mParameters.push_back("FIELD ARRAY REAL");
+      proc.mParameters.push_back("REAL ARRAY FIELD");
       proc.mParameters.push_back("UINT8");
       proc.mParameters.push_back("UINT16");
       proc.mParameters.push_back("TABLE");
@@ -23710,7 +23710,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("UINT64 ARRAY");
       proc.mParameters.push_back("UINT64");
       proc.mParameters.push_back("REAL");
-      proc.mParameters.push_back("FIELD ARRAY DATETIME");
+      proc.mParameters.push_back("DATETIME ARRAY FIELD");
       proc.mParameters.push_back("BOOL");
       procs.push_back(proc);
 
@@ -24336,7 +24336,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
 
       proc.mName = "proc_735_012345";
       proc.mParameters.clear();
-      proc.mParameters.push_back("FIELD ARRAY DATE");
+      proc.mParameters.push_back("DATE ARRAY FIELD");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("BOOL");
       proc.mParameters.push_back("DATE");
@@ -25176,7 +25176,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("RICHREAL ARRAY");
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("UINT16");
-      proc.mParameters.push_back("FIELD ARRAY RICHREAL");
+      proc.mParameters.push_back("RICHREAL ARRAY FIELD");
       proc.mParameters.push_back("UINT64");
       procs.push_back(proc);
 
@@ -25468,7 +25468,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("UINT16");
       proc.mParameters.push_back("RICHREAL");
-      proc.mParameters.push_back("FIELD ARRAY");
+      proc.mParameters.push_back("ARRAY FIELD");
       proc.mParameters.push_back("HIRESTIME ARRAY");
       proc.mParameters.push_back("CHAR");
       proc.mParameters.push_back("RICHREAL");
@@ -25730,7 +25730,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("INT64");
       proc.mParameters.push_back("INT16");
-      proc.mParameters.push_back("FIELD ARRAY INT8");
+      proc.mParameters.push_back("INT8 ARRAY FIELD");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("CHAR");
@@ -26450,7 +26450,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("UINT16");
       proc.mParameters.push_back("CHAR");
-      proc.mParameters.push_back("FIELD ARRAY");
+      proc.mParameters.push_back("ARRAY FIELD");
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("UINT64");
@@ -26605,7 +26605,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("REAL");
       proc.mParameters.push_back("UNDEFINED");
       proc.mParameters.push_back("TEXT");
-      proc.mParameters.push_back("FIELD ARRAY UINT8");
+      proc.mParameters.push_back("UINT8 ARRAY FIELD");
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("TEXT");
       proc.mParameters.push_back("INT8");
@@ -27567,7 +27567,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("DATETIME");
-      proc.mParameters.push_back("FIELD ARRAY INT64");
+      proc.mParameters.push_back("INT64 ARRAY FIELD");
       proc.mParameters.push_back("DATE");
       proc.mParameters.push_back("UINT16");
       proc.mParameters.push_back("DATETIME");
@@ -29142,7 +29142,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("INT64");
       proc.mParameters.push_back("UINT64");
       proc.mParameters.push_back("INT8");
-      proc.mParameters.push_back("FIELD ARRAY INT64");
+      proc.mParameters.push_back("INT64 ARRAY FIELD");
       proc.mParameters.push_back("BOOL");
       proc.mParameters.push_back("UINT64");
       proc.mParameters.push_back("TEXT");
@@ -29741,7 +29741,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("INT8");
       proc.mParameters.push_back("INT32");
       proc.mParameters.push_back("UINT64");
-      proc.mParameters.push_back("FIELD ARRAY DATETIME");
+      proc.mParameters.push_back("DATETIME ARRAY FIELD");
       proc.mParameters.push_back("HIRESTIME");
       procs.push_back(proc);
 
@@ -30881,7 +30881,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("TABLE");
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("UINT16");
-      proc.mParameters.push_back("FIELD ARRAY DATE");
+      proc.mParameters.push_back("DATE ARRAY FIELD");
       proc.mParameters.push_back("UINT32");
       proc.mParameters.push_back("RICHREAL");
       proc.mParameters.push_back("CHAR");
@@ -31672,7 +31672,7 @@ setup_database(const string& db, vector<ProcedureDescription>& procs)
       proc.mParameters.push_back("TEXT");
       proc.mParameters.push_back("TABLE(field_1_01 UINT32 ARRAY, field_2_012 UINT8, field_3_0123 REAL ARRAY, field_4_01234 UINT64, field_5_012345 DATE, field_6_0123456 UINT16, field_7_01234567 CHAR, field_8_012345678 INT8, field_9_0123456789 INT64, field_10_0 DATETIME ARRAY, field_11_01 INT32, field_12_012 DATETIME, field_13_0123 DATETIME, field_14_01234 HIRESTIME, field_15_012345 DATE ARRAY, field_16_0123456 INT32, field_17_01234567 UINT32, field_18_012345678 CHAR, field_19_0123456789 DATETIME, field_20_0 INT16, field_21_01 INT64, field_22_012 REAL ARRAY, field_23_0123 UINT64, field_24_01234 INT32, field_25_012345 INT8, field_26_0123456 UINT16, field_27_01234567 INT16, field_28_012345678 INT64, field_29_0123456789 INT8, field_30_0 INT32, field_31_01 INT16, field_32_012 RICHREAL, field_33_0123 UINT32)");
       proc.mParameters.push_back("INT64");
-      proc.mParameters.push_back("FIELD ARRAY BOOL");
+      proc.mParameters.push_back("BOOL ARRAY FIELD");
       proc.mParameters.push_back("UINT8");
       proc.mParameters.push_back("INT8");
       proc.mParameters.push_back("DATE");

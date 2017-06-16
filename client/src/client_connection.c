@@ -28,8 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "client_connection.h"
 
 uint_t
-read_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
-               uint_t* const                    outFrameSize)
+read_raw_frame(struct INTERNAL_HANDLER* const pHnd, uint_t* const outFrameSize)
 {
   uint32_t frameId;
   uint16_t frameSize = 0;
@@ -94,8 +93,7 @@ read_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
 
 
 uint_t
-write_raw_frame(struct INTERNAL_HANDLER* const   pHnd,
-                 const  uint_t                   frameSize)
+write_raw_frame(struct INTERNAL_HANDLER* const pHnd, const uint_t frameSize)
 {
   uint_t result = whs_write(pHnd->socket, pHnd->data, frameSize);
 

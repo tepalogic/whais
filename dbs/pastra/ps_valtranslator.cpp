@@ -1133,6 +1133,7 @@ Utf8Translator::Write(uint8_t* const utf8Dest, const uint_t maxSize, const DReal
     utf8Dest[result] = 0;
   }
 
+
   assert(result < maxSize);
   assert((strlen(_RC(char*, utf8Dest))) == result);
 

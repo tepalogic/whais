@@ -268,6 +268,7 @@ main(int argc, char** argv)
     for (auto& d : databases)
       LoadDatabase( *glbLog, d);
 
+    cout << "All configured databases have been loaded!\n";
     StartServer(*glbLog, databases);
   }
   catch(Exception& e)
