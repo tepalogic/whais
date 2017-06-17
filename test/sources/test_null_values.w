@@ -1130,6 +1130,7 @@ DO
     write_log ("Start of null_test_2");
     IF (result != NULL) DO
         write_log ("... FAIL: 'result' is not null by default.");
+	RETURN NULL;
     END
 
     write_log ("... Local values are null by default.");

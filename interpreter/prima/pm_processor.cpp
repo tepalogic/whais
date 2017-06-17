@@ -1652,8 +1652,8 @@ ProcedureCall::ProcedureCall(Session& session, SessionStack& stack, const Proced
     if (stack.Size() + LocalsCount() > session.MaxStackCount())
     {
       throw InterException(_EXTRA(InterException::STACK_TOO_BIG),
-                           "Failed to call procedure '%s' as it will exceed the maximum stack"
-                           " count of %u elements limit.",
+                           "Failed to call procedure '%s' as it will exceed the maximum stack "
+                           "count of %u elements limit.",
                            mProcedure.mProcMgr->Name(mProcedure.mId),
                            session.MaxStackCount());
     }

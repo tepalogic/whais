@@ -37,9 +37,9 @@ static const char *MSG_PREFIX[] = {"", "error ", "warning ", "error ", "extra "}
 
 static int
 get_line_from_buffer(const vector<SourceCodeMark>& codeMarks,
-                     const char*                   buffer,
-                     uint_t                        bufferOff,
-                     uint_t* const                 mark)
+                     const char* buffer,
+                     uint_t bufferOff,
+                     uint_t* const mark)
 {
   if (bufferOff == WHC_IGNORE_BUFFER_POS || codeMarks.size() == 0)
     return -1;

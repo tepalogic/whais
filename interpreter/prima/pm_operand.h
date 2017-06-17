@@ -877,9 +877,8 @@ public:
   }
 
   TextOperand(const TextOperand& source)
-    : mValue(SharedTextStore::Instance().Alloc())
+    : TextOperand(**source.mValue)
   {
-    *mValue = *source.mValue;
   }
 
   TextOperand(TextOperand&& source)
@@ -897,7 +896,6 @@ public:
   virtual bool IsNull() const override;
 
   virtual void GetValue(DText& outValue) const override;
-
   virtual void SetValue(const DText& value) override;
 
   virtual void SelfAdd(const DChar& value) override;
@@ -979,18 +977,16 @@ public:
     *mValue = shared_make(DArray, array);
   }
 
+  ArrayOperand(const ArrayOperand& src)
+    : ArrayOperand(**src.mValue)
+  {
+  }
+
   ArrayOperand(ArrayOperand&& src)
     : mValue(src.mValue),
       mFirstArrayType(src.mFirstArrayType)
   {
     src.mValue = nullptr;
-  }
-
-  ArrayOperand(const ArrayOperand& src)
-    : mValue(SharedArrayStore::Instance().Alloc()),
-      mFirstArrayType(src.mFirstArrayType)
-  {
-    *mValue = *src.mValue;
   }
 
   ~ArrayOperand()
@@ -1002,7 +998,6 @@ public:
   virtual bool IsNull() const override;
 
   virtual void GetValue(DArray& outValue) const override;
-
   virtual void SetValue(const DArray& value) override;
 
   virtual uint_t GetType() override;
@@ -1011,7 +1006,6 @@ public:
   virtual StackValue Clone() const override;
 
   virtual bool StartIterate(const bool reverse, StackValue& outStartItem) override;
-
   virtual bool CustomCopyIncomplete(void* const) override;
 
 private:
