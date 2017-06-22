@@ -54,6 +54,8 @@ custom_mem_free(void* ptr)
 
 #undef new
 
+#ifdef CXX_CUSTOM_MEMORY_ALLOCATOR
+
 void*
 operator new(std::size_t size)
 {
@@ -140,7 +142,7 @@ operator new [] (size_t size, const char* pFile, uint_t line)
 }
 
 
-void
+CUSTOM_SHL void
 operator delete(void* ptr)
 {
   if (ptr != nullptr)
@@ -183,3 +185,7 @@ operator delete[] (void* ptr, const char*, uint_t )
     custom_trace_mem_free(ptr, nullptr, 0);
 #endif
 }
+
+#endif
+
+

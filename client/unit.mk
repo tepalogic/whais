@@ -15,7 +15,7 @@ wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_valparser.cpp wcmd/wcmd_dbcheck.cpp wcmd/wcmd_altertable.cpp
 		 
 wcmd_DEF:=USE_DBS_SHL USE_INTERP_SHL WVER_MAJ=1 WVER_MIN=2
-wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcustom 
+wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcustom custom/wslcppmemalloc  
 wcmd_SHL:=dbs/wpastra compiler/wcompiler interpreter/wprima
 wcmd_INC:=
 

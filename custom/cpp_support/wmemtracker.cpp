@@ -28,7 +28,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 uint32_t WMemoryTracker::smInitCount = 0;
 const char* WMemoryTracker::smModule = "COMMON";
 #endif
-
-
-
-

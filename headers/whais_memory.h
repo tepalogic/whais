@@ -65,29 +65,32 @@ extern "C"
 
 #ifdef ENABLE_MEMORY_TRACE
 
-void*
+CUSTOM_SHL void*
 custom_trace_mem_alloc(size_t          size,
                        const char*     file,
                        uint_t          line);
 
-void*
+CUSTOM_SHL void*
 custom_trace_mem_realloc(void*           oldPtr,
                          size_t          newSize,
                          const char*     file,
                          uint_t          line);
 
-void
+CUSTOM_SHL void
 custom_trace_mem_free(void*              ptr,
                        const char*        file,
                        uint_t             line);
 
 #endif /* ENABLE_MEMORY_TRACE */
 
-void* custom_mem_alloc(size_t size);
+CUSTOM_SHL void*
+custom_mem_alloc(size_t size);
 
-void* custom_mem_realloc(void* oldPtr, size_t newSize);
+CUSTOM_SHL void*
+custom_mem_realloc(void* oldPtr, size_t newSize);
 
-void custom_mem_free(void* ptr);
+CUSTOM_SHL void
+custom_mem_free(void* ptr);
 
 
 #ifdef __cplusplus
@@ -129,7 +132,6 @@ operator delete(void* ptr) noexcept;
 
 void
 operator delete[](void* ptr) noexcept;
-
 
 #endif /* CXX_CUSTOM_MEMORY_ALLOCATOR */
 
@@ -179,39 +181,25 @@ public:
 
   ~WMemoryTracker()
   {
-    if(smInitCount == 0)
-      {
-        int a = 1;
-        int b = 0;
+    if (smInitCount == 0)
+    {
+      int a = 1;
+      int b = 0;
 
-        a /= b; //If you are to crash make it loud.
-      }
+      a /= b; //If you are to crash make it loud.
+    }
 
-    if((--smInitCount & 0x7FFFFFFF) == 0)
+    if ((--smInitCount & 0x7FFFFFFF) == 0)
       PrintMemoryStatistics();
   }
 
-  static size_t MaxMemoryUsage()
-  {
-    return test_get_mem_max();
-  }
-  static void MaxMemoryUsage(const size_t size)
-  {
-    test_set_mem_max(size);
-  }
-  static size_t GetMemoryUsagePeak()
-  {
-    return test_get_mem_peak();
-  }
-
-  static size_t GetCurrentMemoryUsage()
-  {
-    return test_get_mem_used();
-  }
-
+  static size_t MaxMemoryUsage() { return test_get_mem_max(); }
+  static void MaxMemoryUsage(const size_t size) { test_set_mem_max(size); }
+  static size_t GetMemoryUsagePeak() { return test_get_mem_peak(); }
+  static size_t GetCurrentMemoryUsage() { return test_get_mem_used(); }
   static void PrintMemResume(const bool print)
   {
-    if(print)
+    if (print)
       smInitCount |= 0x80000000;
 
     else
@@ -220,34 +208,33 @@ public:
 
   static bool PrintMemResume()
   {
-    return((smInitCount & 0x80000000) != 0)
-            || (getenv("WHAIS_TST_MEM") != NULL);
+    return ((smInitCount & 0x80000000) != 0) || (getenv("WHAIS_TST_MEM") != NULL);
   }
 
 private:
-  static void PrintMemoryStatistics()
+  static void
+  WMemoryTracker::PrintMemoryStatistics()
   {
-    if (GetCurrentMemoryUsage() != 0 || ! PrintMemResume())
-      return ;
+    if (GetCurrentMemoryUsage() != 0 || !PrintMemResume())
+    return;
 
     std::cout << '(' << smModule << ") ";
-    if(GetCurrentMemoryUsage() != 0)
-      {
-        std::cout << "MEMORY: FAILED\n";
-        test_print_unfree_mem();
-      }
-      std::cout << "MEMORY: OK\n";
-
+    if (GetCurrentMemoryUsage() != 0)
+    {
+      std::cout << "MEMORY: FAILED\n";
+      test_print_unfree_mem();
+    }
+    std::cout << "MEMORY: OK\n";
     std::cout << "Memory peak  : " << GetMemoryUsagePeak() << " bytes.\n";
     std::cout << "Memory in use: " << GetCurrentMemoryUsage() << " bytes.\n";
   }
 
-  static uint32_t       smInitCount;
-  static const char*    smModule;
+
+  static uint32_t smInitCount;
+  static const char* smModule;
 };
 
 static WMemoryTracker __One_Hidden_Static_For_Compiling_Unit__;
-
 #else
 #define shared_make(T,...)       std::make_shared<T>(__VA_ARGS__)
 #define shared_array_make(T,s)   std::make_shared<T>((std::size_t)(s))

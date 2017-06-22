@@ -28,10 +28,11 @@ test_set_mem_max(size_t size)
 }
 
 size_t
-test_get_mem_max(void)
+test_get_mem_max()
 {
   return test_max_mem;
 }
+
 
 size_t
 test_get_mem_used(void)

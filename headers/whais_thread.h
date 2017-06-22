@@ -32,54 +32,54 @@ extern "C"
 
 typedef void(*WH_THREAD_ROUTINE) (void*);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_lock_init(WH_LOCK* const lock);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_lock_destroy(WH_LOCK* const lock);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_lock_acquire(WH_LOCK* const lock);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_lock_try_acquire(WH_LOCK* const lock,
                      bool_t* const outAcquired);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_lock_release(WH_LOCK* const lock);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_thread_create(WH_THREAD*                    outThread,
                   const WH_THREAD_ROUTINE       routine,
                   void*                         args);
 
-uint_t
+CUSTOM_SHL uint_t 
 wh_thread_free(WH_THREAD thread);
 
-void
+CUSTOM_SHL void 
 wh_yield();
 
-void
+CUSTOM_SHL void 
 wh_sleep(const uint_t millisecs);
 
-int16_t
+CUSTOM_SHL int16_t 
 wh_atomic_fetch_inc16(volatile int16_t* const value);
 
-int16_t
+CUSTOM_SHL int16_t 
 wh_atomic_fetch_dec16(volatile int16_t* const value);
 
-int32_t
+CUSTOM_SHL int32_t 
 wh_atomic_fetch_inc32(volatile int32_t* const value);
 
-int32_t
+CUSTOM_SHL int32_t 
 wh_atomic_fetch_dec32(volatile int32_t* const value);
 
-int64_t
+CUSTOM_SHL int64_t 
 wh_atomic_fetch_inc64(volatile int64_t* const value);
 
-int64_t
+CUSTOM_SHL int64_t 
 wh_atomic_fetch_dec64(volatile int64_t* const value);
- 
+
 
 #ifdef __cplusplus
 }

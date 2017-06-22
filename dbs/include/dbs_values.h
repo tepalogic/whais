@@ -1422,9 +1422,8 @@ private:
 
 #pragma warning(disable:4251)
   std::shared_ptr<ITextStrategy> mText;
-#pragma warning(default:4251)
-
   mutable SpinLock mLock;
+#pragma warning(default:4251)
 };
 
 class IArrayStrategy;
@@ -1520,9 +1519,8 @@ private:
 
 #pragma warning(disable:4251)
   std::shared_ptr<IArrayStrategy> mArray;
-#pragma warning(default:4251)
-
   mutable SpinLock mLock;
+#pragma warning(default:4251)
 };
 
 

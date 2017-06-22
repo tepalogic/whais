@@ -31,7 +31,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #else
     #define COMPILER_SHL SHL_IMPORT_SYMBOL
   #endif
-  #define USE_SHL
 #else
   #define COMPILER_SHL
 #endif
@@ -42,7 +41,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #else
     #define DBS_SHL SHL_IMPORT_SYMBOL
   #endif
-  #define USE_SHL
 #else
   #define DBS_SHL
 #endif
@@ -53,21 +51,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #else
     #define INTERP_SHL SHL_IMPORT_SYMBOL
   #endif
-  #define USE_SHL
 #else
   #define INTERP_SHL
 #endif
 
-#ifdef USE_SHL
-  #ifdef EXPORT_EXCEP_SHL
-    #define EXCEP_SHL SHL_EXPORT_SYMBOL
+#ifdef USE_CUSTOM_SHL
+  #ifdef CUSTOM_EXPORTING
+    #define CUSTOM_SHL SHL_EXPORT_SYMBOL
   #else
-    #define EXCEP_SHL SHL_IMPORT_SYMBOL
+    #define CUSTOM_SHL SHL_IMPORT_SYMBOL
   #endif
 #else
-  #define EXCEP_SHL
+  #define CUSTOM_SHL
 #endif
-
 
 #if ! (defined(YYTOKENTYPE) || defined(YYBISON))
 #ifdef __cplusplus
@@ -76,13 +72,13 @@ extern "C"
 #endif
 
 
-WH_SHLIB
+CUSTOM_SHL WH_SHLIB
 wh_shl_load(const char* const library);
 
-void
+CUSTOM_SHL void
 wh_shl_release(WH_SHLIB shl);
 
-void*
+CUSTOM_SHL void*
 wh_shl_symbol(WH_SHLIB shl, const char* const symbol);
 
 

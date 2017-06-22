@@ -34,7 +34,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace whais {
 
 
-class Lock
+class CUSTOM_SHL Lock
 {
 public:
   Lock();
@@ -51,7 +51,7 @@ private:
   WH_LOCK mLock;
 };
 
-class SpinLock
+class CUSTOM_SHL SpinLock
 {
 public:
   SpinLock();
@@ -271,7 +271,7 @@ public:
 
 
 
-class Thread
+class CUSTOM_SHL Thread
 {
 public:
   Thread();
@@ -322,7 +322,7 @@ private:
 
 
 
-class ThreadException : public Exception
+class CUSTOM_SHL ThreadException : public Exception
 {
 public:
   ThreadException(const uint32_t    code,

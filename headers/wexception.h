@@ -51,12 +51,10 @@ enum EXCEPTION_TYPE
   CONNECTION_EXCEPTION
 };
 
-class EXCEP_SHL Exception
+class CUSTOM_SHL Exception
 {
 public:
-  Exception(uint32_t      code,
-             const char*   file,
-             uint32_t      line);
+  Exception(uint32_t code, const char* file, uint32_t line);
   Exception(const Exception& source);
 
   virtual ~Exception();

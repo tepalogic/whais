@@ -44,55 +44,55 @@ extern "C"
 {
 #endif
 
-WH_FILE
+CUSTOM_SHL WH_FILE 
 whf_open(const char* const file, uint_t mode);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_read(WH_FILE hnd, uint8_t* dstBuffer, uint_t size);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_write(WH_FILE hnd, const uint8_t* srcBuffer, uint_t size);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_seek(WH_FILE hnd, int64_t where, int whence);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_tell(WH_FILE hnd, uint64_t* const outPosition);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_sync(WH_FILE hnd);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_tell_size(WH_FILE hnd, uint64_t* const outSize);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_set_size(WH_FILE, const uint64_t newSize);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_close(WH_FILE hnd);
 
-uint32_t
+CUSTOM_SHL uint32_t 
 whf_last_error();
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_err_to_str(uint64_t errorCode, char* str, uint_t strSize);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_remove(const char* const file);
 
-void
+CUSTOM_SHL void 
 whf_move_file(const char* existingFIle, const char* newFile );
 
-const char
+CUSTOM_SHL const char 
 whf_dir_delim();
 
-const char*
+CUSTOM_SHL const char* 
 whf_current_dir();
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_is_absolute(const char* const path);
 
-bool_t
+CUSTOM_SHL bool_t 
 whf_file_exists(const char* const file);
 
 #ifdef __cplusplus

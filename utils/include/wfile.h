@@ -33,7 +33,7 @@ namespace whais
 {
 
 
-class FileException : public Exception
+class CUSTOM_SHL  FileException : public Exception
 {
 public:
   FileException(const uint32_t    code,
@@ -48,7 +48,7 @@ public:
 };
 
 
-class File
+class CUSTOM_SHL File
 {
 public:
   explicit File(const char* name, uint_t mode = 0);

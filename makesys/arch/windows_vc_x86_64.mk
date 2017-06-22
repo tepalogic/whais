@@ -23,7 +23,7 @@ SHLS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 LIBS_OUT_DIR?=$(WHAIS_OUT_DIR)/lib/
 HDRS_OUT_DIR?=$(WHAIS_OUT_DIR)/include/
 
-CC_FLAGS:=/LD /W3 /TC /c  /Y- /nologo /wd4242 /wd4244  /wd4267 /wd4290 /wd4355 /wd4800 /wd5030
+CC_FLAGS:=/LD /W3 /TC /c  /Y- /nologo /wd4242 /wd4244  /wd4267 /wd4275 /wd4290 /wd4355 /wd4800 /wd5030
 
 ifeq ($(ASSERTS),no)
 DEFINES+=NDEBUG=1

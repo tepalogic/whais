@@ -30,10 +30,10 @@ extern "C"
 {
 #endif
 
-bool_t
+CUSTOM_SHL bool_t 
 wh_disable_echo();
 
-bool_t
+CUSTOM_SHL bool_t 
 wh_enable_echo();
 
 #ifdef __cplusplus

@@ -463,7 +463,7 @@ BaseOperand::RedifineValue(StackValue& source)
   if (_SC(void*, this) == _SC(void*, &source))
     return;
 
-  this->~IOperand();
+  this->~BaseOperand();
   _RC(uint64_t*, this)[0] = 0;
 
   auto& op = _SC(BaseOperand&, source.Operand());
