@@ -66,20 +66,13 @@ extern "C"
 #ifdef ENABLE_MEMORY_TRACE
 
 CUSTOM_SHL void*
-custom_trace_mem_alloc(size_t          size,
-                       const char*     file,
-                       uint_t          line);
+custom_trace_mem_alloc(size_t size, const char* file, uint_t line);
 
 CUSTOM_SHL void*
-custom_trace_mem_realloc(void*           oldPtr,
-                         size_t          newSize,
-                         const char*     file,
-                         uint_t          line);
+custom_trace_mem_realloc(void* oldPtr, size_t newSize, const char* file, uint_t line);
 
 CUSTOM_SHL void
-custom_trace_mem_free(void*              ptr,
-                       const char*        file,
-                       uint_t             line);
+custom_trace_mem_free(void* ptr, const char* file, uint_t line);
 
 #endif /* ENABLE_MEMORY_TRACE */
 
@@ -212,8 +205,7 @@ public:
   }
 
 private:
-  static void
-  WMemoryTracker::PrintMemoryStatistics()
+  static void PrintMemoryStatistics()
   {
     if (GetCurrentMemoryUsage() != 0 || !PrintMemResume())
     return;
