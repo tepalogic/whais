@@ -1,0 +1,899 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366" moduleId="org.eclipse.cdt.core.settings" name="Release x86_64">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366" name="Release x86_64" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1096450506" name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.558715629" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.455130733" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86_64" command="make" id="cdt.managedbuild.target.gnu.builder.base.1614971589" incrementalBuildTarget="-j 8 all ARCH=linux_gcc_x86_64 FLAVOR=release" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1078550578" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.625050028" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.1909570791" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1832421902" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1599193409" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1345298361" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1742404150" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.2056325830" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.771336538" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.154023267" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.819528097" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1753538516" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.829428880" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.1256653264" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1037334367" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1364570129" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.2045178264" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1750266998" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1078550578"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.696979609" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.625050028">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.22238114" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.879715821" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.704547554" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.1345298361">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1194784119" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1273489833" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1852133637" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.154023267"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1184617760" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.819528097"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1993147421" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.829428880">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1595204572" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753" moduleId="org.eclipse.cdt.core.settings" name="x86_64 debug (with tests)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753" name="x86_64 debug (with tests)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.686347923" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.281109811" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86_64" command="make" id="cdt.managedbuild.target.gnu.builder.base.112973377" incrementalBuildTarget="-j8 all  ARCH=linux_gcc_x86_64  BUILD_TESTS=yes" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" stopOnErr="true" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.157364399" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1377513523" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.5989342" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.341167170" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1418944217" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.947628908" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.223753176" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.399973392" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1996622376" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.919662108" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1190080058" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.837742146" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.35486967" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.824007795" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1668957604" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.157364399"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1541526739" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.1377513523">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.201615807" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1854709093" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.551924880" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.1418944217">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.542658806" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1742603350" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1701696747" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.399973392"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1440839025" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.1996622376"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.37598267" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.1190080058">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1646691645" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555" moduleId="org.eclipse.cdt.core.settings" name="x86_64 debug (no tests)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555" name="x86_64 debug (no tests)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1063981744" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1262590324" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86_64" command="make" id="cdt.managedbuild.target.gnu.builder.base.296152360" incrementalBuildTarget="-j 8 all  ARCH=linux_gcc_x86_64 " keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" stopOnErr="true" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.687297005" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.948085983" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1319391902" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.589217174" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.348959476" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2102804449" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1719738387" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.2086057560" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1180001687" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.785403288" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1661166831" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.660003781" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1611143513" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.579098599" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.836036272" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.687297005"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1068340941" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.948085983">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.2062081341" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1859697991" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.82153045" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.348959476">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1882119446" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.95189881" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1520045847" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.2086057560"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1515398774" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.1180001687"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.961018558" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.1661166831">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.622020752" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147" moduleId="org.eclipse.cdt.core.settings" name="Release_x86_32">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147" name="Release_x86_32" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.152119894" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1636391650" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86" command="make" id="cdt.managedbuild.target.gnu.builder.base.994137118" incrementalBuildTarget="-j 8 all ARCH=linux_gcc_x86 FLAVOR=release" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1286848884" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.332778568" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.379683847" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.197836998" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1745780176" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.936808356" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.871762306" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_32"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.1297882657" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.798327721" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1522951181" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.263464844" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.690256369" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1993445085" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.77411676" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1087171200" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.573822757" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.337624197" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1296646547" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1286848884"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.116388186" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.332778568">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.311171082" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.432241812" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.327344307" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.936808356">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.2029832459" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.104253604" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.631709467" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.1522951181"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.677332451" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.263464844"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.169426982" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.1993445085">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.462222085" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828" moduleId="org.eclipse.cdt.core.settings" name="x86_32_debug(no_test)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828" name="x86_32_debug(no_test)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.974551008" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.639668377" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86" command="make" id="cdt.managedbuild.target.gnu.builder.base.151209744" incrementalBuildTarget="-j 8 all  ARCH=linux_gcc_x86" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" stopOnErr="true" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1107422795" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.299780004" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.87137010" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.725163172" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.302949541" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.671362114" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.2135102872" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1294184236" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1899339782" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.2025761863" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.661538261" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.2118119263" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1796225191" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1293404295" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1669118123" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1107422795"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1861532232" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.299780004">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.918118328" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1766213811" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.819317794" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.302949541">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.783030373" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1047506861" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1001992859" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.1294184236"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.310075449" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.1899339782"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.143770302" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.661538261">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1422311055" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292" moduleId="org.eclipse.cdt.core.settings" name="x86_32 debug(with tests)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292" name="x86_32 debug(with tests)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.656705244" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.872639509" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86" command="make" id="cdt.managedbuild.target.gnu.builder.base.1896853737" incrementalBuildTarget="-j8 all  ARCH=linux_gcc_x86  BUILD_TESTS=yes" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" stopOnErr="true" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1475313869" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.764291378" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1376336849" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1533481145" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.504256641" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1346150681" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_32"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="CXX_CUSTOM_MEMORY_ALLOCATOR=1"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1314277867" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.112683323" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1409618385" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1540696584" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.56428001" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1671176102" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.358472078" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1478088544" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.520458458" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.1475313869"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.730318099" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.764291378">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.6859453" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1408745588" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1297747394" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.504256641">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.357722288" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="BUILD_TEST=1"/>
+									<listOptionValue builtIn="false" value="ENABLE_MEMORY_TRACE=1"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1757575918" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.2114152244" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.112683323"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.527580323" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.1409618385"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.884927026" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.56428001">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.106429381" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.1505610576">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1505610576" moduleId="org.eclipse.cdt.core.settings" name="Release x86_64(with tests)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.1505610576" name="Release x86_64(with tests)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1505610576." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1542492782" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1335389091" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86_64" command="make" id="cdt.managedbuild.target.gnu.builder.base.4305245" incrementalBuildTarget="-j 8 all ARCH=linux_gcc_x86_64 FLAVOR=release BUILD_TESTS=yes" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.295115675" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.753310557" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.1222019165" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1536067073" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.610143744" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1417987657" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1135486139" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.610409248" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.435205560" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.552896178" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.2080660141" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.21102817" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.626637856" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.437422608" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1881367723" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.1505610576.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1814277288" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.104940530" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.510658528" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.295115675"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1548137486" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.753310557">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.2070813920" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1743580705" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1202913658" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.1417987657">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1809046368" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1177455725" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1033538925" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.552896178"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.498645222" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.2080660141"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.321861907" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.626637856">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1015823456" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.1260356719">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.1260356719" moduleId="org.eclipse.cdt.core.settings" name="Release x86_32 (with tests)">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildProperties="" description="" id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.1260356719" name="Release x86_32 (with tests)" parent="org.eclipse.cdt.build.core.emptycfg">
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.1260356719." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.560020173" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1633954360" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<builder buildPath="/home/ipopa/work/whisper" cleanBuildTarget="clean ARCH=linux_gcc_x86" command="make" id="cdt.managedbuild.target.gnu.builder.base.906921217" incrementalBuildTarget="-j 8 all ARCH=linux_gcc_x86 FLAVOR=release BUILD_TESTS=yes" keepEnvironmentInBuildfile="false" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.780217671" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.635237297" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
+								<option id="gnu.cpp.compiler.option.include.paths.297861589" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.180018283" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_64"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.85734934" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.652306860" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1514602131" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="_GNU_SOURCE"/>
+									<listOptionValue builtIn="false" value="QWORDS_PER_OP=4"/>
+									<listOptionValue builtIn="false" value="WOS=Linux"/>
+									<listOptionValue builtIn="false" value="WARCH=x86_32"/>
+								</option>
+								<option id="gnu.c.compiler.option.include.paths.1894646034" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.175289546" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.937944582" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1553656261" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1460240045" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.1195679022" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base">
+								<option id="gnu.both.asm.option.include.paths.1771743343" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/ipopa/work/whisper/headers"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1024220752" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.1260356719.whisper" name="/" resourcePath="whisper">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.base.2033381660" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base" unusedChildren="">
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.986077771" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.593342733" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base.780217671"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.base.1080910456" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base.635237297">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.340401026" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2137193039" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.base.1161527845" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base.652306860">
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.145857602" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="ARCH_LINUX_GCC"/>
+									<listOptionValue builtIn="false" value="INLINE=__inline__"/>
+									<listOptionValue builtIn="false" value="DBS_SHL"/>
+									<listOptionValue builtIn="false" value="COMPILER_SHL"/>
+									<listOptionValue builtIn="false" value="INTERP_SHL"/>
+									<listOptionValue builtIn="false" value="EXCEP_SHL"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1067496657" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.408142471" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base.937944582"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.base.1646239536" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base.1553656261"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.base.13118765" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.base.1195679022">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.97914800" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="whais.null.1572593131" name="whais"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="x86_32 debug(with tests)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="Release x86_64(with tests)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="x86_32 (no tests)"/>
+		<configuration configurationName="x_86_64 with tests">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="Release_x86_32">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="x85_32 debug (with tests)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="x86_64 debug (with tests)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="Release x86_64">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="x86_64 debug (no tests)"/>
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="x86_32_debug(no_test)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+		<configuration configurationName="Release x86_32 (with tests)">
+			<resource resourceType="PROJECT" workspacePath="/whais"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147;cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.;cdt.managedbuild.tool.gnu.cpp.compiler.base.332778568;cdt.managedbuild.tool.gnu.cpp.compiler.input.1745780176">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.2120456032;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.2120456032.;cdt.managedbuild.tool.gnu.cpp.compiler.base.452789059;cdt.managedbuild.tool.gnu.cpp.compiler.input.1187715022">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366;cdt.managedbuild.toolchain.gnu.base.1997578366.1096450506;cdt.managedbuild.tool.gnu.cpp.compiler.base.625050028;cdt.managedbuild.tool.gnu.cpp.compiler.input.1599193409">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.;cdt.managedbuild.tool.gnu.c.compiler.base.348959476;cdt.managedbuild.tool.gnu.c.compiler.input.1719738387">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366;cdt.managedbuild.toolchain.gnu.base.1997578366.1096450506;cdt.managedbuild.tool.gnu.c.compiler.base.1345298361;cdt.managedbuild.tool.gnu.c.compiler.input.771336538">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828.;cdt.managedbuild.tool.gnu.c.compiler.base.302949541;cdt.managedbuild.tool.gnu.c.compiler.input.2135102872">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.2120456032;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.2120456032.;cdt.managedbuild.tool.gnu.c.compiler.base.846931159;cdt.managedbuild.tool.gnu.c.compiler.input.969585498">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292.;cdt.managedbuild.tool.gnu.cpp.compiler.base.764291378;cdt.managedbuild.tool.gnu.cpp.compiler.input.1533481145">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.;cdt.managedbuild.tool.gnu.cpp.compiler.base.948085983;cdt.managedbuild.tool.gnu.cpp.compiler.input.589217174">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1291454165;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1291454165.;cdt.managedbuild.tool.gnu.cpp.compiler.base.635437604;cdt.managedbuild.tool.gnu.cpp.compiler.input.1097118591">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.;cdt.managedbuild.tool.gnu.cpp.compiler.base.1377513523;cdt.managedbuild.tool.gnu.cpp.compiler.input.341167170">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1291454165;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1291454165.;cdt.managedbuild.tool.gnu.c.compiler.base.1912403531;cdt.managedbuild.tool.gnu.c.compiler.input.1467747331">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147;cdt.managedbuild.toolchain.gnu.base.1997578366.2075318147.;cdt.managedbuild.tool.gnu.c.compiler.base.936808356;cdt.managedbuild.tool.gnu.c.compiler.input.798327721">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1846455555.54792828.;cdt.managedbuild.tool.gnu.cpp.compiler.base.299780004;cdt.managedbuild.tool.gnu.cpp.compiler.input.725163172">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.;cdt.managedbuild.tool.gnu.c.compiler.base.1418944217;cdt.managedbuild.tool.gnu.c.compiler.input.223753176">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292;cdt.managedbuild.toolchain.gnu.base.1997578366.1245943166.1339279753.1117950292.;cdt.managedbuild.tool.gnu.c.compiler.base.504256641;cdt.managedbuild.tool.gnu.c.compiler.input.1314277867">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>
