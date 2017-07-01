@@ -43,9 +43,8 @@ whs_init()
   WORD wVersionRequested;
   WSADATA wsaData;
 
-  assert(_inited == FALSE);
   if (_inited)
-    return FALSE;
+    return TRUE;
 
   wVersionRequested = MAKEWORD(2, 2);
 
@@ -53,10 +52,10 @@ whs_init()
     return FALSE;
 
   if ((LOBYTE( wsaData.wVersion) != 2) || (HIBYTE( wsaData.wVersion) != 2))
-    {
-        WSACleanup();
-        return FALSE;
-    }
+  {
+    WSACleanup();
+    return FALSE;
+  }
 
   _inited = TRUE;
   return TRUE;

@@ -33,76 +33,50 @@ namespace whais {
 
 
 
-Socket::Socket(const char* const   serverHost,
-                const char* const   service)
-  : mSocket(INVALID_SOCKET),
-    mOwned(false)
+Socket::Socket(const char* const serverHost, const char* const service)
+    : mSocket(INVALID_SOCKET)
 {
   const uint32_t e = whs_create_client(serverHost, service, &mSocket);
   if (e != WOP_OK)
-    {
-      throw SocketException(_EXTRA(e),
-                             "Could not connect to '%s:%s'.",
-                             serverHost,
-                             service);
-    }
+    throw SocketException(_EXTRA(e), "Could not connect to '%s:%s'.", serverHost, service);
 
   assert(mSocket != INVALID_SOCKET);
-
-  mOwned = true;
 }
 
 
-Socket::Socket(const char* const   serverHost,
-                const uint16_t      port)
-  : mSocket(INVALID_SOCKET),
-    mOwned(false)
+Socket::Socket(const char* const serverHost, const uint16_t port)
+    : mSocket(INVALID_SOCKET)
 {
   uint32_t e;
-  char     service[16];
+  char service[16];
 
   sprintf(service, "%u", port);
 
   e = whs_create_client(serverHost, service, &mSocket);
   if (e != WOP_OK)
-    {
-      throw SocketException(_EXTRA(e),
-                             "Could not connect to '%s:%u'.",
-                             serverHost,
-                             _SC(uint_t, port));
-    }
-
+  {
+    throw SocketException(_EXTRA(e),
+                          "Could not connect to '%s:%u'.",
+                          serverHost,
+                          _SC(uint_t, port));
+  }
   assert(mSocket != INVALID_SOCKET);
-
-  mOwned = true;
 }
 
 
-Socket::Socket(const char* const     localAdress,
-                const char* const     service,
-                const uint_t          backLog)
-  : mSocket(INVALID_SOCKET),
-    mOwned(false)
+Socket::Socket(const char* const localAdress, const char* const service, const uint_t backLog)
+    : mSocket(INVALID_SOCKET)
 {
   uint32_t e = whs_create_server(localAdress, service, backLog, &mSocket);
   if (e != WOP_OK)
-    {
-      throw SocketException(_EXTRA(e),
-                             "Could not start listen at '%s@%s'.",
-                             localAdress,
-                             service);
-    }
+    throw SocketException(_EXTRA(e), "Could not start listen at '%s@%s'.", localAdress, service);
 
   assert(mSocket != INVALID_SOCKET);
-  mOwned = true;
 }
 
 
-Socket::Socket(const char* const   localAdress,
-                const uint16_t      port,
-                const uint_t        backLog)
-  : mSocket(INVALID_SOCKET),
-    mOwned(false)
+Socket::Socket(const char* const localAdress, const uint16_t port, const uint_t backLog)
+    : mSocket(INVALID_SOCKET)
 {
   char   service[16];
 
@@ -118,48 +92,38 @@ Socket::Socket(const char* const   localAdress,
     }
 
   assert(mSocket != INVALID_SOCKET);
-  mOwned = true;
 }
 
 
 Socket::Socket(const WH_SOCKET sd)
-  : mSocket(sd),
-    mOwned(sd != INVALID_SOCKET)
+    : mSocket(sd)
 {
 }
 
-
-Socket::Socket(const Socket& src)
-  : mSocket(src.mSocket),
-    mOwned(src.mOwned)
+Socket::Socket(Socket&& src)
+    : mSocket(src.mSocket)
 {
-  _CC(bool&, src.mOwned) = false;
+  src.mSocket = INVALID_SOCKET;
 }
-
 
 Socket::~Socket()
 {
-  if (mOwned)
-    {
-      assert(mSocket != INVALID_SOCKET);
-      whs_close(mSocket);
-    }
+  if (mSocket != INVALID_SOCKET)
+    whs_close(mSocket);
 }
 
-
 Socket&
-Socket::operator= (const Socket& src)
+Socket::operator=(Socket&& src)
 {
   if (this != &src)
-    {
-      if (mOwned)
-        whs_close(mSocket);
+  {
+    if (mSocket != INVALID_SOCKET)
+      whs_close(mSocket);
 
-      mSocket = src.mSocket;
-      mOwned  = src.mOwned;
+    mSocket = src.mSocket;
+    src.mSocket = INVALID_SOCKET;
+  }
 
-      _CC(bool&, src.mOwned) = false;
-    }
   return *this;
 }
 
@@ -167,15 +131,11 @@ Socket::operator= (const Socket& src)
 Socket
 Socket::Accept()
 {
-  WH_SOCKET      client = INVALID_SOCKET;
-  const uint32_t e      = whs_accept(mSocket, &client);
+  WH_SOCKET client = INVALID_SOCKET;
+  const uint32_t e = whs_accept(mSocket, &client);
 
-  if (e != WOP_OK )
-    {
-      throw SocketException(_EXTRA(e),
-                             "Socket(%d) failed to accept connection.",
-                             mSocket);
-    }
+  if (e != WOP_OK)
+    throw SocketException(_EXTRA(e), "Socket(%d) failed to accept connection.", mSocket);
 
   assert(client != INVALID_SOCKET);
 
@@ -186,17 +146,13 @@ Socket::Accept()
 uint_t
 Socket::Read(uint8_t* const buffer, const uint_t maxCount)
 {
-  uint_t         result = maxCount;
-  const uint32_t e      = whs_read(mSocket, buffer, &result);
+  uint_t result = maxCount;
+  const uint32_t e = whs_read(mSocket, buffer, &result);
 
   assert(mSocket != INVALID_SOCKET);
 
   if (e != WOP_OK)
-    {
-      throw SocketException(_EXTRA(e),
-                             "Failed to read from socket(%d).",
-                             mSocket);
-    }
+    throw SocketException(_EXTRA(e), "Failed to read from socket(%d).", mSocket);
 
   return result;
 }
@@ -210,27 +166,18 @@ Socket::Write(const uint8_t* const buffer, const uint_t count)
   assert(mSocket != INVALID_SOCKET);
 
   if (e != WOP_OK)
-    {
-      throw SocketException(_EXTRA(e),
-                             "Failed to write on socket(%d).",
-                             mSocket);
-    }
-
+    throw SocketException(_EXTRA(e), "Failed to write on socket(%d).", mSocket);
 }
 
 
 void
 Socket::Close()
 {
-  if (! mOwned)
+  if (mSocket == INVALID_SOCKET)
     return;
 
-  assert(mSocket != INVALID_SOCKET);
-
   whs_close(mSocket);
-
   mSocket = INVALID_SOCKET;
-  mOwned  = false;
 }
 
 } //namespace whais

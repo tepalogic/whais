@@ -35,13 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool_t
 whs_init()
 {
-  static bool_t _inited = FALSE;
-
-  assert(_inited == FALSE);
-  if (_inited)
-    return FALSE;
-
-  _inited = TRUE;
   return TRUE;
 }
 

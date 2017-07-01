@@ -59,12 +59,11 @@ public:
 
   //Utility constructors
   Socket(const WH_SOCKET sd);
-  Socket(const Socket& src);
+  Socket(Socket&& src);
 
-  Socket& operator= (const Socket& src);
+  Socket& operator= (Socket&& src);
 
   ~Socket();
-
 
   Socket  Accept();
   uint_t  Read(uint8_t* const buffer, const uint_t maxCount);
@@ -73,7 +72,6 @@ public:
 
 private:
   WH_SOCKET   mSocket;
-  bool        mOwned;
 
   struct CUSTOM_SHL  SocketInitialiser
   {

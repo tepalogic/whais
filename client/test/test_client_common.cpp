@@ -98,6 +98,12 @@ tc_settup_connection(int              argc,
   cout << "Frame size: " << frameSize << endl;
   cout << "Connecting ... ";
 
+  if ( ! whs_init())
+  {
+    cout << "Failed to initialize the network subsystem!\n";
+    return false;
+  }
+
   status = WConnect(host, port, database, password, userid, frameSize, pHnd);
   if (status != WCS_OK)
     {

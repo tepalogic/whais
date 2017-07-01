@@ -72,7 +72,7 @@ public:
       if ( !user.mEndConnection)
         continue;
 
-      user.mSocket = socket;
+      user.mSocket = std::move(socket);
       user.mEndConnection = false;
       user.mLastReqTick = 0;
       if (user.mThread.Run(task, &user))
