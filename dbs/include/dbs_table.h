@@ -213,9 +213,9 @@ public:
                             const bool        skipThreadSafety = false) = 0;
 
   virtual void Sort(const FIELD_INDEX   field,
-                    const ROW_INDEX     from,
-                    const ROW_INDEX     to,
-                    const bool          reverse) = 0;
+                      const ROW_INDEX     from,
+                      const ROW_INDEX     to,
+                      const bool         reverse) = 0;
 
   virtual DArray MatchRows(const DBool&        min,
                            const DBool&        max,

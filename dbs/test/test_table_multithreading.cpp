@@ -53,7 +53,7 @@ test_table_sort(void *)
                                                        ? "f_int"
                                                        : "f_text");
 
-        refTable->Sort(f, 0, refTable->AllocatedRows(), (i & 1) == 0);
+        refTable->Sort(f, 0, refTable->AllocatedRows() - 1, (i & 1) == 0);
 
         wh_sleep(3);
       }

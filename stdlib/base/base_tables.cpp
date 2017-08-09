@@ -142,7 +142,7 @@ public:
     extract_fields_ids(fields);
 
     mTable.LockTable();
-    mRowsPermutation.reserve(mTable.AllocatedRows());
+    mRowsPermutation.resize(mTable.AllocatedRows());
     for (ROW_INDEX i = 0; i < mRowsPermutation.size(); ++i)
       mRowsPermutation[i] = i;
 
@@ -281,6 +281,9 @@ public:
       }
     }
   }
+
+  TableSortContainer(const TableSortContainer&) = delete;
+  TableSortContainer& operator=(const TableSortContainer&) = delete;
 
   const Value operator[] (const int64_t position) const { return Value(*this, position); }
   void Exchange( const int64_t pos1, const int64_t pos2)

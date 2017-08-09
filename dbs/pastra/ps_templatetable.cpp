@@ -2023,10 +2023,10 @@ private:
 
 
 void
-PrototypeTable::Sort(const FIELD_INDEX     field,
-                     const ROW_INDEX       fromRow,
-                     const ROW_INDEX       toRow,
-                     const bool            reverse)
+PrototypeTable::Sort(const FIELD_INDEX field,
+                        const ROW_INDEX fromRow,
+                        const ROW_INDEX toRow,
+                        const bool reverse)
 {
   const DBSFieldDescriptor fd = DescribeField(field);
 
@@ -2044,119 +2044,120 @@ PrototypeTable::Sort(const FIELD_INDEX     field,
   if (from > to)
     throw DBSException(_EXTRA(DBSException::INVALID_PARAMETERS));
 
-  else if (from == to)
-    return;
+  else
+    if (from == to)
+      return;
 
   switch (fd.type)
   {
   case T_BOOL:
   {
     SortTableContainer<DBool> temp( *this, field);
-    quick_sort<DBool, SortTableContainer<DBool> >(from, to, reverse, temp);
+    quick_sort<DBool, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_CHAR:
   {
     SortTableContainer<DChar> temp( *this, field);
-    quick_sort<DChar, SortTableContainer<DChar> >(from, to, reverse, temp);
+    quick_sort<DChar, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_DATE:
   {
     SortTableContainer<DDate> temp( *this, field);
-    quick_sort<DDate, SortTableContainer<DDate> >(from, to, reverse, temp);
+    quick_sort<DDate, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_DATETIME:
   {
     SortTableContainer<DDateTime> temp( *this, field);
-    quick_sort<DDateTime, SortTableContainer<DDateTime> >(from, to, reverse, temp);
+    quick_sort<DDateTime, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_HIRESTIME:
   {
     SortTableContainer<DHiresTime> temp( *this, field);
-    quick_sort<DHiresTime, SortTableContainer<DHiresTime> >(from, to, reverse, temp);
+    quick_sort<DHiresTime, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_UINT8:
   {
     SortTableContainer<DUInt8> temp( *this, field);
-    quick_sort<DUInt8, SortTableContainer<DUInt8> >(from, to, reverse, temp);
+    quick_sort<DUInt8, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_UINT16:
   {
     SortTableContainer<DUInt16> temp( *this, field);
-    quick_sort<DUInt16, SortTableContainer<DUInt16> >(from, to, reverse, temp);
+    quick_sort<DUInt16, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_UINT32:
   {
     SortTableContainer<DUInt32> temp( *this, field);
-    quick_sort<DUInt32, SortTableContainer<DUInt32> >(from, to, reverse, temp);
+    quick_sort<DUInt32, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_UINT64:
   {
     SortTableContainer<DUInt64> temp( *this, field);
-    quick_sort<DUInt64, SortTableContainer<DUInt64> >(from, to, reverse, temp);
+    quick_sort<DUInt64, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_REAL:
   {
     SortTableContainer<DReal> temp( *this, field);
-    quick_sort<DReal, SortTableContainer<DReal> >(from, to, reverse, temp);
+    quick_sort<DReal, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_RICHREAL:
   {
     SortTableContainer<DRichReal> temp( *this, field);
-    quick_sort<DRichReal, SortTableContainer<DRichReal> >(from, to, reverse, temp);
+    quick_sort<DRichReal, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_INT8:
   {
     SortTableContainer<DInt8> temp( *this, field);
-    quick_sort<DInt8, SortTableContainer<DInt8> >(from, to, reverse, temp);
+    quick_sort<DInt8, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_INT16:
   {
     SortTableContainer<DInt16> temp( *this, field);
-    quick_sort<DInt16, SortTableContainer<DInt16> >(from, to, reverse, temp);
+    quick_sort<DInt16, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_INT32:
   {
     SortTableContainer<DInt32> temp( *this, field);
-    quick_sort<DInt32, SortTableContainer<DInt32> >(from, to, reverse, temp);
+    quick_sort<DInt32, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 
   case T_INT64:
   {
     SortTableContainer<DInt64> temp( *this, field);
-    quick_sort<DInt64, SortTableContainer<DInt64> >(from, to, reverse, temp);
+    quick_sort<DInt64, decltype(temp)>(from, to, reverse, temp);
   }
     break;
   case T_TEXT:
   {
     SortTableContainer<DText> temp( *this, field);
-    quick_sort<DText, SortTableContainer<DText> >(from, to, reverse, temp);
+    quick_sort<DText, decltype(temp)>(from, to, reverse, temp);
   }
     break;
 

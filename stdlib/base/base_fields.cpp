@@ -713,8 +713,7 @@ compute_field_average( SessionStack& stack, ISession&)
 static WLIB_STATUS
 field_sort_table( SessionStack& stack, ISession&)
 {
-  DBool result;
-  DBool reverseSort;
+  DBool result, reverseSort;
 
   IOperand& opField = stack[stack.Size() - 2].Operand();
   stack[stack.Size() - 1].Operand().GetValue(reverseSort);
@@ -724,15 +723,15 @@ field_sort_table( SessionStack& stack, ISession&)
     const FIELD_INDEX field = opField.GetField();
     ITable& table = opField.GetTable();
 
-    table.Sort(field,
-               0,
-               table.AllocatedRows() - 1,
-               reverseSort.IsNull() ? false : reverseSort.mValue);
-    result = DBool(true);
+    const auto rowsCount = table.AllocatedRows();
+    if (rowsCount != 0)
+    {
+      table.Sort(field, 0, rowsCount - 1, reverseSort == DBool(true));
+      result = DBool(true);
+    }
   }
 
   stack.Pop(1);
-
   return WOP_OK;
 }
 
