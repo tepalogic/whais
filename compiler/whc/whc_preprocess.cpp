@@ -316,9 +316,9 @@ get_tag_value(const string& line, const char* const tag)
 
 static void
 process_line_tags(const string&                     file,
-                   const uint_t                      lineIndex,
-                   vector<ReplacementTag>&           tagPairs,
-                   string&                           line)
+                  const uint_t                      lineIndex,
+                  vector<ReplacementTag>&           tagPairs,
+                  string&                           line)
 {
   size_t inoutOff = 0, lastOff = 0;
 

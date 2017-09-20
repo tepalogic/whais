@@ -469,7 +469,7 @@ finalize_for_stmt(struct ParserState* const parser)
       struct WArray* const iterators = stmt_query_loop_iterators_stack(stmt);
       wh_array_resize(iterators, wh_array_count(iterators) -1 );
     }
-
+  
   wh_array_resize(loopsStack, loopId);
 }
 

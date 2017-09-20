@@ -407,6 +407,7 @@ wod_dump_code(const uint8_t  *code,
               ostream&        output,
               const char*     prefix)
 {
+  static char conv[] = "0123456789ABCDEF";
   uint_t currPos = 0;
 
   while (currPos < codeSize)
@@ -426,6 +427,14 @@ wod_dump_code(const uint8_t  *code,
 
     instrSize += wod_decode_table[opcode](code + instrSize, operand1, operand2);
 
+    string bytes;
+    for (auto i = 0u; i < instrSize; ++i)
+    {
+      bytes += conv[(code[i] >> 4) & 0x0F];
+      bytes += conv[code[i] & 0x0F];
+    }
+
+    output << setw(16) << setfill(' ') << bytes;
     output << setw(10) << setfill(' ') << wod_str_table[opcode];
     output << setw(0) << operand1;
 

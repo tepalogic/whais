@@ -27,7 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "warray.h"
 
 struct WArray*
-wh_array_init_ex(struct WArray* const outArray, size_t itemSize, uint_t increment, uint_t alignment)
+wh_array_init_ex(struct WArray* const outArray,
+                   size_t itemSize,
+                   uint_t increment,
+                   uint_t alignment)
 {
   /* Check if the reuired alignment is supported. */
   if ((alignment > sizeof(uint64_t)) || (alignment == 0))

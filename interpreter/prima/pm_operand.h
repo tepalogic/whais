@@ -877,12 +877,13 @@ public:
   }
 
   TextOperand(const TextOperand& source)
-    : TextOperand(**source.mValue)
+    : mValue(SharedTextStore::Instance().Alloc())
   {
+    *mValue = *source.mValue;
   }
 
   TextOperand(TextOperand&& source)
-      : mValue(source.mValue)
+    : mValue(source.mValue)
   {
     source.mValue = nullptr;
   }
@@ -1019,16 +1020,32 @@ class BaseArrayElOperand : public BaseOperand
 protected:
   BaseArrayElOperand(std::shared_ptr<DArray>* array, const uint64_t index)
     : mIndex(index),
-      mArray(array)
-  {}
+      mArray(SharedArrayStore::Instance().Alloc())
+  {
+    *mArray = *array;
+  }
 
   BaseArrayElOperand(const BaseArrayElOperand& source)
     : mIndex(source.mIndex),
+      mArray(SharedArrayStore::Instance().Alloc())
+  {
+    *mArray = *source.mArray;
+  }
+
+  BaseArrayElOperand(BaseArrayElOperand&& source)
+    : mIndex(source.mIndex),
       mArray(source.mArray)
-  {}
+  {
+    source.mArray = nullptr;
+  }
+
+  ~BaseArrayElOperand()
+  {
+    if (mArray)
+      SharedArrayStore::Instance().Free(mArray);
+  }
 
   BaseArrayElOperand& operator= (const BaseArrayElOperand& source) = delete;
-  ~BaseArrayElOperand() = default;
 
   template <typename DBS_T> void Get(DBS_T& outValue) const
   {
@@ -1051,8 +1068,8 @@ protected:
   virtual uint64_t IteratorOffset() override;
 
 private:
-  const uint64_t                 mIndex;
-  std::shared_ptr<DArray>* const mArray;
+  const uint64_t          mIndex;
+  std::shared_ptr<DArray>* mArray;
 };
 
 
