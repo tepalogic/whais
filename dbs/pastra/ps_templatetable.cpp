@@ -1146,9 +1146,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   {
     assert(s->Utf8CountU() < _SC(uint_t, Serializer::Size(T_TEXT, false)));
 
-    fieldValueSize[sizeof(uint64_t) - 1] = s->Utf8CountU();
-    fieldValueSize[sizeof(uint64_t) - 1] |= 0x80;
-
+    store_le_int64((s->Utf8CountU() | 0x80) << 56, fieldValueSize);
     s->ReadUtf8U(0, s->Utf8CountU(), rowData + desc.RowDataOff());
   }
   else
@@ -1269,9 +1267,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   {
     assert(s->RawSize() < _SC(uint_t, Serializer::Size(T_HIRESTIME, true)));
 
-    fieldValueSize[sizeof(uint64_t) - 1] = s->RawSize();
-    fieldValueSize[sizeof(uint64_t) - 1] |= 0x80;
-
+    store_le_int64((s->RawSize() | 0x80) << 56, fieldValueSize);
     s->RawRead(0, s->RawSize(), rowData + desc.RowDataOff());
   }
   else

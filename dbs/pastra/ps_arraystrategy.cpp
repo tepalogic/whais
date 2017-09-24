@@ -85,7 +85,9 @@ IArrayStrategy::Get(const uint64_t index, uint8_t* const dest)
 }
 
 shared_ptr<IArrayStrategy>
-IArrayStrategy::Set(const DBS_BASIC_TYPE type, const uint8_t* const rawValue, const uint64_t index)
+IArrayStrategy::Set(const DBS_BASIC_TYPE type,
+                       const uint8_t* const rawValue,
+                       const uint64_t index)
 {
   LockRAII<Lock> _l(mLock);
 

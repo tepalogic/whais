@@ -2530,23 +2530,22 @@ protected:
     ITable& table = mTableRef->GetTable();
 
     if (table.AllocatedRows() <= mRow)
-      {
-        outValue = DBS_T();
-        return ;
-      }
+    {
+      outValue = DBS_T();
+      return;
+    }
 
     DArray array;
     table.Get(mRow, mField, array);
-
     if (array.Count() <= mIndex)
-      {
-        outValue = DBS_T();
-        return ;
-      }
+    {
+      outValue = DBS_T();
+      return;
+    }
 
     array.Get(mIndex, outValue);
 
-    assert(! outValue.IsNull());
+    assert( !outValue.IsNull());
   }
 
   template <typename DBS_T> void Set(const DBS_T& value)
