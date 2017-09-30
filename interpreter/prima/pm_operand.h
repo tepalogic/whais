@@ -877,9 +877,8 @@ public:
   }
 
   TextOperand(const TextOperand& source)
-    : mValue(SharedTextStore::Instance().Alloc())
+    : TextOperand(**source.mValue)
   {
-    *mValue = *source.mValue;
   }
 
   TextOperand(TextOperand&& source)

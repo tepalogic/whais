@@ -2814,7 +2814,6 @@ bool
 CharTextElOperand::CustomCopyIncomplete(void* const dest)
 {
   _placement_new(dest, *this);
-
   return false;
 }
 

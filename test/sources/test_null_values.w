@@ -1699,42 +1699,50 @@ ENDPROC
 
 
 #TEST: null_test_2_2
-#Call this function twice in and make sure it returns the same result.
+#Call this function twice in and make sure it returns the same TRUE result.
 PROCEDURE null_test_2_2 ()
-RETURN ARRAY
+RETURN BOOL
 DO
     VAR result INT8 ARRAY;
 
     write_log ("Start of null_test_2_2");
     IF (result != NULL) DO
         write_log ("... FAIL: 'result' is not null by default.");
+	RETURN FALSE;
     END
     
     IF (result[0] != NULL) DO
         write_log ("... FAIL: 'result[0]' is not null.");
+	RETURN FALSE;
     END
 
     result[0] = -10;
 
     IF (result == NULL) DO
         write_log ("... FAIL: 'result' is null.");
+	RETURN FALSE;
     END
     
     IF (result[0] == NULL) DO
         write_log ("... FAIL: 'result[0]' is null.");
+	RETURN FALSE;
     END
 
     IF (result[1] != NULL) DO
         write_log ("... FAIL: 'result[1]' is not null.");
+	RETURN FALSE;
     END
     
     IF (result[2] != NULL) DO
         write_log ("... FAIL: 'result[2]' is not null.");
+	RETURN FALSE;
     END
+
+    array_pushback(result, 20);
 
     write_log ("End of null_test_2_2");
 
-    RETURN result;
+    RETURN TRUE;
 ENDPROC
 
 
@@ -2174,7 +2182,7 @@ ENDPROC
 
 
 #TEST: null_test_4
-#This function should return true
+#This function should return true twice when called multiple times.
 PROCEDURE null_test_4 () RETURN BOOL
 DO
     VAR t TEXT;
@@ -2217,6 +2225,52 @@ DO
 
     RETURN TRUE;
 ENDPROC
+
+#TEST: null_test_4_1a
+#This function should return the same result when called multiple times.
+PROCEDURE null_test_4_1a () RETURN BOOL
+DO
+    VAR t TEXT;
+
+    write_log ("Started test null_test_4_1a");
+
+    IF (t != NULL) DO
+        write_log ("... FAIL: The text is not null: " + t);
+        RETURN FALSE;    
+    END
+
+    IF (t[0] != NULL) DO
+        write_log ("... FAIL: The first char of text is not null: " + t);
+        RETURN FALSE;
+    END
+
+    t += "Te";
+
+    IF (t == NULL) DO
+        write_log ("... FAIL: The text is null.");
+        RETURN FALSE;
+    END
+    
+    IF (t[0] != 'T') DO
+        write_log ("... FAIL: The first char of text is not expcted");
+        RETURN FALSE;
+    END
+    
+    IF (t[1] != 'e') DO
+        write_log ("... FAIL: The second char of text is not expected: " + t);
+        RETURN FALSE;
+    END
+
+    IF (t[2] != NULL) DO
+        write_log ("... FAIL: The third char of text is not null: " + t);
+        RETURN FALSE;
+    END
+
+    write_log ("End of null_test_4");
+
+    RETURN TRUE;
+ENDPROC
+
 
 #TEST: null_test_4_1
 #This function should return true
@@ -2284,7 +2338,7 @@ DO
 ENDPROC
 
 #TEST: null_test_5_1
-#This function should return a null table with the correct signature.
+#This function should return a null array with the correct signature.
 PROCEDURE null_test_5_1 () RETURN INT32 ARRAY
 DO
     write_log ("Started test null_test_5_1");
@@ -2294,7 +2348,7 @@ DO
 ENDPROC
 
 #TEST: null_test_5_2
-#This function should return a null table with the correct signature.
+#This function should return a null text with the correct signature.
 PROCEDURE null_test_5_2 () RETURN TEXT
 DO
     write_log ("Started test null_test_5_2");
@@ -2304,7 +2358,7 @@ DO
 ENDPROC
 
 #TEST: null_test_5_3
-#This function should return a null table with the correct signature.
+#This function should return a null bool with the correct signature.
 PROCEDURE null_test_5_3 () RETURN BOOL
 DO
     write_log ("Started test null_test_5_3");
