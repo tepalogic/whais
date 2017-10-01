@@ -2032,7 +2032,8 @@ translate_leaf_exp(struct ParserState* const   parser,
 
   if (exp == NULL)
   {
-    if (encode_opcode(instrs, W_LDNULL) == NULL)
+    if ((encode_opcode(instrs, W_LDNULL) == NULL)
+        || wh_ostream_wint8(instrs, 1) == NULL)
     {
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
@@ -2593,14 +2594,11 @@ translate_call_exp(struct ParserState* const   parser,
                               exp->firstTree->val.u_id.length),
                 stmt_get_param_count(proc),
                 argCount);
-
-    for (; argCount < stmt_get_param_count(proc); ++argCount)
+    if (encode_opcode(instrs, W_LDNULL) == NULL
+        || wh_ostream_wint8(instrs, stmt_get_param_count(proc) - argCount) == NULL)
     {
-      if (encode_opcode(instrs, W_LDNULL) == NULL)
-      {
-        log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
-        return sgResultUnk;
-      }
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
     }
   }
   free_sem_value(exp->firstTree);

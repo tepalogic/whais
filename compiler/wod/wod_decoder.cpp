@@ -102,9 +102,11 @@ wod_dec_w_na(const uint8_t* args, char* const op1, char* const op2)
 static uint_t
 wod_dec_w_ldnull(const uint8_t* args, char* const op1, char* const op2)
 {
-  op1[0] = op2[0] = 0;
+  int8_str_conv(op1, args[0]);
+  strcat(op1, "h");
+  op2[0] = 0;
 
-  return 0;
+  return 1;
 }
 
 static uint_t

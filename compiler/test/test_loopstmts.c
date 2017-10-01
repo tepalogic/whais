@@ -394,7 +394,7 @@ check_procedure_3(struct ParserState *state, char * proc_name)
       return FALSE;
     }
 
-  if (decode_opcode(code + for_end_pos) != W_LDNULL)
+  if ((decode_opcode(code + for_end_pos) != W_LDNULL) || (code[for_end_pos + 1] != 1))
     return FALSE;
 
   return TRUE;
@@ -451,7 +451,8 @@ check_procedure_4(struct ParserState *state, char * proc_name)
     }
 
   if ((decode_opcode(code + for_end_pos) != W_CTS)
-      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL))
+      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL)
+      || (code[for_end_pos + 2] != 1))
     {
       return FALSE;
     }
@@ -509,11 +510,13 @@ check_procedure_5(struct ParserState *state, char * proc_name)
       return FALSE;
     }
 
+
   if ((decode_opcode(code + for_end_pos) != W_CTS)
-      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL))
-    {
-      return FALSE;
-    }
+      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL)
+      || (code[for_end_pos + 2] != 1))
+  {
+    return FALSE;
+  }
 
   return TRUE;
 }

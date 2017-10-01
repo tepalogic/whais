@@ -95,18 +95,15 @@ test_op_ldnull(Session& session)
 {
   std::cout << "Testing ldnull...\n";
 
-
-  const uint32_t procId = session.FindProcedure(
-                                              _RC(const uint8_t*, procName),
-                                              sizeof procName - 1
-                                                );
-  const Procedure& proc   = session.GetProcedure(procId);
+  const uint32_t procId = session.FindProcedure(_RC(const uint8_t*, procName), sizeof procName - 1);
+  const Procedure& proc = session.GetProcedure(procId);
   uint8_t* testCode = _CC(uint8_t*, proc.mProcMgr->Code(proc, nullptr));
 
   SessionStack stack;
 
   uint_t opSize = w_encode_opcode(W_LDNULL, testCode);
-  w_encode_opcode(W_RET, testCode + opSize);
+  testCode[opSize] = 1;
+  w_encode_opcode(W_RET, testCode + opSize + 1);
   session.ExecuteProcedure(procName, stack);
 
   if (stack.Size() != 1)

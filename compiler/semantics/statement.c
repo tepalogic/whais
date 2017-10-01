@@ -498,8 +498,8 @@ add_constant_text(struct Statement* const   stmt,
                   const uint_t              testSize)
 {
   struct WOutputStream *stream = stmt->type == STMT_GLOBAL
-                                 ? &stmt->spec.glb.constsArea
-                                 : &stmt->parent->spec.glb.constsArea;
+                                   ? &stmt->spec.glb.constsArea
+                                   : &stmt->parent->spec.glb.constsArea;
 
   const uint8_t *streamBuff  = wh_ostream_data(stream);
   const uint_t   streamSize  = wh_ostream_size(stream);
