@@ -65,6 +65,7 @@ enum EXP_OPERATION
   OP_FIELD,
 
   OP_ATTR,
+  OP_ATTR_AUTO,
 
   OP_SADD,
   OP_SSUB,

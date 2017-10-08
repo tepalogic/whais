@@ -42,7 +42,6 @@ struct ExpResultType
   uint_t                     type;
 };
 
-
 static const struct ExpResultType sgResultUnk = { NULL, T_UNKNOWN };
 
 
@@ -1309,6 +1308,102 @@ are_compatible_tables(struct ParserState* const           parser,
     field1 = field1->extra;
   }
   return TRUE;
+}
+
+static struct ExpResultType
+translate_auto_store_exp (struct ParserState* const           parser,
+                          struct Statement* const             stmt,
+                          struct SemId* const                 id,
+                          struct SemExpression* const         tree)
+{
+  assert(stmt->type == STMT_PROC);
+
+  struct WOutputStream* const instrs = stmt_query_instrs(stmt);
+
+  const uint8_t value_8 = ~0;
+  const uint16_t value_16 = ~0;
+  const uint32_t localId = stmt->localsUsed - 1; /* Don't count the return value! */
+
+  if (localId <= value_8)
+  {
+    if (encode_opcode(instrs, W_LDLO8) == NULL
+        || wh_ostream_wint8(instrs, localId & 0xFF) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+  }
+  else if (localId <= value_16)
+  {
+    if (encode_opcode(instrs, W_LDLO16) == NULL
+        || wh_ostream_wint16(instrs, localId & 0xFFFF) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+  }
+  else
+  {
+    if (encode_opcode(instrs, W_LDLO32) == NULL
+        || wh_ostream_wint32(instrs, localId) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+  }
+
+  const struct ExpResultType expType = translate_tree_exp(parser, stmt, tree);
+  if (expType.type == T_UNKNOWN)
+    return expType; /* An error was encountered! The error condition was alreadu signaled. */
+
+  struct DeclaredVar var = {0, };
+  var.label = id->name;
+  var.labelLength = id->length;
+  var.declarationPos = (id->name - parser->buffer);
+  var.type = GET_TYPE(expType.type);
+  var.extra = (void*)expType.extra;
+  struct DeclaredVar* const result = stmt_add_declaration(stmt, &var, FALSE);
+  if (result == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    parser->abortError = TRUE;
+  }
+  else
+  {
+    assert(RETRIVE_ID(result->varId) == (localId + 1));
+    assert(result->extra == expType.extra);
+    assert(result->type == GET_TYPE(expType.type));
+  }
+
+  enum W_OPCODE opcode = W_NA;
+  if (GET_TYPE(expType.type) < T_UNDETERMINED)
+    opcode = store_op[GET_TYPE(expType.type)][GET_TYPE(expType.type)];
+
+  else if (IS_TABLE(expType.type))
+    opcode = W_STTA;
+
+  else if (IS_FIELD(expType.type))
+    opcode = W_STF;
+
+  else if (IS_ARRAY(expType.type))
+    opcode = W_STA;
+
+  else if (GET_TYPE(expType.type) == T_UNDETERMINED)
+    opcode = W_STUD;
+
+  if (opcode == W_NA)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_INT_ERR);
+    return sgResultUnk;
+  }
+
+  if (encode_opcode(instrs, opcode) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    return sgResultUnk;
+  }
+
+  return expType;
 }
 
 static struct ExpResultType
@@ -2797,7 +2892,17 @@ translate_tree_exp(struct ParserState* const   parser,
   assert(parser->pCurrentStmt == stmt);
   assert(parser->pCurrentStmt->type == STMT_PROC);
 
-  if (is_leaf_exp( tree))
+  if (tree->opcode == OP_ATTR_AUTO)
+  {
+    assert (tree->firstTree->val_type == VAL_ID);
+    assert (tree->secondTree->val_type == VAL_EXP_LINK);
+
+    return translate_auto_store_exp(parser,
+                                    stmt,
+                                    &tree->firstTree->val.u_id,
+                                    &tree->secondTree->val.u_exp);
+  }
+  else if (is_leaf_exp(tree))
     return translate_leaf_exp(parser, stmt, tree->firstTree);
 
   else if (tree->opcode == OP_CALL)
@@ -2814,9 +2919,7 @@ translate_tree_exp(struct ParserState* const   parser,
 
   assert(tree->firstTree->val_type == VAL_EXP_LINK);
 
-  opType1 = translate_tree_exp(parser,
-                                stmt,
-                                &(tree->firstTree->val.u_exp));
+  opType1 = translate_tree_exp(parser, stmt, &(tree->firstTree->val.u_exp));
   if (opType1.type == T_UNKNOWN)
   {
     assert(parser->abortError);
@@ -2890,14 +2993,16 @@ translate_exp(struct ParserState* const   parser,
   assert(exp->val_type == VAL_EXP_LINK);
   assert(stmt->type == STMT_PROC);
 
-  translate_tree_exp(parser, stmt, &(exp->val.u_exp));
+  const struct ExpResultType expType = translate_tree_exp(parser, stmt, &(exp->val.u_exp));
 
-  free_sem_value(exp);
+  exp->val_type = VAL_TYPE_SPEC;
+  exp->val.u_tspec.type = GET_TYPE(expType.type);
+  exp->val.u_tspec.extra = (void *)expType.extra;
 
   if (encode_opcode(instrs, W_CTS) == NULL)
     log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
 
-  return NULL;
+  return exp;
 }
 
 YYSTYPE

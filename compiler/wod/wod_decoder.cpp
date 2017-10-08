@@ -100,13 +100,10 @@ wod_dec_w_na(const uint8_t* args, char* const op1, char* const op2)
 }
 
 static uint_t
-wod_dec_w_ldnull(const uint8_t* args, char* const op1, char* const op2)
+wod_dec_w_no_ops(const uint8_t* args, char* const op1, char* const op2)
 {
-  int8_str_conv(op1, args[0]);
-  strcat(op1, "h");
-  op2[0] = 0;
-
-  return 1;
+  op1[0] = op2[0] = 0;
+  return 0;
 }
 
 static uint_t
@@ -315,8 +312,8 @@ wod_dec_w_ldrr(const uint8_t* args, char* const op1, char* const op2)
 }
 
 static const FDECODE_OPCODE wod_dec_w_ldt = wod_dec_w_ldi32;
-static const FDECODE_OPCODE wod_dec_w_ldbt = wod_dec_w_ldnull;
-static const FDECODE_OPCODE wod_dec_w_ldbf = wod_dec_w_ldnull;
+static const FDECODE_OPCODE wod_dec_w_ldbt = wod_dec_w_no_ops;
+static const FDECODE_OPCODE wod_dec_w_ldbf = wod_dec_w_no_ops;
 
 static uint_t
 wod_dec_w_ldlo8(const uint8_t* args, char* const op1, char* const op2)
@@ -361,30 +358,30 @@ const FDECODE_OPCODE wod_dec_w_ldgb8  = wod_dec_w_ldlo8;
 const FDECODE_OPCODE wod_dec_w_ldgb16 = wod_dec_w_ldlo16;
 const FDECODE_OPCODE wod_dec_w_ldgb32 = wod_dec_w_ldlo32;
 
-const FDECODE_OPCODE wod_dec_w_cts    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stb    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stc    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_std    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stdt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sti8   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sti16  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sti32  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sti64  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_str    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_strr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stt    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stui8  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stui16 = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stui32 = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stui64 = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stta   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stf    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_stud   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_cts    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stb    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stc    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_std    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stdt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sti8   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sti16  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sti32  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sti64  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_str    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_strr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stt    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stui8  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stui16 = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stui32 = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stui64 = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stta   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stf    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sta    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_stud   = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_inull  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_nnull  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_inull  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_nnull  = wod_dec_w_no_ops;
 
 static uint_t
 wod_dec_w_call(const uint8_t* args, char* const op1, char* const op2)
@@ -399,73 +396,73 @@ wod_dec_w_call(const uint8_t* args, char* const op1, char* const op2)
   return sizeof(uint32_t);
 }
 
-const FDECODE_OPCODE wod_dec_w_ret    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_add    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_addrr  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_addt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_and    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_andb   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_div    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_divu   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_divr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_divrr  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eq     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqb    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqc    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqd    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqdt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqrr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_eqt    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ge     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_geu    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gec    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ged    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gedt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_geht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gerr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gt     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtu    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtc    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtd    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtdt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_gtrr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_le     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_leu    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_lec    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_led    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ledt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_leht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_lerr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_lt     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltu    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltc    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltd    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltdt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ltrr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_mod    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_modu   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_mul    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_mulu   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_mulrr  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ne     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_neb    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_nec    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ned    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_nedt   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_neht   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_nerr   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_net    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_not    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_notb   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_or     = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_orb    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sub    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_subrr  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_xor    = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_xorb   = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_ret    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_add    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_addrr  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_addt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_and    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_andb   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_div    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_divu   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_divr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_divrr  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eq     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqb    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqc    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqd    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqdt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqrr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_eqt    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ge     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_geu    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gec    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ged    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gedt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_geht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gerr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gt     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtu    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtc    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtd    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtdt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_gtrr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_le     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_leu    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_lec    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_led    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ledt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_leht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_lerr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_lt     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltu    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltc    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltd    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltdt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ltrr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_mod    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_modu   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_mul    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_mulu   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_mulrr  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ne     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_neb    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_nec    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ned    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_nedt   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_neht   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_nerr   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_net    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_not    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_notb   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_or     = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_orb    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sub    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_subrr  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_xor    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_xorb   = wod_dec_w_no_ops;
 
 static uint_t
 wod_dec_w_jf(const uint8_t* args, char* const op1, char* const op2)
@@ -486,9 +483,9 @@ const FDECODE_OPCODE wod_dec_w_jt  = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jtc = wod_dec_w_jf;
 const FDECODE_OPCODE wod_dec_w_jmp = wod_dec_w_jf;
 
-const FDECODE_OPCODE wod_dec_w_indt  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_inda  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_indf  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_indt  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_inda  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_indf  = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_indta = wod_dec_w_ldlo32;
 const FDECODE_OPCODE wod_dec_w_self  = wod_dec_w_ldlo32;
 
@@ -508,44 +505,44 @@ wod_dec_w_bsync(const uint8_t* args, char* const op1, char* const op2)
 
 const FDECODE_OPCODE wod_dec_w_esync = wod_dec_w_bsync;
 
-const FDECODE_OPCODE wod_dec_w_sadd   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_saddrr = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_saddc  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_saddt  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sadd   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_saddrr = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_saddc  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_saddt  = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_ssub   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_ssubrr = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_ssub   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ssubrr = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_smul   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_smulu  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_smulrr = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_smul   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_smulu  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_smulrr = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_sdiv   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sdivu  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sdivrr = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sdiv   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sdivu  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sdivrr = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_smod   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_smodu  = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_smod   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_smodu  = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_sand  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sandb = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sand  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sandb = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_sxor  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sxorb = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sxor  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sxorb = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_sor  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_sorb = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_sor  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_sorb = wod_dec_w_no_ops;
 
-const FDECODE_OPCODE wod_dec_w_itbf  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_itbl  = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_itn   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_itp   = wod_dec_w_ldnull;
-const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_ldnull;
+const FDECODE_OPCODE wod_dec_w_itbf  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_itbl  = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_itn   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_itp   = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_no_ops;
 
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
 
-  wod_dec_w_ldnull,
+  wod_dec_w_ldi8,
   wod_dec_w_ldc,
   wod_dec_w_ldi8,
   wod_dec_w_ldi16,
