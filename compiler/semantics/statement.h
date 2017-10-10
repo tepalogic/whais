@@ -65,6 +65,7 @@ struct _ProcStatementSpec
   struct WArray          branchStack;    /* Keeps track of conditional branches.*/
   struct WArray          loopStack;      /* Keeps track of looping statements */
   struct WArray          iteratorsStack; /* Keeps track of loop iterators */
+  struct WArray          iteratorsUsage; /* Keeps track of loop iterators */
   uint32_t               procId;         /* Procedure's ID in the import table. */
   uint16_t               syncTracker;    /* Keeps track of sync statements. */
   uint_t                 declarationPos;
@@ -152,6 +153,14 @@ stmt_query_loop_iterators_stack(struct Statement* const stmt)
   assert(stmt->type == STMT_PROC);
   return &stmt->spec.proc.iteratorsStack;
 }
+
+static INLINE struct WArray*
+stmt_query_usage_iterators_stack(struct Statement* const stmt)
+{
+  assert(stmt->type == STMT_PROC);
+  return &stmt->spec.proc.iteratorsUsage;
+}
+
 
 uint_t
 fill_type_spec(struct WOutputStream* const       typeStream,

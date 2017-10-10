@@ -373,6 +373,22 @@ finish_proc_decl(struct ParserState* const parser)
     log_message(parser, parser->bufferPos, MSG_PROC_NO_RET, tname);
   }
 
+  struct Statement* stmt = parser->pCurrentStmt;
+  struct WArray* iteratorsOffset = stmt_query_usage_iterators_stack(stmt);
+  uint8_t* const code = wh_ostream_data(&stmt->spec.proc.code);
+  const uint32_t itOffset = stmt->localsUsed - 1;
+
+  uint_t i;
+  for (i = 0; i < wh_array_count(iteratorsOffset); ++i)
+  {
+    const uint32_t offset = *(uint32_t*)wh_array_get(iteratorsOffset, i);
+    uint32_t it = load_le_int32(code + offset);
+    it += itOffset;
+    store_le_int32(it, code + offset);
+  }
+
+  wh_array_clean(iteratorsOffset);
+
   parser->pCurrentStmt = &parser->globalStmt;
   return;
 }

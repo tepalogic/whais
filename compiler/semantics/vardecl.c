@@ -351,41 +351,31 @@ add_auto_declaration(struct ParserState* const parser,
 {
   assert(id->val_type == VAL_ID);
 
+  YYSTYPE link = NULL;
   struct Statement* const stmt = parser->pCurrentStmt;
   struct DeclaredVar* decl = stmt_find_declaration(stmt,
                                                    id->val.u_id.name,
                                                    id->val.u_id.length,
                                                    TRUE,
                                                    FALSE);
+  check_for_dead_statement(parser);
   if (decl == NULL)
   {
-    check_for_dead_statement(parser);
-
-    YYSTYPE link = create_exp_link(parser, id, exp, NULL, OP_ATTR_AUTO);
-    if (link == NULL)
-      return NULL; /* Some error has been encountered */
-
-    YYSTYPE expResult = translate_exp(parser, link);
-    free_sem_value(expResult);
-    free_sem_value(id);
+    link = create_exp_link(parser, id, exp, NULL, OP_ATTR_AUTO);
   }
   else
   {
-    check_for_dead_statement(parser);
-
-    YYSTYPE link = create_exp_link(parser, id, NULL, NULL, OP_NULL);
+    link = create_exp_link(parser, id, NULL, NULL, OP_NULL);
     if (link == NULL)
       return NULL; /* Some error has been encountered */
 
     link = create_exp_link(parser, link, exp, NULL, OP_ATTR);
-
-    if (link == NULL)
-        return NULL; /* Some error has been encountered */
-
-    YYSTYPE expResult = translate_exp(parser, link);
-    free_sem_value(expResult);
   }
 
+  if (link == NULL)
+      return NULL; /* Some error has been encountered */
+
+  translate_exp(parser, link, TRUE);
   return NULL;
 }
 

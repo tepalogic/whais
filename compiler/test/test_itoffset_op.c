@@ -53,7 +53,6 @@ char proc_decl_buffer[] =
   "PROCEDURE proc_t() RETURN DATE "
   "DO "
   "   VAR an_array DATE ARRAY;"
-  "   VAR i INT32;"
   " "
   "   FOR(d: an_array) "
   "          i = @d;"
@@ -68,9 +67,9 @@ check_procedure(struct ParserState *state)
     find_proc_decl(state, "proc_t", strlen("proc_t"), FALSE);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
 
-  if ((decode_opcode(code + 18) != W_LDLO8)
-      || (code[19] != 2)
-      || (decode_opcode(code + 20) != W_ITOFF))
+  if ((decode_opcode(code + 18) != W_LDLO32)
+      || (load_le_int32(code + 19) != 0x02)
+      || (decode_opcode(code + 23) != W_ITOFF))
     {
       return FALSE;
     }

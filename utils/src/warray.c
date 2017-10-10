@@ -148,5 +148,8 @@ wh_array_clean(struct WArray* const array)
 
   if (array->arraysList != NULL)
     mem_free(array->arraysList);
+
+  array->arraysCount = 0;
+  array->arraysList = NULL;
 }
 

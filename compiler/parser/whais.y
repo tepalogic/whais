@@ -289,17 +289,17 @@ extern_proc_decl_stmt: EXTERN PROCEDURE IDENTIFIER
 
 local_block_statement: /* empty */
                      | var_decl_stmt local_block_statement
-                     | let_decl_stmt local_block_statement
                      | one_statement local_block_statement
                      | until_stmt local_block_statement
                      | syncronize_stmt local_block_statement
 ;
 
-let_decl_stmt: IDENTIFIER '='  exp ';'
+auto_decl_stmt: IDENTIFIER '='  exp ';'
                   { $$ = add_auto_declaration (state, $1, $3); CHK_SEM_ERROR; }
 ;
 
 one_statement: return_stmt
+             | auto_decl_stmt
              | exp_stmt 
              | if_stmt 
              | while_stmt 
@@ -337,7 +337,7 @@ list_of_paramaters_decl: IDENTIFIER type_spec
 exp_stmt : exp ';'
         {
            check_for_dead_statement (state);
-           $$ = translate_exp(state, $1); 
+           $$ = translate_exp(state, $1, TRUE); 
            CHK_SEM_ERROR;
         }
 ;
