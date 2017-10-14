@@ -802,9 +802,6 @@ PersistentTable::~PersistentTable()
     }
   }
   MakeHeaderPersistent();
-
-  if (mVSData != nullptr)
-    mVSData->ReleaseReference();
 }
 
 
@@ -898,14 +895,12 @@ PersistentTable::InitVariableStorages()
 
     if (fieldDesc.isArray || (fieldDesc.type == T_TEXT))
     {
-      unique_ptr<VariableSizeStore> hold(unique_make(VariableSizeStore));
+      mVSData = shared_make(VariableSizeStore);
+      mVSData->Init((mFileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(),
+                    mVSDataSize,
+                    mMaxFileSize);
 
-      hold->Init((mFileNamePrefix + PS_TABLE_VARFIELDS_EXT).c_str(), mVSDataSize, mMaxFileSize);
-
-      hold->RegisterReference();
-      mVSData = hold.release();
-
-      //We only need on field to require variable storage initialisation
+      //We only need one field to require variable storage initialisation
       //and it would be enough for the(if they are present).
       break;
     }
@@ -1044,12 +1039,12 @@ PersistentTable::TableContainer()
 }
 
 
-VariableSizeStore&
+VariableSizeStoreSPtr
 PersistentTable::VSStore()
 {
-  assert(mVSData != nullptr);
+  assert(mVSData);
 
-  return *mVSData;
+  return mVSData;
 }
 
 
@@ -1773,9 +1768,6 @@ TemporalTable::~TemporalTable()
 {
   for (FIELD_INDEX fieldIndex = 0; fieldIndex < mFieldsCount; ++fieldIndex)
     delete mvIndexNodeMgrs[fieldIndex];
-
-  if (mVSData != nullptr)
-    mVSData->ReleaseReference();
 }
 
 bool
@@ -1831,19 +1823,16 @@ TemporalTable::RowsContainer()
   return *mRowsData.get();
 }
 
-VariableSizeStore&
+VariableSizeStoreSPtr
 TemporalTable::VSStore()
 {
-  if (mVSData == nullptr)
+  if ( ! mVSData)
   {
-    unique_ptr<VariableSizeStore> hold(unique_make(VariableSizeStore));
-
-    hold->Init(mDbs.WorkingDir().c_str(), 4096);
-    hold->RegisterReference();
-
-    mVSData = hold.release();
+    mVSData = shared_make(VariableSizeStore);
+    mVSData->Init(mDbs.WorkingDir().c_str(), 4096);
   }
-  return *mVSData;
+
+  return mVSData;
 }
 
 

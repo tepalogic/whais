@@ -615,7 +615,7 @@ TemporalArray::GetTemporalContainer()
 }
 
 
-RowFieldArray::RowFieldArray(VariableSizeStore&     storage,
+RowFieldArray::RowFieldArray(VariableSizeStoreSPtr  storage,
                              const uint64_t         firstRecordEntry,
                              const DBS_FIELD_TYPE   type)
   : IArrayStrategy(type),
@@ -626,12 +626,10 @@ RowFieldArray::RowFieldArray(VariableSizeStore&     storage,
   assert((mElementsType >= T_BOOL) && (mElementsType < T_TEXT));
   assert(mElementRawSize > 0);
 
-  mStorage.RegisterReference();
-  mStorage.IncrementRecordRef(mFirstRecordEntry);
+  mStorage->IncrementRecordRef(mFirstRecordEntry);
 
   uint8_t elemetsCount[METADATA_SIZE];
-
-  mStorage.GetRecord(firstRecordEntry, 0, sizeof elemetsCount, elemetsCount);
+  mStorage->GetRecord(firstRecordEntry, 0, sizeof elemetsCount, elemetsCount);
 
   mElementsCount = load_le_int64(elemetsCount);
 
@@ -643,11 +641,7 @@ RowFieldArray::RowFieldArray(VariableSizeStore&     storage,
 RowFieldArray::~RowFieldArray()
 {
   if (mFirstRecordEntry > 0)
-  {
-    mStorage.DecrementRecordRef(mFirstRecordEntry);
-    //mStorage.Flush();
-    mStorage.ReleaseReference();
-  }
+    mStorage->DecrementRecordRef(mFirstRecordEntry);
 }
 
 bool
@@ -659,9 +653,9 @@ RowFieldArray::IsShared() const
 void
 RowFieldArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* const buffer)
 {
-  if (mFirstRecordEntry > 0)
+  if (mStorage)
   {
-    mStorage.GetRecord(mFirstRecordEntry, offset + METADATA_SIZE, size, buffer);
+    mStorage->GetRecord(mFirstRecordEntry, offset + METADATA_SIZE, size, buffer);
     return;
   }
   mTempStorage.Read(offset, size, buffer);
@@ -671,7 +665,7 @@ RowFieldArray::RawRead(const uint64_t offset, const uint64_t size, uint8_t* cons
 void
 RowFieldArray::RawWrite(const uint64_t offset, const uint64_t size, const uint8_t* const buffer)
 {
-  if (mFirstRecordEntry == 0)
+  if ( ! mStorage)
   {
     mTempStorage.Write(offset, size, buffer);
     return;
@@ -683,26 +677,24 @@ RowFieldArray::RawWrite(const uint64_t offset, const uint64_t size, const uint8_
   {
     uint_t chunkSize = MIN(sizeof buffer, mElementsCount * mElementRawSize - coff);
 
-    mStorage.GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, tbuffer);
+    mStorage->GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, tbuffer);
     mTempStorage.Write(coff, chunkSize, tbuffer);
 
     coff += chunkSize;
   }
 
   assert(coff == mElementsCount * mElementRawSize);
-
-  mStorage.DecrementRecordRef(mFirstRecordEntry);
-  mFirstRecordEntry = 0;
-  //mStorage.Flush();
-  mStorage.ReleaseReference();
-
   mTempStorage.Write(offset, size, buffer);
+
+  mStorage->DecrementRecordRef(mFirstRecordEntry);
+  mFirstRecordEntry = 0;
+  mStorage.reset();
 }
 
 void
 RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 {
-  if (mFirstRecordEntry == 0)
+  if ( ! mStorage)
   {
     mTempStorage.Colapse(offset, count);
     return;
@@ -714,7 +706,7 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
   {
     uint_t chunkSize = MIN(sizeof buffer, offset - coff);
 
-    mStorage.GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, buffer);
+    mStorage->GetRecord(mFirstRecordEntry, coff + METADATA_SIZE, chunkSize, buffer);
     mTempStorage.Write(coff, chunkSize, buffer);
 
     coff += chunkSize;
@@ -725,7 +717,7 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
   while (coff + count < mElementsCount * mElementRawSize)
   {
     uint_t chunkSize = MIN(sizeof buffer, mElementsCount * mElementRawSize - coff - count);
-    mStorage.GetRecord(mFirstRecordEntry, coff + count + METADATA_SIZE, chunkSize, buffer);
+    mStorage->GetRecord(mFirstRecordEntry, coff + count + METADATA_SIZE, chunkSize, buffer);
     mTempStorage.Write(coff, chunkSize, buffer);
 
     coff += chunkSize;
@@ -733,10 +725,9 @@ RowFieldArray::ColapseRaw(const uint64_t offset, const uint64_t count)
 
   assert(coff + count == mElementsCount * mElementRawSize);
 
-  mStorage.DecrementRecordRef(mFirstRecordEntry);
+  mStorage->DecrementRecordRef(mFirstRecordEntry);
   mFirstRecordEntry = 0;
-  //mStorage.Flush();
-  mStorage.ReleaseReference();
+  mStorage.reset();
 }
 
 uint64_t
@@ -754,7 +745,7 @@ RowFieldArray::GetTemporalContainer()
 VariableSizeStore&
 RowFieldArray::GetRowStorage()
 {
-  return mStorage;
+  return *mStorage.get();
 }
 
 

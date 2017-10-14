@@ -109,10 +109,9 @@ private:
 class VariableSizeStore : public IBlocksManager
 {
 public:
-  VariableSizeStore();
+  VariableSizeStore() = default;
+  ~VariableSizeStore() = default;
 
-  void RegisterReference();
-  void ReleaseReference();
   void Init(const char* tempDir, const uint32_t reservedMem);
   void Init(const char* baseName, const uint64_t storeSize, const uint64_t maxFileSize);
 
@@ -171,14 +170,13 @@ private:
 
   std::unique_ptr<IDataContainer> mEntriesContainer;
   BlockCache                      mEntriesCache;
-  uint64_t                        mFirstFreeEntry;
-  uint64_t                        mEntriesCount;
-  uint64_t                        mRefsCount;
+  uint64_t                        mFirstFreeEntry = { 0 };
+  uint64_t                        mEntriesCount = { 0 };
   Lock                            mSync;
-
   std::vector<bool>               mUsedEntries;
 };
 
+using VariableSizeStoreSPtr = std::shared_ptr<VariableSizeStore>;
 
 } //namespace pastra
 } //namespace whais

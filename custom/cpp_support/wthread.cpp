@@ -33,13 +33,16 @@ namespace whais
 {
 
 
-
 Lock::Lock()
 {
   const uint_t result = wh_lock_init(&mLock);
 
   if (result != WOP_OK)
+  {
+    assert(false);
+
     throw LockException(_EXTRA(result), "Failed to initialize a lock.");
+  }
 }
 
 
@@ -57,7 +60,11 @@ Lock::Acquire()
 {
   const uint_t result = wh_lock_acquire(&mLock);
   if (result != WOP_OK)
+  {
+    assert(false);
+
     throw LockException(_EXTRA(result), "Failed to acquire a lock.");
+  }
 }
 
 
@@ -69,7 +76,11 @@ Lock::TryAcquire()
   const int result = wh_lock_try_acquire(&mLock, &acquired);
 
   if (result != WOP_OK)
+  {
+    assert(false);
+
     throw LockException(_EXTRA(result), "Failed to try to acquire a lock.");
+  }
 
   return acquired != FALSE;
 }
@@ -126,6 +137,7 @@ void
 SpinLock::Release()
 {
   assert(mLock > 0);
+
   wh_atomic_fetch_dec16(&mLock);
 }
 
@@ -201,21 +213,21 @@ Thread::~Thread()
 void
 Thread::WaitToEnd(const bool throwPending)
 {
-  while (wh_atomic_fetch_inc32(&mEnded) != 0)
-    {
-      wh_yield();
-      LockRAII<Lock> _l(mRoutineExecutionLock); //Avoid spin locks!
-      wh_atomic_fetch_dec32(&mEnded);
-    }
+  while (wh_atomic_fetch_inc32( &mEnded) != 0)
+  {
+    wh_yield();
+    LockRAII < Lock > _l(mRoutineExecutionLock); //Avoid spin locks!
+    wh_atomic_fetch_dec32 (&mEnded);
+  }
 
   if (mNeedsClean)
-    {
-      wh_thread_free(mThread);
-      mNeedsClean = false;
+  {
+    wh_thread_free (mThread);
+    mNeedsClean = false;
 
-      if (throwPending)
-        ThrowPendingException();
-    }
+    if (throwPending)
+      ThrowPendingException();
+  }
 
   wh_atomic_fetch_dec32(&mEnded);
 }
@@ -230,23 +242,23 @@ Thread::ThrowPendingException()
     return;
 
   if (mUnkExceptSignaled)
-    {
-      DiscardException();
+  {
+    DiscardException();
 
-      wh_atomic_fetch_dec32(&mEnded);
+    wh_atomic_fetch_dec32 (&mEnded);
 
-      throw ThreadException(_EXTRA(WOP_UNKNOW));
-    }
+    throw ThreadException(_EXTRA(WOP_UNKNOW));
+  }
 
   if (mException != nullptr)
-    {
-      Exception* clone = mException->Clone();
-      DiscardException();
+  {
+    Exception* clone = mException->Clone();
+    DiscardException();
 
-      wh_atomic_fetch_dec32(&mEnded);
+    wh_atomic_fetch_dec32 (&mEnded);
 
-      throw clone;
-    }
+    throw clone;
+  }
 }
 
 
