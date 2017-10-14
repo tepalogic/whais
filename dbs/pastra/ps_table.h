@@ -67,7 +67,7 @@ protected:
   virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field) override;
   virtual IDataContainer& RowsContainer() override;
   virtual IDataContainer& TableContainer() override;
-  virtual VariableSizeStore& VSStore() override;
+  virtual VariableSizeStoreSPtr VSStore() override;
 
   const DBSSettings&               mDbsSettings;
   uint64_t                         mMaxFileSize;
@@ -75,7 +75,7 @@ protected:
   std::string                      mFileNamePrefix;
   std::unique_ptr<FileContainer>   mTableData;
   std::unique_ptr<FileContainer>   mRowsData;
-  VariableSizeStore               *mVSData;
+  VariableSizeStoreSPtr            mVSData;
   bool                             mRemoved;
 
 private:
@@ -105,11 +105,11 @@ protected:
   virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field) override;
   virtual IDataContainer& RowsContainer() override;
   virtual IDataContainer& TableContainer() override;
-  virtual VariableSizeStore& VSStore() override;
+  virtual VariableSizeStoreSPtr VSStore() override;
 
   std::unique_ptr<TemporalContainer>   mTableData;
   std::unique_ptr<TemporalContainer>   mRowsData;
-  VariableSizeStore*                   mVSData;
+  VariableSizeStoreSPtr                mVSData;
 };
 
 

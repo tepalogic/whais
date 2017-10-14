@@ -186,7 +186,7 @@ class RowFieldArray : public IArrayStrategy
   friend class PrototypeTable;
 
 public:
-  RowFieldArray(VariableSizeStore& storage,
+  RowFieldArray(VariableSizeStoreSPtr storage,
                 const uint64_t firstRecordEntry,
                 const DBS_FIELD_TYPE type);
 
@@ -206,9 +206,9 @@ protected:
   pastra::VariableSizeStore& GetRowStorage() override;
 
 private:
-  uint64_t             mFirstRecordEntry;
-  VariableSizeStore&   mStorage;
-  TemporalContainer    mTempStorage;
+  uint64_t              mFirstRecordEntry;
+  VariableSizeStoreSPtr mStorage;
+  TemporalContainer     mTempStorage;
 
   static const uint_t METADATA_SIZE = sizeof(uint64_t);
 };

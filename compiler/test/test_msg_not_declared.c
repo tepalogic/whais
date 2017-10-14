@@ -71,8 +71,8 @@ char test_prog_1[] = ""
   "ENDPROC\n " "\n ";
 
 char test_prog_2[] = ""
-  "PROCEDURE Proc_2(v1 DATE)\n RETURN DATE "
-  "DO\n " "v2 = v1;\n " "RETURN v2;\n " "ENDPROC\n " "\n " "";
+  "PROCEDURE Proc_2(v1 INT8)\n RETURN INT8 "
+  "DO\n " "v2 += v1;\n " "RETURN v2;\n " "ENDPROC\n " "\n " "";
 
 bool_t
 test_for_error(const char *test_buffer, uint_t err_expected, uint_t err_type)

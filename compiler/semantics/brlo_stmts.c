@@ -144,7 +144,7 @@ get_iterator_local_index(struct ParserState* const parser,
       return 0;
     }
   }
-  return stmt->localsUsed + wh_array_count(iterators);
+  return wh_array_count(iterators);
 }
 
 void
@@ -294,7 +294,7 @@ begin_for_stmt(struct ParserState* const   parser,
 
   loop.type = LE_FOR_BEGIN;
 
-  translate_exp(parser, exp1);
+  translate_exp(parser, exp1, TRUE);
   if (parser->abortError)
     return ;
 
@@ -307,7 +307,7 @@ begin_for_stmt(struct ParserState* const   parser,
   }
 
   loop.continueMark = wh_ostream_size(code);
-  translate_exp(parser, exp3);
+  translate_exp(parser, exp3, TRUE);
   if (parser->abortError)
     return ;
 
@@ -358,8 +358,6 @@ begin_foreach_stmt(struct ParserState* const   parser,
   it.localIndex = get_iterator_local_index(parser, it.name, it.nameLen);
   if (parser->abortError)
     return ;
-
-  assert(it.localIndex >= parser->pCurrentStmt->localsUsed);
 
   it.type = translate_iterable_exp(parser, exp);
   if (parser->abortError)
@@ -469,7 +467,7 @@ finalize_for_stmt(struct ParserState* const parser)
       struct WArray* const iterators = stmt_query_loop_iterators_stack(stmt);
       wh_array_resize(iterators, wh_array_count(iterators) -1 );
     }
-  
+
   wh_array_resize(loopsStack, loopId);
 }
 

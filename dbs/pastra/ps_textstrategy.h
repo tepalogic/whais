@@ -170,7 +170,9 @@ class RowFieldText : public ITextStrategy
   friend class PrototypeTable;
 
 public:
-  RowFieldText(VariableSizeStore& storage, const uint64_t firstEntry, const uint64_t bytesSize);
+  RowFieldText(VariableSizeStoreSPtr storage,
+               const uint64_t firstEntry,
+               const uint64_t bytesSize);
 
   RowFieldText(const RowFieldText&) = delete;
   RowFieldText operator=(const RowFieldText&) = delete;
@@ -189,7 +191,7 @@ protected:
 
   const uint64_t mFirstEntry;
   const uint64_t mUtf8Count;
-  VariableSizeStore& mStorage;
+  VariableSizeStoreSPtr mStorage;
   TemporalContainer mTempContainer;
 
   static const uint64_t CACHE_META_DATA_SIZE = 3 * sizeof(uint32_t);

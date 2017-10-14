@@ -65,6 +65,7 @@ enum EXP_OPERATION
   OP_FIELD,
 
   OP_ATTR,
+  OP_ATTR_AUTO,
 
   OP_SADD,
   OP_SSUB,
@@ -88,7 +89,8 @@ create_exp_link(struct ParserState* const   parser,
 
 YYSTYPE
 translate_exp(struct ParserState* const   parser,
-              YYSTYPE                     exp);
+              YYSTYPE                     exp,
+              bool_t                      ingoreResult);
 
 YYSTYPE
 translate_return_exp(struct ParserState* const   parser,

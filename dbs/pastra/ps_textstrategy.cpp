@@ -1008,9 +1008,9 @@ TemporalText::GetTemporalContainer()
 
 
 
-RowFieldText::RowFieldText(VariableSizeStore& storage,
-                           const uint64_t     firstEntry,
-                           const uint64_t     bytesSize)
+RowFieldText::RowFieldText(VariableSizeStoreSPtr storage,
+                           const uint64_t        firstEntry,
+                           const uint64_t        bytesSize)
   : mFirstEntry(firstEntry),
     mUtf8Count(bytesSize == 0 ? 0 : bytesSize - CACHE_META_DATA_SIZE),
     mStorage(storage)
@@ -1020,13 +1020,12 @@ RowFieldText::RowFieldText(VariableSizeStore& storage,
 
   assert(bytesSize > CACHE_META_DATA_SIZE);
 
-  mStorage.RegisterReference();
-  mStorage.IncrementRecordRef(mFirstEntry);
+  mStorage->IncrementRecordRef(mFirstEntry);
 
   assert(bytesSize > CACHE_META_DATA_SIZE);
 
   uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
-  mStorage.GetRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
+  mStorage->GetRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
 
   mCachedCharsCount = load_le_int32(cachedMetaData);
   mCachedCharIndex = load_le_int32(cachedMetaData + sizeof(uint32_t));
@@ -1043,16 +1042,14 @@ RowFieldText::~RowFieldText()
   {
     uint8_t cachedMetaData[CACHE_META_DATA_SIZE];
 
-    mStorage.GetRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
+    mStorage->GetRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
 
     //Do not update the elements count
     store_le_int32(mCachedCharIndex, cachedMetaData + sizeof(uint32_t));
     store_le_int32(mCachedCharIndexOffset, cachedMetaData + 2 * sizeof(uint32_t));
 
-    mStorage.UpdateRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
-
-    mStorage.DecrementRecordRef(mFirstEntry);
-    mStorage.ReleaseReference();
+    mStorage->UpdateRecord(mFirstEntry, 0, CACHE_META_DATA_SIZE, cachedMetaData);
+    mStorage->DecrementRecordRef(mFirstEntry);
   }
 }
 
@@ -1088,7 +1085,7 @@ RowFieldText::ReadUtf8U(const uint64_t offset, const uint64_t count, uint8_t* co
   if (toRead == 0)
     return;
 
-  mStorage.GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, toRead, buffer);
+  mStorage->GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, toRead, buffer);
 }
 
 
@@ -1114,7 +1111,7 @@ RowFieldText::WriteUtf8U(const uint64_t offset,
     while (offset < mUtf8Count)
     {
       const uint_t chunkSize = MIN(sizeof buffer, mUtf8Count - offset);
-      mStorage.GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, chunkSize, buffer);
+      mStorage->GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, chunkSize, buffer);
       mTempContainer.Write(offset, chunkSize, buffer);
       offset += chunkSize;
     }
@@ -1122,8 +1119,8 @@ RowFieldText::WriteUtf8U(const uint64_t offset,
     assert(offset == mUtf8Count);
     assert(mTempContainer.Size() == mUtf8Count);
 
-    mStorage.DecrementRecordRef(mFirstEntry);
-    mStorage.ReleaseReference();
+    mStorage->DecrementRecordRef(mFirstEntry);
+    mStorage.reset();
 
     _CC(uint64_t&, mUtf8Count) = 0;
   }
@@ -1144,7 +1141,7 @@ RowFieldText::TruncateUtf8U(const uint64_t atOffset)
     while (offset < MIN(mUtf8Count, atOffset))
     {
       const uint_t chunkSize = MIN(sizeof buffer, MIN(mUtf8Count, atOffset) - offset);
-      mStorage.GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, chunkSize, buffer);
+      mStorage->GetRecord(mFirstEntry, offset + CACHE_META_DATA_SIZE, chunkSize, buffer);
       mTempContainer.Write(offset, chunkSize, buffer);
       offset += chunkSize;
     }
@@ -1152,8 +1149,8 @@ RowFieldText::TruncateUtf8U(const uint64_t atOffset)
     assert(offset == MIN(mUtf8Count, atOffset));
     assert(mTempContainer.Size() == mUtf8Count);
 
-    mStorage.DecrementRecordRef(mFirstEntry);
-    mStorage.ReleaseReference();
+    mStorage->DecrementRecordRef(mFirstEntry);
+    mStorage.reset();
 
     _CC(uint64_t&, mUtf8Count) = 0;
   }
@@ -1170,7 +1167,7 @@ RowFieldText::GetTemporalContainer()
 VariableSizeStore&
 RowFieldText::GetRowStorage()
 {
-  return mStorage;
+  return *(mStorage.get());
 }
 
 

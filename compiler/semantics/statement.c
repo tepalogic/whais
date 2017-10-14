@@ -91,6 +91,7 @@ init_proc_stmt(struct Statement* const   parent,
   wh_array_init(stmt_query_branch_stack(outStmt), sizeof(struct Branch));
   wh_array_init(stmt_query_loop_stack(outStmt), sizeof(struct Loop));
   wh_array_init(stmt_query_loop_iterators_stack(outStmt), sizeof(struct LoopIterator));
+  wh_array_init(stmt_query_usage_iterators_stack(outStmt), sizeof(uint32_t));
 
   wh_ostream_init(0, stmt_query_instrs(outStmt));
 
@@ -115,8 +116,9 @@ clear_proc_stmt(struct Statement* const stmt)
   wh_array_clean(stmt_query_branch_stack( stmt));
   wh_array_clean(stmt_query_loop_stack( stmt));
   wh_array_clean(stmt_query_loop_iterators_stack(stmt));
+  wh_array_clean(stmt_query_usage_iterators_stack(stmt));
 
-  wh_ostream_clean(stmt_query_instrs( stmt));
+  wh_ostream_clean(stmt_query_instrs(stmt));
 
   stmt->type = STMT_ERR;
 }
@@ -498,8 +500,8 @@ add_constant_text(struct Statement* const   stmt,
                   const uint_t              testSize)
 {
   struct WOutputStream *stream = stmt->type == STMT_GLOBAL
-                                 ? &stmt->spec.glb.constsArea
-                                 : &stmt->parent->spec.glb.constsArea;
+                                   ? &stmt->spec.glb.constsArea
+                                   : &stmt->parent->spec.glb.constsArea;
 
   const uint8_t *streamBuff  = wh_ostream_data(stream);
   const uint_t   streamSize  = wh_ostream_size(stream);

@@ -88,6 +88,11 @@ add_list_declaration(struct ParserState* const parser,
                      YYSTYPE                   type);
 
 YYSTYPE
+add_auto_declaration(struct ParserState* const parser,
+                     YYSTYPE                   vars,
+                     YYSTYPE                   type);
+
+YYSTYPE
 add_field_declaration(struct ParserState* const   parser,
                       YYSTYPE                     var,
                       YYSTYPE                     type,

@@ -403,7 +403,7 @@ protected:
   virtual IDataContainer* CreateIndexContainer(const FIELD_INDEX field) = 0;
   virtual IDataContainer& RowsContainer() = 0;
   virtual IDataContainer& TableContainer() = 0;
-  virtual VariableSizeStore& VSStore() = 0;
+  virtual VariableSizeStoreSPtr VSStore() = 0;
   virtual void FlushEpilog() = 0;
   void MarkRowModification();
   void FlushInternal();

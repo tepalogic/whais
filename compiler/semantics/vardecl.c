@@ -29,6 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "wlog.h"
 #include "statement.h"
 #include "vardecl.h"
+#include "expression.h"
+#include "brlo_stmts.h"
 
 
 YYSTYPE
@@ -242,6 +244,7 @@ add_declaration(struct ParserState* const parser,
     {
       result = NULL;   /* Something went wrong along the way */
     }
+#if 0
     else if (stmt->type != STMT_GLOBAL
              && ! IS_TABLE_FIELD(var.type)
              && wh_ostream_size(&stmt->spec.proc.code) > 0)
@@ -253,6 +256,7 @@ add_declaration(struct ParserState* const parser,
 
       parser->abortError = TRUE;
     }
+#endif
     else if ((result = stmt_add_declaration(stmt, &var, parameter)) == NULL)
     {
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -337,6 +341,42 @@ add_list_declaration(struct ParserState* const parser,
     free_sem_value(type);
 
   return result;
+}
+
+
+YYSTYPE
+add_auto_declaration(struct ParserState* const parser,
+                     YYSTYPE                   id,
+                     YYSTYPE                   exp)
+{
+  assert(id->val_type == VAL_ID);
+
+  YYSTYPE link = NULL;
+  struct Statement* const stmt = parser->pCurrentStmt;
+  struct DeclaredVar* decl = stmt_find_declaration(stmt,
+                                                   id->val.u_id.name,
+                                                   id->val.u_id.length,
+                                                   TRUE,
+                                                   FALSE);
+  check_for_dead_statement(parser);
+  if (decl == NULL)
+  {
+    link = create_exp_link(parser, id, exp, NULL, OP_ATTR_AUTO);
+  }
+  else
+  {
+    link = create_exp_link(parser, id, NULL, NULL, OP_NULL);
+    if (link == NULL)
+      return NULL; /* Some error has been encountered */
+
+    link = create_exp_link(parser, link, exp, NULL, OP_ATTR);
+  }
+
+  if (link == NULL)
+      return NULL; /* Some error has been encountered */
+
+  translate_exp(parser, link, TRUE);
+  return NULL;
 }
 
 YYSTYPE

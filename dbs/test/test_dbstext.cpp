@@ -144,12 +144,11 @@ test_nulliness()
       std::string temp_file_base = DBSGetSeettings().mWorkDir;
       temp_file_base += "t_cont_1";
 
-      VariableSizeStore storage;
-      storage.Init(temp_file_base.c_str(), 0, 713);
-      storage.RegisterReference();
-      storage.MarkForRemoval();
+      VariableSizeStoreSPtr storage = shared_make(VariableSizeStore);
+      storage->Init(temp_file_base.c_str(), 0, 713);
+      storage->MarkForRemoval();
 
-      uint64_t allocated_entry = storage.AddRecord(nullptr, 0);
+      uint64_t allocated_entry = storage->AddRecord(nullptr, 0);
 
       std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText, storage, allocated_entry, 0);
       s->SetSelfReference(s);
@@ -173,7 +172,7 @@ test_nulliness()
       else if (textVarRaw.CharAt(1).mIsNull == false)
         result = false;
 
-      storage.Flush();
+      storage->Flush();
     }
 
   std::cout << ( result ? "OK" : "FALSE") << std::endl;
@@ -244,7 +243,6 @@ test_text_append()
 
         VariableSizeStore storage;
         storage.Init(temp_file_base.c_str(), 0, 713);
-        storage.RegisterReference();
 
         allocated_entry = storage.AddRecord(
                                   tempBuff,
@@ -258,11 +256,10 @@ test_text_append()
         result = false;
     else
     {
-      VariableSizeStore storage;
+      VariableSizeStoreSPtr storage = shared_make(VariableSizeStore);
 
-      storage.Init(temp_file_base.c_str(), 1, 713);
-      storage.RegisterReference();
-      storage.MarkForRemoval();
+      storage->Init(temp_file_base.c_str(), 1, 713);
+      storage->MarkForRemoval();
 
       {
         std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText,
@@ -285,7 +282,7 @@ test_text_append()
               result = false;
         }
       }
-      storage.Flush();
+      storage->Flush();
     }
   }
 
@@ -334,16 +331,15 @@ test_character_insertion()
         temp_file_base += "ps_t_text";
         uint64_t allocated_entry = 0;
 
-        VariableSizeStore storage;
-        storage.Init(temp_file_base.c_str(), 0, 713);
-        storage.RegisterReference();
-        storage.MarkForRemoval();
+        VariableSizeStoreSPtr storage = shared_make(VariableSizeStore);
+        storage->Init(temp_file_base.c_str(), 0, 713);
+        storage->MarkForRemoval();
 
         uint8_t tempBuff[1024] = { 0, };
         strcpy(_RC(char*, tempBuff) + 12, pOriginalText);
         store_le_int32((sizeof charValues / sizeof(uint32_t)), tempBuff);
 
-        allocated_entry = storage.AddRecord(tempBuff, (sizeof charValues / sizeof(uint32_t)) + 12);
+        allocated_entry = storage->AddRecord(tempBuff, (sizeof charValues / sizeof(uint32_t)) + 12);
         std::shared_ptr<ITextStrategy> s = shared_make(RowFieldText,
                                                        storage,
                                                        allocated_entry,
@@ -360,7 +356,7 @@ test_character_insertion()
         else if (originalText.CharAt(charsCount / 2).mValue != 0x21135)
           result = false;
 
-        storage.Flush();
+        storage->Flush();
       }
     }
   }

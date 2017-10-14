@@ -38,9 +38,17 @@ namespace prima {
 
 
 static void
-op_func_ldnull(ProcedureCall& call, int64_t&)
+op_func_ldnull(ProcedureCall& call, int64_t& offset)
 {
-  call.GetStack().Push();
+  const uint8_t* const data = call.Code() + call.CurrentOffset() + offset;
+
+  assert(data[0] != 0);
+
+  SessionStack& stack = call.GetStack();
+  for (uint8_t i = 0; i < data[0]; ++i)
+    stack.Push();
+
+  offset += sizeof(uint8_t);
 }
 
 static void

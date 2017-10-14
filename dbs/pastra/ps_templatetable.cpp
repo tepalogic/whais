@@ -1052,6 +1052,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   uint64_t newFirstEntry = ~0ull;
   uint64_t newFieldValueSize = 0;
   const bool skipVariableStore = s->Utf8CountU() < (2 * sizeof(uint64_t));
+  VariableSizeStore* const store = VSStore().get();
 
   if ( !skipVariableStore)
   {
@@ -1060,9 +1061,13 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
       RowFieldText& r = _SC(RowFieldText&, *s);
       newFieldValueSize = r.Utf8CountU() + RowFieldText::CACHE_META_DATA_SIZE;
 
-      if ( &r.GetRowStorage() != &VSStore())
-        newFirstEntry = VSStore().AddRecord(r.GetRowStorage(), r.mFirstEntry, 0, newFieldValueSize);
-
+      if ( &r.GetRowStorage() != store)
+      {
+        newFirstEntry = store->AddRecord(r.GetRowStorage(),
+                                         r.mFirstEntry,
+                                         0,
+                                         newFieldValueSize);
+      }
       else
       {
         r.GetRowStorage().IncrementRecordRef(r.mFirstEntry);
@@ -1089,12 +1094,12 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
       store_le_int32(s->mCachedCharIndex, headerData + sizeof(uint32_t));
       store_le_int32(s->mCachedCharIndexOffset, headerData + 2 * sizeof(uint32_t));
 
-      newFirstEntry = VSStore().AddRecord(headerData, sizeof headerData);
-      VSStore().UpdateRecord(newFirstEntry,
-                             sizeof headerData,
-                             s->GetTemporalContainer(),
-                             0,
-                             s->Utf8CountU());
+      newFirstEntry = store->AddRecord(headerData, sizeof headerData);
+      store->UpdateRecord(newFirstEntry,
+                          sizeof headerData,
+                          s->GetTemporalContainer(),
+                          0,
+                          s->Utf8CountU());
     }
   }
 
@@ -1139,7 +1144,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   if ((fieldValueWasNull == false)
       && ((load_le_int64(fieldValueSize) & 0x8000000000000000ull) == 0))
   {
-    VSStore().DecrementRecordRef(load_le_int64(fieldFirstEntry));
+    store->DecrementRecordRef(load_le_int64(fieldFirstEntry));
   }
 
   if (skipVariableStore)
@@ -1184,6 +1189,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   const uint8_t bitsSet = ~0;
   bool fieldValueWasNull = false;
   const bool skipVariableStore = s->RawSize() < (2 * sizeof(uint64_t));
+  VariableSizeStore* const store = VSStore().get();
 
   if ( !skipVariableStore)
   {
@@ -1191,7 +1197,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
     {
       VariableSizeStore& arrayStore = s->GetRowStorage();
       const uint64_t arrayFirstEntry = _SC(RowFieldArray&, *s).mFirstRecordEntry;
-      if ( &arrayStore == &VSStore())
+      if ( &arrayStore == store)
       {
         arrayStore.IncrementRecordRef(arrayFirstEntry);
 
@@ -1201,7 +1207,10 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
       else
       {
         newFieldValueSize = s->RawSize() + RowFieldArray::METADATA_SIZE;
-        newFirstEntry = VSStore().AddRecord(arrayStore, arrayFirstEntry, 0, newFieldValueSize);
+        newFirstEntry = store->AddRecord(arrayStore,
+                                         arrayFirstEntry,
+                                         0,
+                                         newFieldValueSize);
       }
     }
     else
@@ -1211,12 +1220,12 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
       uint8_t elemsCount[RowFieldArray::METADATA_SIZE];
       store_le_int64(s->Count(), elemsCount);
 
-      newFirstEntry = VSStore().AddRecord(elemsCount, sizeof elemsCount);
-      VSStore().UpdateRecord(newFirstEntry,
-                             sizeof elemsCount,
-                             s->GetTemporalContainer(),
-                             0,
-                             newFieldValueSize);
+      newFirstEntry = store->AddRecord(elemsCount, sizeof elemsCount);
+      store->UpdateRecord(newFirstEntry,
+                          sizeof elemsCount,
+                          s->GetTemporalContainer(),
+                          0,
+                          newFieldValueSize);
       newFieldValueSize += sizeof elemsCount;
     }
   }
@@ -1260,7 +1269,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   if ((fieldValueWasNull == false)
       && ((load_le_int64(fieldValueSize) & 0x8000000000000000ull) == 0))
   {
-    VSStore().DecrementRecordRef(load_le_int64(fieldFirstEntry));
+    store->DecrementRecordRef(load_le_int64(fieldFirstEntry));
   }
 
   if (skipVariableStore)
@@ -1448,23 +1457,28 @@ PrototypeTable::Set(const ROW_INDEX      row,
 
 
 shared_ptr<ITextStrategy>
-allocate_row_field_text(VariableSizeStore&   store,
-                        const uint64_t       firstRecordEntry,
-                        const uint64_t       valueSize)
+allocate_row_field_text(VariableSizeStoreSPtr store,
+                        const uint64_t        firstRecordEntry,
+                        const uint64_t        valueSize)
 {
-  shared_ptr<ITextStrategy> result = shared_make(RowFieldText, store, firstRecordEntry, valueSize);
+  shared_ptr<ITextStrategy> result = shared_make(RowFieldText,
+                                                 store,
+                                                 firstRecordEntry,
+                                                 valueSize);
   result->SetSelfReference(result);
-
   return result;
 }
 
 
 static shared_ptr<IArrayStrategy>
-allocate_row_field_array(VariableSizeStore&        store,
-                         const uint64_t            firstRecordEntry,
-                         const DBS_FIELD_TYPE      type)
+allocate_row_field_array(VariableSizeStoreSPtr store,
+                         const uint64_t        firstRecordEntry,
+                         const DBS_FIELD_TYPE  type)
 {
-  shared_ptr<IArrayStrategy> r = shared_make(RowFieldArray, store, firstRecordEntry, type);
+  shared_ptr<IArrayStrategy> r = shared_make(RowFieldArray,
+                                             store,
+                                             firstRecordEntry,
+                                             type);
   r->SetSelfReference(r);
   return r;
 }

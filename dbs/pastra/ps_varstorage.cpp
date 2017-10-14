@@ -70,36 +70,8 @@ StoreEntry::Write(uint_t offset, uint_t count, const uint8_t* buffer)
 }
 
 
-VariableSizeStore::VariableSizeStore()
-  : mEntriesCache(),
-    mFirstFreeEntry(0),
-    mEntriesCount(0),
-    mRefsCount(0)
-{
-}
-
-
-void
-VariableSizeStore::RegisterReference()
-{
-  wh_atomic_fetch_inc64(_RC(int64_t*, &mRefsCount));
-}
-
-
-void
-VariableSizeStore::ReleaseReference()
-{
-  assert(mRefsCount > 0);
-
-  if (wh_atomic_fetch_dec64(_RC(int64_t*, &mRefsCount)) == 1)
-    delete this;
-}
-
-
 void VariableSizeStore::Init(const char* tempDir, const uint32_t reservedMem)
 {
-  assert(mRefsCount == 0);
-
   mEntriesContainer.reset(new TemporalContainer());
   mEntriesCount = 0;
 
@@ -113,7 +85,6 @@ VariableSizeStore::Init(const char* baseName,
                         const uint64_t maxFileSize)
 {
   assert(maxFileSize != 0);
-  assert(mRefsCount == 0);
 
   const uint64_t unitsCount = (containerSize + maxFileSize - 1) / maxFileSize;
 

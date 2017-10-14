@@ -227,34 +227,36 @@ check_procedure_less_params(struct ParserState *state,
                              char * proc_name,
                              uint_t args_provided)
 {
-  struct Statement *stmt = find_proc_decl(state, proc_name,
-                                           strlen(proc_name), FALSE);
-  struct Statement *called_stmt = find_proc_decl(state, "ProcId1",
-                                                  strlen("ProcId1"), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  struct Statement *called_stmt = find_proc_decl(state, "ProcId1", strlen("ProcId1"), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
   uint32_t linkid = stmt_get_import_id(called_stmt);
   uint_t count;
   uint_t offset = 0;
 
   for (count = 0; count < 16; ++count)
+  {
+    if (count < args_provided)
     {
-      if (count < args_provided)
-        {
-          if ((decode_opcode( code + offset) != W_LDLO8)
-              || (code[offset + 1] != count))
-            {
-              return FALSE;
-            }
-          offset += 2;
-        }
-      else
-        {
-          if (decode_opcode( code + offset) != W_LDNULL)
-            return FALSE;
-
-          offset += 1;
-        }
+      if ((decode_opcode(code + offset) != W_LDLO8) || (code[offset + 1] != count))
+      {
+        return FALSE;
+      }
+      offset += 2;
     }
+    else
+    {
+      if (decode_opcode(code + offset) != W_LDNULL)
+        return FALSE;
+
+      offset += 1;
+      if (code[offset] != (16 - args_provided))
+        return FALSE;
+
+      offset += 1;
+      break;
+    }
+  }
 
   if (code[offset++] != W_CALL)
     return FALSE;

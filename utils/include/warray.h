@@ -43,7 +43,6 @@ struct WArray
   int8_t** arraysList;
   uint_t   incrementCount;
   uint_t   arraysCount;
-  uint_t   arraysUsed;
 };
 
 

@@ -111,6 +111,7 @@ var_decl_stmt: VAR id_list type_spec ';'
                   { $$ = add_list_declaration (state, $2, $3); CHK_SEM_ERROR; }
              | VAR id_list RETURN ';'
                   { $$ = add_list_declaration (state, $2, NULL); CHK_SEM_ERROR; }
+;
 
 id_list: IDENTIFIER  
             { $$ = add_id_to_list(NULL, $1); }
@@ -225,14 +226,14 @@ container_type_decl: IDENTIFIER basic_type_spec ',' container_type_decl
                             $$ = add_field_declaration(state,
                                 $1, $2, (struct DeclaredVar *)$4);
                             CHK_SEM_ERROR;
-                        }                
+                        }
                    | IDENTIFIER basic_type_spec
                         {
                             MARK_TABLE_FIELD ($2->val.u_tspec.type);
                             $$ = add_field_declaration(state,
                                 $1, $2, NULL);
                             CHK_SEM_ERROR;
-                        }                
+                        }
                    | IDENTIFIER array_type_spec
                         {
                             MARK_TABLE_FIELD ($2->val.u_tspec.type);
@@ -293,7 +294,12 @@ local_block_statement: /* empty */
                      | syncronize_stmt local_block_statement
 ;
 
+auto_decl_stmt: IDENTIFIER '='  exp ';'
+                  { $$ = add_auto_declaration (state, $1, $3); CHK_SEM_ERROR; }
+;
+
 one_statement: return_stmt
+             | auto_decl_stmt
              | exp_stmt 
              | if_stmt 
              | while_stmt 
@@ -331,7 +337,7 @@ list_of_paramaters_decl: IDENTIFIER type_spec
 exp_stmt : exp ';'
         {
            check_for_dead_statement (state);
-           $$ = translate_exp(state, $1); 
+           $$ = translate_exp(state, $1, TRUE); 
            CHK_SEM_ERROR;
         }
 ;
