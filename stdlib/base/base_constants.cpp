@@ -35,10 +35,10 @@
 
 using namespace whais;
 
-
 WLIB_PROC_DESCRIPTION     gProcPI;
+WLIB_PROC_DESCRIPTION     gProcPHI;
 WLIB_PROC_DESCRIPTION     gProcSQRT2;
-WLIB_PROC_DESCRIPTION     gProcNE;
+WLIB_PROC_DESCRIPTION     gProcE;
 
 WLIB_PROC_DESCRIPTION     gProcMinB;
 WLIB_PROC_DESCRIPTION     gProcMinC;
@@ -47,19 +47,13 @@ WLIB_PROC_DESCRIPTION     gProcMinD;
 WLIB_PROC_DESCRIPTION     gProcMinDT;
 WLIB_PROC_DESCRIPTION     gProcMinHT;
 
-WLIB_PROC_DESCRIPTION     gProcMinI8;
-WLIB_PROC_DESCRIPTION     gProcMinI16;
-WLIB_PROC_DESCRIPTION     gProcMinI32;
-WLIB_PROC_DESCRIPTION     gProcMinI64;
-
-WLIB_PROC_DESCRIPTION     gProcMinU8;
-WLIB_PROC_DESCRIPTION     gProcMinU16;
-WLIB_PROC_DESCRIPTION     gProcMinU32;
-WLIB_PROC_DESCRIPTION     gProcMinU64;
+WLIB_PROC_DESCRIPTION     gProcMinS8;
+WLIB_PROC_DESCRIPTION     gProcMinS16;
+WLIB_PROC_DESCRIPTION     gProcMinS32;
+WLIB_PROC_DESCRIPTION     gProcMinS64;
 
 WLIB_PROC_DESCRIPTION     gProcMinR;
 WLIB_PROC_DESCRIPTION     gProcMinRR;
-
 
 WLIB_PROC_DESCRIPTION     gProcMaxB;
 WLIB_PROC_DESCRIPTION     gProcMaxC;
@@ -68,10 +62,10 @@ WLIB_PROC_DESCRIPTION     gProcMaxD;
 WLIB_PROC_DESCRIPTION     gProcMaxDT;
 WLIB_PROC_DESCRIPTION     gProcMaxHT;
 
-WLIB_PROC_DESCRIPTION     gProcMaxI8;
-WLIB_PROC_DESCRIPTION     gProcMaxI16;
-WLIB_PROC_DESCRIPTION     gProcMaxI32;
-WLIB_PROC_DESCRIPTION     gProcMaxI64;
+WLIB_PROC_DESCRIPTION     gProcMaxS8;
+WLIB_PROC_DESCRIPTION     gProcMaxS16;
+WLIB_PROC_DESCRIPTION     gProcMaxS32;
+WLIB_PROC_DESCRIPTION     gProcMaxS64;
 
 WLIB_PROC_DESCRIPTION     gProcMaxU8;
 WLIB_PROC_DESCRIPTION     gProcMaxU16;
@@ -81,6 +75,13 @@ WLIB_PROC_DESCRIPTION     gProcMaxU64;
 WLIB_PROC_DESCRIPTION     gProcMaxR;
 WLIB_PROC_DESCRIPTION     gProcMaxRR;
 
+
+static WLIB_STATUS
+get_PHI( SessionStack& stack, ISession&)
+{
+  stack.Push(DRichReal(RICHREAL_T(1, 61803398874989ull, DBS_RICHREAL_PREC)));
+  return WOP_OK;
+}
 
 
 static WLIB_STATUS
@@ -94,13 +95,13 @@ get_PI( SessionStack& stack, ISession&)
 static WLIB_STATUS
 get_SQRT2(SessionStack& stack, ISession&)
 {
-  stack.Push(DRichReal(RICHREAL_T(2, 41421356237309ull, DBS_RICHREAL_PREC)));
+  stack.Push(DRichReal(RICHREAL_T(1, 41421356237309ull, DBS_RICHREAL_PREC)));
   return WOP_OK;
 }
 
 
 static WLIB_STATUS
-get_NE( SessionStack& stack, ISession&)
+get_E( SessionStack& stack, ISession&)
 {
   stack.Push(DRichReal(RICHREAL_T(2, 71828182845904ull, DBS_RICHREAL_PREC)));
   return WOP_OK;
@@ -149,20 +150,25 @@ base_generics_init()
   static const uint8_t* procLocalRType[]     = { gRealType };
   static const uint8_t* procLocalRRType[]    = { gRichRealType };
 
-  gProcPI.name             = "pi";
+  gProcPHI.name             = "pi";
+  gProcPHI.localsCount      = 1;
+  gProcPHI.localsTypes      = procLocalRRType;
+  gProcPHI.code             = get_PI;
+
+  gProcPI.name             = "phi";
   gProcPI.localsCount      = 1;
   gProcPI.localsTypes      = procLocalRRType;
-  gProcPI.code             = get_PI;
+  gProcPI.code             = get_PHI;
 
   gProcSQRT2.name          = "sqrt2";
   gProcSQRT2.localsCount   = 1;
   gProcSQRT2.localsTypes   = procLocalRRType;
   gProcSQRT2.code          = get_SQRT2;
 
-  gProcNE.name             = "e";
-  gProcNE.localsCount      = 1;
-  gProcNE.localsTypes      = procLocalRRType;
-  gProcNE.code             = get_NE;
+  gProcE.name             = "e";
+  gProcE.localsCount      = 1;
+  gProcE.localsTypes      = procLocalRRType;
+  gProcE.code             = get_E;
 
 
   gProcMinB.name          = "min_bool";
@@ -215,81 +221,60 @@ base_generics_init()
   gProcMaxHT.localsTypes  = procLocalHTType;
   gProcMaxHT.code         = get_max_value<DHiresTime>;
 
-  gProcMinI8.name         = "min_i8";
-  gProcMinI8.localsCount  = 1;
-  gProcMinI8.localsTypes  = procLocalI8Type;
-  gProcMinI8.code         = get_min_value<DInt8>;
+  gProcMinS8.name         = "min_s8";
+  gProcMinS8.localsCount  = 1;
+  gProcMinS8.localsTypes  = procLocalI8Type;
+  gProcMinS8.code         = get_min_value<DInt8>;
 
-  gProcMaxI8.name         = "max_i8";
-  gProcMaxI8.localsCount  = 1;
-  gProcMaxI8.localsTypes  = procLocalI8Type;
-  gProcMaxI8.code         = get_max_value<DInt8>;
+  gProcMaxS8.name         = "max_s8";
+  gProcMaxS8.localsCount  = 1;
+  gProcMaxS8.localsTypes  = procLocalI8Type;
+  gProcMaxS8.code         = get_max_value<DInt8>;
 
-  gProcMinI16.name         = "min_i16";
-  gProcMinI16.localsCount  = 1;
-  gProcMinI16.localsTypes  = procLocalI16Type;
-  gProcMinI16.code         = get_min_value<DInt16>;
+  gProcMinS16.name         = "min_s16";
+  gProcMinS16.localsCount  = 1;
+  gProcMinS16.localsTypes  = procLocalI16Type;
+  gProcMinS16.code         = get_min_value<DInt16>;
 
-  gProcMaxI16.name         = "max_i16";
-  gProcMaxI16.localsCount  = 1;
-  gProcMaxI16.localsTypes  = procLocalI16Type;
-  gProcMaxI16.code         = get_max_value<DInt16>;
+  gProcMaxS16.name         = "max_s16";
+  gProcMaxS16.localsCount  = 1;
+  gProcMaxS16.localsTypes  = procLocalI16Type;
+  gProcMaxS16.code         = get_max_value<DInt16>;
 
-  gProcMinI32.name         = "min_i32";
-  gProcMinI32.localsCount  = 1;
-  gProcMinI32.localsTypes  = procLocalI32Type;
-  gProcMinI32.code         = get_min_value<DInt32>;
+  gProcMinS32.name         = "min_s32";
+  gProcMinS32.localsCount  = 1;
+  gProcMinS32.localsTypes  = procLocalI32Type;
+  gProcMinS32.code         = get_min_value<DInt32>;
 
-  gProcMaxI32.name         = "max_i32";
-  gProcMaxI32.localsCount  = 1;
-  gProcMaxI32.localsTypes  = procLocalI32Type;
-  gProcMaxI32.code         = get_max_value<DInt32>;
+  gProcMaxS32.name         = "max_s32";
+  gProcMaxS32.localsCount  = 1;
+  gProcMaxS32.localsTypes  = procLocalI32Type;
+  gProcMaxS32.code         = get_max_value<DInt32>;
 
-  gProcMinI64.name         = "min_i64";
-  gProcMinI64.localsCount  = 1;
-  gProcMinI64.localsTypes  = procLocalI64Type;
-  gProcMinI64.code         = get_min_value<DInt64>;
+  gProcMinS64.name         = "min_s64";
+  gProcMinS64.localsCount  = 1;
+  gProcMinS64.localsTypes  = procLocalI64Type;
+  gProcMinS64.code         = get_min_value<DInt64>;
 
-  gProcMaxI64.name         = "max_i64";
-  gProcMaxI64.localsCount  = 1;
-  gProcMaxI64.localsTypes  = procLocalI64Type;
-  gProcMaxI64.code         = get_max_value<DInt64>;
-
-
-  gProcMinU8.name          = "min_u8";
-  gProcMinU8.localsCount   = 1;
-  gProcMinU8.localsTypes   = procLocalUI8Type;
-  gProcMinU8.code          = get_min_value<DUInt8>;
+  gProcMaxS64.name         = "max_s64";
+  gProcMaxS64.localsCount  = 1;
+  gProcMaxS64.localsTypes  = procLocalI64Type;
+  gProcMaxS64.code         = get_max_value<DInt64>;
 
   gProcMaxU8.name          = "max_u8";
   gProcMaxU8.localsCount   = 1;
   gProcMaxU8.localsTypes   = procLocalUI8Type;
   gProcMaxU8.code          = get_max_value<DUInt8>;
 
-  gProcMinU16.name         = "min_u16";
-  gProcMinU16.localsCount  = 1;
-  gProcMinU16.localsTypes  = procLocalUI16Type;
-  gProcMinU16.code         = get_min_value<DUInt16>;
-
   gProcMaxU16.name         = "max_u16";
   gProcMaxU16.localsCount  = 1;
   gProcMaxU16.localsTypes  = procLocalUI16Type;
   gProcMaxU16.code         = get_max_value<DUInt16>;
 
-  gProcMinU32.name         = "min_u32";
-  gProcMinU32.localsCount  = 1;
-  gProcMinU32.localsTypes  = procLocalUI32Type;
-  gProcMinU32.code         = get_min_value<DUInt32>;
-
   gProcMaxU32.name         = "max_u32";
   gProcMaxU32.localsCount  = 1;
   gProcMaxU32.localsTypes  = procLocalUI32Type;
   gProcMaxU32.code         = get_max_value<DUInt32>;
-
-  gProcMinU64.name         = "min_u64";
-  gProcMinU64.localsCount  = 1;
-  gProcMinU64.localsTypes  = procLocalUI64Type;
-  gProcMinU64.code         = get_min_value<DUInt64>;
 
   gProcMaxU64.name         = "max_u64";
   gProcMaxU64.localsCount  = 1;

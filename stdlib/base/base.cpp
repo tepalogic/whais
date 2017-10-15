@@ -46,9 +46,10 @@ using namespace whais;
 
 static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
         //Basic procedures returning constants
+                                                    &gProcPHI,
                                                     &gProcPI,
                                                     &gProcSQRT2,
-                                                    &gProcNE,
+                                                    &gProcE,
 
                                                     &gProcMinB,
                                                     &gProcMaxB,
@@ -65,28 +66,21 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcMinHT,
                                                     &gProcMaxHT,
 
-                                                    &gProcMinI8,
-                                                    &gProcMaxI8,
+                                                    &gProcMinS8,
+                                                    &gProcMaxS8,
 
-                                                    &gProcMinI16,
-                                                    &gProcMaxI16,
+                                                    &gProcMinS16,
+                                                    &gProcMaxS16,
 
-                                                    &gProcMinI32,
-                                                    &gProcMaxI32,
+                                                    &gProcMinS32,
+                                                    &gProcMaxS32,
 
-                                                    &gProcMinI64,
-                                                    &gProcMaxI64,
+                                                    &gProcMinS64,
+                                                    &gProcMaxS64,
 
-                                                    &gProcMinU8,
                                                     &gProcMaxU8,
-
-                                                    &gProcMinU16,
                                                     &gProcMaxU16,
-
-                                                    &gProcMinU32,
                                                     &gProcMaxU32,
-
-                                                    &gProcMinU64,
                                                     &gProcMaxU64,
 
                                                     &gProcMinR,

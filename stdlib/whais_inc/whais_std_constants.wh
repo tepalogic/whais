@@ -30,14 +30,17 @@
 #@guard whais_std_constants
 
 
+#Get the mathematical Euler's number.
+EXTERN PROCEDURE e() RETURN RICHREAL;
+
+#Get the mathematical 'golden ratio'  constant.
+EXTERN PROCEDURE phi() RETURN RICHREAL;
+
 #Get the mathematical PI constant.
 EXTERN PROCEDURE pi() RETURN RICHREAL;
 
 #Get the square root of 2.
 EXTERN PROCEDURE sqrt2() RETURN RICHREAL;
-
-#Get the mathematical Euler's number.
-EXTERN PROCEDURE e() RETURN RICHREAL;
 
 #Get the minimum non null value for a BOOL typed value.
 EXTERN PROCEDURE min_bool() RETURN BOOL;
@@ -76,43 +79,31 @@ EXTERN PROCEDURE min_i8() RETURN INT8;
 EXTERN PROCEDURE max_i8() RETURN INT8;
 
 #Get the minimum non null values for a INT16 typed value.
-EXTERN PROCEDURE min_i16() RETURN INT16;
+EXTERN PROCEDURE min_s16() RETURN INT16;
 
 #Get the maximum non null values for a INT16 typed values.
-EXTERN PROCEDURE max_i16() RETURN INT16;
+EXTERN PROCEDURE max_s16() RETURN INT16;
 
 #Get the minimum non null values for a INT32 typed value.
-EXTERN PROCEDURE min_i32() RETURN INT32;
+EXTERN PROCEDURE min_s32() RETURN INT32;
 
 #Get the maximum non null values for a INT32 typed values.
-EXTERN PROCEDURE max_i32() RETURN INT32;
+EXTERN PROCEDURE max_s32() RETURN INT32;
 
 #Get the minimum non null values for a INT64 typed value.
-EXTERN PROCEDURE min_i64() RETURN INT64;
+EXTERN PROCEDURE min_s64() RETURN INT64;
 
 #Get the maximum non null values for a INT64 typed values.
-EXTERN PROCEDURE max_i64() RETURN INT64;
-
-#Get the minimum non null values for a UINT8 typed value.
-EXTERN PROCEDURE min_u8() RETURN UINT8;
+EXTERN PROCEDURE max_s64() RETURN INT64;
 
 #Get the maximum non null values for a UINT8 typed values.
 EXTERN PROCEDURE max_u8() RETURN UINT8;
 
-#Get the minimum non null values for a UINT16 typed value.
-EXTERN PROCEDURE min_u16() RETURN UINT16;
-
 #Get the maximum non null values for a UINT16 typed values.
 EXTERN PROCEDURE max_u16() RETURN UINT16;
 
-#Get the minimum non null values for a UINT32 typed value.
-EXTERN PROCEDURE min_u32() RETURN UINT32;
-
 #Get the maximum non null values for a UINT32 typed values.
 EXTERN PROCEDURE max_u32() RETURN UINT32;
-
-#Get the minimum non null values for a UINT64 typed value.
-EXTERN PROCEDURE min_u64() RETURN UINT64;
 
 #Get the maximum non null values for a UINT64 typed values.
 EXTERN PROCEDURE max_u64() RETURN UINT64;
