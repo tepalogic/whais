@@ -50,6 +50,11 @@ static const uint_t UTF16_EXTRA_BYTE_MAX        = 0xDFFF;
 static const uint_t UTF16_EXTRA_10BIT_MASK      = 0x03FF;
 static const uint_t UTF16_EXTRA_CODE_UNIT_MARK  = 0x10000;
 
+static const uint_t UTF16_EXTRA_LO_SURROGATE     = 0xD800;
+static const uint_t UTF16_EXTRA_LO_SURROGATE_END = 0xDBFF;
+static const uint_t UTF16_EXTRA_HI_SURROGATE     = 0xDC00;
+static const uint_t UTF16_EXTRA_HI_SURROGATE_END = 0xDFFF;
+
 
 /* Get the code units count of an UTF-8 encoded char using the
  * first code unit. */

@@ -75,13 +75,24 @@ WLIB_PROC_DESCRIPTION       gTextCompare;
 static int
 compare_chars(const int c1, const int c2, const bool ignoreCase, const bool alphabetically)
 {
-  const int lc1 = (alphabetically || ignoreCase) ? wh_to_lowercase( c1) : c1;
-  const int lc2 = (alphabetically || ignoreCase) ? wh_to_lowercase( c2) : c2;
+  const int lc1 = (alphabetically || ignoreCase) ? wh_to_lowercase(c1) : c1;
+  const int lc2 = (alphabetically || ignoreCase) ? wh_to_lowercase(c2) : c2;
 
-  if (alphabetically && (lc1 == lc2))
-    return c1 - c2;
+  if (!ignoreCase && alphabetically && (lc1 == lc2))
+  {
+    if (c1 == c2)
+      return 0;
 
-  return lc1 - lc2;
+    return isupper(c1) ? 1 : -1;
+  }
+
+  if (lc1 < lc2)
+    return -1;
+
+  else if (lc1 == lc2)
+    return 0;
+
+  return 1;
 }
 
 
@@ -337,7 +348,8 @@ load_utf16_text( SessionStack& stack, ISession&)
 
     //Read into temporal buffer as much as we can.
     for (tempCount = 0;
-        (tempCount < (sizeof temp / sizeof(temp[0]))) && (it + tempCount < arrayCount); ++tempCount)
+        (tempCount < (sizeof temp / sizeof(temp[0]))) && (it + tempCount < arrayCount);
+        ++tempCount)
     {
       DUInt16 codeUnit;
       source.Get(it + tempCount, codeUnit);
@@ -419,12 +431,7 @@ get_chars_count( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 1].Operand().GetValue(text);
   stack.Pop(1);
-
-  if (text.IsNull())
-    stack.Push(DUInt64());
-
-  else
-    stack.Push(DUInt64(text.Count()));
+  stack.Push(DUInt64(text.Count()));
 
   return WOP_OK;
 }
@@ -568,8 +575,8 @@ compare_texts( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 4].Operand().GetValue(text1);
   stack[stack.Size() - 3].Operand().GetValue(text2);
-  stack[stack.Size() - 2].Operand().GetValue(ignoreCase);
-  stack[stack.Size() - 1].Operand().GetValue(alphabetically);
+  stack[stack.Size() - 2].Operand().GetValue(alphabetically);
+  stack[stack.Size() - 1].Operand().GetValue(ignoreCase);
   stack.Pop(4);
 
   const uint64_t maxCount = max(text1.Count(), text2.Count());
@@ -585,7 +592,7 @@ compare_texts( SessionStack& stack, ISession&)
     result = compare_chars(c1, c2, igCase, alphabet);
   }
 
-  stack.Push(DInt32(result));
+  stack.Push(DInt8(result));
   return WOP_OK;
 }
 
@@ -634,20 +641,20 @@ base_text_init()
 
   static const uint8_t* unicodeConvLocal[] = { gUInt32Type, gCharType };
 
-  gUnicodeCP.name            = "unicode_cp";
   gUnicodeCP.localsCount     = 2;
+  gUnicodeCP.name            = "unicode_cp";
   gUnicodeCP.localsTypes     = unicodeConvLocal;
   gUnicodeCP.code            = get_char_cp;
 
 
   static const uint8_t* charConvLocals[] = { gCharType, gCharType };
 
-  gUpperChar.name            = "uppercase_char";
+  gUpperChar.name            = "to_upper";
   gUpperChar.localsCount     = 2;
   gUpperChar.localsTypes     = charConvLocals;
   gUpperChar.code            = get_char_upper;
 
-  gLowerChar.name            = "lowercase_char";
+  gLowerChar.name            = "to_lower";
   gLowerChar.localsCount     = 2;
   gLowerChar.localsTypes     = charConvLocals;
   gLowerChar.code            = get_char_lower;
@@ -655,12 +662,12 @@ base_text_init()
 
   static const uint8_t* textLocals[] = { gTextType, gTextType };
 
-  gUpperText.name            = "uppercase_text";
+  gUpperText.name            = "to_uppercase";
   gUpperText.localsCount     = 2;
   gUpperText.localsTypes     = textLocals;
   gUpperText.code            = get_text_upper;
 
-  gLowerText.name            = "lowercase_text";
+  gLowerText.name            = "to_lowercase";
   gLowerText.localsCount     = 2;
   gLowerText.localsTypes     = textLocals;
   gLowerText.code            = get_text_lower;
@@ -716,7 +723,7 @@ base_text_init()
 
   static const uint8_t* charsCountLocals[] = { gUInt64Type, gTextType };
 
-  gTextCharsCount.name        = "text_length";
+  gTextCharsCount.name        = "length";
   gTextCharsCount.localsCount = 2;
   gTextCharsCount.localsTypes = charsCountLocals;
   gTextCharsCount.code        = get_chars_count;
@@ -752,7 +759,7 @@ base_text_init()
                                              gUInt64Type
                                            };
 
-  gTextFind.name              = "find_substring";
+  gTextFind.name              = "find";
   gTextFind.localsCount       = 6;
   gTextFind.localsTypes       = findTextLocals;
   gTextFind.code              = find_substring_offset;
@@ -768,21 +775,21 @@ base_text_init()
                                                 gUInt64Type
                                               };
 
-  gTextReplace.name          = "replace_substring";
+  gTextReplace.name          = "replace";
   gTextReplace.localsCount   = 7;
   gTextReplace.localsTypes   = replaceTextLocals;
   gTextReplace.code          = replace_substring_offset;
 
 
   static const uint8_t* textCompareLocals[] = {
-                                                gInt32Type,
+                                                gInt8Type,
                                                 gTextType,
                                                 gTextType,
                                                 gBoolType,
                                                 gBoolType
                                               };
 
-  gTextCompare.name            = "text_compare";
+  gTextCompare.name            = "compare";
   gTextCompare.localsCount     = 5;
   gTextCompare.localsTypes     = textCompareLocals;
   gTextCompare.code            = compare_texts;

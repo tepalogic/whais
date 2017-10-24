@@ -92,7 +92,7 @@ EXTERN PROCEDURE unicode_cp (c CHAR) RETURN UINT32;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not have an upper case corresponded.
-EXTERN PROCEDURE uppercase_char (c CHAR) RETURN CHAR;
+EXTERN PROCEDURE to_upper (c CHAR) RETURN CHAR;
 
 #Retrieve the lower case correspondent of a WHAIS character.
 #In:
@@ -100,7 +100,7 @@ EXTERN PROCEDURE uppercase_char (c CHAR) RETURN CHAR;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not not have a lower case corresponded.
-EXTERN PROCEDURE lowercase_char (c CHAR) RETURN CHAR;
+EXTERN PROCEDURE to_lower (c CHAR) RETURN CHAR;
 
 #Get the converted all to upper case text.
 #In:
@@ -108,7 +108,7 @@ EXTERN PROCEDURE lowercase_char (c CHAR) RETURN CHAR;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   upper case converted.
-EXTERN PROCEDURE uppercase_text (t TEXT) RETURN TEXT;
+EXTERN PROCEDURE to_uppercase (t TEXT) RETURN TEXT;
 
 #Get the converted all to lower case text.
 #In:
@@ -116,7 +116,7 @@ EXTERN PROCEDURE uppercase_text (t TEXT) RETURN TEXT;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   lower case converted.
-EXTERN PROCEDURE lowercase_text (t TEXT) RETURN TEXT;
+EXTERN PROCEDURE to_lowercase (t TEXT) RETURN TEXT;
 
 #Get the UTF-8 representation of a text.
 #In:
@@ -165,7 +165,7 @@ EXTERN PROCEDURE text_from_array (s CHAR ARRAY) RETURN TEXT;
 #   @t - The text value.
 #Out:
 #   The count of the text's characters.
-EXTERN PROCEDURE text_length (t TEXT) RETURN UINT64;
+EXTERN PROCEDURE length (t TEXT) RETURN UINT64;
 
 #Get a hash code for a text.
 #In:
@@ -198,11 +198,11 @@ EXTERN PROCEDURE find_char( source TEXT,
 #   @to     - Last position to look to.
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
-EXTERN PROCEDURE find_substring( source TEXT,
-                                 str TEXT, 
-                                 case BOOL,
-                                 from UINT64,
-                                 to UINT64) RETURN UINT64;
+EXTERN PROCEDURE find_str( source TEXT,
+                           str TEXT, 
+                           case BOOL,
+                           from UINT64,
+                           to UINT64) RETURN UINT64;
                                  
 #Replace a substring in a text.
 #In:
@@ -214,12 +214,12 @@ EXTERN PROCEDURE find_substring( source TEXT,
 #   @to     - Last position to look to.
 #Out:
 #   A text holding the resulted content.
-EXTERN PROCEDURE replace_substring (source TEXT,
-                                    str TEXT,
-                                    newStr TEXT, 
-                                    case BOOL,
-                                    from UINT64,
-                                    to UINT64) RETURN TEXT;
+EXTERN PROCEDURE replace_str(source TEXT,
+                             str TEXT,
+                             newStr TEXT, 
+                             case BOOL,
+                             from UINT64,
+                             to UINT64) RETURN TEXT;
 # Compare to text string.
 #In:
 #   @first  - Text source text.
@@ -228,7 +228,7 @@ EXTERN PROCEDURE replace_substring (source TEXT,
 #   @alph   - TRUE to compare alphabetically.
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
-EXTERN PROCEDURE text_compare( first TEXT,
-                               second TEXT, 
-                               case BOOL,
-                               alph BOOL) RETURN INT32;
+EXTERN PROCEDURE compare(first TEXT,
+                         second TEXT, 
+                         alph BOOL,
+                         case BOOL) RETURN INT32;

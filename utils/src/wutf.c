@@ -58,11 +58,8 @@ wh_utf8_cu_count(const uint8_t codeUnit)
 uint_t
 wh_utf16_cu_count(const uint16_t codeUnit)
 {
-  if ((UTF16_EXTRA_BYTE_MIN <= codeUnit)
-      && (codeUnit <= UTF16_EXTRA_BYTE_MAX))
-  {
+  if ((UTF16_EXTRA_BYTE_MIN <= codeUnit) && (codeUnit <= UTF16_EXTRA_BYTE_MAX))
     return 2;
-  }
 
   return 1;
 }
@@ -139,16 +136,16 @@ wh_load_utf8_cp(const uint8_t* const utf8Str, uint32_t* const outCodePoint)
 uint_t
 wh_load_utf16_cp(const uint16_t* const utf16Str, uint32_t* const outCodePoint)
 {
-  if ((UTF16_EXTRA_BYTE_MIN <= utf16Str[0])
-      && (utf16Str[0] <= UTF16_EXTRA_BYTE_MAX))
+  if ((UTF16_EXTRA_LO_SURROGATE <= utf16Str[0])
+      && (utf16Str[0] <= UTF16_EXTRA_LO_SURROGATE_END))
   {
-    *outCodePoint   = utf16Str[0] & UTF16_EXTRA_10BIT_MASK;
+    *outCodePoint   = utf16Str[0] - UTF16_EXTRA_LO_SURROGATE;
     *outCodePoint <<= 10;
 
-    if ((UTF16_EXTRA_BYTE_MIN <= utf16Str[1])
-        && (utf16Str[1] <= UTF16_EXTRA_BYTE_MAX))
+    if ((UTF16_EXTRA_HI_SURROGATE <= utf16Str[1])
+        && (utf16Str[1] <= UTF16_EXTRA_HI_SURROGATE_END))
     {
-      *outCodePoint  += utf16Str[1] & UTF16_EXTRA_10BIT_MASK;
+      *outCodePoint  += utf16Str[1] - UTF16_EXTRA_HI_SURROGATE;
       *outCodePoint  += UTF16_EXTRA_CODE_UNIT_MARK;
 
       return 2;
@@ -242,8 +239,8 @@ wh_store_utf16_cp(const uint32_t codePoint, uint16_t* const dest)
     const uint32_t cp = codePoint - UTF16_EXTRA_CODE_UNIT_MARK;
     assert(codePoint >= UTF16_EXTRA_CODE_UNIT_MARK);
 
-    dest[0] = UTF16_EXTRA_BYTE_MIN + (cp >> 10);
-    dest[1] = cp & UTF16_EXTRA_10BIT_MASK;
+    dest[0] = UTF16_EXTRA_LO_SURROGATE + ((cp >> 10) & UTF16_EXTRA_10BIT_MASK);
+    dest[1] = UTF16_EXTRA_HI_SURROGATE + (cp & UTF16_EXTRA_10BIT_MASK);
 
     return 2;
   }
