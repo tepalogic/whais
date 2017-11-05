@@ -551,7 +551,7 @@ VariableSizeStore::AddRecord(const uint8_t* buffer, const uint64_t size)
   entry->NextEntry(StoreEntry::LAST_CHAINED_ENTRY);
   entry->PrevEntry(StoreEntry::FIRST_PREV_ENTRY);
 
-  sync.Release();
+  sync.unlock();
 
   if ((resultEntry != 0) && (size > 0))
   {
@@ -584,7 +584,7 @@ VariableSizeStore::AddRecord(VariableSizeStore& sourceStore,
   entry->NextEntry(StoreEntry::LAST_CHAINED_ENTRY);
   entry->PrevEntry(StoreEntry::FIRST_PREV_ENTRY);
 
-  sync.Release();
+  sync.unlock();
 
   if ((resultEntry != 0) && (sourceSize > 0))
   {
@@ -614,7 +614,7 @@ VariableSizeStore::AddRecord(IDataContainer& sourceContainer,
   entry->NextEntry(StoreEntry::LAST_CHAINED_ENTRY);
   entry->PrevEntry(StoreEntry::FIRST_PREV_ENTRY);
 
-  sync.Release();
+  sync.unlock();
 
   if ((resultEntry != 0) && (sourceSize > 0))
     UpdateRecord(resultEntry, 0, sourceContainer, sourceOffset, sourceSize);

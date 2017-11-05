@@ -63,7 +63,7 @@ public:
 
     if (--mRefCount == 0)
       {
-        _lock.Release();
+        _lock.unlock();
         delete this;
       }
   }

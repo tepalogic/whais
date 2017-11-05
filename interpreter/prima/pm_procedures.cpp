@@ -201,7 +201,7 @@ ProcedureManager::AquireSync(const Procedure& proc, const uint32_t sync)
     if (aquired)
     {
       //Some one has taken this before us! Prepare to try again!
-      holder.Release();
+      holder.unlock();
       wh_yield();
     }
     else

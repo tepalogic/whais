@@ -493,7 +493,7 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
 
   LockRAII<Lock> holder(sClosingLock);
   sListeners = nullptr;
-  holder.Release();
+  holder.unlock();
 
   for (uint_t index = 0; index < listeners.size(); ++index)
     listeners[index].mListenThread.WaitToEnd(false);

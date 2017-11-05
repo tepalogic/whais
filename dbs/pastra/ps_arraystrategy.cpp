@@ -495,7 +495,7 @@ NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
 
     inited = true;
   }
-  _l.Release();
+  _l.unlock();
 
 
   switch(type)

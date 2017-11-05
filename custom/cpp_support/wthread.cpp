@@ -56,7 +56,7 @@ Lock::~Lock()
 
 
 void
-Lock::Acquire()
+Lock::lock()
 {
   const uint_t result = wh_lock_acquire(&mLock);
   if (result != WOP_OK)
@@ -69,7 +69,7 @@ Lock::Acquire()
 
 
 bool
-Lock::TryAcquire()
+Lock::try_lock()
 {
   bool_t acquired;
 
@@ -88,7 +88,7 @@ Lock::TryAcquire()
 
 
 void
-Lock::Release()
+Lock::unlock()
 {
   const uint_t result = wh_lock_release(&mLock);
 
@@ -106,7 +106,7 @@ SpinLock::SpinLock()
 
 
 void
-SpinLock::Acquire()
+SpinLock::lock()
 {
   while (true)
     {
@@ -122,7 +122,7 @@ SpinLock::Acquire()
 
 
 bool
-SpinLock::TryAcquire()
+SpinLock::try_lock()
 {
   assert(mLock >= 0);
 
@@ -134,7 +134,7 @@ SpinLock::TryAcquire()
 }
 
 void
-SpinLock::Release()
+SpinLock::unlock()
 {
   assert(mLock > 0);
 

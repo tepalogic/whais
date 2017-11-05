@@ -40,9 +40,9 @@ public:
   Lock();
   ~Lock();
 
-  void Acquire();
-  bool TryAcquire();
-  void Release();
+  void lock();
+  bool try_lock();
+  void unlock();
 
 private:
   Lock(const Lock&);
@@ -56,9 +56,9 @@ class CUSTOM_SHL SpinLock
 public:
   SpinLock();
 
-  void Acquire();
-  bool TryAcquire();
-  void Release();
+  void lock();
+  bool try_lock();
+  void unlock();
 
 private:
   SpinLock(const SpinLock&);
@@ -77,31 +77,31 @@ public:
       mIsAcquireed(false)
   {
     if ( ! skipAcquire)
-      Acquire();
+      this->lock();
   }
 
   ~LockRAII()
   {
-    Release();
+    unlock();
   }
 
-  void Acquire()
+  void lock()
   {
-    mLock.Acquire();
+    mLock.lock();
     mIsAcquireed = true;
   }
 
-  bool TryAcquire()
+  bool try_lock()
   {
-    mIsAcquireed = mLock.TryAcquire();
+    mIsAcquireed = mLock.try_lock();
     return mIsAcquireed;
   }
 
-  void Release()
+  void unlock()
   {
     if (mIsAcquireed)
       {
-        mLock.Release();
+        mLock.unlock();
         mIsAcquireed = false;
       }
   }
@@ -138,23 +138,23 @@ public:
   {
     if (&mLock1 == &mLock2)
       {
-        mLock1.Acquire();
+        mLock1.lock();
         mIsAcquireed1 = true;
         return ;
       }
 
     while (true)
       {
-        mLock1.Acquire();
+        mLock1.lock();
         mIsAcquireed1 = true;
 
-        if (mLock2.TryAcquire())
+        if (mLock2.try_lock())
           {
             mIsAcquireed2 = true;
             return ;
           }
 
-        mLock1.Release();
+        mLock1.unlock();
         mIsAcquireed1 = false;
 
         wh_yield();
@@ -164,10 +164,10 @@ public:
   void ReleaseBoth()
   {
     if (mIsAcquireed1)
-      mLock1.Release();
+      mLock1.unlock();
 
     if (mIsAcquireed2)
-      mLock2.Release();
+      mLock2.unlock();
   }
 
 private:
@@ -206,15 +206,15 @@ public:
   {
     while (true)
       {
-        mLock1.Acquire();
+        mLock1.lock();
         mIsAcquireed1 = true;
 
         if ((&mLock2 == &mLock1)
-            || ((mIsAcquireed2 = mLock2.TryAcquire()) == true))
+            || ((mIsAcquireed2 = mLock2.try_lock()) == true))
         {
             if ((&mLock3 == &mLock2)
                 || (&mLock3 == &mLock1)
-                || ((mIsAcquireed3 = mLock3.TryAcquire()) == true))
+                || ((mIsAcquireed3 = mLock3.try_lock()) == true))
               {
                 return;
               }
@@ -228,13 +228,13 @@ public:
   void ReleaseAll()
   {
     if (mIsAcquireed1)
-      mLock1.Release();
+      mLock1.unlock();
 
     if (mIsAcquireed2)
-      mLock2.Release();
+      mLock2.unlock();
 
     if (mIsAcquireed3)
-      mLock3.Release();
+      mLock3.unlock();
 
     mIsAcquireed1 = mIsAcquireed2 = mIsAcquireed3 = false;
   }

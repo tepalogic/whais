@@ -93,8 +93,8 @@ PrototypeTable::LockTable()
 
   mLockInProgress = true;
 
-  mRowsSync.Acquire();
-  mIndexesSync.Acquire();
+  mRowsSync.lock();
+  mIndexesSync.lock();
 
   FlushInternal();
 }
@@ -108,8 +108,8 @@ PrototypeTable::UnlockTable()
 
   mLockInProgress = false;
 
-  mIndexesSync.Release();
-  mRowsSync.Release();
+  mIndexesSync.unlock();
+  mRowsSync.unlock();
 }
 
 
@@ -331,7 +331,7 @@ PrototypeTable::GetReusableRow(const bool forceAdd)
   {
     if (forceAdd)
     {
-      syncHolder.Release();
+      syncHolder.unlock();
       return PrototypeTable::AddRow();
     }
   }
@@ -930,7 +930,7 @@ PrototypeTable::AcquireFieldIndex(FieldDescriptor* const field)
       break;
     }
 
-    syncHolder.Release();
+    syncHolder.unlock();
     wh_yield();
   }
 }
@@ -1001,7 +1001,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
     if (threadSafe)
     {
       AcquireFieldIndex( &desc);
-      syncHolder.Release();
+      syncHolder.unlock();
     }
 
     try
@@ -1020,7 +1020,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
     if (threadSafe)
     {
       ReleaseIndexField( &desc);
-      syncHolder.Acquire();
+      syncHolder.lock();
     }
   }
 }
