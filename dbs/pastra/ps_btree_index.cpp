@@ -258,7 +258,7 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
 {
   assert(nodeId != NIL_NODE);
 
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
   auto it = mNodesKeeper.find(nodeId);
 
   if (it == mNodesKeeper.end())
@@ -299,7 +299,7 @@ IBTreeNodeManager::RetrieveNode(const NODE_INDEX nodeId)
 void
 IBTreeNodeManager::ReleaseNode(const NODE_INDEX nodeId)
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
   const auto it = mNodesKeeper.find(nodeId);
 
   assert(it != mNodesKeeper.end());
@@ -312,7 +312,7 @@ IBTreeNodeManager::ReleaseNode(const NODE_INDEX nodeId)
 void
 IBTreeNodeManager::FlushNodes()
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   for (auto& node : mNodesKeeper)
   {

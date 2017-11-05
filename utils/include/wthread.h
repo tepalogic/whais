@@ -69,10 +69,10 @@ private:
 
 
 template<class T>
-class LockRAII
+class LockGuard
 {
 public:
-  explicit LockRAII( T &lock, const bool skipAcquire = false)
+  explicit LockGuard( T &lock, const bool skipAcquire = false)
     : mLock(lock),
       mIsAcquireed(false)
   {
@@ -80,7 +80,7 @@ public:
       this->lock();
   }
 
-  ~LockRAII()
+  ~LockGuard()
   {
     unlock();
   }
@@ -107,8 +107,8 @@ public:
   }
 
 private:
-  LockRAII(const LockRAII&);
-  LockRAII& operator= (const LockRAII& );
+  LockGuard(const LockGuard&);
+  LockGuard& operator= (const LockGuard& );
 
   T&       mLock;
   bool     mIsAcquireed;
@@ -116,10 +116,10 @@ private:
 
 
 template<typename T>
-class DoubleLockRAII
+class DoubleLockGuard
 {
 public:
-  DoubleLockRAII(T& lock1, T& lock2, const bool skipAcquire = false)
+  DoubleLockGuard(T& lock1, T& lock2, const bool skipAcquire = false)
     : mLock1(lock1),
       mLock2(lock2),
       mIsAcquireed1(false),
@@ -129,7 +129,7 @@ public:
       AcquireBoth();
   }
 
-  ~DoubleLockRAII()
+  ~DoubleLockGuard()
   {
     ReleaseBoth();
   }
@@ -171,8 +171,8 @@ public:
   }
 
 private:
-  DoubleLockRAII(const DoubleLockRAII&);
-  DoubleLockRAII& operator= (const DoubleLockRAII& );
+  DoubleLockGuard(const DoubleLockGuard&);
+  DoubleLockGuard& operator= (const DoubleLockGuard& );
 
   T&       mLock1;
   T&       mLock2;
@@ -182,10 +182,10 @@ private:
 
 
 template<typename T>
-class TripleLockRAII
+class TripleLockGuard
 {
 public:
-  TripleLockRAII(T& lock1, T& lock2, T& lock3, const bool skipAcquire = false)
+  TripleLockGuard(T& lock1, T& lock2, T& lock3, const bool skipAcquire = false)
     : mLock1(lock1),
       mLock2(lock2),
       mLock3(lock3),
@@ -197,7 +197,7 @@ public:
       AcquireAll();
   }
 
-  ~TripleLockRAII()
+  ~TripleLockGuard()
   {
     ReleaseAll();
   }
@@ -240,8 +240,8 @@ public:
   }
 
 private:
-  TripleLockRAII(const TripleLockRAII&);
-  TripleLockRAII& operator= (const TripleLockRAII& );
+  TripleLockGuard(const TripleLockGuard&);
+  TripleLockGuard& operator= (const TripleLockGuard& );
 
   T&       mLock1;
   T&       mLock2;

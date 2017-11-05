@@ -69,7 +69,7 @@ IArrayStrategy::Type()
 uint_t
 IArrayStrategy::Get(const uint64_t index, uint8_t* const dest)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   assert (mSelfShare.lock().get() == this);
 
@@ -89,7 +89,7 @@ IArrayStrategy::Set(const DBS_BASIC_TYPE type,
                        const uint8_t* const rawValue,
                        const uint64_t index)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   shared_ptr<IArrayStrategy> r = mSelfShare.lock();
   assert (r.get() == this);
@@ -134,7 +134,7 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
                     const uint8_t* const rawValue,
                     uint64_t* const outIndex)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   shared_ptr<IArrayStrategy> r = mSelfShare.lock();
   assert (r.get() == this);
@@ -173,7 +173,7 @@ IArrayStrategy::Add(const DBS_BASIC_TYPE type,
 shared_ptr<IArrayStrategy>
 IArrayStrategy::Remove(const uint64_t index)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   shared_ptr<IArrayStrategy> r = mSelfShare.lock();
   assert (r.get() == this);
@@ -232,7 +232,7 @@ IArrayStrategy::Remove(const uint64_t index)
 shared_ptr<IArrayStrategy>
 IArrayStrategy::Sort(const bool reverse)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   shared_ptr<IArrayStrategy> r = mSelfShare.lock();
   assert (r.get() == this);
@@ -472,7 +472,7 @@ NullArray::GetSingletoneInstace(const DBS_FIELD_TYPE type)
   static bool inited = false;
   static SpinLock initLock;
 
-  LockRAII<decltype(initLock)> _l(initLock);
+  LockGuard<decltype(initLock)> _l(initLock);
 
   if ( ! inited)
   {

@@ -79,7 +79,7 @@ PrototypeTable::PrototypeTable(const PrototypeTable& prototype)
 void
 PrototypeTable::Flush()
 {
-  DoubleLockRAII<Lock> _l(mRowsSync, mIndexesSync);
+  DoubleLockGuard<Lock> _l(mRowsSync, mIndexesSync);
 
   FlushInternal();
 }
@@ -184,7 +184,7 @@ ROW_INDEX
 PrototypeTable::AddRow(const bool skipThreadSafety)
 {
   MarkRowModification();
-  LockRAII<Lock> _l(mRowsSync, skipThreadSafety);
+  LockGuard<Lock> _l(mRowsSync, skipThreadSafety);
 
   uint64_t lastRowPosition = mRowsCount * mRowSize;
   uint_t toWrite = mRowSize;
@@ -209,7 +209,7 @@ PrototypeTable::AddRow(const bool skipThreadSafety)
 
   removedRows.InsertKey(TableRmKey(mRowsCount), &dummyNode, &dummyKey);
 
-  LockRAII<Lock> syncHolder2(mIndexesSync);
+  LockGuard<Lock> syncHolder2(mIndexesSync);
 
   for (uint_t f = 0; f < mvIndexNodeMgrs.size(); f++)
   {
@@ -326,7 +326,7 @@ PrototypeTable::GetReusableRow(const bool forceAdd)
   TableRmKey key(0);
   BTree removedRows( *this);
 
-  LockRAII<Lock> syncHolder(mRowsSync);
+  LockGuard<Lock> syncHolder(mRowsSync);
   if (removedRows.FindBiggerOrEqual(key, &node, &keyIndex) == false)
   {
     if (forceAdd)
@@ -360,7 +360,7 @@ PrototypeTable::ReusableRowsCount()
   TableRmKey key(0);
   BTree removedRows( *this);
 
-  LockRAII<Lock> syncHolder(mRowsSync);
+  LockGuard<Lock> syncHolder(mRowsSync);
   if (removedRows.FindBiggerOrEqual(key, &nodeId, &keyIndex) == false)
     return 0;
 
@@ -501,7 +501,7 @@ PrototypeTable::CreateIndex(const FIELD_INDEX field,
                        mFieldsCount);
   }
 
-  LockRAII<Lock> syncHolder(mRowsSync);
+  LockGuard<Lock> syncHolder(mRowsSync);
 
   assert(mvIndexNodeMgrs.size() == mFieldsCount);
 
@@ -631,7 +631,7 @@ PrototypeTable::RemoveIndex(const FIELD_INDEX field)
 
   assert(mvIndexNodeMgrs.size() == mFieldsCount);
 
-  LockRAII<Lock> syncHolder(mRowsSync);
+  LockGuard<Lock> syncHolder(mRowsSync);
 
   FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
@@ -658,7 +658,7 @@ PrototypeTable::RemoveIndex(const FIELD_INDEX field)
 bool
 PrototypeTable::IsIndexed(const FIELD_INDEX field) const
 {
-  LockRAII<Lock> syncHolder(_CC(Lock&, mRowsSync));
+  LockGuard<Lock> syncHolder(_CC(Lock&, mRowsSync));
 
   if (field >= mFieldsCount)
   {
@@ -922,7 +922,7 @@ PrototypeTable::AcquireFieldIndex(FieldDescriptor* const field)
 {
   while (true)
   {
-    LockRAII<Lock> syncHolder(mIndexesSync);
+    LockGuard<Lock> syncHolder(mIndexesSync);
 
     if ( !field->IsAcquired())
     {
@@ -955,7 +955,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
   T currentValue;
 
   MarkRowModification();
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
   if (row == mRowsCount)
     AddRow(true);
 
@@ -1044,10 +1044,10 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   assert(Serializer::Size(T_TEXT, false) == 2 * sizeof(uint64_t));
 
   MarkRowModification();
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
 
   shared_ptr<ITextStrategy> s = value.GetStrategy();
-  LockRAII<Lock> _l(s->mLock);
+  LockGuard<Lock> _l(s->mLock);
 
   uint64_t newFirstEntry = ~0ull;
   uint64_t newFieldValueSize = 0;
@@ -1171,10 +1171,10 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
   MarkRowModification();
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
 
   auto s = value.GetStrategy();
-  LockRAII<Lock> _l(s->mLock);
+  LockGuard<Lock> _l(s->mLock);
 
   if ( ! IS_ARRAY(desc.Type())
       || (GET_BASIC_TYPE(desc.Type()) != s->Type() && s->Count() != 0))
@@ -1490,7 +1490,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
                               const bool        threadSafe,
                               T&                outValue)
 {
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
@@ -1526,7 +1526,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
                               const bool        threadSafe,
                               DText&            outValue)
 {
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
@@ -1569,7 +1569,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
                               const bool        threadSafe,
                               DArray&           outValue)
 {
-  LockRAII<Lock> syncHolder(mRowsSync, !threadSafe);
+  LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
 
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
@@ -1875,7 +1875,7 @@ PrototypeTable::ExchangeRows(const ROW_INDEX    row1,
                              const ROW_INDEX    row2,
                              const bool         skipTthreadSafety)
 {
-  LockRAII<Lock> _l(mRowsSync, skipTthreadSafety);
+  LockGuard<Lock> _l(mRowsSync, skipTthreadSafety);
 
   const ROW_INDEX allocatedRows = AllocatedRows();
   const FIELD_INDEX fieldsCount = FieldsCount();
@@ -2046,7 +2046,7 @@ PrototypeTable::Sort(const FIELD_INDEX field,
                        "This implementation does not sort array fields.");
   }
 
-  LockRAII<Lock> _l(mRowsSync);
+  LockGuard<Lock> _l(mRowsSync);
 
   const ROW_INDEX from = MIN(fromRow, toRow);
   const ROW_INDEX to = MIN(MAX(fromRow, toRow), AllocatedRows() - 1);

@@ -57,7 +57,7 @@ ITextStrategy::operator==(ITextStrategy& o)
   if (this == &o)
     return true;
 
-  DoubleLockRAII<Lock> _l(mLock, o.mLock);
+  DoubleLockGuard<Lock> _l(mLock, o.mLock);
 
   const uint64_t utf8Count = Utf8CountU();
   if (utf8Count != o.Utf8CountU())
@@ -87,7 +87,7 @@ ITextStrategy::operator==(ITextStrategy& o)
 uint64_t
 ITextStrategy::CharsCount()
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   assert (mSelfShare.lock().get() == this);
 
@@ -97,7 +97,7 @@ ITextStrategy::CharsCount()
 uint64_t
 ITextStrategy::CharsUntilOffset(const uint64_t offset)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return CharsUntilOffsetU(offset);
 }
 
@@ -138,7 +138,7 @@ ITextStrategy::CharsUntilOffsetU(const uint64_t offset)
 uint64_t
 ITextStrategy::OffsetOfChar(const uint64_t index)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return OffsetOfCharU(index);
 }
 
@@ -221,7 +221,7 @@ ITextStrategy::CharAt(const uint64_t index)
 {
   assert (mSelfShare.lock().get() == this);
 
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   if (index > mCachedCharsCount)
     throw DBSException(_EXTRA(DBSException::STRING_INDEX_TOO_BIG));
@@ -378,7 +378,7 @@ ITextStrategy::ToCase(const bool toLower)
 {
   assert(mSelfShare.lock().get() == this);
 
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return ToCaseU(toLower);
 }
 
@@ -440,7 +440,7 @@ ITextStrategy::Append(const uint32_t ch)
 {
   assert(mSelfShare.lock().get() == this);
 
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return AppendU(ch);
 }
 
@@ -480,7 +480,7 @@ ITextStrategy::Append(ITextStrategy& text)
 {
   assert(mSelfShare.lock().get() == this);
 
-  DoubleLockRAII<Lock> _l(text.mLock, mLock);
+  DoubleLockGuard<Lock> _l(text.mLock, mLock);
   return AppendU(text);
 }
 
@@ -535,7 +535,7 @@ ITextStrategy::Append(ITextStrategy& text, const uint64_t utf8OffFrom, const uin
 {
   assert(mSelfShare.lock().get() == this);
 
-  DoubleLockRAII<Lock> _l(text.mLock, mLock);
+  DoubleLockGuard<Lock> _l(text.mLock, mLock);
   return AppendU(text, utf8OffFrom, utf8OffTo);
 }
 
@@ -604,7 +604,7 @@ ITextStrategy::UpdateCharAt(const uint32_t newCh, const uint64_t index)
 {
   assert(mSelfShare.lock().get() == this);
 
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   return UpdateCharAtU(newCh, index);
 }
@@ -613,7 +613,7 @@ ITextStrategy::UpdateCharAt(const uint32_t newCh, const uint64_t index)
 int
 ITextStrategy::CompareTo(ITextStrategy& s)
 {
-  DoubleLockRAII<Lock> _l(mLock, s.mLock);
+  DoubleLockGuard<Lock> _l(mLock, s.mLock);
 
   const uint64_t charsCount = max(mCachedCharsCount, s.mCachedCharsCount);
 
@@ -746,7 +746,7 @@ ITextStrategy::FindMatchInText(ITextStrategy& text,
 {
   assert(mSelfShare.lock().get() == this);
 
-  DoubleLockRAII<Lock> _l(mLock, text.mLock);
+  DoubleLockGuard<Lock> _l(mLock, text.mLock);
 
   if ((mCachedCharsCount == 0) || (toCh <= fromCh) || (toCh - fromCh < mCachedCharsCount))
     return DUInt64();
@@ -778,7 +778,7 @@ ITextStrategy::ReplaceInText(shared_ptr<ITextStrategy> text,
   else if (text == newSubstr)
     return mSelfShare.lock();
 
-  TripleLockRAII<Lock> _l(mLock, text->mLock, newSubstr->mLock);
+  TripleLockGuard<Lock> _l(mLock, text->mLock, newSubstr->mLock);
 
   shared_ptr<ITextStrategy> ns = newSubstr;
 
@@ -815,7 +815,7 @@ ITextStrategy::ReplaceInText(shared_ptr<ITextStrategy> text,
 uint64_t
 ITextStrategy::Utf8Count()
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return Utf8CountU();
 }
 
@@ -823,7 +823,7 @@ ITextStrategy::Utf8Count()
 void
 ITextStrategy::ReadUtf8(const uint64_t offset, const uint64_t count, uint8_t* const dest)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return ReadUtf8U(offset, count, dest);
 }
 
@@ -833,7 +833,7 @@ ITextStrategy::WriteUtf8(const uint64_t offset,
                          const uint64_t count,
                          const uint8_t* const buffer)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
 
   delete mMatcher;
   mMatcher = nullptr;
@@ -844,7 +844,7 @@ ITextStrategy::WriteUtf8(const uint64_t offset,
 void
 ITextStrategy::TruncateUtf8(const uint64_t offset)
 {
-  LockRAII<Lock> _l(mLock);
+  LockGuard<Lock> _l(mLock);
   return TruncateUtf8U(offset);
 }
 

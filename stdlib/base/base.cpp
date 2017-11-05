@@ -245,7 +245,7 @@ extern "C" {
 SHL_EXPORT_SYMBOL WLIB_STATUS
 wlib_start()
 {
-  LockRAII<Lock> syncHolder( sgShlLocker);
+  LockGuard<Lock> syncHolder( sgShlLocker);
 
   assert( sgRefsCount >= 0);
 
@@ -276,7 +276,7 @@ wlib_start()
 SHL_EXPORT_SYMBOL WLIB_STATUS
 wlib_end()
 {
-  LockRAII<Lock> syncHolder( sgShlLocker);
+  LockGuard<Lock> syncHolder( sgShlLocker);
 
   assert( (! sgInited) || (sgRefsCount > 0));
 

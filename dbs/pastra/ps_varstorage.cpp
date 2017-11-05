@@ -521,7 +521,7 @@ VariableSizeStore::FinishInit(const bool nonPersitentData)
 void
 VariableSizeStore::Flush()
 {
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   mEntriesCache.Flush();
 }
@@ -539,7 +539,7 @@ VariableSizeStore::AddRecord(const uint8_t* buffer, const uint64_t size)
 {
   assert(mUsedEntries.size() == 0);
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   uint64_t resultEntry = AllocateEntry(0);
   StoredItem cachedItem = mEntriesCache.RetriveItem(resultEntry);
@@ -572,7 +572,7 @@ VariableSizeStore::AddRecord(VariableSizeStore& sourceStore,
 {
   assert(mUsedEntries.size() == 0);
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   uint64_t resultEntry = AllocateEntry(0);
   StoredItem cachedItem = mEntriesCache.RetriveItem(resultEntry);
@@ -602,7 +602,7 @@ VariableSizeStore::AddRecord(IDataContainer& sourceContainer,
 {
   assert(mUsedEntries.size() == 0);
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   uint64_t resultEntry = AllocateEntry(0);
   StoredItem cachedItem = mEntriesCache.RetriveItem(resultEntry);
@@ -631,7 +631,7 @@ VariableSizeStore::GetRecord(uint64_t  recordFirstEntry,
 {
   assert(mUsedEntries.size() == 0);
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
   do
   {
 
@@ -681,7 +681,7 @@ VariableSizeStore::UpdateRecord(uint64_t       recordFirstEntry,
 
   uint64_t prevEntry = recordFirstEntry;
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
   do
   {
 
@@ -745,7 +745,7 @@ VariableSizeStore::UpdateRecord(uint64_t           recordFirstEntry,
   uint64_t prevEntry = recordFirstEntry;
   uint64_t sourcePrevEntry = sourceFirstEntry;
 
-  DoubleLockRAII<Lock> sync(mSync, sourceStore.mSync);
+  DoubleLockGuard<Lock> sync(mSync, sourceStore.mSync);
   do
   {
     if (recordFirstEntry == StoreEntry::LAST_CHAINED_ENTRY)
@@ -856,7 +856,7 @@ VariableSizeStore::UpdateRecord(uint64_t         recordFirstEntry,
 
   uint64_t prevEntry = recordFirstEntry;
 
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   do
   {
@@ -920,7 +920,7 @@ VariableSizeStore::UpdateRecord(uint64_t         recordFirstEntry,
 void
 VariableSizeStore::IncrementRecordRef(const uint64_t recordFirstEntry)
 {
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   StoredItem cachedItem = mEntriesCache.RetriveItem(recordFirstEntry);
   const auto entry = _RC(StoreEntry*, cachedItem.GetDataForUpdate());
@@ -936,7 +936,7 @@ VariableSizeStore::IncrementRecordRef(const uint64_t recordFirstEntry)
 void
 VariableSizeStore::DecrementRecordRef(const uint64_t recordFirstEntry)
 {
-  LockRAII<Lock> sync(mSync);
+  LockGuard<Lock> sync(mSync);
 
   StoredItem cachedItem = mEntriesCache.RetriveItem(recordFirstEntry);
   const auto entry = _RC(StoreEntry*, cachedItem.GetDataForUpdate());
@@ -958,7 +958,7 @@ VariableSizeStore::DecrementRecordRef(const uint64_t recordFirstEntry)
 uint64_t
 VariableSizeStore::Size() const
 {
-  LockRAII<Lock> sync(_CC(Lock&, mSync));
+  LockGuard<Lock> sync(_CC(Lock&, mSync));
 
   if (mEntriesContainer.get() == nullptr)
     return 0;

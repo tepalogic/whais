@@ -216,7 +216,7 @@ Thread::WaitToEnd(const bool throwPending)
   while (wh_atomic_fetch_inc32( &mEnded) != 0)
   {
     wh_yield();
-    LockRAII < Lock > _l(mRoutineExecutionLock); //Avoid spin locks!
+    LockGuard < Lock > _l(mRoutineExecutionLock); //Avoid spin locks!
     wh_atomic_fetch_dec32 (&mEnded);
   }
 
@@ -271,7 +271,7 @@ Thread::ThreadWrapperRoutine(void* const args)
 
   th->mNeedsClean = true;
 
-  LockRAII<Lock> _l(th->mRoutineExecutionLock);
+  LockGuard<Lock> _l(th->mRoutineExecutionLock);
   try
   {
       th->mRoutine(th->mRoutineArgs);

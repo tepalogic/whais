@@ -3209,77 +3209,77 @@ public:
 
   bool IsNull()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().IsNull();
   }
 
   template <class DBS_T>
   void GetValue(DBS_T& outValue)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().GetValue(outValue);
   }
 
   template <class DBS_T>
   void SetValue(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SetValue(value);
   }
 
   template <class DBS_T>
   void SelfAdd(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfAdd(value);
   }
 
   template <class DBS_T>
   void SelfSub(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfSub(value);
   }
 
   template <class DBS_T>
   void SelfMul(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfMul(value);
   }
 
   template <class DBS_T>
   void SelfDiv(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfDiv(value);
   }
 
   template <class DBS_T>
   void SelfMod(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfMod(value);
   }
 
   template <class DBS_T>
   void SelfAnd(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfAnd(value);
   }
 
   template <class DBS_T>
   void SelfXor(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfXor(value);
   }
 
   template <class DBS_T>
   void SelfOr(const DBS_T& value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().SelfOr(value);
   }
 
@@ -3291,93 +3291,93 @@ public:
 
   FIELD_INDEX GetField()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetField();
   }
 
   ITable& GetTable()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetTable();
   }
 
   StackValue GetFieldAt(const FIELD_INDEX field)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetFieldAt(field);
 
   }
 
   StackValue GetValueAt(const uint64_t index)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetValueAt(index);
   }
 
   StackValue Clone()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().Clone();
   }
 
   bool StartIterate(const bool  reverse, StackValue& outStartItem)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().StartIterate(reverse, outStartItem);
   }
 
   bool PrepareToCopy(void* const dest)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().CustomCopyIncomplete(dest);
   }
 
   TableOperand GetTableOp()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetTableOp();
   }
 
   void CopyTableOp(const TableOperand& source)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().CopyTableOp(source);
   }
 
   FieldOperand  GetFieldOp()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetFieldOp();
   }
 
   void CopyFieldOp(const FieldOperand& source)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().CopyFieldOp(source);
   }
 
   void NativeObject(INativeObject* const value)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().NativeObject(value);
   }
 
   INativeObject& NativeObject()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().NativeObject();
   }
 
   TableReference& GetTableReference()
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     return Operand().GetTableReference();
   }
 
 
   void RedfineValue(StackValue& source)
   {
-    LockRAII<Lock> dummy(mSync);
+    LockGuard<Lock> dummy(mSync);
     Operand().RedifineValue(source);
   }
 

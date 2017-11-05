@@ -170,7 +170,7 @@ DbsHandler::RetrievePersistentTable(const TABLE_INDEX index)
 {
   TABLE_INDEX iterator = index;
 
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   if (iterator >= mTables.size())
   {
@@ -203,7 +203,7 @@ DbsHandler::RetrievePersistentTable(const TABLE_INDEX index)
 ITable&
 DbsHandler::RetrievePersistentTable(const char* const name)
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   auto it = mTables.find(name);
   if (it == mTables.end())
@@ -227,7 +227,7 @@ DbsHandler::AddTable(const char* const           name,
                      const FIELD_INDEX           fieldsCount,
                      DBSFieldDescriptor* const   inoutFields)
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   if (name == nullptr
       || inoutFields == nullptr
@@ -277,7 +277,7 @@ DbsHandler::ReleaseTable(ITable& hndTable)
                        "Cannot release a table that was created on a different database.");
   }
 
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
   if (hndTable.IsTemporal())
   {
     assert(mCreatedTemporalTables > 0);
@@ -303,7 +303,7 @@ DbsHandler::TableName(const TABLE_INDEX index)
 {
   TABLE_INDEX iterator = index;
 
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   if (iterator >= mTables.size())
   {
@@ -326,7 +326,7 @@ DbsHandler::TableName(const TABLE_INDEX index)
 void
 DbsHandler::DeleteTable(const char* const name)
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   auto it = mTables.find(name);
   if (it == mTables.end())
@@ -353,7 +353,7 @@ DbsHandler::DeleteTable(const char* const name)
 void
 DbsHandler::SyncAllTablesContent()
 {
-  LockRAII<Lock> _l(mSync);
+  LockGuard<Lock> _l(mSync);
 
   if ( ! mNeedsSync)
     return;
@@ -380,7 +380,7 @@ DbsHandler::SyncAllTablesContent()
 void
 DbsHandler::SyncTableContent(const TABLE_INDEX index)
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   if (index >= mTables.size())
   {
@@ -405,7 +405,7 @@ DbsHandler::SyncTableContent(const TABLE_INDEX index)
 void
 DbsHandler::NotifyDatabaseUpdate()
 {
-  LockRAII<Lock> _l(mSync);
+  LockGuard<Lock> _l(mSync);
 
   if (mNeedsSync)
     return ;
@@ -429,7 +429,7 @@ DbsHandler::CreateTempTable(const FIELD_INDEX   fieldsCount,
 {
   ITable* const result = new TemporalTable(*this, inoutFields, fieldsCount);
 
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   ++mCreatedTemporalTables;
 
@@ -439,7 +439,7 @@ DbsHandler::CreateTempTable(const FIELD_INDEX   fieldsCount,
 void
 DbsHandler::Discard()
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   for (auto& table : mTables)
   {
@@ -491,7 +491,7 @@ DbsHandler::HasUnreleasedTables()
 void
 DbsHandler::RegisterTableSpawn()
 {
-  LockRAII<Lock> syncHolder(mSync);
+  LockGuard<Lock> syncHolder(mSync);
 
   ++mCreatedTemporalTables;
 }
@@ -729,7 +729,7 @@ DBSRetrieveDatabase(const char* const name, const char* path)
   if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
-  LockRAII<Lock> syncHolder(dbsMgrs_->mSync);
+  LockGuard<Lock> syncHolder(dbsMgrs_->mSync);
 
   auto& dbses = dbsMgrs_->mDatabases;
   auto it = dbses.find(name);
@@ -759,7 +759,7 @@ DBSReleaseDatabase(IDBSHandler& hnd)
   if (dbsMgrs_.get() == nullptr)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
-  LockRAII<Lock> syncHolder(dbsMgrs_->mSync);
+  LockGuard<Lock> syncHolder(dbsMgrs_->mSync);
 
   auto& dbses = dbsMgrs_->mDatabases;
   for (auto it = dbses.begin(); it != dbses.end(); ++it)
@@ -807,7 +807,7 @@ DBSRemoveDatabase(const char* const name, const char* path)
     throw DBSException(_EXTRA(DBSException::NOT_INITED), "DBS framework is not initialized.");
 
   //Acquire the DBS's manager lock!
-  LockRAII<Lock> syncHolder(dbsMgrs_->mSync);
+  LockGuard<Lock> syncHolder(dbsMgrs_->mSync);
 
   auto& dbses = dbsMgrs_->mDatabases;
   auto it = dbses.find(name);

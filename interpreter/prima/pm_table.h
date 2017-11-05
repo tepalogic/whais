@@ -51,13 +51,13 @@ public:
 
   void IncrementRefCount()
   {
-    LockRAII<Lock> _lock(mLock);
+    LockGuard<Lock> _lock(mLock);
     ++mRefCount;
   }
 
   void DecrementRefCount()
   {
-    LockRAII<Lock> _lock(mLock);
+    LockGuard<Lock> _lock(mLock);
 
     assert(mRefCount > 0);
 

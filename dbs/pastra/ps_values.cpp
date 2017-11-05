@@ -736,7 +736,7 @@ DText::UpperCase()
 shared_ptr<ITextStrategy>
 DText::GetStrategy() const
 {
-  LockRAII<decltype(mLock)> _l(mLock);
+  LockGuard<decltype(mLock)> _l(mLock);
   return mText;
 }
 
@@ -744,7 +744,7 @@ DText::GetStrategy() const
 void
 DText::ReplaceStrategy(shared_ptr<ITextStrategy> s)
 {
-  LockRAII<decltype(mLock)> _l(mLock);
+  LockGuard<decltype(mLock)> _l(mLock);
 
   if (mText != s)
       mText = s;
@@ -835,7 +835,7 @@ DArray::operator= (const DArray& source)
 {
   if (this != &source)
   {
-    LockRAII<decltype(mLock)> _l(source.mLock);
+    LockGuard<decltype(mLock)> _l(source.mLock);
     ReplaceStrategy(source.mArray);
   }
 
@@ -1325,14 +1325,14 @@ DArray::Sort(bool reverse)
 shared_ptr<IArrayStrategy>
 DArray::GetStrategy() const
 {
-  LockRAII<decltype(mLock)> _l(mLock);
+  LockGuard<decltype(mLock)> _l(mLock);
   return mArray;
 }
 
 void
 DArray::ReplaceStrategy(shared_ptr<IArrayStrategy> s)
 {
-  LockRAII<decltype(mLock)> _l(mLock);
+  LockGuard<decltype(mLock)> _l(mLock);
   if (s != mArray)
     mArray = s;
 }

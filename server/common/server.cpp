@@ -346,7 +346,7 @@ ticks_routine()
 
   } while (true);
 
-  LockRAII<Lock> holder(sClosingLock);
+  LockGuard<Lock> holder(sClosingLock);
 
   if (sListeners != nullptr)
   {
@@ -491,7 +491,7 @@ StartServer(FileLogger& log, vector<DBSDescriptors>& databases)
   ticks_routine();
   log.Log(LT_DEBUG, "Ticks routine has stopped.");
 
-  LockRAII<Lock> holder(sClosingLock);
+  LockGuard<Lock> holder(sClosingLock);
   sListeners = nullptr;
   holder.unlock();
 
@@ -510,7 +510,7 @@ StopServer()
   if ( ! sListeners || sServerStopped)
       return ;
 
-  LockRAII<Lock> holder(sClosingLock);
+  LockGuard<Lock> holder(sClosingLock);
 
   sMainLog->Log(LT_INFO, "Server asked to shutdown. Waiting for the next tick...");
 

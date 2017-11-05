@@ -53,7 +53,7 @@ static Lock                    gSync;
 INTERP_SHL void
 InitInterpreter(const char* adminDbsDir)
 {
-  LockRAII<Lock> syncHolder(gSync);
+  LockGuard<Lock> syncHolder(gSync);
 
   if (gmNameSpaces.size() != 0)
     throw InterException(_EXTRA(InterException::ALREADY_INITED));
@@ -72,7 +72,7 @@ GetInstance(const char* name, Logger* log)
   if (log == nullptr)
     log = &NULL_LOGGER;
 
-  LockRAII<Lock> syncHolder(gSync);
+  LockGuard<Lock> syncHolder(gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException(_EXTRA(InterException::NOT_INITED));
@@ -112,7 +112,7 @@ GetInstance(const char* name, Logger* log)
 INTERP_SHL void
 ReleaseInstance(ISession& instance)
 {
-  LockRAII<Lock> syncHolder(gSync);
+  LockGuard<Lock> syncHolder(gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException(_EXTRA(InterException::NOT_INITED));
@@ -126,7 +126,7 @@ ReleaseInstance(ISession& instance)
 INTERP_SHL void
 CleanInterpreter(const bool forced)
 {
-  LockRAII<Lock> syncHolder(gSync);
+  LockGuard<Lock> syncHolder(gSync);
 
   if (gmNameSpaces.size() == 0)
     throw InterException(_EXTRA(InterException::NOT_INITED));

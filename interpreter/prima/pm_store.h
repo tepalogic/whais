@@ -21,13 +21,13 @@ class Store
 public:
   T* Alloc()
   {
-    whais::LockRAII<decltype(mLock)> _l(mLock);
+    whais::LockGuard<decltype(mLock)> _l(mLock);
     return new T();
   }
 
   void Free(T* const obj)
   {
-    whais::LockRAII<decltype(mLock)> _l(mLock);
+    whais::LockGuard<decltype(mLock)> _l(mLock);
     delete obj;
   }
 
