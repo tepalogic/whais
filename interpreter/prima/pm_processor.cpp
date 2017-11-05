@@ -243,8 +243,6 @@ op_func_ldlo32(ProcedureCall& call, int64_t& offset)
   const uint8_t* const data = call.Code() + call.CurrentOffset() + offset;
   const uint32_t localIndex = load_le_int32(data);
 
-  assert(localIndex < call.LocalsCount());
-
   LocalOperand localOp(call.GetStack(), call.StackBegin() + localIndex);
 
   call.GetStack().Push(StackValue(localOp));

@@ -92,7 +92,7 @@ EXTERN PROCEDURE unicode_cp (c CHAR) RETURN UINT32;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not have an upper case corresponded.
-EXTERN PROCEDURE to_upper (c CHAR) RETURN CHAR;
+EXTERN PROCEDURE upper (c CHAR) RETURN CHAR;
 
 #Retrieve the lower case correspondent of a WHAIS character.
 #In:
@@ -100,7 +100,7 @@ EXTERN PROCEDURE to_upper (c CHAR) RETURN CHAR;
 #Out:
 #   The corresponded character if there is one, or the character itself if 
 #   it does not not have a lower case corresponded.
-EXTERN PROCEDURE to_lower (c CHAR) RETURN CHAR;
+EXTERN PROCEDURE lower (c CHAR) RETURN CHAR;
 
 #Get the converted all to upper case text.
 #In:
@@ -108,7 +108,7 @@ EXTERN PROCEDURE to_lower (c CHAR) RETURN CHAR;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   upper case converted.
-EXTERN PROCEDURE to_uppercase (t TEXT) RETURN TEXT;
+EXTERN PROCEDURE upper_all (t TEXT) RETURN TEXT;
 
 #Get the converted all to lower case text.
 #In:
@@ -116,35 +116,35 @@ EXTERN PROCEDURE to_uppercase (t TEXT) RETURN TEXT;
 #Out:
 #   A text with the same characters as the original, but with all characters
 #   lower case converted.
-EXTERN PROCEDURE to_lowercase (t TEXT) RETURN TEXT;
+EXTERN PROCEDURE lower_all (t TEXT) RETURN TEXT;
 
 #Get the UTF-8 representation of a text.
 #In:
 #   @t - The text.
 #Out:
 #   An array holding the UTF-8 representation.
-EXTERN PROCEDURE text_to_utf8 (t TEXT) RETURN  UINT8 ARRAY;
+EXTERN PROCEDURE to_utf8 (t TEXT) RETURN  UINT8 ARRAY;
 
 #Get the a WHAIS text from the UTF-8 representation.
 #In:
 #   @s - An array holding the UTF-8 code units.
 #Out:
 #   A text holding the corresponded of the UTF-8 text.
-EXTERN PROCEDURE text_from_utf8 (s UINT8 ARRAY) RETURN TEXT;
+EXTERN PROCEDURE from_utf8 (s UINT8 ARRAY) RETURN TEXT;
 
 #Get the UTF-16 representation of a text.
 #In:
 #   @t - The text.
 #Out:
 #   An array holding the UTF-16 representation.
-EXTERN PROCEDURE text_to_utf16 (t TEXT) RETURN  UINT16 ARRAY;
+EXTERN PROCEDURE to_utf16 (t TEXT) RETURN  UINT16 ARRAY;
 
 #Get the a WHAIS text from the UTF-16 representation.
 #In:
 #   @s - An array holding the UTF-16 code units.
 #Out:
 #   A text holding the corresponded of the UTF-16 text.
-EXTERN PROCEDURE text_from_utf16 (s UINT16 ARRAY) RETURN TEXT;
+EXTERN PROCEDURE from_utf16 (s UINT16 ARRAY) RETURN TEXT;
 
 #Transform a WHAIS text an array of characters.
 #In:
@@ -220,7 +220,8 @@ EXTERN PROCEDURE replace_str(source TEXT,
                              case BOOL,
                              from UINT64,
                              to UINT64) RETURN TEXT;
-# Compare to text string.
+                             
+# Compare two text strings.
 #In:
 #   @first  - Text source text.
 #   @second - The substring to look for.
@@ -232,3 +233,35 @@ EXTERN PROCEDURE compare(first TEXT,
                          second TEXT, 
                          alph BOOL,
                          case BOOL) RETURN INT32;
+
+# Retrieve the integer value of a digit character of a numeric system.
+#In:
+#   @d    - The character holding the digit.
+#   @base - The numeric base system.
+#Out:
+#   The integer value of the digit, NULL if the base is not supported
+#   or the provided character is not a valid digit.
+EXTERN PROCEDURE digit(d CHAR, base UINT8) RETURN UINT8; 
+
+
+# Convert a text value to an integer value.
+#In:
+#   @n     - The number representation.
+#   @base  - The numeric base system of the representation.
+#   @start - The index from the to start the parsing of the text value.
+#Out:
+#   The integer value of the digit, NULL if the base is not supported
+#   or the provided character is not a valid digit.
+EXTERN PROCEDURE to_uint(n TEXT, base UINT8, start UINT64) RETURN UINT64; 
+
+
+# Get the text representation of a text.
+#In:
+#   @n     - The positive integer.
+#   @base  - The numeric base system of the representation.
+#Out:
+#   It returns the text representation of the number (according with supplied numeric system base) 
+#   or NULL in case of errors (e.g. the numeric base is not supported,
+#   or the number itself is NULL).
+EXTERN PROCEDURE from_uint(n UINT64, base UINT8) RETURN TEXT;
+

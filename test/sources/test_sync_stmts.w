@@ -29,6 +29,8 @@ DO
 		IF (failure == 1)
 			RETURN 2;
 
+		#On purpose this ... to verify if the
+		#section  locks are disabled in case of internal errors.
 		IF (failure == 3)
 			RETURN failure / (failure - 3);
 
