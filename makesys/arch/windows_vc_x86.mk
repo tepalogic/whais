@@ -9,7 +9,7 @@ ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
 
 _vc_native:=x86
-_windows_cmd_line=cmd /c '$(WHAIS_VC_PATH)\vcvarsall.bat' $(_vc_native) \&\& $(1) 
+_windows_cmd_line=cmd.exe /c '$(WHAIS_VC_PATH)\vcvarsall.bat' $(_vc_native) \&\& $(1) 
 
 CC:=$(call _windows_cmd_line, cl.exe)
 CXX:=$(CC)

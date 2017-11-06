@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <utility>
 
 #include "base_fields.h"
 #include "base_types.h"

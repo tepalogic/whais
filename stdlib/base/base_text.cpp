@@ -62,6 +62,10 @@ WLIB_PROC_DESCRIPTION       gTextFromUtf16;
 WLIB_PROC_DESCRIPTION       gTextToCharArray;
 WLIB_PROC_DESCRIPTION       gTextFromCharArray;
 
+WLIB_PROC_DESCRIPTION       gUIntFromDigit;
+WLIB_PROC_DESCRIPTION       gUIntFromText;
+WLIB_PROC_DESCRIPTION       gTextFromUInt;
+
 WLIB_PROC_DESCRIPTION       gTextCharsCount;
 WLIB_PROC_DESCRIPTION       gTextHash;
 
@@ -459,6 +463,191 @@ get_hash_code( SessionStack& stack, ISession&)
   return WOP_OK;
 }
 
+static int8_t
+convert_digit_rfc4646(const decltype('a') d, const uint8_t base)
+{
+  if (2 <= base && base <= 10)
+  {
+    if ('0' <= d && d < ('0' + base))
+      return d - '0';
+  }
+  else if (base == 16)
+  {
+    const uint_t digit = toupper(d);
+
+    if ('0' <= d && d <= '9')
+      return d - '0';
+
+    else if ('A' <= digit && digit <= 'F')
+      return 10 + digit - 'A';
+  }
+  else if (base == 32)
+  {
+    const uint_t digit = toupper(d);
+
+    if ('A' <= digit && digit <= 'Z')
+      return digit - 'A';
+
+    else if ('2' <= digit && digit <= '7')
+      return 26 + digit - '2';
+  }
+  else if (base == 64)
+  {
+    if ('A' <= d && d <= 'Z')
+      return d - 'A';
+
+    else if ('a' <= d && d <= 'z')
+      return 26 + d - 'a';
+
+    else if ('0' <= d && d <= '9')
+      return 52 + d - '0';
+
+    else if (d == '+')
+      return 62;
+
+    else if (d == '/')
+      return 63;
+  }
+
+  return -1;
+}
+
+static WLIB_STATUS
+convert_digit (SessionStack& stack, ISession&)
+{
+  DChar c;
+  DUInt8 base;
+
+  stack[stack.Size() - 2].Operand().GetValue(c);
+  stack[stack.Size() - 1].Operand().GetValue(base);
+
+  stack.Pop(2);
+  if (c.IsNull())
+  {
+    stack.Push(DUInt8());
+    return WOP_OK;
+  }
+
+  if (base.IsNull())
+    base = DUInt8(10);
+
+  int temp = convert_digit_rfc4646(c.mValue, base.mValue);
+
+  stack.Push(temp < 0 ? DUInt8() : DUInt8(_SC(uint8_t, temp)));
+  return WOP_OK;
+}
+
+static WLIB_STATUS
+convert_text (SessionStack& stack, ISession&)
+{
+  DText t;
+  DUInt8 base;
+  DUInt64 start;
+
+  stack[stack.Size() - 3].Operand().GetValue(t);
+  stack[stack.Size() - 2].Operand().GetValue(base);
+  stack[stack.Size() - 1].Operand().GetValue(start);
+
+  stack.Pop(3);
+  if (t.IsNull())
+  {
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
+
+  if (base.IsNull())
+    base = DUInt8(10);
+
+  if (start.IsNull())
+    start = DUInt64(0);
+
+  const uint64_t textLen = t.Count();
+  if (start.mValue >= textLen)
+  {
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
+
+  uint64_t result = 0;
+  for (auto i = start.mValue; i < textLen; ++i)
+  {
+    const DChar c = t.CharAt(i);
+    const int t = convert_digit_rfc4646(c.mValue, base.mValue);
+
+    if (t < 0)
+    {
+      stack.Push(DUInt64());
+      return WOP_OK;
+    }
+    result *= base.mValue;
+    result += t;
+  }
+
+  stack.Push(DUInt64(result));
+  return WOP_OK;
+}
+
+
+static WLIB_STATUS
+convert_number (SessionStack& stack, ISession&)
+{
+  DUInt64 number;
+  DUInt8 base;
+
+  stack[stack.Size() - 2].Operand().GetValue(number);
+  stack[stack.Size() - 1].Operand().GetValue(base);
+
+  stack.Pop(2);
+  if (number.IsNull())
+  {
+    stack.Push(DText());
+    return WOP_OK;
+  }
+
+  if (base.IsNull())
+    base = DUInt8(10);
+
+  static const char digits10[] = "0123456789";
+  static const char digits16[] = "0123456789ABCDEF";
+  static const char digits32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  static const char digits64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                 "abcdefghijklmnopqrstuvwxyz"
+                                 "0123456789+/";
+  const char* digits = nullptr;
+  if (2 <= base.mValue && base.mValue <= 10)
+    digits = digits10;
+
+  else if (base.mValue == 16)
+    digits = digits16;
+
+  else if (base.mValue == 32)
+    digits = digits32;
+
+  else if (base.mValue == 64)
+    digits = digits64;
+
+  else
+  {
+    stack.Push(DText());
+    return WOP_OK;
+  }
+
+  assert (digits != nullptr);
+
+  char result[64] = {0, };
+  uint_t iterator = sizeof result - 1;
+
+  uint64_t n = number.mValue;
+  do
+  {
+    result[--iterator] = digits[n % base.mValue];
+    n /= base.mValue;
+  } while (n != 0);
+
+  stack.Push(DText(result + iterator));
+  return WOP_OK;
+}
+
 
 static WLIB_STATUS
 find_char_offset( SessionStack& stack, ISession&)
@@ -649,12 +838,12 @@ base_text_init()
 
   static const uint8_t* charConvLocals[] = { gCharType, gCharType };
 
-  gUpperChar.name            = "to_upper";
+  gUpperChar.name            = "upper";
   gUpperChar.localsCount     = 2;
   gUpperChar.localsTypes     = charConvLocals;
   gUpperChar.code            = get_char_upper;
 
-  gLowerChar.name            = "to_lower";
+  gLowerChar.name            = "lower";
   gLowerChar.localsCount     = 2;
   gLowerChar.localsTypes     = charConvLocals;
   gLowerChar.code            = get_char_lower;
@@ -662,12 +851,12 @@ base_text_init()
 
   static const uint8_t* textLocals[] = { gTextType, gTextType };
 
-  gUpperText.name            = "to_uppercase";
+  gUpperText.name            = "upper_all";
   gUpperText.localsCount     = 2;
   gUpperText.localsTypes     = textLocals;
   gUpperText.code            = get_text_upper;
 
-  gLowerText.name            = "to_lowercase";
+  gLowerText.name            = "lower_all";
   gLowerText.localsCount     = 2;
   gLowerText.localsTypes     = textLocals;
   gLowerText.code            = get_text_lower;
@@ -733,6 +922,26 @@ base_text_init()
   gTextHash.localsTypes       = charsCountLocals;
   gTextHash.code              = get_hash_code;
 
+  static const uint8_t*  charConvertToInt[] = { gUInt8Type, gCharType, gUInt8Type };
+
+  gUIntFromDigit.name        = "digit";
+  gUIntFromDigit.localsCount = 3;
+  gUIntFromDigit.localsTypes = charConvertToInt;
+  gUIntFromDigit.code        = convert_digit;
+
+  static const uint8_t*  numberFromText[] = { gUInt64Type, gTextType, gUInt8Type, gUInt64Type };
+
+  gUIntFromText.name        = "to_uint";
+  gUIntFromText.localsCount = 4;
+  gUIntFromText.localsTypes = numberFromText;
+  gUIntFromText.code        = convert_text;
+
+  static const uint8_t*  textFromNuber[] = { gTextType,  gUInt64Type, gUInt8Type };
+
+  gTextFromUInt.name        = "from_uint";
+  gTextFromUInt.localsCount = 3;
+  gTextFromUInt.localsTypes = textFromNuber;
+  gTextFromUInt.code        = convert_number;
 
 
   static const uint8_t* findCharLocals[] = {
