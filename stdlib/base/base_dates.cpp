@@ -55,7 +55,7 @@ static const int64_t        uSECS_PER_MIN  = SECS_PER_MIN  * uSECS_PER_SEC;
 static const int64_t        uSECS_PER_HOUR = SECS_PER_HOUR * uSECS_PER_SEC;
 static const int64_t        uSECS_PER_DAY  = SECS_PER_DAY  * uSECS_PER_SEC;
 
-static YearsAttrs cachedYears[0xFFFF];
+static YearsAttrs cachedYears[0x10000];
 
 WLIB_PROC_DESCRIPTION       gProcTicks;
 WLIB_PROC_DESCRIPTION       gProcNow;
@@ -309,10 +309,10 @@ get_date_year( SessionStack& stack, ISession&)
   stack.Pop(1);
 
   if (date.IsNull())
-    stack.Push(DInt16());
+    stack.Push(DInt32());
 
   else
-    stack.Push(DInt16(date.mYear));
+    stack.Push(DInt32(date.mYear));
 
   return WOP_OK;
 }
@@ -436,7 +436,7 @@ diff_date_days( SessionStack& stack, ISession&)
   stack.Pop(2);
 
   if (firstDate.IsNull() || secondDate.IsNull())
-    stack.Push(DInt32());
+    stack.Push(DInt64());
 
   else
   {
@@ -444,7 +444,7 @@ diff_date_days( SessionStack& stack, ISession&)
     result += day_of_date(secondDate.mYear, secondDate.mMonth, secondDate.mDay);
     result -= day_of_date(firstDate.mYear, firstDate.mMonth, firstDate.mDay);
 
-    stack.Push(DInt32(result));
+    stack.Push(DInt64(result));
   }
 
   return WOP_OK;
@@ -461,10 +461,10 @@ add_time_delta_days( SessionStack& stack, ISession&)
   stack[stack.Size() - 1].Operand().GetValue(days);
   stack.Pop(2);
 
-  if (time.IsNull())
+  if (time.IsNull() || days.IsNull())
     stack.Push(DHiresTime());
 
-  else if (days.IsNull() || (days.mValue == 0))
+  else if (days.mValue == 0)
     stack.Push(time);
 
   else
@@ -536,10 +536,10 @@ add_time_delta_seconds( SessionStack& stack, ISession&)
   stack[stack.Size() - 1].Operand().GetValue(seconds);
   stack.Pop(2);
 
-  if (time.IsNull())
+  if (time.IsNull() || seconds.IsNull())
     stack.Push(DHiresTime());
 
-  else if (seconds.IsNull() || (seconds.mValue == 0))
+  else if (seconds.mValue == 0)
     stack.Push(time);
 
   else
@@ -639,10 +639,10 @@ add_time_delta_microseconds( SessionStack& stack, ISession&)
   stack[stack.Size() - 1].Operand().GetValue(useconds);
   stack.Pop(2);
 
-  if (time.IsNull())
+  if (time.IsNull() || useconds.IsNull())
     stack.Push(DHiresTime());
 
-  else if (useconds.IsNull() || (useconds.mValue == 0))
+  else if (useconds.mValue == 0)
     stack.Push(time);
 
   else
@@ -818,7 +818,7 @@ base_dates_init()
   gProcNow.code          = get_curr_time;
 
 
-  static const uint8_t* yearLocal[] = { gInt16Type, gDateType };
+  static const uint8_t* yearLocal[] = { gInt32Type, gDateType };
 
   gProcTimeYear.name        = "year";
   gProcTimeYear.localsCount = 2;
@@ -857,12 +857,12 @@ base_dates_init()
 
   static const uint8_t* htimeLocal[] = { gUInt32Type, gHiresTimeType };
 
-  gProcTimeMicroseconds.name         = "microsecs";
+  gProcTimeMicroseconds.name         = "useconds";
   gProcTimeMicroseconds.localsCount  = 2;
   gProcTimeMicroseconds.localsTypes  = htimeLocal;
   gProcTimeMicroseconds.code         = get_date_microsecs;
 
-  static const uint8_t* daysDiffLocals[] = { gInt32Type, gDateType, gDateType};
+  static const uint8_t* daysDiffLocals[] = { gInt64Type, gDateType, gDateType};
 
   gProcDateDaysDiff.name        = "days_diff";
   gProcDateDaysDiff.localsCount = 3;
@@ -887,7 +887,7 @@ base_dates_init()
                                              gHiresTimeType
                                             };
 
-  gProcDateMicrosecondsDiff.name        = "microsecs_diff";
+  gProcDateMicrosecondsDiff.name        = "useconds_diff";
   gProcDateMicrosecondsDiff.localsCount = 3;
   gProcDateMicrosecondsDiff.localsTypes = usecsDiffLocals;
   gProcDateMicrosecondsDiff.code        = diff_time_microsecs;
@@ -909,7 +909,7 @@ base_dates_init()
   gProcDateSecondsDelta.localsTypes      = deltaAddLocals;
   gProcDateSecondsDelta.code             = add_time_delta_seconds;
 
-  gProcDateMicrosecondsDelta.name         = "add_microsecs";
+  gProcDateMicrosecondsDelta.name         = "add_useconds";
   gProcDateMicrosecondsDelta.localsCount  = 3;
   gProcDateMicrosecondsDelta.localsTypes  = deltaAddLocals;
   gProcDateMicrosecondsDelta.code         = add_time_delta_microseconds;

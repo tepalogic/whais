@@ -787,6 +787,7 @@ test_tabletext_char(IDBSHandler& dbsHnd)
   const ROW_INDEX row = testTable.GetReusableRow(true);
   {
     assert(row == 0);
+    (void)row;
     FieldOperand fieldArrayOp(tableOp, testTable.RetrieveField("text_type"));
 
     stackTextField = fieldArrayOp.GetValueAt(0);

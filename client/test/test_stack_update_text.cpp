@@ -80,7 +80,7 @@ test_simple_text(WH_CONNECTION hnd)
 {
   uint_t              aSimpleOffset = wh_rnd() % 7;
 
-  const char*       ref;
+  const char*       ref = NULL;
   char              aValue[MAX_STRING_SIZE];
   const char*       value;
   unsigned long long  count;

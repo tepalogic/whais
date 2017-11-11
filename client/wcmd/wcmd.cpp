@@ -505,284 +505,269 @@ main(const int argc, char *argv[])
   const char*   cmdScript           = nullptr;
   string        dbDirectory;
 
-  if (! whs_init())
-    {
-      cerr << "Couldn't not initialize the network socket framework.\n";
-
-      return ENOTSOCK;
-    }
+  if ( !whs_init())
+  {
+    cerr << "Couldn't not initialize the network socket framework.\n";
+    return ENOTSOCK;
+  }
 
   if (argc == currentArg)
-    {
-      PrintWrongUsage(nullptr);
-      return EINVAL;
-    }
+  {
+    PrintWrongUsage(nullptr);
+    return EINVAL;
+  }
 
   InitCmdManager();
 
   while (currentArg < argc)
+  {
+    if ((strcmp(argv[currentArg], "--help") == 0)
+        || (strcmp(argv[currentArg], "-h") == 0))
     {
-      if ((strcmp(argv[currentArg], "--help") == 0) ||
-          (strcmp(argv[currentArg], "-h") == 0))
-        {
-          PrintHelpUsage();
-          return 0;
-        }
-      else if ((strcmp(argv[currentArg], "-c") == 0) ||
-               (strcmp(argv[currentArg], "--create" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetWorkingDB(argv[currentArg++]);
-          createDB = true;
-        }
-      else if ((strcmp(argv[currentArg], "-r") == 0) ||
-               (strcmp(argv[currentArg], "--remove" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetWorkingDB(argv[currentArg++]);
-          removeDB = true;
-        }
-      else if ((strcmp(argv[currentArg], "-u") == 0) ||
-               (strcmp(argv[currentArg], "--use" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetWorkingDB(argv[currentArg++]);
-          useDB = true;
-        }
-      else if ((strcmp(argv[currentArg], "-H") == 0) ||
-               (strcmp(argv[currentArg], "--host" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetRemoteHostName(argv[currentArg++]);
-        }
-      else if ((strcmp(argv[currentArg], "-P") == 0) ||
-               (strcmp(argv[currentArg], "--port" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetConnectionPort(argv[currentArg++]);
-        }
-      else if ((strcmp(argv[currentArg], "-A") == 0) ||
-               (strcmp(argv[currentArg], "--admin" ) == 0))
-        {
-          ++currentArg;
-          SetUserId(0);
-        }
-      else if ((strcmp(argv[currentArg], "-p") == 0) ||
-               (strcmp(argv[currentArg], "--pass" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg == argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          SetUserPassword(argv[currentArg++]);
-        }
-      else if ((strcmp(argv[currentArg], "-d") == 0) ||
-               (strcmp(argv[currentArg], "--dir" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-
-          SetWorkingDirectory(argv[currentArg++]);
-        }
-      else if ((strcmp(argv[currentArg], "-G") == 0)
-               || (strcmp(argv[currentArg], "--globals") == 0))
-        {
-          genHeader = true;
-          showLogo  = false;
-          ++currentArg;
-        }
-      else if (strcmp(argv[currentArg], "--verbose" ) == 0)
-        {
-          ++currentArg;
-          if (currentArg >= argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-
-          const int verbosityLevel = atoi(argv[currentArg++]);
-          if (verbosityLevel > 5)
-            {
-              cerr << "The value of the verbosity level is invalid.\n";
-
-              return EINVAL;
-            }
-
-          SetVerbosityLevel(verbosityLevel);
-        }
-      else if ((strcmp(argv[currentArg], "-s") == 0) ||
-               (strcmp(argv[currentArg], "--script" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg == argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          scriptFile = argv [currentArg++];
-          showLogo = false;
-        }
-      else if ((strcmp(argv[currentArg], "-S") == 0) ||
-               (strcmp(argv[currentArg], "--cmd" ) == 0))
-        {
-          ++currentArg;
-          if (currentArg == argc)
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-
-              return EINVAL;
-            }
-          cmdScript = argv [currentArg++];
-          showLogo = false;
-        }
-      else if ((strcmp(argv[currentArg], "-m") == 0) ||
-               (strcmp(argv[currentArg], "--file_size" ) == 0))
-        {
-          ++currentArg;
-
-          if ((currentArg == argc) ||
-              ( ! SetMaximumFileSize(argv[currentArg])))
-            {
-              PrintWrongUsage(argv[currentArg - 1]);
-              return EINVAL;
-            }
-          else
-            ++currentArg;
-        }
-      else if ((strcmp(argv[currentArg], "-f") == 0)
-               || (strcmp(argv[currentArg], "--auto_yes" ) == 0))
-        {
-          ++currentArg;
-
-          autoYes = true;
-        }
-      else if ((strcmp(argv[currentArg], "-t") == 0)
-               || (strcmp(argv[currentArg], "--validate") == 0))
-        {
-          ++currentArg;
-
-          checkDbForErrors = true;
-        }
-      else if (strcmp(argv[currentArg], "--nologo") == 0)
-        {
-          ++currentArg,
-          showLogo = false;
-        }
-      else if ((strcmp(argv[currentArg], "-l") == 0)
-               || (strcmp(argv[currentArg], "--license") == 0))
-        {
-          ++currentArg,
-          showLicense = true;
-        }
-      else
-        {
-          cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
-          return EINVAL;
-        }
-    }
-
-  if (showLicense)
-    {
-      displayLicenseInformation(cout, sProgramName, sProgramDesc);
+      PrintHelpUsage();
       return 0;
     }
+    else if ((strcmp(argv[currentArg], "-c") == 0)
+             || (strcmp(argv[currentArg], "--create") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+
+        return EINVAL;
+      }
+      SetWorkingDB(argv[currentArg++]);
+      createDB = true;
+    }
+    else if ((strcmp(argv[currentArg], "-r") == 0)
+             || (strcmp(argv[currentArg], "--remove") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      SetWorkingDB(argv[currentArg++]);
+      removeDB = true;
+    }
+    else if ((strcmp(argv[currentArg], "-u") == 0)
+             || (strcmp(argv[currentArg], "--use") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+
+        return EINVAL;
+      }
+      SetWorkingDB(argv[currentArg++]);
+      useDB = true;
+    }
+    else if ((strcmp(argv[currentArg], "-H") == 0)
+             || (strcmp(argv[currentArg], "--host") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      SetRemoteHostName(argv[currentArg++]);
+    }
+    else if ((strcmp(argv[currentArg], "-P") == 0)
+             || (strcmp(argv[currentArg], "--port") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      SetConnectionPort(argv[currentArg++]);
+    }
+    else if ((strcmp(argv[currentArg], "-A") == 0)
+             || (strcmp(argv[currentArg], "--admin") == 0))
+    {
+      ++currentArg;
+      SetUserId(0);
+    }
+    else if ((strcmp(argv[currentArg], "-p") == 0)
+             || (strcmp(argv[currentArg], "--pass") == 0))
+    {
+      ++currentArg;
+      if (currentArg == argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+
+        return EINVAL;
+      }
+      SetUserPassword(argv[currentArg++]);
+    }
+    else if ((strcmp(argv[currentArg], "-d") == 0)
+             || (strcmp(argv[currentArg], "--dir") == 0))
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+
+      SetWorkingDirectory(argv[currentArg++]);
+    }
+    else if ((strcmp(argv[currentArg], "-G") == 0)
+             || (strcmp(argv[currentArg], "--globals") == 0))
+    {
+      genHeader = true;
+      showLogo = false;
+      ++currentArg;
+    }
+    else if (strcmp(argv[currentArg], "--verbose") == 0)
+    {
+      ++currentArg;
+      if (currentArg >= argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+
+      const int verbosityLevel = atoi(argv[currentArg++]);
+      if (verbosityLevel > 5)
+      {
+        cerr << "The value of the verbosity level is invalid.\n";
+        return EINVAL;
+      }
+
+      SetVerbosityLevel(verbosityLevel);
+    }
+    else if ((strcmp(argv[currentArg], "-s") == 0)
+             || (strcmp(argv[currentArg], "--script") == 0))
+    {
+      ++currentArg;
+      if (currentArg == argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      scriptFile = argv[currentArg++];
+      showLogo = false;
+    }
+    else if ((strcmp(argv[currentArg], "-S") == 0)
+             || (strcmp(argv[currentArg], "--cmd") == 0))
+    {
+      ++currentArg;
+      if (currentArg == argc)
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      cmdScript = argv[currentArg++];
+      showLogo = false;
+    }
+    else if ((strcmp(argv[currentArg], "-m") == 0)
+             || (strcmp(argv[currentArg], "--file_size") == 0))
+    {
+      ++currentArg;
+
+      if ((currentArg == argc) || ( !SetMaximumFileSize(argv[currentArg])))
+      {
+        PrintWrongUsage(argv[currentArg - 1]);
+        return EINVAL;
+      }
+      else
+        ++currentArg;
+    }
+    else if ((strcmp(argv[currentArg], "-f") == 0)
+             || (strcmp(argv[currentArg], "--auto_yes") == 0))
+    {
+      ++currentArg;
+      autoYes = true;
+    }
+    else if ((strcmp(argv[currentArg], "-t") == 0)
+             || (strcmp(argv[currentArg], "--validate") == 0))
+    {
+      ++currentArg;
+
+      checkDbForErrors = true;
+    }
+    else if (strcmp(argv[currentArg], "--nologo") == 0)
+    {
+      ++currentArg, showLogo = false;
+    }
+    else if ((strcmp(argv[currentArg], "-l") == 0)
+             || (strcmp(argv[currentArg], "--license") == 0))
+    {
+      ++currentArg, showLicense = true;
+    }
+    else
+    {
+      cerr << "Unknown parameter '" << argv[currentArg] << "'.\n";
+      return EINVAL;
+    }
+  }
+
+  if (showLicense)
+  {
+    displayLicenseInformation(cout, sProgramName, sProgramDesc);
+    return 0;
+  }
   else if (showLogo)
     displayBanner(cout, "Whais Commander", WVER_MAJ, WVER_MIN);
 
-  if (! (useDB || createDB || removeDB))
-    {
-      cerr << "A database needs to be selected.\n";
+  if ( ! (useDB || createDB || removeDB))
+  {
+    cerr << "A database needs to be selected.\n";
 
-      return ECANCELED;
-    }
+    return ECANCELED;
+  }
 
   if (useDB)
+  {
+    if (removeDB)
     {
-      if (removeDB)
-        {
-          cerr << "Could not use and remove a database in the same time.\n";
-
-          return EINVAL;
-        }
-      else if (createDB)
-        {
-          cerr << "Could not use and create a database in the same time.\n";
-
-          return EINVAL;
-        }
+      cerr << "Could not use and remove a database in the same time.\n";
+      return EINVAL;
     }
-  else if (removeDB && createDB)
+    else if (createDB)
     {
-      cerr << "Could not remove and create a database in the same time.\n";
+      cerr << "Could not use and create a database in the same time.\n";
+      return EINVAL;
+    }
+  }
+  else if (removeDB && createDB)
+  {
+    cerr << "Could not remove and create a database in the same time.\n";
+    return EINVAL;
+  }
+
+  if (IsOnlineDatabase() || genHeader)
+  {
+    if (removeDB || createDB)
+    {
+      if (genHeader)
+      {
+        cerr << "Cannot generate header file for a database that will be "
+             << (createDB ? "created" : "removed.") << endl;
+      }
+      else
+        cerr << "Cannot remove nor create a database on a remote host.\n";
 
       return EINVAL;
     }
 
-  if (IsOnlineDatabase() || genHeader)
-    {
-      if (removeDB || createDB)
-        {
-          if (genHeader)
-            {
-              cerr << "Cannot generate header file for a database that will be "
-                   << (createDB ? "created" : "removed.") << endl;
-            }
-          else
-            cerr << "Cannot remove nor create a database on a remote host.\n";
-          return EINVAL;
-        }
-
-      assert(useDB);
-    }
+    assert(useDB);
+  }
 
   if (checkDbForErrors)
+  {
+    if ( !useDB || IsOnlineDatabase())
     {
-      if ( ! useDB || IsOnlineDatabase())
-        {
-          cerr << "Only an existent local database may be validated.\n";
-          return EINVAL;
-        }
+      cerr << "Only an existent local database may be validated.\n";
+      return EINVAL;
     }
+  }
 
   try
   {
@@ -805,27 +790,27 @@ main(const int argc, char *argv[])
       if (! IsOnlineDatabase() && showLogo)
         cout << DescribeDbsEngineVersion() << endl << endl;
 
-      if (checkDbForErrors)
-        {
-          assert(useDB && ! IsOnlineDatabase());
+    if (checkDbForErrors)
+    {
+      assert(useDB && !IsOnlineDatabase());
 
-          checkDbForErrors = false;
+      checkDbForErrors = false;
 
-          cout << "Checking database ...\n";
-          result = check_database_for_errors(autoYes, true);
+      cout << "Checking database ...\n";
+      result = check_database_for_errors(autoYes, true);
 
-          if (result < 0)
-            {
-              cerr << "\nThe selected database is not in a valid state."
-                      " Aborting!\n";
-            }
-          else
-            {
-              cout << "\nThe database validation went well. Please restart the "
-                      "program with out '-t' or '--validate'.\n";
-            }
-            result = EAGAIN;
-        }
+      if (result < 0)
+      {
+        cerr << "\nThe selected database is not in a valid state."
+                " Aborting!\n";
+      }
+      else
+      {
+        cout << "\nThe database validation went well. Please restart the "
+                "program with out '-t' or '--validate'.\n";
+      }
+      result = EAGAIN;
+    }
 
       if ((result == 0) &&  ! removeDB)
         {
@@ -894,46 +879,44 @@ main(const int argc, char *argv[])
               AddOfflineTableCommands();
             }
 
-        set_signals();
-        if (genHeader)
-          {
-            PrintExternalDeclarations(cout);
-            result = 0;
-          }
-        else if (scriptFile != nullptr)
-          {
-            ifstream script(scriptFile, ios_base::in | ios_base::binary);
-            result = ExecuteInteractively(script);
-          }
-        else if (cmdScript != nullptr)
-          {
-            istringstream script(cmdScript);
-            result = ExecuteInteractively(script);
-          }
-        else
-          result = ExecuteInteractively(cin);
+      set_signals();
+      if (genHeader)
+      {
+        PrintExternalDeclarations(cout);
+        result = 0;
+      }
+      else if (scriptFile != nullptr)
+      {
+        ifstream script(scriptFile, ios_base::in | ios_base::binary);
+        result = ExecuteInteractively(script);
+      }
+      else if (cmdScript != nullptr)
+      {
+        istringstream script(cmdScript);
+        result = ExecuteInteractively(script);
+      }
+      else
+        result = ExecuteInteractively(cin);
 
-          if (! IsOnlineDatabase())
-            DBSReleaseDatabase(GetDBSHandler());
-        }
-      else if (result == 0)
-        RemoveDB();
+      if ( !IsOnlineDatabase())
+        DBSReleaseDatabase(GetDBSHandler());
+    }
+    else if (result == 0)
+      RemoveDB();
   }
   catch(const Exception& e)
   {
-    if ((e.Type() == DBS_EXCEPTION)
-        && (e.Code() == DBSException::DATABASE_IN_USE))
-      {
-        cerr << "The selected database was not closed properly last time it ";
-        cerr << "was used.\n";
-        checkDbForErrors = repair_database_erros();
-      }
+    if ((e.Type() == DBS_EXCEPTION) && (e.Code() == DBSException::DATABASE_IN_USE))
+    {
+      cerr << "The selected database was not closed properly last time it ";
+      cerr << "was used.\n";
+      checkDbForErrors = repair_database_erros();
+    }
     else
-      {
-        printException(cerr, e);
-
-        result = e.Code();
-      }
+    {
+      printException(cerr, e);
+      result = e.Code();
+    }
   }
   catch(...)
   {
@@ -943,21 +926,21 @@ main(const int argc, char *argv[])
 
   try
   {
-      if (checkDbForErrors)
-        {
-          if (check_database_for_errors(autoYes, false) < 0)
-            {
-              cout << "Failed to validate the database.\n";
-              result = EINVAL;
-            }
-          else
-            {
-              cout << "The database has been successfully repaired. "
-                      "You need to restart the program to use it.\n";
-              result = EAGAIN;
-            }
-        }
-      StopDBS();
+    if (checkDbForErrors)
+    {
+      if (check_database_for_errors(autoYes, false) < 0)
+      {
+        cout << "Failed to validate the database.\n";
+        result = EINVAL;
+      }
+      else
+      {
+        cout << "The database has been successfully repaired. "
+                "You need to restart the program to use it.\n";
+        result = EAGAIN;
+      }
+    }
+    StopDBS();
   }
   catch(const Exception& e)
   {

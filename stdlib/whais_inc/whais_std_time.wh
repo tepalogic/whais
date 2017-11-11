@@ -39,7 +39,7 @@ EXTERN PROCEDURE now () RETURN HIRESTIME;
 #    @d - The date value.
 #Out:
 #    The year part of the date.
-EXTERN PROCEDURE year (d DATE) RETURN INT16;
+EXTERN PROCEDURE year (d DATE) RETURN INT32;
 
 #Get the month part from a date.
 #In:
@@ -81,7 +81,7 @@ EXTERN PROCEDURE seconds (t DATETIME) RETURN UINT8;
 #   @t - The time value.
 #Out:
 #   The seconds part.
-EXTERN PROCEDURE microsecs (t HIRESTIME) RETURN UINT8;
+EXTERN PROCEDURE useconds (t HIRESTIME) RETURN UINT8;
 
 #Calculate the difference in days between to dates.
 #In:
@@ -90,7 +90,7 @@ EXTERN PROCEDURE microsecs (t HIRESTIME) RETURN UINT8;
 #Out:
 #   The number of days between those dates. The result is negative if the
 #   @first date is newer than @second.
-EXTERN PROCEDURE days_diff (first DATE, second DATE) RETURN INT32;
+EXTERN PROCEDURE days_diff (first DATE, second DATE) RETURN INT64;
 
 #Calculate the difference in seconds between to time related values.
 #In:
@@ -110,12 +110,12 @@ EXTERN PROCEDURE seconds_diff (first DATETIME,
 #Out:
 #   The number of microseconds between those values. The result is negative if
 #   the @first value is newer than @second.
-EXTERN PROCEDURE microsecs_diff (first HIRESTIME, 
-                                 second HIRESTIME) RETURN INT64;
+EXTERN PROCEDURE useconds_diff (first HIRESTIME, 
+                                second HIRESTIME) RETURN INT64;
 
 EXTERN PROCEDURE add_days (time HIRESTIME, days INT64) RETURN HIRESTIME;
 EXTERN PROCEDURE add_seconds (time HIRESTIME, secs INT64) RETURN HIRESTIME;
-EXTERN PROCEDURE add_microsecs (time HIRESTIME, usecs INT64) RETURN HIRESTIME;
+EXTERN PROCEDURE add_useconds (time HIRESTIME, usecs INT64) RETURN HIRESTIME;
 EXTERN PROCEDURE year_leaps (y INT64) RETURN BOOL;
 
 #Get the week of the year for a date.
