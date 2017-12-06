@@ -402,13 +402,20 @@ DbsHandler::SyncTableContent(const TABLE_INDEX index)
     it->second->Flush();
 }
 
-void
-DbsHandler::NotifyDatabaseUpdate()
+bool
+DbsHandler::NotifyDatabaseUpdate(const bool tryDbLock)
 {
-  LockGuard<Lock> _l(mSync);
+  LockGuard<Lock> _l(mSync, true);
+  if (tryDbLock)
+  {
+    if (! _l.try_lock())
+      return false;
+  }
+  else
+    _l.lock();
 
   if (mNeedsSync)
-    return ;
+    return true;
 
   mNeedsSync = true;
 
@@ -421,6 +428,8 @@ DbsHandler::NotifyDatabaseUpdate()
 
   mFile.Seek(PS_DBS_FLAGS_OFF, WH_SEEK_BEGIN);
   mFile.Write(flags, sizeof flags);
+
+  return true;
 }
 
 ITable&

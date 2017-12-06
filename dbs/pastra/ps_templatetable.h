@@ -405,7 +405,7 @@ protected:
   virtual IDataContainer& TableContainer() = 0;
   virtual VariableSizeStoreSPtr VSStore() = 0;
   virtual void FlushEpilog() = 0;
-  void MarkRowModification();
+  void MarkRowModification(LockGuard<Lock>* const guard);
   void FlushInternal();
 
   //Data members

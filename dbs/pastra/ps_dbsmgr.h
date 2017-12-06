@@ -63,7 +63,7 @@ public:
   virtual void DeleteTable(const char* const name) override;
   virtual void SyncAllTablesContent() override;
   virtual void SyncTableContent(const TABLE_INDEX index) override;
-  virtual void NotifyDatabaseUpdate() override;
+  virtual bool NotifyDatabaseUpdate(const bool tryDbLock) override;
 
   virtual ITable& CreateTempTable(const FIELD_INDEX fieldsCount, DBSFieldDescriptor* inoutFields) override;
   virtual const char* TableName(const TABLE_INDEX index) override;

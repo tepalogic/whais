@@ -183,8 +183,8 @@ insert_null_field_value(BTree& tree, const ROW_INDEX row)
 ROW_INDEX
 PrototypeTable::AddRow(const bool skipThreadSafety)
 {
-  MarkRowModification();
-  LockGuard<Lock> _l(mRowsSync, skipThreadSafety);
+  LockGuard<Lock> syncGuard(mRowsSync, skipThreadSafety);
+  MarkRowModification(skipThreadSafety ? nullptr : &syncGuard);
 
   uint64_t lastRowPosition = mRowsCount * mRowSize;
   uint_t toWrite = mRowSize;
@@ -801,7 +801,7 @@ PrototypeTable::LoadNode(const NODE_INDEX nodeId)
 
   else
   {
-    MarkRowModification();
+    MarkRowModification(nullptr);
 
     //Reserve space for this node
     assert(TableContainer().Size() == (nodeId * NodeRawSize()));
@@ -953,8 +953,6 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
                            const T& value)
 {
   T currentValue;
-
-  MarkRowModification();
   LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
   if (row == mRowsCount)
     AddRow(true);
@@ -964,6 +962,8 @@ PrototypeTable::StoreEntry(const ROW_INDEX row,
 
   if (currentValue == value)
     return; //Nothing to change
+
+  MarkRowModification(threadSafe ? &syncHolder : nullptr);
 
   const uint8_t bitsSet = ~0;
   FieldDescriptor& desc = GetFieldDescriptorInternal(field);
@@ -1043,8 +1043,8 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
 
   assert(Serializer::Size(T_TEXT, false) == 2 * sizeof(uint64_t));
 
-  MarkRowModification();
   LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
+  MarkRowModification(threadSafe ? &syncHolder : nullptr);
 
   shared_ptr<ITextStrategy> s = value.GetStrategy();
   LockGuard<Lock> _l(s->mLock);
@@ -1170,8 +1170,8 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
-  MarkRowModification();
   LockGuard<Lock> syncHolder(mRowsSync, !threadSafe);
+  MarkRowModification(threadSafe ? &syncHolder : nullptr);
 
   auto s = value.GetStrategy();
   LockGuard<Lock> _l(s->mLock);
@@ -2506,14 +2506,23 @@ PrototypeTable::MatchRowsNoIndex(const T&          min,
 
 
 void
-PrototypeTable::MarkRowModification()
+PrototypeTable::MarkRowModification(LockGuard<Lock>* const guard)
 {
-  if ( ! mRowModified)
+  if (mRowModified)
+    return ;
+
+  while (! mDbs.NotifyDatabaseUpdate(true))
   {
-    mRowModified = true;
-    mDbs.NotifyDatabaseUpdate();
-    MakeHeaderPersistent();
+    if (guard != nullptr)
+      guard->unlock();
+
+    wh_yield();
+
+    if (guard != nullptr)
+      guard->lock();
   }
+  mRowModified = true;
+  MakeHeaderPersistent();
 }
 
 
