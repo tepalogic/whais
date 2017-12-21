@@ -63,6 +63,7 @@ public:
   virtual ~IOperand() = default;
 
   virtual bool IsNull() const = 0;
+  virtual bool IsNullExpression() const = 0;
 
   virtual void GetValue(DBool& outValue) const = 0;
   virtual void GetValue(DChar& outValue) const = 0;

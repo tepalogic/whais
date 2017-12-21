@@ -64,7 +64,7 @@ typedef enum
 {
   TK_CHAR,         /* A character constant. (e.g 'a') */
   TK_STRING,       /* A string constant. (e.g. "String"). */
-  TK_DATETIME,     /* Date /moment constant. */
+  TK_TIME,         /* Date /moment constant. */
   TK_IDENTIFIER,   /* An identifier */
   TK_NUMERIC,      /* An integer constant.  */
   TK_OPERATOR,     /* Expression operator(e.g. '+' , '-', '<='). */
@@ -310,7 +310,7 @@ next_token(const char     *buffer,
     else
       entrySize += wh_load_utf8_cp((const uint8_t*)(*outpToken + entrySize), &dummy);
 
-    result = ((*outpToken)[entrySize] == '\'') ? TK_CHAR : TK_DATETIME;
+    result = ((*outpToken)[entrySize] == '\'') ? TK_CHAR : TK_TIME;
   }
   else
     buffer++;
@@ -685,7 +685,7 @@ parse_time_value(const char       *buffer,
   if (buffer[0] == '\'')
     return result;      /* end of date/time entry */
 
-  else if (buffer[0] != '/')
+  else if ((buffer[0] != '/') && (buffer[0] != '-'))
     return 0; /* parsing error - no date delimiter */
 
   else
@@ -707,7 +707,7 @@ parse_time_value(const char       *buffer,
   if (buffer[0] == '\'')
     return result;      /* end of date/time entry */
 
-  else if (buffer[0] != '/')
+  else if ((buffer[0] != '/') && (buffer[0] != '-'))
     return 0; /* parsing error - no date delimiter */
 
   else
@@ -924,7 +924,7 @@ yylex(YYSTYPE * lvalp, struct ParserState* parser)
 
       break;
 
-    case TK_DATETIME:
+    case TK_TIME:
       if ((tokenLen > 2) || (pToken[0] != '\''))
       {
         pToken++;

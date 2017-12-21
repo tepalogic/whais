@@ -31,7 +31,7 @@
     
 #Check if a table is persistent.
 #In:
-#   @t - The table value.
+#   @t - The table.
 #Out:
 #   TRUE if the table is persistent.
 EXTERN PROCEDURE is_persistent( t TABLE) RETURN BOOL;
@@ -40,24 +40,37 @@ EXTERN PROCEDURE is_persistent( t TABLE) RETURN BOOL;
 #In:
 #   @t - The table value.
 #Out:
-#   The fields count of the supplied tabled.
-EXTERN PROCEDURE fields_count( t TABLE) RETURN UINT64;
+#   The count of the tables' fields.
+EXTERN PROCEDURE count_fields( t TABLE) RETURN UINT32;
 
-#Get a field of a table by id.
+#Get a field of a table by index.
 #In:
 #   @t - The table value.
-#   @i - Field index.
+#   @i - Field's index.
+#Out:
+#   A value holding the corresponding field.
+EXTERN PROCEDURE get_fieldth ( t TABLE, 
+                             i UINT64) RETURN FIELD;
+                             
+
+#Get a field of a table by name.
+#In:
+#   @t - The table value.
+#   @name - Field name.
 #Out:
 #   A value holding the corresponding field.
 EXTERN PROCEDURE get_field ( t TABLE, 
-                             i UINT64) RETURN FIELD;
+                             name TEXT) RETURN FIELD;
  
 #Get the rows count of a table.
 #In:
 #   @t - The table value.
+#   @mpties - True if it should count only
+#   	      the empty rows.
 #Out:
-#   The numbers of rows allocated by the supplied table.
-EXTERN PROCEDURE rows_count( t TABLE, BOOL onlyEmpty) RETURN UINT64;
+#   The number of the rows after count.
+EXTERN PROCEDURE count_rows( t TABLE,
+			     empties BOOL) RETURN UINT64;
 
 #Allocate a row into a table.
 #In:
@@ -79,7 +92,7 @@ EXTERN PROCEDURE get_empty( t TABLE) RETURN UINT64;
 #   @t - The table value.
 #   @r - The tables' row.
 #Out:
-#   The provided row index.
+#   TRUE if the row was emptied.
 EXTERN PROCEDURE empty_row( t TABLE,
                             r UINT64) RETURN BOOL;
                                      
@@ -96,12 +109,19 @@ EXTERN PROCEDURE exchg_rows( t TABLE,
 
 #Sort table rows.
 #In:
-#   @t - The table;
-#   @f - Array of integer values with the fields to sort in order of priority.
-#   @o - For each provided field onto @f specifies the reversing sort order if
-#        is the case (e.g. set the value from the same array index to TRUE).
+#   @t         - The table;
+#   @fields    - Array with the fields to sort in order of priority.
+#   @direction - For each provided field onto @fields specifies the direction 
+#                of the sort. That is a true value is for ascending sort and 
+#                a false value for descending. If a value is missing the sort
+#                will be ascending.
+#   @from      - The row from where the sort should start (partial table sort).
+#   @to        - The last row of a partial sort.
 #Out:
-#   The result of the sorting operation. TRUE if it was successfully. 
+#   True if the sort was successful.
 EXTERN PROCEDURE sort_table( t TABLE,
                              fields UINT32 ARRAY,
-                             reverse BOOL ARRAY) RETURN BOOL;
+                             reverse BOOL ARRAY,
+                             from UINT64,
+                             to   UINT64) RETURN BOOL;
+                             

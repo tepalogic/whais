@@ -121,6 +121,13 @@ TableOperand::GetTableReference()
 }
 
 
+bool TableOperand::IsNullExpression() const
+{
+  return (mTableRef == nullptr)
+         || (mTableRef->GetTable().FieldsCount() == 0);
+}
+
+
 FieldOperand::FieldOperand(TableOperand& tableOp, const FIELD_INDEX field)
   : mTableRef(&tableOp.GetTableReference()),
     mField(field)

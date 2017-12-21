@@ -44,7 +44,6 @@ WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
 WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
 WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
 WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
-WLIB_PROC_DESCRIPTION       gProcTableReusableRowsCount;
 WLIB_PROC_DESCRIPTION       gProcTableAddRow;
 WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
 WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;
@@ -472,8 +471,7 @@ static WLIB_STATUS
 proc_table_ispersistent( SessionStack& stack, ISession&)
 {
   IOperand& op = stack[stack.Size() - 1].Operand();
-
-  if (op.IsNull())
+  if (op.IsNullExpression())
   {
     stack.Pop(1);
     stack.Push(DBool());
@@ -481,9 +479,7 @@ proc_table_ispersistent( SessionStack& stack, ISession&)
     return WOP_OK;
   }
 
-  ITable& table = op.GetTable();
-
-  DBool result( !table.IsTemporal());
+  DBool result( ! op.GetTable().IsTemporal());
 
   stack.Pop(1);
   stack.Push(result);
@@ -495,14 +491,11 @@ proc_table_ispersistent( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_fields_count( SessionStack& stack, ISession&)
 {
+  DUInt64 result(0);
+
   IOperand& op = stack[stack.Size() - 1].Operand();
-
-  ITable* const table = &op.GetTable();
-
-  if (table == nullptr)
-    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
-
-  DUInt64 result(table->FieldsCount());
+  if ( ! op.IsNullExpression())
+    result = DUInt64(op.GetTable().FieldsCount());
 
   stack.Pop(1);
   stack.Push(result);
@@ -515,16 +508,19 @@ static WLIB_STATUS
 proc_table_field_by_id( SessionStack& stack, ISession&)
 {
   IOperand& op = stack[stack.Size() - 2].Operand();
+  if (op.IsNullExpression())
+  {
+    stack.Pop(2);
+    stack.Push();
 
+    return WOP_OK;
+  }
+
+  StackValue result;
   DUInt64 fieldId;
   stack[stack.Size() - 1].Operand().GetValue(fieldId);
-
-  if (fieldId.IsNull())
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_VALUE),
-                         "A non null index is required for retrieving a table field.");
-  }
-  StackValue result = op.GetFieldAt(fieldId.mValue);
+  if ( ! fieldId.IsNull() && (fieldId.mValue < op.GetTable().FieldsCount()))
+    result = op.GetFieldAt(fieldId.mValue);
 
   stack.Pop(2);
   stack.Push(move(result));
@@ -537,32 +533,38 @@ static WLIB_STATUS
 proc_table_field_name( SessionStack& stack, ISession&)
 {
   uint8_t fieldName[MAX_FIELD_NAME_LENGTH];
-
   DText field;
 
-  IOperand& opTable = stack[stack.Size() - 2].Operand();
-  ITable* const table = &opTable.GetTable();
+  IOperand& op = stack[stack.Size() - 2].Operand();
+  if (op.IsNullExpression())
+  {
+    stack.Pop(2);
+    stack.Push();
+    return WOP_OK;
+  }
 
   stack[stack.Size() - 1].Operand().GetValue(field);
-  if (field.IsNull())
+  if (field.IsNull() || field.RawSize() >= sizeof fieldName)
   {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_VALUE),
-                         "A non null name is required to retrieve a field.");
+    stack.Pop(2);
+    stack.Push();
+    return WOP_OK;
   }
-  else if (field.RawSize() >= sizeof fieldName)
-  {
-    throw InterException(_EXTRA(InterException::FIELD_NAME_TOO_LONG),
-                         "This implementation support fields names up to %d characters.",
-                         sizeof fieldName);
-  }
-  else if (table == nullptr)
-    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
 
   field.RawRead(0, field.RawSize(), fieldName);
   fieldName[field.RawSize()] = 0;
 
-  const FIELD_INDEX fieldId = table->RetrieveField(_RC(char*, fieldName));
-  StackValue result = opTable.GetFieldAt(fieldId);
+  StackValue result;
+  try
+  {
+    const FIELD_INDEX fieldId = op.GetTable().RetrieveField(_RC(char*, fieldName));
+    result = op.GetFieldAt(fieldId);
+  }
+  catch (DBSException& e)
+  {
+    if (e.Code() != DBSException::FIELD_NOT_FOUND)
+      throw ;
+  }
 
   stack.Pop(2);
   stack.Push(move(result));
@@ -574,44 +576,31 @@ proc_table_field_name( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_rows_count( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size() - 1].Operand();
+  DBool empties;
 
-  if (op.IsNull())
+  stack[stack.Size() - 1].Operand().GetValue(empties);
+  if (empties.IsNull())
+    empties = DBool(false);
+
+  IOperand& op = stack[stack.Size() - 2].Operand();
+  if (op.IsNullExpression())
   {
-    stack.Pop(1);
+    stack.Pop(2);
+    stack.Push(DUInt64());
+    return WOP_OK;
+  }
+  else if (op.IsNull())
+  {
+    stack.Pop(2);
     stack.Push(DUInt64(0));
 
     return WOP_OK;
   }
 
   ITable& table = op.GetTable();
+  DUInt64 result(empties.mValue ? table.ReusableRowsCount() : table.AllocatedRows());
 
-  DUInt64 result(table.AllocatedRows());
-
-  stack.Pop(1);
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-static WLIB_STATUS
-proc_table_reusable_rows_count( SessionStack& stack, ISession&)
-{
-  IOperand& op = stack[stack.Size() - 1].Operand();
-
-  if (op.IsNull())
-  {
-    stack.Pop(1);
-    stack.Push(DUInt64(0));
-
-    return WOP_OK;
-  }
-
-  ITable& table = op.GetTable();
-  DUInt64 result(table.AllocatedRows());
-
-  stack.Pop(1);
+  stack.Pop(2);
   stack.Push(result);
 
   return WOP_OK;
@@ -621,13 +610,13 @@ proc_table_reusable_rows_count( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_add_row( SessionStack& stack, ISession&)
 {
+  DUInt64 result;
   IOperand& op = stack[stack.Size() - 1].Operand();
-  ITable& table = op.GetTable();
-  DUInt64 result(table.AddRow());
+  if ( ! op.IsNullExpression())
+    result = DUInt64(op.GetTable().AddRow());
 
   stack.Pop(1);
   stack.Push(result);
-
   return WOP_OK;
 }
 
@@ -635,12 +624,13 @@ proc_table_add_row( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_table_reusable_row( SessionStack& stack, ISession&)
 {
+  DUInt64 result;
   IOperand& op = stack[stack.Size() - 1].Operand();
-  ITable& table = op.GetTable();
-  DUInt64 result( table.GetReusableRow( true));
+  if ( ! op.IsNullExpression())
+    result = DUInt64(op.GetTable().GetReusableRow(true));
 
   stack.Pop(1);
-  stack.Push( result);
+  stack.Push(result);
 
   return WOP_OK;
 }
@@ -652,8 +642,17 @@ proc_table_reuse_row( SessionStack& stack, ISession&)
   DUInt64 row;
   DBool   result;
 
-  ITable& table = stack[stack.Size() - 2].Operand().GetTable();
-  stack[stack.Size() - 1].Operand().GetValue( row);
+  IOperand& op = stack[stack.Size() - 2].Operand();
+  if (op.IsNullExpression())
+  {
+    stack.Pop(2);
+    stack.Push(result);
+
+    return WOP_OK;
+  }
+
+  ITable& table = op.GetTable();
+  stack[stack.Size() - 1].Operand().GetValue(row);
 
   if (! row.IsNull()
       && (row.mValue < table.AllocatedRows()))
@@ -662,6 +661,8 @@ proc_table_reuse_row( SessionStack& stack, ISession&)
 
     result = DBool(true);
   }
+  else
+    result = DBool(false);
 
   stack.Pop(2);
   stack.Push(result);
@@ -676,63 +677,111 @@ table_exchange_rows( SessionStack& stack, ISession&)
   DUInt64 row1, row2;
 
   IOperand& op = stack[stack.Size() - 3].Operand();
-  stack[stack.Size() - 2].Operand().GetValue(row1);
-  stack[stack.Size() - 1].Operand().GetValue(row2);
-
-  if (op.IsNull() || row1.IsNull() || row2.IsNull())
+  if (op.IsNullExpression())
   {
     stack.Pop(3);
     stack.Push(DBool());
 
     return WOP_OK;
   }
+  stack[stack.Size() - 2].Operand().GetValue(row1);
+  stack[stack.Size() - 1].Operand().GetValue(row2);
 
   ITable& table = op.GetTable();
+  const auto rowsCount = table.AllocatedRows();
+  if (row1.IsNull() || row1.mValue >= rowsCount
+      || row2.IsNull() || row2.mValue >= rowsCount)
+  {
+    stack.Pop(3);
+    stack.Push(DBool(false));
+
+    return WOP_OK;
+  }
 
   table.ExchangeRows(row1.mValue, row2.mValue);
-
   stack.Pop(3);
   stack.Push(DBool(true));
 
   return WOP_OK;
-
 }
 
 
 static WLIB_STATUS
 proc_table_sort( SessionStack& stack, ISession&)
 {
-  DArray fields, sortOrder;
+  DArray fields(_SC(DUInt32*, nullptr));
+  DArray sortOrder(_SC(DBool*, nullptr));
 
-  IOperand& opTable = stack[stack.Size() - 3].Operand();
-  stack[stack.Size() - 2].Operand().GetValue(fields);
-  stack[stack.Size() - 1].Operand().GetValue(sortOrder);
-
-  if (opTable.IsNull() || fields.IsNull())
+  IOperand& opTable = stack[stack.Size() - 5].Operand();
+  if (opTable.IsNullExpression() || opTable.IsNull())
   {
-    stack.Pop(2);
+    stack.Pop(5);
+    stack.Push(DBool());
     return WOP_OK;
   }
-  else if (fields.Count() < sortOrder.Count())
+
+  IOperand& opFields = stack[stack.Size() - 4].Operand();
+  if (! opFields.IsNullExpression())
+    opFields.GetValue(fields);
+
+
+  const uint32_t fieldsCount = fields.Count();
+  ITable& table = opTable.GetTable();
+  const FIELD_INDEX tableFieldsCount = table.FieldsCount();
+  for (auto f = 0u; f < fieldsCount; ++f)
   {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_VALUE),
-                         "The field list and sort order arrays should have the same "
-                         "count of elements.");
+    DUInt32 fieldId;
+
+    fields.Get(f, fieldId);
+    if (fieldId.mValue >= tableFieldsCount)
+    {
+      stack.Pop(5);
+      stack.Push(DBool(false));
+      return WOP_OK;
+    }
   }
 
-  for (int i = fields.Count() - sortOrder.Count(); i > 0; --i)
+  IOperand& opDirs = stack[stack.Size() - 3].Operand();
+  if (! opDirs.IsNullExpression())
+    opDirs.GetValue(sortOrder);
+
+  const uint32_t directionsCount = sortOrder.Count();
+  if (directionsCount > fieldsCount)
+  {
+    stack.Pop(5);
+    stack.Push(DBool(false));
+    return WOP_OK;
+  }
+
+  for (int i = fieldsCount - directionsCount; i > 0; --i)
     sortOrder.Add(DBool(false));
 
-  ITable& table = opTable.GetTable();
-  TableSortContainer container(table, fields, sortOrder);
+  DInt64 from, to;
+  stack[stack.Size() - 2].Operand().GetValue(from);
+  if (from.IsNull())
+    from = DInt64(0);
 
-  quick_sort<TableSortContainer::Value, TableSortContainer>(0,
-                                                            table.AllocatedRows() - 1,
-                                                            false,
-                                                            container);
+  stack[stack.Size() - 1].Operand().GetValue(to);
+  if (to.IsNull())
+    to = DInt64(numeric_limits<decltype(to.mValue)>::max());
+
+  if (to < from)
+    swap(to, from);
+
+  if ((from.mValue < 0)
+      || (to.mValue >= _SC(decltype(to.mValue), table.AllocatedRows())))
+  {
+    stack.Pop(5);
+    stack.Push(DBool(false));
+    return WOP_OK;
+  }
+
+  TableSortContainer container(table, fields, sortOrder);
+  quick_sort<TableSortContainer::Value>(from.mValue, to.mValue, false, container);
   container.Commit();
 
-  stack.Pop(2);
+  stack.Pop(5);
+  stack.Push(DBool(true));
   return WOP_OK;
 }
 
@@ -744,17 +793,17 @@ base_tables_init()
                                                  gBoolType,
                                                  gGenericTableType
                                                };
-  gProcTableIsPersistent.name        = "table_is_persistent";
+  gProcTableIsPersistent.name        = "is_persistent";
   gProcTableIsPersistent.localsCount = 2;
   gProcTableIsPersistent.localsTypes = isPersistentLocals;
   gProcTableIsPersistent.code        = proc_table_ispersistent;
 
   static const uint8_t* tableFieldsLocals[] = {
-                                                gUInt64Type,
+                                                gUInt32Type,
                                                 gGenericTableType
                                               };
 
-  gProcTableFieldsCount.name        = "table_fields_count";
+  gProcTableFieldsCount.name        = "count_fields";
   gProcTableFieldsCount.localsCount = 2;
   gProcTableFieldsCount.localsTypes = tableFieldsLocals;
   gProcTableFieldsCount.code        = proc_table_fields_count;
@@ -766,7 +815,7 @@ base_tables_init()
                                                    gUInt64Type
                                                   };
 
-  gProcTableFieldByIndex.name        = "table_field_by_id";
+  gProcTableFieldByIndex.name        = "get_fieldth";
   gProcTableFieldByIndex.localsCount = 3;
   gProcTableFieldByIndex.localsTypes = tableFieldByIdLocals;
   gProcTableFieldByIndex.code        = proc_table_field_by_id;
@@ -777,30 +826,34 @@ base_tables_init()
                                                      gTextType
                                                     };
 
-  gProcTableFieldByName.name        = "table_field";
+  gProcTableFieldByName.name        = "get_field";
   gProcTableFieldByName.localsCount = 3;
   gProcTableFieldByName.localsTypes = tableFieldByNameLocals;
   gProcTableFieldByName.code        = proc_table_field_name;
 
+  static const uint8_t* tableCountRows[] = {
+                                             gUInt64Type,
+                                             gGenericTableType,
+                                             gBoolType
+                                           };
 
-  gProcTableRowsCount.name        = "table_rows";
-  gProcTableRowsCount.localsCount = 2;
-  gProcTableRowsCount.localsTypes = tableFieldsLocals; //reusing
+  gProcTableRowsCount.name        = "count_rows";
+  gProcTableRowsCount.localsCount = 3;
+  gProcTableRowsCount.localsTypes = tableCountRows;
   gProcTableRowsCount.code        = proc_table_rows_count;
 
-  gProcTableReusableRowsCount.name        = "table_resuable_rows";
-  gProcTableReusableRowsCount.localsCount = 2;
-  gProcTableReusableRowsCount.localsTypes = tableFieldsLocals; //reusing
-  gProcTableReusableRowsCount.code        = proc_table_reusable_rows_count;
-
-  gProcTableAddRow.name        = "table_add_row";
+  static const uint8_t* tableAddRowLocals[] = {
+                                                gUInt64Type,
+                                                gGenericTableType
+                                              };
+  gProcTableAddRow.name        = "add_row";
   gProcTableAddRow.localsCount = 2;
-  gProcTableAddRow.localsTypes = tableFieldsLocals; //reusing
+  gProcTableAddRow.localsTypes = tableAddRowLocals;
   gProcTableAddRow.code        = proc_table_add_row;
 
-  gProcTableFindRemovedRow.name        = "table_reusable_row";
+  gProcTableFindRemovedRow.name        = "get_empty";
   gProcTableFindRemovedRow.localsCount = 2;
-  gProcTableFindRemovedRow.localsTypes = tableFieldsLocals; //reusing
+  gProcTableFindRemovedRow.localsTypes = tableAddRowLocals; //reusing
   gProcTableFindRemovedRow.code        = proc_table_reusable_row;
 
   static const uint8_t* tableReuseRowLocals[] = {
@@ -809,7 +862,7 @@ base_tables_init()
                                                   gUInt64Type
                                                 };
 
-  gProcTableRemoveRow.name        = "table_reuse_row";
+  gProcTableRemoveRow.name        = "empty_row";
   gProcTableRemoveRow.localsCount = 3;
   gProcTableRemoveRow.localsTypes = tableReuseRowLocals;
   gProcTableRemoveRow.code        = proc_table_reuse_row;
@@ -821,20 +874,22 @@ base_tables_init()
                                                 gUInt64Type
                                               };
 
-  gProcTableExchangeRows.name        = "table_exchg_rows";
+  gProcTableExchangeRows.name        = "exchg_rows";
   gProcTableExchangeRows.localsCount = 4;
   gProcTableExchangeRows.localsTypes = tableExchangeRows;
   gProcTableExchangeRows.code        = table_exchange_rows;
 
   static const uint8_t* tableSortLocals[] = {
+                                              gBoolType,
                                               gGenericTableType,
-                                              gGenericTableType,
-                                              gGenericArrayType,
-                                              gABoolType
+                                              gAUInt32Type,
+                                              gABoolType,
+                                              gUInt64Type,
+                                              gUInt64Type
                                             };
 
-  gProcTableSort.name        = "table_sort";
-  gProcTableSort.localsCount = 4;
+  gProcTableSort.name        = "sort_table";
+  gProcTableSort.localsCount = 6;
   gProcTableSort.localsTypes = tableSortLocals;
   gProcTableSort.code        = proc_table_sort;
 

@@ -127,6 +127,7 @@ class BaseOperand : public IOperand
 {
 public:
   virtual bool IsNull() const override;
+  virtual bool IsNullExpression() const override;
 
   virtual void GetValue(DBool& outValue) const override;
   virtual void GetValue(DChar& outValue) const override;
@@ -214,6 +215,7 @@ public:
   virtual ~NullOperand() = default;
 
   virtual bool IsNull() const override;
+  virtual bool IsNullExpression() const override;
 
   virtual void GetValue(DBool& outValue) const override;
   virtual void GetValue(DChar& outValue) const override;
@@ -1714,6 +1716,8 @@ public:
 
   virtual TableReference& GetTableReference() override;
 
+  virtual bool IsNullExpression() const override;
+
 private:
   TableReference* mTableRef;
   bool            mChangeable;
@@ -3213,6 +3217,12 @@ public:
     return Operand().IsNull();
   }
 
+  bool IsNullExpression()
+  {
+    LockGuard<Lock> dummy(mSync);
+    return Operand().IsNullExpression();
+  }
+
   template <class DBS_T>
   void GetValue(DBS_T& outValue)
   {
@@ -3398,6 +3408,7 @@ public:
   GlobalOperand(GlobalValue& global);
 
   virtual bool IsNull() const override;
+  virtual bool IsNullExpression() const override;
 
   virtual void GetValue(DBool& outValue) const override;
   virtual void GetValue(DChar& outValue) const override;
@@ -3490,6 +3501,7 @@ public:
   LocalOperand(SessionStack& stack, const uint64_t index);
 
   virtual bool IsNull() const override;
+  virtual bool IsNullExpression() const override;
 
   virtual void GetValue(DBool& outValue) const override;
   virtual void GetValue(DChar& outValue) const override;

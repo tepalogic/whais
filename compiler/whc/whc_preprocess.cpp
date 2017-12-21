@@ -318,96 +318,121 @@ static void
 process_line_tags(const string&                     file,
                   const uint_t                      lineIndex,
                   vector<ReplacementTag>&           tagPairs,
-                  string&                           line)
+                  string&                           line,
+                  string&                           func,
+                  string&                           lastToken)
 {
   size_t inoutOff = 0, lastOff = 0;
 
   string token, newLine, tags;
-  while ( ! (token = NextToken(line, inoutOff, "\t ")).empty())
+  while ( !(token = NextToken(line, inoutOff, "\t ()[];-+*/?%\\!^&|{}:.,><~`@")).empty())
+  {
+    do
     {
-      do {
-          const char ch = token[0];
-          if ( ! (isalpha(ch)
-                  || (ch == '_') || (ch == '#' )
-                  || (ch == '\'') || (ch == '\"')))
-            {
-              token.erase(0, 1);
-            }
+      const char ch = token[0];
+      if ( ! (isalpha(ch) || (ch == '_') || (ch == '#') || (ch == '\'') || (ch == '\"')))
+        token.erase(0, 1);
 
-          else
-            break;
+      else
+        break;
+    } while ( !token.empty());
+
+    newLine += line.substr(lastOff, inoutOff - lastOff - token.length());
+    lastOff = inoutOff;
+    if (token.empty())
+      continue;
+
+    do
+    {
+      const char ch = token[token.length() - 1];
+      if ( !(isalpha(ch) || (ch == '_') || (ch == '#') || (ch == '\'') || (ch == '\"')))
+      {
+        lastOff--;
+        token.erase(token.length() - 1);
       }
-      while (! token.empty());
 
-      newLine += line.substr(lastOff, inoutOff - lastOff - token.length());
+      else
+        break;
+    } while ( !token.empty());
+
+    if (token.empty())
+    {
+      newLine += line.substr(lastOff, inoutOff - lastOff);
       lastOff = inoutOff;
-      if (token.empty())
-        continue;
-
-      do
-        {
-          const char ch = token[token.length()  - 1];
-          if ( ! (isalpha(ch)
-                  || (ch == '_') || (ch == '#' )
-                  || (ch == '\'') || (ch == '\"')))
-            {
-              lastOff--;
-              token.erase(token.length() - 1);
-            }
-
-          else
-            break;
-        }
-      while ( ! token.empty());
-
-      if (token.empty())
-        {
-          newLine += line.substr(lastOff, inoutOff - lastOff);
-          lastOff = inoutOff;
-          continue;
-        }
-
-      else if (token[0] == '#')
-        {
-          newLine += token;
-          break;
-        }
-
-      for (size_t i = 0; i < tagPairs.size(); ++i)
-        {
-          if (token == tagPairs[i].mTagName)
-            {
-              tags  += ' '; tags  += tagPairs[i].mTagName;
-              if ((token == "_FILE_")
-                  && (tagPairs[i].mDefinitionOffset ==
-                      ReplacementTag::BUILDIN_OFF))
-                {
-                  token = '"'; token += file; token += '"';
-                }
-              else if ((token == "_LINE_")
-                       && (tagPairs[i].mDefinitionOffset ==
-                           ReplacementTag::BUILDIN_OFF))
-                {
-                  char temp[8];
-                  snprintf(temp, sizeof temp, "%u", lineIndex);
-                  token = temp;
-                }
-              else
-                token  = tagPairs[i].mTagValue;
-
-              break;
-            }
-        }
-      newLine += token;
+      continue;
     }
+    else if (token[0] == '#')
+    {
+      newLine += token;
+      break;
+    }
+
+    for (size_t i = 0; i < tagPairs.size(); ++i)
+    {
+      if (token == tagPairs[i].mTagName)
+      {
+        tags += ' ';
+        tags += tagPairs[i].mTagName;
+        if ((token == "_FILE_") && (tagPairs[i].mDefinitionOffset == ReplacementTag::BUILDIN_OFF))
+        {
+          token = '"';
+          token += file + '"';
+        }
+        else if ((token == "_LINE_")
+                 && (tagPairs[i].mDefinitionOffset == ReplacementTag::BUILDIN_OFF))
+        {
+          char temp[8];
+          snprintf(temp, sizeof temp, "%u", lineIndex);
+          token = temp;
+        }
+        else if ((token == "_FLINE_")
+                 && (tagPairs[i].mDefinitionOffset == ReplacementTag::BUILDIN_OFF))
+        {
+          char temp[8];
+          snprintf(temp, sizeof temp, "%u", lineIndex);
+          token = '"';
+          token += file + ':' + temp + '"';
+        }
+        else if ((token == "_FUNC_")
+            && (tagPairs[i].mDefinitionOffset == ReplacementTag::BUILDIN_OFF))
+        {
+          token = '"';
+          token += func + '"';
+        }
+        else if ((token == "_FUNCL_")
+            && (tagPairs[i].mDefinitionOffset == ReplacementTag::BUILDIN_OFF))
+        {
+          char temp[8];
+          snprintf(temp, sizeof temp, "%u", lineIndex);
+          token = '"';
+          token += func + ':' + temp + '"';
+        }
+        else
+          token = tagPairs[i].mTagValue;
+
+
+        break;
+      }
+    }
+    newLine += token;
+    if (lastToken == "PROCEDURE")
+      func = token;
+
+    lastToken = token;
+    for (auto& c : lastToken)
+      c = toupper(c);
+
+    if (lastToken == "ENDPROC")
+      func.clear();
+  }
 
   newLine += line.substr(lastOff);
-  line     = newLine;
-  if ( ! tags.empty())
-    {
-      line += "\t#Tags applied:";
-      line += tags;
-    }
+  line = newLine;
+  if ( !tags.empty())
+  {
+    line += "\t#Tags applied:";
+    line += tags;
+  }
 }
 
 
@@ -463,226 +488,195 @@ preprocess_directives(const string&                    file,
 
 {
   if (levelSize >= MAX_INCLUDED_LEVELS)
-    {
-      print_err_include_to_deep(codeMarks, sourceCode.str());
-      return false;
-    }
+  {
+    print_err_include_to_deep(codeMarks, sourceCode.str());
+    return false;
+  }
 
   add_file_to_deps(file, usedFiles);
 
-  uint_t lineIndex    = 1;
+  uint_t lineIndex = 1;
+  codeMarks.push_back(SourceCodeMark(sourceCode.tellp(), lineIndex, file, levelSize));
+  string func, lastToken;
+  while (includedSource.good())
+  {
+    const char* occurence;
+    string line;
 
-  codeMarks.push_back(SourceCodeMark(sourceCode.tellp(),
-                                       lineIndex,
-                                       file,
-                                       levelSize));
-  while ( includedSource.good())
+    getline(includedSource, line);
+    process_line_tags(file, lineIndex, tagPairs, line, func, lastToken);
+
+    if (((occurence = strstr(line.c_str(), cmdDefined)) != nullptr)
+        && check_preprocess_tag(line.c_str(), cmdDefined, occurence))
     {
-      const char* occurence;
-      string line;
+      size_t inoutOffset = 0;
+      string token = NextToken(line, inoutOffset, "\t ");
 
-      getline(includedSource, line);
-      process_line_tags(file, lineIndex, tagPairs, line);
+      assert(token == cmdDefined);
 
-      if (((occurence = strstr(line.c_str(), cmdDefined)) != nullptr)
-          && check_preprocess_tag(line.c_str(), cmdDefined, occurence))
-        {
-          size_t inoutOffset = 0;
-          string token = NextToken(line, inoutOffset, "\t ");
+      string tag = NextToken(line, inoutOffset, "\t ");
+      if (tag.empty())
+      {
+        print_err_cmd_no_value(codeMarks, sourceCode.str(), cmdDefined);
+        return false;
+      }
 
-          assert(token == cmdDefined);
+      string value;
+      do
+      {
+        token = NextToken(line, inoutOffset, "\t ");
+        if ((token[0] == '#') || token.empty()) break;
 
-          string tag = NextToken(line, inoutOffset, "\t ");
-          if (tag.empty())
-            {
-              print_err_cmd_no_value(codeMarks, sourceCode.str(), cmdDefined);
-              return false;
-            }
+        if ( !value.empty()) value += ' ';
 
-          string value;
-          do
-            {
-              token = NextToken(line, inoutOffset, "\t ");
-              if ((token[0] == '#') || token.empty())
-                break;
+        value += token;
+      } while ( !token.empty());
 
-              if ( ! value.empty())
-                value += ' ';
+      if (value.empty())
+      {
+        print_err_def_no_value(codeMarks, sourceCode.str(), tag);
+        return false;
+      }
 
-              value += token;
-            }
-          while ( ! token.empty());
+      if ( !add_tag_definition(codeMarks,
+                               sourceCode,
+                               tagPairs,
+                               ReplacementTag(tag, value, sourceCode.tellp())))
+      {
+        return false;
+      }
 
-          if (value.empty())
-            {
-              print_err_def_no_value(codeMarks, sourceCode.str(), tag);
-              return false;
-            }
-
-          if ( ! add_tag_definition(
-                          codeMarks,
-                          sourceCode,
-                          tagPairs,
-                          ReplacementTag(tag, value, sourceCode.tellp()))
-                                    )
-            {
-              return false;
-            }
-
-          sourceCode << line << endl;
-          ++lineIndex;
-        }
-      else if (((occurence = strstr(line.c_str(), cmdUndefine)) != nullptr)
-               && check_preprocess_tag(line.c_str(), cmdUndefine, occurence))
-        {
-          string tags;
-          size_t inoutOffset = (occurence - line.c_str())
-                               + strlen(cmdUndefine);
-          while (true)
-            {
-              string token = NextToken(line, inoutOffset, "\t ");
-              if (token.empty())
-                break;
-
-              tags += ' '; tags += token;
-              for (vector<ReplacementTag>::iterator it = tagPairs.begin();
-                   it != tagPairs.end();
-                   ++it)
-                {
-                  if (it->mTagName == token)
-                    {
-                      tagPairs.erase(it);
-                      break;
-                    }
-                }
-            }
-
-          sourceCode << line << endl;
-          ++lineIndex;
-        }
-      else if (((occurence = strstr(line.c_str(), cmdInclude)) != nullptr)
-               && check_preprocess_tag(line.c_str(), cmdInclude, occurence))
-        {
-          string includeName = get_tag_value(line, cmdInclude);
-          if (includeName.empty())
-            {
-              print_err_cmd_no_value(codeMarks, sourceCode.str(), cmdInclude);
-              return false;
-            }
-
-          vector<string> foundFiles;
-          search_for_header_file(inclusionPaths, includeName, foundFiles);
-
-          if (foundFiles.size() > 1)
-            {
-              print_err_multiple_include(codeMarks,
-                                          sourceCode.str(),
-                                          foundFiles,
-                                          includeName);
-              return false;
-            }
-          else if (foundFiles.size() == 0)
-            {
-              print_err_no_include(codeMarks,
-                                    sourceCode.str(),
-                                    inclusionPaths,
-                                    includeName);
-              return false;
-            }
-
-          File includedFile(foundFiles[0].c_str(), WH_FILEREAD);
-          string includeContent;
-
-          includeContent.resize(includedFile.Size(), ' ');
-
-          includedFile.Read(_CC(uint8_t*,
-                                  _RC(const uint8_t*,
-                                       includeContent.c_str())),
-                             includeContent.size());
-
-          const char* const guard = strstr(includeContent.c_str(),
-                                            cmdGuard);
-
-          string guardValue;
-          bool ignoreInclusion = false;
-          if (guard != nullptr)
-            {
-              if (strstr(guard + strlen(cmdGuard),
-                          cmdGuard) != nullptr)
-                {
-                  print_err_multiple_guard_entries(codeMarks,
-                                                    sourceCode.str(),
-                                                    foundFiles[0]);
-                  return 0;
-                }
-
-              guardValue = get_tag_value(guard, cmdGuard);
-              if ( ! guardValue.empty())
-                {
-                  for (uint_t i = 0; i < includedGuards.size(); ++i)
-                    {
-                      if (includedGuards[i] == guardValue)
-                        {
-                          ignoreInclusion = true;
-                          break;
-                        }
-                    }
-                }
-            }
-
-          if (ignoreInclusion)
-            {
-              line = string("#Ignoring include of '") +
-                     foundFiles[0] + "' due to guard '" + guardValue + "'.";
-
-              sourceCode << line << endl;
-              ++lineIndex;
-            }
-          else
-            {
-              codeMarks.push_back(SourceCodeMark(sourceCode.tellp(),
-                                                   lineIndex,
-                                                   file,
-                                                   levelSize));
-              line = string("#Including '") +
-                     foundFiles[0] + "' with guard '" + guardValue + "'.";
-
-              sourceCode << line << endl;
-
-              if (! guardValue.empty())
-                includedGuards.push_back(guardValue);
-
-              istringstream includedSource(includeContent);
-              if (! preprocess_directives(foundFiles[0],
-                                           inclusionPaths,
-                                           includedGuards,
-                                           tagPairs,
-                                           levelSize + 1,
-                                           includedSource,
-                                           sourceCode,
-                                           codeMarks,
-                                           usedFiles))
-                {
-                  return false;
-                }
-
-              line = string("#Finished including '") +
-                     foundFiles[0] + "' with guard '" + guardValue + "'.";
-
-              sourceCode << line << endl;
-              ++lineIndex;
-              codeMarks.push_back(SourceCodeMark(sourceCode.tellp(),
-                                                   lineIndex,
-                                                   file,
-                                                   levelSize));
-            }
-        }
-      else
-        {
-          sourceCode << line << endl;
-          ++lineIndex;
-        }
+      sourceCode << line << endl;
+      ++lineIndex;
     }
+    else if (((occurence = strstr(line.c_str(), cmdUndefine)) != nullptr)
+             && check_preprocess_tag(line.c_str(), cmdUndefine, occurence))
+    {
+      string tags;
+      size_t inoutOffset = (occurence - line.c_str()) + strlen(cmdUndefine);
+      while (true)
+      {
+        string token = NextToken(line, inoutOffset, "\t ");
+        if (token.empty()) break;
+
+        tags += ' ';
+        tags += token;
+        for (vector<ReplacementTag>::iterator it = tagPairs.begin(); it != tagPairs.end(); ++it)
+        {
+          if (it->mTagName == token)
+          {
+            tagPairs.erase(it);
+            break;
+          }
+        }
+      }
+
+      sourceCode << line << endl;
+      ++lineIndex;
+    }
+    else if (((occurence = strstr(line.c_str(), cmdInclude)) != nullptr)
+             && check_preprocess_tag(line.c_str(), cmdInclude, occurence))
+    {
+      string includeName = get_tag_value(line, cmdInclude);
+      if (includeName.empty())
+      {
+        print_err_cmd_no_value(codeMarks, sourceCode.str(), cmdInclude);
+        return false;
+      }
+
+      vector<string> foundFiles;
+      search_for_header_file(inclusionPaths, includeName, foundFiles);
+
+      if (foundFiles.size() > 1)
+      {
+        print_err_multiple_include(codeMarks, sourceCode.str(), foundFiles, includeName);
+        return false;
+      }
+      else if (foundFiles.size() == 0)
+      {
+        print_err_no_include(codeMarks, sourceCode.str(), inclusionPaths, includeName);
+        return false;
+      }
+
+      File includedFile(foundFiles[0].c_str(), WH_FILEREAD);
+      string includeContent;
+
+      includeContent.resize(includedFile.Size(), ' ');
+
+      includedFile.Read(_CC(uint8_t*, _RC(const uint8_t*, includeContent.c_str())),
+                        includeContent.size());
+
+      const char* const guard = strstr(includeContent.c_str(), cmdGuard);
+
+      string guardValue;
+      bool ignoreInclusion = false;
+      if (guard != nullptr)
+      {
+        if (strstr(guard + strlen(cmdGuard), cmdGuard) != nullptr)
+        {
+          print_err_multiple_guard_entries(codeMarks, sourceCode.str(), foundFiles[0]);
+          return 0;
+        }
+
+        guardValue = get_tag_value(guard, cmdGuard);
+        if ( !guardValue.empty())
+        {
+          for (uint_t i = 0; i < includedGuards.size(); ++i)
+          {
+            if (includedGuards[i] == guardValue)
+            {
+              ignoreInclusion = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (ignoreInclusion)
+      {
+        line = string("#Ignoring include of '") + foundFiles[0]
+                      + "' due to guard '" + guardValue + "'.";
+
+        sourceCode << line << endl;
+        ++lineIndex;
+      }
+      else
+      {
+        codeMarks.push_back(SourceCodeMark(sourceCode.tellp(), lineIndex, file, levelSize));
+        line = string("#Including '") + foundFiles[0] + "' with guard '" + guardValue + "'.";
+
+        sourceCode << line << endl;
+
+        if ( !guardValue.empty()) includedGuards.push_back(guardValue);
+
+        istringstream includedSource(includeContent);
+        if ( !preprocess_directives(foundFiles[0],
+                                    inclusionPaths,
+                                    includedGuards,
+                                    tagPairs,
+                                    levelSize + 1,
+                                    includedSource,
+                                    sourceCode,
+                                    codeMarks,
+                                    usedFiles))
+        {
+          return false;
+        }
+
+        line = string("#Finished including '") + foundFiles[0]
+                      + "' with guard '" + guardValue + "'.";
+
+        sourceCode << line << endl;
+        ++lineIndex;
+        codeMarks.push_back(SourceCodeMark(sourceCode.tellp(), lineIndex, file, levelSize));
+      }
+    }
+    else
+    {
+      sourceCode << line << endl;
+      ++lineIndex;
+    }
+  }
 
   return true;
 }

@@ -46,7 +46,7 @@ DO
 
     write_log ("... Local values are null by default.");
 
-    row = table_reusable_row (result);
+    row = get_empty (result);
     result.field1[row] = TRUE;
     result.field2[row] = 'C';
     result.field3[row] = '1800/10/14';
@@ -105,7 +105,7 @@ DO
 
     write_log ("... Local values are null by default.");
 
-    row = table_reusable_row (result);
+    row = get_empty (result);
     
     IF (result.field1[row] != NULL) DO
         write_log ("... FAIL: Field1 is not null");
@@ -441,7 +441,7 @@ DO
 
     write_log ("... Local values are null by default.");
 
-    row = table_reusable_row (result);
+    row = get_empty (result);
     
     array_pushback(result.field1[row], TRUE);
     array_pushback(result.field1[row], FALSE);
@@ -504,7 +504,7 @@ DO
 
     write_log ("... Local values are null by default.");
     
-    row = table_reusable_row (result);
+    row = get_empty (result);
     
     IF (result.field1[row] != NULL) DO
         write_log ("... FAIL: Field1 is not null");

@@ -1883,6 +1883,9 @@ PrototypeTable::ExchangeRows(const ROW_INDEX    row1,
   if ((allocatedRows <= row1) || (allocatedRows <= row2))
     throw DBSException(_EXTRA(DBSException::ROW_NOT_ALLOCATED));
 
+  if (row1 == row2)
+    return ;
+
   for (FIELD_INDEX field = 0; field < fieldsCount; ++field)
   {
     const DBSFieldDescriptor fieldDesc = DescribeField(field);

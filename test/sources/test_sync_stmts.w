@@ -21,7 +21,7 @@ DO
 		IF (failure == 0)
 			RETURN 1;
 
-		result = table_reusable_row (gTestTableSync);
+		result = get_empty (gTestTableSync);
 		gTestTableSync.entryId[result]  = gEntryCount;
 		gTestTableSync.rndValue[result] = random (gEntryCount + 1);
 		gEntryCount += 1;

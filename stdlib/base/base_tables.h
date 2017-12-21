@@ -34,7 +34,6 @@ extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldsCount;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldByIndex;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableFieldByName;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableRowsCount;
-extern whais::WLIB_PROC_DESCRIPTION       gProcTableReusableRowsCount;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableAddRow;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableFindRemovedRow;
 extern whais::WLIB_PROC_DESCRIPTION       gProcTableRemoveRow;

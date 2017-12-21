@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size ./test_auto_restore ./logs
+rm -rf ./admin_db ./echo_proc_db ./obj ./test_exec_db ./test_list_db ./test_list_db_frame_size ./test_auto_restore ./logs ./test_table_apis
 
 if [ "$1" == "--clean" ]; then
 	echo "Clean done!" ;
@@ -36,7 +36,6 @@ create_empty_test_db () {
 }
 
 create_empty_test_db echo_proc_db
-create_empty_test_db test_exec_db
 create_empty_test_db test_list_db
 create_empty_test_db test_list_db_frame_size
 create_empty_test_db test_auto_restore
@@ -47,6 +46,21 @@ if [ $? -ne 0 ]; then
 	echo "Failed to add tables into 'test_auto_restore' database"
 	exit 1
 fi
+
+
+create_empty_test_db test_exec_db
+echo 'Create test_exec_db database...'
+echo 'add table_glb_pesitent f1 UINT8; add table_glb_pesistent_2 f2 INT16; quit' | wcmd -u test_exec_db -d ./test_exec_db > /dev/null
+if [ $? -ne 0 ]; then
+	echo "Failed to setup 'test_exec_db' database."
+	exit 1
+fi
+wcmd -u test_exec_db -d ./test_exec_db -G > ./test_exec_db/globals.wh
+if [ $? -ne 0 ]; then
+	echo "Failed to generate 'test_exec_db globals' header."
+	exit 1
+fi
+
 
 
 mkdir ./obj

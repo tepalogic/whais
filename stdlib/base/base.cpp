@@ -223,7 +223,6 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcTableFieldByIndex,
                                                     &gProcTableFieldByName,
                                                     &gProcTableRowsCount,
-                                                    &gProcTableReusableRowsCount,
                                                     &gProcTableAddRow,
                                                     &gProcTableFindRemovedRow,
                                                     &gProcTableRemoveRow,

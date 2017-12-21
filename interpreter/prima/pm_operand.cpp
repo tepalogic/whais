@@ -42,6 +42,12 @@ BaseOperand::IsNull() const
 }
 
 
+bool
+BaseOperand::IsNullExpression() const
+{
+  return false;
+}
+
 void
 BaseOperand::GetValue(DBool& outValue) const
 {
@@ -483,6 +489,13 @@ static void assign_null(T& output)
 
 bool
 NullOperand::IsNull() const
+{
+  return true;
+}
+
+
+bool
+NullOperand::IsNullExpression() const
 {
   return true;
 }
@@ -2832,6 +2845,13 @@ GlobalOperand::IsNull() const
 }
 
 
+bool
+GlobalOperand::IsNullExpression() const
+{
+  return mValue.IsNullExpression();
+}
+
+
 void
 GlobalOperand::GetValue(DBool& outValue) const
 {
@@ -3268,6 +3288,13 @@ bool
 LocalOperand::IsNull() const
 {
   return mStack[mIndex].Operand().IsNull();
+}
+
+
+bool
+LocalOperand::IsNullExpression() const
+{
+  return mStack[mIndex].Operand().IsNullExpression();
 }
 
 

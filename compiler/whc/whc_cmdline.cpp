@@ -269,6 +269,9 @@ CmdLineParser::CheckArguments()
   //Just place holders! These are supposed to be dealt with differently!
   mReplacementTags.push_back(ReplacementTag("_FILE_", ""));
   mReplacementTags.push_back(ReplacementTag("_LINE_", ""));
+  mReplacementTags.push_back(ReplacementTag("_FLINE_", ""));
+  mReplacementTags.push_back(ReplacementTag("_FUNC_", ""));
+  mReplacementTags.push_back(ReplacementTag("_FUNCL_", ""));
 }
 
 
