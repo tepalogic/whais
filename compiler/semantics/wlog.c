@@ -191,6 +191,10 @@ static const struct MsgCodeEntry messages[] = {
     "An outer loop use the same name '%s' for the iterator identifier."},
   {MSG_IT_NOTFOUND, MSG_ERROR_EVENT,
     "Cannot find an iterator named '%s'."},
+  {MSG_SEL_NO_BOOL, MSG_ERROR_EVENT,
+      "Operator '?:' requires the test subexpression to be of type BOOL rather than '%s'."},
+  {MSG_SEL_EXP_NOT_EQ, MSG_ERROR_EVENT,
+      "Operator '?:' requires both result expression to be equal or compatible tables. The first expression's type is '%s' and the second's type is '%s'."},
   {0, 0, 0}
 };
 

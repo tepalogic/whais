@@ -77,6 +77,9 @@ enum EXP_OPERATION
   OP_SOR,
   OP_CALL,
 
+  OP_EXP_SEL,
+  OP_EXP_ALT,
+
   OP_MAX
 };
 

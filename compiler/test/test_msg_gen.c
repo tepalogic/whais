@@ -83,7 +83,7 @@ char test_prog_2[] = ""
   " \n"
   "PROCEDURE Proc() RETURN RICHREAL \n"
   "DO \n"
-  "IF Proc_1() THEN \n"
+  "IF (Proc_1()) DO\n"
   "RETURN 0.23; \n" "END \n" "RETURN 0.1; \n" "ENDPROC \n";
 
 char test_prog_3[] = ""

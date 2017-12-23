@@ -136,6 +136,18 @@ is_integer(const uint_t type)
 }
 
 static bool_t
+is_real(const uint_t type)
+{
+  return type == T_REAL || type == T_RICHREAL;
+}
+
+static bool_t
+is_time_related(const uint_t type)
+{
+  return T_DATE <= type && type <= T_HIRESTIME;
+}
+
+static bool_t
 is_leaf_exp(const struct SemExpression *const exp)
 {
   return exp->opcode == OP_NULL && exp->secondTree == NULL;
@@ -180,7 +192,10 @@ are_fields_compatible(const struct DeclaredVar* const   field1,
   assert(baseType1 < T_UNDETERMINED);
   assert(baseType2 < T_UNDETERMINED);
 
-  if (IS_ARRAY(GET_FIELD_TYPE(field1->type)) != IS_ARRAY(GET_FIELD_TYPE(field2->type)))
+  if (IS_ARRAY(GET_FIELD_TYPE(field1->type)) && IS_ARRAY(GET_FIELD_TYPE(field2->type)))
+    return (baseType1 == baseType2) ? TRUE : FALSE;
+
+  else if (IS_ARRAY(GET_FIELD_TYPE(field1->type)) ^ IS_ARRAY(GET_FIELD_TYPE(field2->type)))
     return FALSE;
 
   else if (store_op[baseType1][baseType2] == W_NA)
@@ -198,25 +213,25 @@ array_to_text(uint_t type)
   assert(type > T_UNKNOWN || type <= T_UNDETERMINED);
 
   if (type == T_BOOL)
-    return "BOOL ARRAY FIELD";
+    return "BOOL ARRAY";
 
   else if (type == T_CHAR)
-    return "CHAR ARRAY FIELD";
+    return "CHAR ARRAY";
 
   else if (type == T_DATE)
-    return "DATE ARRAY FIELD";
+    return "DATE ARRAY";
 
   else if (type == T_DATETIME)
-    return "DATETIME ARRAY FIELD";
+    return "DATETIME ARRAY";
 
   else if (type == T_HIRESTIME)
-    return "HIRESTIME ARRAY FIELD";
+    return "HIRESTIME ARRAY";
 
   else if (type == T_INT8)
-    return "INT8 ARRAY FIELD";
+    return "INT8 ARRAY";
 
   else if (type == T_INT16)
-    return "INT16 ARRAY FIELD";
+    return "INT16 ARRAY";
 
   else if (type == T_INT32)
     return "INT32 ARRAY";
@@ -435,6 +450,79 @@ type_to_text(uint_t type)
 
   return NULL;
 }
+
+static char*
+get_type_description(const struct ExpResultType* const opType)
+{
+  uint_t descriptionLength;
+  char* result;
+  const struct DeclaredVar* field;
+  const struct DeclaredVar* const extra = opType->extra;
+  int i, j;
+
+  if ( ! IS_TABLE(opType->type)
+       || ((extra == NULL) || ! IS_TABLE_FIELD(extra->type)))
+  {
+    const char* const type = type_to_text(opType->type);
+
+    result = (char *)mem_alloc(strlen(type) + 1);
+    if (result != NULL)
+      strcpy(result, type);
+
+    return result;
+  }
+
+  descriptionLength = 8 + 1; /* strlen("TABLE ()") + 1; */
+  field = extra;
+  while (field && IS_TABLE_FIELD(field->type))
+  {
+    const char* const type = type_to_text(field->type);
+
+    descriptionLength += 2; /* strlen(", ") */
+    descriptionLength += field->labelLength + 1; /* ' ' */
+    descriptionLength += strlen (type);
+
+    field = field->extra;
+  }
+
+  result = (char *)mem_alloc(descriptionLength);
+  if (result == NULL)
+    return result;
+
+  result[0] = 0;
+  field = extra;
+  while (field && IS_TABLE_FIELD(field->type))
+  {
+    if (result[0] == 0)
+      strcpy(result, "TABLE (");
+    else
+      strcat(result, ", ");
+
+    /* strncpy (result + strlen(result), field->label, field->labelLength); */
+    for (i = 0, j = strlen(result); i < field->labelLength; ++i, ++j)
+      result[j] = field->label[i], result[j+1] = 0;
+
+    strcat (result, " ");
+    strcat (result, type_to_text(field->type));
+
+    field = field->extra;
+  }
+
+  strcat (result, ")");
+
+  assert (strlen(result) + 1 <= descriptionLength);
+
+  return result;
+}
+
+
+void
+free_type_description(char* description)
+{
+  if (description != NULL)
+    mem_free (description);
+}
+
 
 static struct ExpResultType
 translate_not_exp(struct ParserState* const           parser,
@@ -1255,6 +1343,7 @@ translate_xor_exp(struct ParserState* const         parser,
   return result;
 }
 
+
 static bool_t
 are_compatible_tables(struct ParserState* const           parser,
                       const struct ExpResultType* const   table1,
@@ -1894,7 +1983,6 @@ translate_sor_exp(struct ParserState* const           parser,
   result = *opType1;
   return result;
 }
-
 
 static struct ExpResultType
 translate_index_exp(struct ParserState* const           parser,
@@ -2716,6 +2804,229 @@ translate_call_exp(struct ParserState* const   parser,
 }
 
 
+static bool_t
+are_table_fields_included(const struct DeclaredVar* const f1,
+                          const struct DeclaredVar* const f2)
+{
+  const struct DeclaredVar* it1 = f1;
+  const struct DeclaredVar* it2 = f2;
+
+  while (it1 != NULL && ! IS_TABLE(it1->type))
+  {
+    if ((it2 == NULL) || IS_TABLE(it2->type))
+      return FALSE;
+
+    assert (it1->labelLength > 0);
+    assert (it2->labelLength > 0);
+
+    if ((it1->labelLength != it2->labelLength)
+        || (strncmp(it1->label, it2->label, it1->labelLength) != 0))
+    {
+      it2 = it2->extra;
+      continue;
+    }
+
+    if (it1->type != it2->type)
+      return FALSE;
+
+    it1 = it1->extra;
+  }
+
+  return TRUE;
+}
+
+
+static uint_t
+get_common_subtype(const struct ExpResultType* const e1,
+                   const struct ExpResultType* const e2)
+{
+  const uint_t baseType1 = GET_BASIC_TYPE(e1->type);
+  const uint_t baseType2 = GET_BASIC_TYPE(e2->type);
+
+  if (GET_TYPE(e1->type) == T_UNDETERMINED)
+    return 2;
+
+  else if (GET_TYPE(e2->type) == T_UNDETERMINED)
+    return 1;
+
+  if (IS_TABLE(e1->type) && IS_TABLE(e2->type))
+  {
+    if (are_table_fields_included(e1->extra, e2->extra))
+      return 1;
+
+    if (are_table_fields_included(e2->extra, e1->extra))
+      return 2;
+
+    return 0;
+  }
+  else if (IS_TABLE(e1->type) ^ IS_TABLE(e2->type))
+    return 0;
+
+  else if (IS_FIELD(e1->type) && IS_FIELD(e2->type))
+  {
+    if (GET_FIELD_TYPE(e1->type) == GET_FIELD_TYPE(e2->type))
+      return 1;
+
+    if (IS_ARRAY(e1->type) != IS_ARRAY(e2->type))
+      return 0;
+
+    if (baseType1 == T_UNDETERMINED)
+      return 1;
+
+    if (baseType2 == T_UNDETERMINED)
+      return 2;
+
+    return 0;
+  }
+  else if (IS_FIELD(e1->type) ^ IS_FIELD(e2->type))
+    return 0;
+
+  else if(IS_ARRAY(e1->type) && IS_ARRAY(e2->type))
+  {
+    if (baseType1 == baseType2)
+      return 1;
+
+    if (baseType1 == T_UNDETERMINED)
+      return 1;
+
+    if (baseType2 == T_UNDETERMINED)
+      return 2;
+
+    return 0;
+  }
+  else if (IS_ARRAY(e1->type) ^ IS_ARRAY(e2->type))
+    return 0;
+
+  if (baseType1 == baseType2)
+    return 1;
+
+  if (is_integer(baseType1) && is_integer(baseType2))
+  {
+    if ((is_unsigned(baseType1) && is_unsigned(baseType2))
+        || (is_signed(baseType1) && is_signed(baseType2)))
+    {
+      return baseType1 >= baseType2 ? 1 : 2;
+    }
+    return 0;
+  }
+
+  if (is_real(baseType1) && is_real(baseType2))
+    return baseType1 >= baseType2 ? 1 : 2;
+
+  else if (is_real(baseType1) ^ is_real(baseType2))
+    return 0;
+
+  if (is_time_related(baseType1) && is_time_related(baseType2))
+    return baseType1 >= baseType2 ? 1 : 2;
+
+  else if (is_time_related(baseType1) ^ is_time_related(baseType2))
+    return 0;
+
+  return 0;
+}
+
+static struct ExpResultType
+translate_select_exp(struct ParserState* const     parser,
+                     struct Statement* const       stmt,
+                     struct SemExpression* const   exp)
+{
+  struct WOutputStream* const instrs   = stmt_query_instrs(parser->pCurrentStmt);
+  struct SemExpression* const expBool  = &exp->firstTree->val.u_exp;
+  struct SemExpression* const expOp1   = &exp->secondTree->val.u_exp;
+  struct SemExpression* const expOp2   = &exp->thirdTree->val.u_exp;
+
+  struct ExpResultType type, typeE1, typeE2;
+  uint32_t offsetJmpUseExp2, offsetJmpSkipExp2;
+
+  assert(exp->opcode == OP_EXP_SEL);
+  assert(exp->firstTree->val_type == VAL_EXP_LINK);
+  assert(exp->secondTree->val_type == VAL_EXP_LINK);
+  assert(exp->thirdTree->val_type == VAL_EXP_LINK);
+
+  type = translate_tree_exp(parser, stmt, expBool);
+  if (GET_TYPE(type.type) != T_BOOL)
+  {
+    log_message(parser, parser->bufferPos, MSG_SEL_NO_BOOL, type_to_text(type.type));
+    parser->abortError = TRUE;
+
+    return sgResultUnk;
+  }
+
+  offsetJmpUseExp2 = wh_ostream_size(instrs);
+  if (encode_opcode(instrs, W_JFC) == NULL
+      || wh_ostream_wint32(instrs, 0) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    parser->abortError = TRUE;
+    return sgResultUnk;
+  }
+
+  typeE1 = translate_tree_exp(parser, stmt, expOp1);
+  if (typeE1.type == T_UNKNOWN)
+  {
+    assert(parser->abortError);
+    return sgResultUnk;
+  }
+
+  offsetJmpSkipExp2 = wh_ostream_size(instrs);
+  if (encode_opcode(instrs, W_JMP) == NULL
+      || wh_ostream_wint32(instrs, 0) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    parser->abortError = TRUE;
+    return sgResultUnk;
+  }
+
+  uint8_t* code = wh_ostream_data(instrs);
+  store_le_int32(wh_ostream_size(instrs) - offsetJmpUseExp2,
+                 code + offsetJmpUseExp2 + opcode_bytes(W_JFC));
+  typeE2 = translate_tree_exp(parser, stmt, expOp2);
+  if (typeE2.type == T_UNKNOWN)
+  {
+    assert(parser->abortError);
+    return sgResultUnk;
+  }
+
+  code = wh_ostream_data(instrs);
+  store_le_int32(wh_ostream_size(instrs) - offsetJmpSkipExp2,
+                 code + offsetJmpSkipExp2 + opcode_bytes(W_JMP));
+
+  const int subtypeSelector = get_common_subtype(&typeE1, &typeE2);
+  if ((subtypeSelector != 1) && (subtypeSelector != 2))
+  {
+    char* const firstTable = get_type_description(&typeE1);
+    char* const secondTable = get_type_description(&typeE2);
+
+    if (firstTable != NULL && secondTable != NULL)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_SEL_EXP_NOT_EQ,
+                  firstTable,
+                  secondTable);
+
+    }
+    else
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+
+    free_type_description(firstTable);
+    free_type_description(secondTable);
+
+    parser->abortError = TRUE;
+    return sgResultUnk;
+  }
+
+  type.extra = (subtypeSelector == 1) ? typeE1.extra : typeE2.extra;
+  type.type  = GET_TYPE((subtypeSelector == 1) ? typeE1.type : typeE2.type);
+
+  free_sem_value(exp->firstTree);
+  free_sem_value(exp->secondTree);
+  free_sem_value(exp->thirdTree);
+
+  return type;
+}
+
+
 static struct ExpResultType
 translate_tabval_exp(struct ParserState* const     parser,
                      struct Statement* const       stmt,
@@ -2802,6 +3113,7 @@ translate_tabval_exp(struct ParserState* const     parser,
 
   return expType;
 }
+
 
 static struct ExpResultType
 translate_field_exp(struct ParserState* const     parser,
@@ -2906,6 +3218,9 @@ translate_tree_exp(struct ParserState* const   parser,
   }
   else if (is_leaf_exp(tree))
     return translate_leaf_exp(parser, stmt, tree->firstTree);
+
+  else if (tree->opcode == OP_EXP_SEL)
+    return translate_select_exp(parser, stmt, tree);
 
   else if (tree->opcode == OP_CALL)
     return translate_call_exp(parser, stmt, tree);

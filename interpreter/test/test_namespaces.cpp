@@ -39,7 +39,7 @@ static const uint8_t commonCode[] =
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
-    "tab1[p3, vasile] = p1v1;\n"
+    "tab1.vasile[p3] = p1v1;\n"
     "\n"
     "RETURN gb0;\n"
     "\n"
@@ -143,7 +143,7 @@ static const uint8_t db1Code_Fail_4 [] =
     "\n"
     "VAR ind UINT64;\n"
     "\n"
-    "RETURN tab1[ind, vasile];\n"
+    "RETURN tab1.vasile[ind];\n"
     "\n"
     "ENDPROC\n";
 
@@ -164,7 +164,7 @@ static const uint8_t db1Code_Fail_5 [] =
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
-    "tab1[p3, vasile] = p1v1;\n"
+    "tab1.vasile[p3] = p1v1;\n"
     "\n"
     "RETURN p4;\n"
     "\n"

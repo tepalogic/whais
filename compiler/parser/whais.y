@@ -75,19 +75,20 @@ void yyerror(struct ParserState *state,  const char *msg);
 
 //Operator precedence and associativity
 
-
-%right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR
+%right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR '?' ':' '$'
 %left  EQ NE
 %left  AND '&' OR '|' XOR '^'
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right NOT '!' '~'
+%right NOT '!' '~' 
 %right '@'
 // %right INC DEC
 
-%left  '[' ']' '.'
+%right FSELECT 
+%left  '[' ']'  '.'
 %left  '(' ')'
+%right UMINUS
 
 
 /////////////
@@ -298,8 +299,14 @@ auto_decl_stmt: IDENTIFIER '='  exp ';'
                   { $$ = add_auto_declaration (state, $1, $3); CHK_SEM_ERROR; }
 ;
 
+copy_table_rows_fields_stmt: exp '.' '{' id_list '}'  '[' exp ']' '='  exp '.'  '{' id_list  '}' '[' exp ']' ';'
+                     | exp '.' '{' id_list  '}' '[' exp ']' '='  exp '.'  '*'  '[' exp ']' ';'
+                     | exp '.' '*'  '[' exp ']' '='  exp '.'  '*'  '[' exp ']' ';'
+;
+
 one_statement: return_stmt
              | auto_decl_stmt
+             | copy_table_rows_fields_stmt
              | exp_stmt 
              | if_stmt 
              | while_stmt 
@@ -371,6 +378,7 @@ exp : const_exp
             $$ = create_exp_link(state, $2, NULL, NULL, OP_NOT);
             CHK_SEM_ERROR;
         }
+    | '-' exp %prec UMINUS
     | exp '+' exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_ADD);
@@ -466,14 +474,14 @@ exp : const_exp
             $$ = create_exp_link(state, $1, $3, NULL, OP_INDEX);
             CHK_SEM_ERROR;
         }
-    | exp '[' exp ',' IDENTIFIER ']'
-        {
-            $$ = create_exp_link(state, $1, $3, $5, OP_TABVAL); 
-            CHK_SEM_ERROR;
-        }
-    | exp '.' IDENTIFIER
+    | exp '.' IDENTIFIER %prec FSELECT
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_FIELD);
+            CHK_SEM_ERROR;
+        }
+     | exp '.'  IDENTIFIER '[' exp ']'
+        {
+            $$ = create_exp_link(state, $1, $5, $3, OP_TABVAL); 
             CHK_SEM_ERROR;
         }
     | exp '=' exp
@@ -520,6 +528,16 @@ exp : const_exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_SOR);
             CHK_SEM_ERROR;
+        }
+    | exp '?' exp ':' exp  
+       {
+            $$ = create_exp_link(state, $1, $3, $5, OP_EXP_SEL);
+            CHK_SEM_ERROR;
+       }
+    | exp '$' exp ':' exp
+       {
+        $$ = create_exp_link(state, $1, $3, NULL, OP_EXP_ALT);
+        CHK_SEM_ERROR;
         }
     | IDENTIFIER '(' parameters_list ')'
         {
@@ -599,18 +617,18 @@ not_empty_paramter_list: exp
                             }
 ;
 
-if_stmt : IF exp DO 
+if_stmt : IF '(' exp ')' DO 
               {
                 check_for_dead_statement (state);
-                begin_if_stmt(state, $2, BT_IF);
+                begin_if_stmt(state, $3, BT_IF);
                 CHK_SEM_ERROR;
               }
           local_block_statement end_of_if_statement 
 
-        | IF exp 
+        | IF '(' exp ')' 
               {
                 check_for_dead_statement (state);
-                begin_if_stmt(state, $2, BT_IF);
+                begin_if_stmt(state, $3, BT_IF);
                 CHK_SEM_ERROR;
               }
           one_statement possible_no_else_if_clause
@@ -654,10 +672,10 @@ else_if_clause: ELSE
                   }   
 ; 
 
-while_stmt : WHILE exp
+while_stmt : WHILE '(' exp ')'
                {
                     check_for_dead_statement (state);
-                    begin_while_stmt(state, $2);
+                    begin_while_stmt(state, $3);
                     CHK_SEM_ERROR;
                }
              DO local_block_statement END
@@ -665,10 +683,10 @@ while_stmt : WHILE exp
                     finalize_while_stmt(state);
                     CHK_SEM_ERROR;
                }
-           | WHILE exp
+           | WHILE '(' exp ')'
                {
                     check_for_dead_statement (state);
-                    begin_while_stmt(state, $2);
+                    begin_while_stmt(state, $3);
                     CHK_SEM_ERROR;
                }
              one_statement

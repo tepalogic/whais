@@ -73,7 +73,6 @@ struct _ProcStatementSpec
   bool_t                 checkParams;
   bool_t                 returnDetected;
   bool_t                 deadCodeWarned;
-
 };
 
 struct Statement

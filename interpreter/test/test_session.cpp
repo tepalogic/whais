@@ -37,7 +37,7 @@ static const uint8_t firstCode[] =
     "\n"
     "p3 = p2[p1v2[0]] / gb1;\n"
     "\n"
-    "tab1[p3, vasile] = p1v1;\n"
+    "tab1.vasile[p3] = p1v1;\n"
     "\n"
     "RETURN gb0;\n"
     "\n"

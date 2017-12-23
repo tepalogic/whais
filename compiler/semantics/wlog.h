@@ -133,6 +133,8 @@ struct MsgCodeEntry
 #define MSG_IT_VARIABLE        (MSG_DEAD_STMT + 1)
 #define MSG_IT_ALREADY         (MSG_IT_VARIABLE + 1)
 #define MSG_IT_NOTFOUND        (MSG_IT_ALREADY + 1)
+#define MSG_SEL_NO_BOOL        (MSG_IT_NOTFOUND + 1)
+#define MSG_SEL_EXP_NOT_EQ     (MSG_SEL_NO_BOOL + 1)
 
 
 void

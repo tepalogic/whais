@@ -175,9 +175,17 @@ UNIT_EXES+=test_sor_op
 test_sor_op_SRC=test/test_sor_op.c 
 test_sor_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
 
+UNIT_EXES+=test_sel_op
+test_sel_op_SRC=test/test_sel_op.c 
+test_sel_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
 UNIT_EXES+=test_msg_sops
 test_msg_sops_SRC=test/test_msg_sops.c 
 test_msg_sops_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
+UNIT_EXES+=test_msg_sel_op
+test_msg_sel_op_SRC=test/test_msg_sel_op.c 
+test_msg_sel_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
 
 UNIT_EXES+=test_itoffset_op
 test_itoffset_op_SRC=test/test_itoffset_op.c 

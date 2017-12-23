@@ -1,6 +1,6 @@
 #Test file to check the procedure call statements.
-#The same output shoould be resulted no matter what compiler machine
-#archintecture is used.
+#The same output should be resulted no matter what compiler machine
+#architecture is used.
 
 
 PROCEDURE proc_1 () return BOOL

@@ -74,7 +74,7 @@ char test_prog_2[] = ""
   "PROCEDURE Proc_1() RETURN BOOL\n "
   "DO\n "
   "VAR test BOOL; \n "
-  "RETURN test[10, some_field];\n "
+  "RETURN test.some_field[10];\n "
   "ENDPROC\n ";
 
 char test_prog_3[] = ""

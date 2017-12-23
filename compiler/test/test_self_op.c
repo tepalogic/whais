@@ -59,7 +59,7 @@ char proc_decl_buffer[] =
   ""
   "PROCEDURE ProcId2(v1 TABLE(field_2 DATE)) RETURN DATE "
   "DO "
-  "RETURN v1[0, field_2]; "
+  "RETURN v1.field_2[0]; "
   "ENDPROC\n\n";
 
 static bool_t
