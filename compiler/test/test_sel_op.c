@@ -211,16 +211,19 @@ check_procedure(struct ParserState* state,
                                   0x0E, 0x00,
                                   0x72, 0x07, 0x00, 0x00, 0x00,
                                   0x0E, 0x01,
-                                  0x19,
-                                  0x14,
+                                  0x15,
+                                  0x14, 0x01,
                                   0x0E, 0x02,
                                   0x29,
                                   0x2C
                               };
-  if ((T_INT8 <= expected_type && expected_type <= T_INT64)
-      && ((memcmp(code, code_expected, sizeof code_expected) == 0)
-          || (code_size != sizeof code_expected)))
 
+
+
+
+  if (expected_type == T_BOOL
+      && ((memcmp(code, code_expected, sizeof code_expected) != 0)
+          || (code_size != sizeof code_expected)))
   {
     return FALSE;
   }

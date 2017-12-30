@@ -29,7 +29,7 @@ wcompiler_INC=
 wcompiler_SRC=parser/whais.tab.c parser/parser.c parser/yy.c parser/whaisc.c parser/strstore.c \
 			 semantics/expression.c semantics/op_matrix.c semantics/procdecl.c \
 			 semantics/statement.c semantics/vardecl.c semantics/wlog.c \
-			 semantics/brlo_stmts.c wraper_cpp/compiledunit.cpp
+			 semantics/brlo_stmts.c semantics/table_stmts.c wraper_cpp/compiledunit.cpp
 wcompiler_DEF=COMPILER_EXPORTING USE_COMPILER_SHL USE_CUSTOM_SHL WVER_MAJ=1 WVER_MIN=0
 wcompiler_LIB=utils/wslutils custom/wslcppmemalloc
 wcompiler_SHL=custom/wcustom

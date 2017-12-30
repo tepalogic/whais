@@ -17,6 +17,7 @@ struct ParserState;
 #include "../semantics/expression.h"
 #include "../semantics/procdecl.h"
 #include "../semantics/brlo_stmts.h"
+#include "../semantics/table_stmts.h"
 
 int yylex(YYSTYPE *lvalp, struct ParserState *state);
 void yyerror(struct ParserState *state,  const char *msg);
@@ -299,9 +300,14 @@ auto_decl_stmt: IDENTIFIER '='  exp ';'
                   { $$ = add_auto_declaration (state, $1, $3); CHK_SEM_ERROR; }
 ;
 
-copy_table_rows_fields_stmt: exp '.' '{' id_list '}'  '[' exp ']' '='  exp '.'  '{' id_list  '}' '[' exp ']' ';'
-                     | exp '.' '{' id_list  '}' '[' exp ']' '='  exp '.'  '*'  '[' exp ']' ';'
-                     | exp '.' '*'  '[' exp ']' '='  exp '.'  '*'  '[' exp ']' ';'
+copy_table_rows_fields_stmt: exp '{' id_list '}'  '[' exp ']' '='  exp '{' id_list  '}' '[' exp ']' ';'
+                        { $$ = translate_row_copy(state, $1, $3, $6, $9, $11, $14); }
+                     | exp '{' id_list  '}' '[' exp ']' '='  exp '[' exp ']' ';'
+                        { $$ = translate_row_copy(state, $1, $3, $6, $9, NULL, $11); }
+                     | exp '*' '[' exp ']' '='  exp '[' exp ']' ';'
+                        { $$ = translate_row_copy(state, $1, NULL, $4, $7, NULL, $9); }
+                     | exp '!' '[' exp ']' '='  exp '[' exp ']' ';'
+                        { $$ = translate_row_copy_free(state, $1, $4, $7, $9); }
 ;
 
 one_statement: return_stmt
@@ -344,7 +350,7 @@ list_of_paramaters_decl: IDENTIFIER type_spec
 exp_stmt : exp ';'
         {
            check_for_dead_statement (state);
-           $$ = translate_exp(state, $1, TRUE); 
+           $$ = translate_exp(state, $1, TRUE, FALSE); 
            CHK_SEM_ERROR;
         }
 ;
@@ -534,11 +540,6 @@ exp : const_exp
             $$ = create_exp_link(state, $1, $3, $5, OP_EXP_SEL);
             CHK_SEM_ERROR;
        }
-    | exp '$' exp ':' exp
-       {
-        $$ = create_exp_link(state, $1, $3, NULL, OP_EXP_ALT);
-        CHK_SEM_ERROR;
-        }
     | IDENTIFIER '(' parameters_list ')'
         {
             /* procedure call */

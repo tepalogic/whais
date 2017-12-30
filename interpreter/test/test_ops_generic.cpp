@@ -195,6 +195,7 @@ test_op_cts(Session& session)
   opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
   testCode[opSize++] = 0;
   opSize += w_encode_opcode(W_CTS, testCode + opSize);
+  testCode[opSize++] = 1;
   w_encode_opcode(W_RET, testCode + opSize);
 
   stack.Push(op); //A procedure should return a value!

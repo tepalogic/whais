@@ -368,6 +368,7 @@ test_op_stud(Session& session, const DBS_T refValue, const char*  pText)
   testCode[opSize++] = 1;
   opSize += w_encode_opcode(W_STUD, testCode + opSize);
   opSize += w_encode_opcode(W_CTS, testCode + opSize);
+  testCode[opSize++] = 1;
   opSize += w_encode_opcode(W_LDLO8, testCode + opSize);
   testCode[opSize++] = 0;
   w_encode_opcode(W_RET, testCode + opSize);

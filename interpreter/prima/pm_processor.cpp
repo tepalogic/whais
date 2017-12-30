@@ -45,7 +45,7 @@ op_func_ldnull(ProcedureCall& call, int64_t& offset)
   assert(data[0] != 0);
 
   SessionStack& stack = call.GetStack();
-  for (uint8_t i = 0; i < data[0]; ++i)
+  for (uint8_t i = 0; i < *data; ++i)
     stack.Push();
 
   offset += sizeof(uint8_t);
@@ -299,9 +299,12 @@ op_func_ldgb32(ProcedureCall& call, int64_t& offset)
 static void
 op_func_cts(ProcedureCall& call, int64_t& offset)
 {
+  const uint8_t* const data = call.Code() + call.CurrentOffset() + offset;
+
   assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <= call.GetStack().Size());
 
-  call.GetStack().Pop(1);
+  call.GetStack().Pop(*data);
+  offset += sizeof (uint8_t);
 }
 
 

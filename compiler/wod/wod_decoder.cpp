@@ -358,7 +358,8 @@ const FDECODE_OPCODE wod_dec_w_ldgb8  = wod_dec_w_ldlo8;
 const FDECODE_OPCODE wod_dec_w_ldgb16 = wod_dec_w_ldlo16;
 const FDECODE_OPCODE wod_dec_w_ldgb32 = wod_dec_w_ldlo32;
 
-const FDECODE_OPCODE wod_dec_w_cts    = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_ldnull = wod_dec_w_ldi8;
+const FDECODE_OPCODE wod_dec_w_cts    = wod_dec_w_ldi8;
 const FDECODE_OPCODE wod_dec_w_stb    = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_stc    = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_std    = wod_dec_w_no_ops;
@@ -542,7 +543,7 @@ const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_no_ops;
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
 
-  wod_dec_w_ldi8,
+  wod_dec_w_ldnull,
   wod_dec_w_ldc,
   wod_dec_w_ldi8,
   wod_dec_w_ldi16,

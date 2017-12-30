@@ -375,7 +375,7 @@ add_auto_declaration(struct ParserState* const parser,
   if (link == NULL)
       return NULL; /* Some error has been encountered */
 
-  translate_exp(parser, link, TRUE);
+  translate_exp(parser, link, TRUE, FALSE);
   return NULL;
 }
 
@@ -434,27 +434,26 @@ add_field_declaration(struct ParserState* const   parser,
                                 result->label,
                                 MIN(it->labelLength, result->labelLength));
     if (compare > 0
-        || (compare == 0
-            && it->labelLength >= result->labelLength))
+        || (compare == 0 && it->labelLength >= result->labelLength))
+    {
+      assert((compare > 0) || (it->labelLength > result->labelLength));
+
+      if (prev == NULL)
       {
-        assert((compare > 0) || (it->labelLength > result->labelLength));
-
-        if (prev == NULL)
-        {
-          result->extra = it;
-          break;
-        }
-        else
-        {
-          assert(prev->extra == it);
-
-          result->extra = prev->extra;
-          prev->extra   = result;
-          result        = extra;
-
-          break;
-        }
+        result->extra = it;
+        break;
       }
+      else
+      {
+        assert(prev->extra == it);
+
+        result->extra = prev->extra;
+        prev->extra   = result;
+        result        = extra;
+
+        break;
+      }
+    }
 
     prev = it;
     it = it->extra;

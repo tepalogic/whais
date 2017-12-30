@@ -36,11 +36,6 @@
 #include "brlo_stmts.h"
 
 
-struct ExpResultType
-{
-  const struct DeclaredVar  *extra; /* only for table types */
-  uint_t                     type;
-};
 
 static const struct ExpResultType sgResultUnk = { NULL, T_UNKNOWN };
 
@@ -117,35 +112,31 @@ create_exp_link(struct ParserState* const   parser,
   return result;
 }
 
-static bool_t
-is_unsigned(const uint_t type)
+
+YYSTYPE
+create_arg_link(struct ParserState* const   parser,
+                YYSTYPE                     argument,
+                YYSTYPE                     next)
 {
-  return T_UINT8 <= type && type <= T_UINT64;
+  struct SemValue* const result = alloc_sem_value(parser);
+
+  assert((argument != NULL) && (argument->val_type == VAL_EXP_LINK));
+  assert((next == NULL) || (next->val_type = VAL_PRC_ARG_LINK));
+
+  if (result == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    return NULL;
+  }
+
+  result->val_type        = VAL_PRC_ARG_LINK;
+  result->val.u_args.expr = argument;
+  result->val.u_args.next = next;
+
+  return result;
 }
 
-static bool_t
-is_signed(const uint_t type)
-{
-  return T_INT8 <= type && type <= T_INT64;
-}
 
-static bool_t
-is_integer(const uint_t type)
-{
-  return is_unsigned(type) || is_signed(type);
-}
-
-static bool_t
-is_real(const uint_t type)
-{
-  return type == T_REAL || type == T_RICHREAL;
-}
-
-static bool_t
-is_time_related(const uint_t type)
-{
-  return T_DATE <= type && type <= T_HIRESTIME;
-}
 
 static bool_t
 is_leaf_exp(const struct SemExpression *const exp)
@@ -381,7 +372,7 @@ field_to_text(uint_t type)
   return "UNDEFINED FIELD";
 }
 
-static const char*
+const char*
 type_to_text(uint_t type)
 {
   type = GET_TYPE(type);
@@ -451,7 +442,7 @@ type_to_text(uint_t type)
   return NULL;
 }
 
-static char*
+char*
 get_type_description(const struct ExpResultType* const opType)
 {
   uint_t descriptionLength;
@@ -2347,10 +2338,9 @@ translate_leaf_exp(struct ParserState* const   parser,
     const uint16_t value_16 = ~0;
     const uint8_t  value_8  = ~0;
 
+    result.type = exp->val.u_int.isSigned ? T_INT64 : T_UINT64;
     if (exp->val.u_int.value <= value_8)
     {
-      result.type = exp->val.u_int.isSigned ? T_INT8 : T_UINT8;
-
       if (encode_opcode(instrs, W_LDI8) == NULL
           || wh_ostream_wint8(instrs, exp->val.u_int.value & 0xFF) == NULL)
       {
@@ -2360,8 +2350,6 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else if (exp->val.u_int.value <= value_16)
     {
-      result.type = exp->val.u_int.isSigned ? T_INT16 : T_UINT16;
-
       if (encode_opcode(instrs, W_LDI16) == NULL
           || wh_ostream_wint16(instrs, exp->val.u_int.value & 0xFFFF) == NULL)
       {
@@ -2371,8 +2359,6 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else if (exp->val.u_int.value <= value_32)
     {
-      result.type = exp->val.u_int.isSigned ? T_INT32 : T_UINT32;
-
       if (encode_opcode(instrs, W_LDI32) == NULL
           || wh_ostream_wint32(instrs, exp->val.u_int.value & 0xFFFFFFFF) == NULL)
         {
@@ -2382,8 +2368,6 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else
     {
-      result.type = exp->val.u_int.isSigned ? T_INT64 : T_UINT64;
-
       if (encode_opcode(instrs, W_LDI64) == NULL
           || wh_ostream_wint64(instrs, exp->val.u_int.value) == NULL)
       {
@@ -2408,9 +2392,9 @@ translate_leaf_exp(struct ParserState* const   parser,
   {
     struct SemCTime* const value = &exp->val.u_time;
 
+    result.type = T_HIRESTIME;
     if (value->usec != 0)
     {
-      result.type = T_HIRESTIME;
       if (encode_opcode(instrs, W_LDHT) == NULL
           || wh_ostream_wint32(instrs, value->usec) == NULL
           || wh_ostream_wint8(instrs, value->sec) == NULL
@@ -2426,7 +2410,6 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else if ((value->sec != 0) || (value->min != 0) || (value->hour != 0))
     {
-      result.type = T_DATETIME;
       if (encode_opcode(instrs, W_LDDT) == NULL
           || wh_ostream_wint8(instrs, value->sec) == NULL
           || wh_ostream_wint8(instrs, value->min) == NULL
@@ -2441,7 +2424,6 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else
     {
-      result.type = T_DATE;
       if (encode_opcode(instrs, W_LDD) == NULL
           || wh_ostream_wint8(instrs, value->day) == NULL
           || wh_ostream_wint8(instrs, value->month) == NULL
@@ -2483,12 +2465,12 @@ translate_leaf_exp(struct ParserState* const   parser,
   {
     const enum W_OPCODE opcode = exp->val.u_bool.value == FALSE ? W_LDBF : W_LDBT;
 
+    result.type = T_BOOL;
     if (encode_opcode(instrs, opcode) == NULL)
     {
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
     }
-    result.type = T_BOOL;
   }
   else
   {
@@ -3114,7 +3096,6 @@ translate_tabval_exp(struct ParserState* const     parser,
   return expType;
 }
 
-
 static struct ExpResultType
 translate_field_exp(struct ParserState* const     parser,
                     struct Statement* const       stmt,
@@ -3303,7 +3284,8 @@ translate_tree_exp(struct ParserState* const   parser,
 YYSTYPE
 translate_exp(struct ParserState* const   parser,
               YYSTYPE                     exp,
-              bool_t                      ignoreResult)
+              const bool_t                ignoreResult,
+              const bool_t                keepResult)
 {
   struct Statement* const     stmt   = parser->pCurrentStmt;
   struct WOutputStream* const instrs = stmt_query_instrs(stmt);
@@ -3314,6 +3296,8 @@ translate_exp(struct ParserState* const   parser,
   const struct ExpResultType expType = translate_tree_exp(parser, stmt, &(exp->val.u_exp));
   if (ignoreResult)
   {
+    assert (keepResult == FALSE);
+
     free_sem_value(exp);
     exp = NULL;
   }
@@ -3324,8 +3308,14 @@ translate_exp(struct ParserState* const   parser,
     exp->val.u_tspec.extra = (void *)expType.extra;
   }
 
-  if (encode_opcode(instrs, W_CTS) == NULL)
-    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+  if (! keepResult)
+  {
+    if (encode_opcode(instrs, W_CTS) == NULL
+        || wh_ostream_wint8(instrs, 1) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    }
+  }
 
   return exp;
 }
@@ -3523,25 +3513,3 @@ translate_iterable_exp(struct ParserState* const   parser,
 }
 
 
-YYSTYPE
-create_arg_link(struct ParserState* const   parser,
-                YYSTYPE                     argument,
-                YYSTYPE                     next)
-{
-  struct SemValue* const result = alloc_sem_value(parser);
-
-  assert((argument != NULL) && (argument->val_type == VAL_EXP_LINK));
-  assert((next == NULL) || (next->val_type = VAL_PRC_ARG_LINK));
-
-  if (result == NULL)
-  {
-    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
-    return NULL;
-  }
-
-  result->val_type        = VAL_PRC_ARG_LINK;
-  result->val.u_args.expr = argument;
-  result->val.u_args.next = next;
-
-  return result;
-}

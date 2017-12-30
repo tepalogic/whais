@@ -294,7 +294,7 @@ begin_for_stmt(struct ParserState* const   parser,
 
   loop.type = LE_FOR_BEGIN;
 
-  translate_exp(parser, exp1, TRUE);
+  translate_exp(parser, exp1, TRUE, FALSE);
   if (parser->abortError)
     return ;
 
@@ -307,7 +307,7 @@ begin_for_stmt(struct ParserState* const   parser,
   }
 
   loop.continueMark = wh_ostream_size(code);
-  translate_exp(parser, exp3, TRUE);
+  translate_exp(parser, exp3, TRUE, FALSE);
   if (parser->abortError)
     return ;
 
@@ -458,7 +458,8 @@ finalize_for_stmt(struct ParserState* const parser)
 
   if (loopIt->type == LE_FOREACH_BEGIN)
     {
-      if (encode_opcode(stream, W_CTS) == NULL)
+      if (encode_opcode(stream, W_CTS) == NULL
+          || wh_ostream_wint8(stream, 1) == NULL)
       {
         log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
         return;

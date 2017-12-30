@@ -102,10 +102,39 @@ struct TypeSpec
 };
 
 
+static INLINE bool_t
+is_unsigned(const uint_t type)
+{
+  return T_UINT8 <= GET_TYPE(type) && GET_TYPE(type) <= T_UINT64;
+}
+
+static INLINE bool_t
+is_signed(const uint_t type)
+{
+  return T_INT8 <= GET_TYPE(type) && GET_TYPE(type) <= T_INT64;
+}
+
+static INLINE bool_t
+is_integer(const uint_t type)
+{
+  return is_unsigned(type) || is_signed(type);
+}
+
+static INLINE bool_t
+is_real(const uint_t type)
+{
+  return GET_TYPE(type) == T_REAL || GET_TYPE(type) == T_RICHREAL;
+}
+
+static INLINE bool_t
+is_time_related(const uint_t type)
+{
+  return T_DATE <= GET_TYPE(type) && GET_TYPE(type) <= T_HIRESTIME;
+}
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 int
 wh_define_basic_type(const DBS_BASIC_TYPE type, struct TypeSpec* const dest);

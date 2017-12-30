@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../parser/parser.h"
 
-/* careful whit this to be the same as in
+/* careful with this to be the same as in
  * whais.y */
 #ifndef YYSTYPE
 #define YYSTYPE struct SemValue*
@@ -78,10 +78,20 @@ enum EXP_OPERATION
   OP_CALL,
 
   OP_EXP_SEL,
-  OP_EXP_ALT,
+  OP_EXP_COPY_ROW,
+  OP_EXP_COPY_ROW_FREE,
 
   OP_MAX
 };
+
+
+struct ExpResultType
+{
+  const struct DeclaredVar  *extra; /* only for table types */
+  uint_t                     type;
+};
+
+
 
 YYSTYPE
 create_exp_link(struct ParserState* const   parser,
@@ -93,7 +103,8 @@ create_exp_link(struct ParserState* const   parser,
 YYSTYPE
 translate_exp(struct ParserState* const   parser,
               YYSTYPE                     exp,
-              bool_t                      ingoreResult);
+              const bool_t                ingoreResult,
+              const bool_t                keepResult);
 
 YYSTYPE
 translate_return_exp(struct ParserState* const   parser,
@@ -111,6 +122,15 @@ YYSTYPE
 create_arg_link(struct ParserState* const   parser,
                 YYSTYPE                     arg,
                 YYSTYPE                     next);
+
+const char*
+type_to_text(uint_t type);
+
+char*
+get_type_description(const struct ExpResultType* const opType);
+
+void
+free_type_description(char* description);
 
 #endif /* EXPRESSION_H */
 

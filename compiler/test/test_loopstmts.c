@@ -231,7 +231,7 @@ check_procedure_1(struct ParserState *state, char * proc_name)
     find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
   int shift = 0;
-  int cond_exp_pos = 5;
+  int cond_exp_pos = 6;
   int while_end_pos = 0;
 
   if (decode_opcode( code + cond_exp_pos + 2) != W_JFC)
@@ -305,7 +305,7 @@ check_procedure_2(struct ParserState *state, char * proc_name)
   int cond_exp_pos = 0;
 
   /* check continue statement */
-  shift = 5 + 2;
+  shift = 6 + 2;
   if (decode_opcode( code + shift) != W_JFC)
     {
       return FALSE;
@@ -323,7 +323,7 @@ check_procedure_2(struct ParserState *state, char * proc_name)
       return FALSE;
     }
   shift += get_int32(code + shift + 1);
-  if (shift != 5)
+  if (shift != 6)
     {
       return FALSE;
     }
@@ -349,20 +349,21 @@ check_procedure_3(struct ParserState *state, char * proc_name)
   struct Statement *stmt =
     find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int step_exp_pos = 11;
-  int cond_exp_pos = 20;
-  int for_end_pos  = 54;
+  int step_exp_pos = 12;
+  int cond_exp_pos = 22;
+  int for_end_pos  = 56;
   int current_pos = 0;
 
-  current_pos = step_exp_pos - 5 - 1;
+  current_pos = step_exp_pos - 5 - 2;
 
   if ((decode_opcode(code + current_pos) != W_CTS)
-      || (decode_opcode(code + current_pos + 1) != W_JMP))
+      || (code[current_pos + 1] != 1)
+      || (decode_opcode(code + current_pos + 2) != W_JMP))
     {
       return FALSE;
     }
 
-  current_pos += 1;
+  current_pos += 2;
   if (get_int32(code + current_pos + 1) + current_pos != cond_exp_pos)
     return FALSE;
 
@@ -373,21 +374,21 @@ check_procedure_3(struct ParserState *state, char * proc_name)
       return FALSE;
     }
 
-  current_pos = 34;
+  current_pos = 36;
   if ((decode_opcode(code + current_pos) != W_JMP)
       || (current_pos + get_int32(code + current_pos + 1) != step_exp_pos))
     {
       return FALSE;
     }
 
-  current_pos = 44;
+  current_pos = 46;
   if ((decode_opcode(code + current_pos) != W_JMP)
       || (current_pos + get_int32(code + current_pos + 1) != for_end_pos))
     {
       return FALSE;
     }
 
-  current_pos = 49;
+  current_pos = 51;
   if ((decode_opcode(code + current_pos) != W_JMP)
       || (current_pos + get_int32(code + current_pos + 1) != step_exp_pos))
     {
@@ -451,8 +452,9 @@ check_procedure_4(struct ParserState *state, char * proc_name)
     }
 
   if ((decode_opcode(code + for_end_pos) != W_CTS)
-      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL)
-      || (code[for_end_pos + 2] != 1))
+      || (code[for_end_pos + 1] != 1)
+      || (decode_opcode(code + for_end_pos + 2) != W_LDNULL)
+      || (code[for_end_pos + 3] != 1))
     {
       return FALSE;
     }
@@ -512,8 +514,9 @@ check_procedure_5(struct ParserState *state, char * proc_name)
 
 
   if ((decode_opcode(code + for_end_pos) != W_CTS)
-      || (decode_opcode(code + for_end_pos + 1) != W_LDNULL)
-      || (code[for_end_pos + 2] != 1))
+      || (code[for_end_pos + 1] != 1)
+      || (decode_opcode(code + for_end_pos + 2) != W_LDNULL)
+      || (code[for_end_pos + 3] != 1))
   {
     return FALSE;
   }

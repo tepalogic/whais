@@ -62,5 +62,4 @@ wh_log_msg(uint_t position, uint_t code, uint_t type, char* formatedMsg, va_list
 char*
 wh_copy_first(char* dest, const char* src, uint_t destMax, uint_t srcLength);
 
-
 #endif /*MSGLOG_H_ */

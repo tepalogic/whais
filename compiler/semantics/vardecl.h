@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "whais.h"
 #include "../parser/parser.h"
 
-/* careful whit this to be the same as in
+/* careful with this to be the same as in
  * whais.y */
 #ifndef YYSTYPE
 #define YYSTYPE struct SemValue*
