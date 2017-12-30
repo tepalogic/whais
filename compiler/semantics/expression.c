@@ -2747,6 +2747,9 @@ translate_call_exp(struct ParserState* const   parser,
 
   if (argCount < stmt_get_param_count(proc))
   {
+#if 0
+    /* Todo: Keep this here for the moment when warning display
+     * flags will be added. */
     log_message(parser,
                 parser->bufferPos,
                 MSG_PROC_LESS_ARGS,
@@ -2756,6 +2759,7 @@ translate_call_exp(struct ParserState* const   parser,
                               exp->firstTree->val.u_id.length),
                 stmt_get_param_count(proc),
                 argCount);
+#endif
     if (encode_opcode(instrs, W_LDNULL) == NULL
         || wh_ostream_wint8(instrs, stmt_get_param_count(proc) - argCount) == NULL)
     {

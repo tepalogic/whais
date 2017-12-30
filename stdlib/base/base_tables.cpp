@@ -724,7 +724,6 @@ proc_table_sort( SessionStack& stack, ISession&)
   if (! opFields.IsNullExpression())
     opFields.GetValue(fields);
 
-
   const uint32_t fieldsCount = fields.Count();
   ITable& table = opTable.GetTable();
   const FIELD_INDEX tableFieldsCount = table.FieldsCount();
@@ -763,7 +762,7 @@ proc_table_sort( SessionStack& stack, ISession&)
 
   stack[stack.Size() - 1].Operand().GetValue(to);
   if (to.IsNull())
-    to = DInt64(numeric_limits<decltype(to.mValue)>::max());
+    to = DInt64(table.AllocatedRows() - 1);
 
   if (to < from)
     swap(to, from);
