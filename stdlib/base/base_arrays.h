@@ -28,21 +28,12 @@
 
 #include "stdlib/interface.h"
 
-
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayCount;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArraySort;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArraySearch;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayMin;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayMax;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayAverage;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayUnion;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayDiff;
-extern whais::WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
 extern whais::WLIB_PROC_DESCRIPTION         gProcArrayHash;
-
 
 whais::WLIB_STATUS
 base_arrays_init();

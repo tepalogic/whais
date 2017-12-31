@@ -798,16 +798,18 @@ base_fields_init()
 
   static const uint8_t* fieldMinimumLocals[] = {
                                                  gUInt64Type,
-                                                 gGenericFieldType
+                                                 gGenericFieldType,
+                                                 gBoolType,
+                                                 gUndefinedType
                                                };
 
   gProcFieldMinimum.name        = "field_biggest";
-  gProcFieldMinimum.localsCount = 2;
+  gProcFieldMinimum.localsCount = 4;
   gProcFieldMinimum.localsTypes = fieldMinimumLocals;
   gProcFieldMinimum.code        = field_search_minmax<true>;
 
   gProcFieldMaximum.name        = "field_smallest";
-  gProcFieldMaximum.localsCount = 2;
+  gProcFieldMaximum.localsCount = 4;
   gProcFieldMaximum.localsTypes = fieldMinimumLocals; //reusing
   gProcFieldMaximum.code        = field_search_minmax<false>;
 

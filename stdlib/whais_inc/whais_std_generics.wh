@@ -59,14 +59,14 @@ EXTERN PROCEDURE next_real (v REAL) RETURN REAL;
 EXTERN PROCEDURE prev_rreal (v RICHREAL) RETURN RICHREAL;
 EXTERN PROCEDURE next_rreal (v RICHREAL) RETURN RICHREAL;
 
-#Pause the execution thread for specified amount of time
+#Pause the execution for a specified amount of time.
 #In:
-#   @tmo - The amount of time to sleep in milliseconds.
+#   @tmo - The amount of time in milliseconds.
 #Out:
 #   TRUE if successfully.
 EXTERN PROCEDURE sleep (tmo UINT64) RETURN BOOL;
 
-#Outputs the supplied text on the namespace associated logger.
+#Outputs the supplied message onto the logger associated the used namespace.
 #In:
 #   @t - Text text to output.
 #Out:
@@ -76,7 +76,5 @@ EXTERN PROCEDURE write_log (t TEXT) RETURN BOOL;
 EXTERN PROCEDURE ceil (v RICHREAL) RETURN INT64;
 EXTERN PROCEDURE floor (v RICHREAL) RETURN INT64;
 EXTERN PROCEDURE round (v RICHREAL) RETURN INT64;
-
 EXTERN PROCEDURE abs (v RICHREAL) RETURN RICHREAL;
-
 EXTERN PROCEDURE random (maxValue UINT64) RETURN UINT64;

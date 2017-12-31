@@ -219,8 +219,6 @@ check_procedure(struct ParserState* state,
                               };
 
 
-
-
   if (expected_type == T_BOOL
       && ((memcmp(code, code_expected, sizeof code_expected) != 0)
           || (code_size != sizeof code_expected)))

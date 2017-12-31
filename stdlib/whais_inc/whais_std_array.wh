@@ -30,59 +30,36 @@
 
 
 #Get the count of elements from an array.
-EXTERN PROCEDURE array_count( a ARRAY) RETURN UINT64;
+EXTERN PROCEDURE count(a ARRAY) RETURN UINT64;
 
 #Sort the elements of array
 #In:
-#   @a - The original array.
-#   @r - Set to TRUE to sort reversely.
+#   @a       - The array to be sorted.
+#   @reverse - Set to TRUE to sort reversely.
+#   @unique  - Set to TRUE to remove duplicates.
 #Out:
 #   Another array but with the elements sort based on the specified order.
-EXTERN PROCEDURE array_sort( a ARRAY, r BOOL) RETURN ARRAY;
-
-#Binary search for an array element
-#In:
-#   @a - The array.
-#   @v - A generic value
-#   @s - Search type: NULL (or O) exact match only, 
-#                     > 0 match or smallest next,
-#                     < 0 match of biggest prev;
-#Out:
-#   An index in the array holding the required criteria, NULL if not found.
-EXTERN PROCEDURE array_binary_search (a ARRAY,
-                                      v UNDEFINED,
-                                      s INT8) RETURN UINT64;
-
-
-#Search for an array element
-#In:
-#   @a - The array.
-#   @v - A generic value
-#Out:
-#   The index in the array holding the requested element, NULL if not found.
-EXTERN PROCEDURE array_search (a ARRAY,
-                               v UNDEFINED) RETURN UINT64;
+EXTERN PROCEDURE sort(a ARRAY, r BOOL, unique BOOL) RETURN BOOL;
 
 #Search the smallest element.
 #In:
-#   @a - The array.
+#   @a       - An array value.
+#   @first   - TRUE in case of duplicates entries it will return the last or
+#              the first such index
+#   @min     - Search only for values that are bigger or equal with this one. 
 #Out:
-#   The index in the array holding the smallest element.
-EXTERN PROCEDURE array_min (a ARRAY) RETURN UINT64;
+#   The index where the element can be found in the array.
+EXTERN PROCEDURE get_min(a ARRAY, first BOOL, min UNDEFINED) RETURN UINT64;
 
 #Search the biggest element.
 #In:
-#   @a - The array.
+#   @a       - An array value.
+#   @first   - TRUE in case of duplicates entries it will return the last or
+#              the first such index
+#   @max     - Search only for values that are less or equal with this one. 
 #Out:
-#   The index in the array holding the biggest element.
-EXTERN PROCEDURE array_max (a ARRAY) RETURN UINT64;
-
-#For arrays holding numerical values, compute the average of the values.
-#In:
-#   @a - The array.
-#Out:
-#   The computed average value.
-EXTERN PROCEDURE array_average (a ARRAY) RETURN RICHREAL;
+#   The index where the element can be found in the array.
+EXTERN PROCEDURE get_max(a ARRAY, first BOOL, max UNDEFINED) RETURN UINT64;
 
 #Set operations with array elements.
 EXTERN PROCEDURE array_intersection (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
@@ -93,7 +70,7 @@ EXTERN PROCEDURE array_diff (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
 EXTERN PROCEDURE array_pushback (a1 ARRAY, v UNDEFINED) RETURN ARRAY;
 
 #Truncate an array.
-EXTERN PROCEDURE array_truncate (a1 ARRAY, c UINT64) RETURN ARRAY;
+EXTERN PROCEDURE truncate (a1 ARRAY, count UINT64) RETURN ARRAY;
 
 #Compute the corresponding array hash value.
-EXTERN PROCEDURE array_hash (a ARRAY) RETURN UINT64;
+EXTERN PROCEDURE hash_array (a ARRAY) RETURN UINT64;
