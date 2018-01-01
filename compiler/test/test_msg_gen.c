@@ -1169,9 +1169,9 @@ char test_prog_12[] = ""
   "PROCEDURE Proc(b BOOL) RETURN BOOL \n"
   "DO \n"
   "  VAR an_array BOOL ARRAY; \n"
-  "  FOR(p : an_array) \n"
-  "    FOR(p : an_array) \n"
-  "      IF(p) BREAK;\n"
+  "  FOR(o : an_array) \n"
+  "    FOR(o : an_array) \n"
+  "      IF(o) BREAK;\n"
   "  RETURN an_array[0];\n"
   "ENDPROC\n";
 
@@ -1180,6 +1180,7 @@ char test_prog_13[] = ""
   "PROCEDURE Proc(b BOOL) RETURN UINT64 \n"
   "DO \n"
   "  VAR an_array BOOL ARRAY; \n"
+  "  VAR p INT16; \n"
   "  FOR(c : an_array) "
   "    IF(c) RETURN @p;\n"
   "  RETURN 0;\n"
@@ -1189,13 +1190,24 @@ char test_prog_13[] = ""
 char test_prog_14[] = ""
   "PROCEDURE Proc(b BOOL) RETURN UINT64 \n"
   "DO \n"
+  "  VAR an_array BOOL ARRAY; \n"
+  "  VAR p INT16; \n"
+  "  FOR(c : an_array) "
+  "    IF(c) RETURN @(p + 1);\n"
+  "  RETURN 0;\n"
+  "ENDPROC\n";
+
+
+char test_prog_15[] = ""
+  "PROCEDURE Proc(b BOOL) RETURN UINT64 \n"
+  "DO \n"
   "  VAR a_value BOOL; \n"
   "  FOR(c : a_value) "
   "    IF(c) RETURN @p;\n"
   "  RETURN 0;\n"
   "ENDPROC\n";
 
-char test_prog_15[] = ""
+char test_prog_16[] = ""
   "PROCEDURE Proc(b BOOL) RETURN UINT64 \n"
   "DO \n"
   "  VAR a_table TABLE(f2 BOOL); \n"
@@ -1318,16 +1330,22 @@ main()
 
   test_result =
       (test_result == FALSE) ? FALSE : test_for_error(test_prog_13,
-                                                       MSG_IT_NOTFOUND,
+                                                       MSG_IT_ID_TYPE_NA,
                                                        MSG_ERROR_EVENT);
+
 
   test_result =
       (test_result == FALSE) ? FALSE : test_for_error(test_prog_14,
-                                                       MSG_EXP_NOT_ITERABLE,
+                                                       MSG_IT_EXP_TYPE_NA,
                                                        MSG_ERROR_EVENT);
 
   test_result =
       (test_result == FALSE) ? FALSE : test_for_error(test_prog_15,
+                                                       MSG_EXP_NOT_ITERABLE,
+                                                       MSG_ERROR_EVENT);
+
+  test_result =
+      (test_result == FALSE) ? FALSE : test_for_error(test_prog_16,
                                                        MSG_EXP_NOT_ITERABLE,
                                                        MSG_ERROR_EVENT);
 

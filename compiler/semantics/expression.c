@@ -37,7 +37,7 @@
 
 
 
-static const struct ExpResultType sgResultUnk = { NULL, T_UNKNOWN };
+static const struct ExpResultType sgResultUnk = { .extra = NULL, .type = T_UNKNOWN };
 
 
 static struct ExpResultType
@@ -2485,53 +2485,91 @@ translate_leaf_exp(struct ParserState* const   parser,
 }
 
 static struct ExpResultType
-translate_itoffset_exp(struct ParserState* const   parser,
-                       struct Statement*           stmt,
-                       struct SemValue* const      exp)
+translate_offset_exp(struct ParserState* const   parser,
+                     struct Statement*           stmt,
+                     struct SemValue* const      exp)
 {
   struct WOutputStream* const instrs = stmt_query_instrs(stmt);
-  const struct ExpResultType  result = { NULL, T_UINT64 };
-  uint_t i;
+  struct ExpResultType  result = {.extra = NULL, .type = T_UNKNOWN };
+  struct SemExpression* const  e = &exp->val.u_exp;
+  const bool_t isIdExpression = (e->opcode == OP_NULL
+                                 && e->firstTree != NULL
+                                 && e->firstTree->val_type == VAL_ID);
+  char idName[128] = {0, };
 
-  assert(exp->val_type == VAL_ID);
+  assert(exp->val_type == VAL_EXP_LINK);
 
-  for (i = 0; i < wh_array_count(&stmt->spec.proc.iteratorsStack); ++i)
+  if (isIdExpression)
   {
-    struct LoopIterator* const it = wh_array_get(&stmt->spec.proc.iteratorsStack, i);
+    struct SemValue* const idExp = e->firstTree;
 
-    if (exp->val.u_id.length != it->nameLen
-        || strncmp(exp->val.u_id.name, it->name, it->nameLen) != 0)
+    wh_copy_first(idName, idExp->val.u_id.name, sizeof idName, idExp->val.u_id.length);
+
+    uint_t i;
+    for (i = 0; i < wh_array_count(&stmt->spec.proc.iteratorsStack); ++i)
     {
-      continue;
-    }
+      struct LoopIterator* const it = wh_array_get(&stmt->spec.proc.iteratorsStack, i);
 
-    if (encode_opcode(instrs, W_LDLO32) == NULL)
+      if (idExp->val.u_id.length != it->nameLen
+          || strncmp(idExp->val.u_id.name, it->name, it->nameLen) != 0)
+      {
+        continue;
+      }
+
+      if (encode_opcode(instrs, W_LDLO32) == NULL)
+      {
+        log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        return sgResultUnk;
+      }
+
+      uint32_t offset = wh_ostream_size(instrs);
+      if (wh_array_add(&stmt->spec.proc.iteratorsUsage, &offset) == NULL)
+      {
+        log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        return sgResultUnk;
+      }
+
+      if ((wh_ostream_wint32(instrs, it->localIndex) == NULL)
+          || (encode_opcode(instrs, W_ITOFF) == NULL))
+      {
+        log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+        return sgResultUnk;
+      }
+
+      free_sem_value(idExp);
+      free_sem_value(exp);
+      result.type = T_UINT64;
+      return result;
+    }
+  }
+
+  result = translate_tree_exp(parser, parser->pCurrentStmt, e);
+  free_sem_value(exp);
+
+  if (result.type == sgResultUnk.type)
+    return result;
+
+  else if (IS_FIELD(result.type))
+  {
+    assert (result.extra == NULL);
+
+    if (encode_opcode(instrs, W_FID) == NULL)
     {
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
     }
 
-    uint32_t offset = wh_ostream_size(instrs);
-    if (wh_array_add(&stmt->spec.proc.iteratorsUsage, &offset) == NULL)
-    {
-      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return sgResultUnk;
-    }
-
-    if ((wh_ostream_wint32(instrs, it->localIndex) == NULL)
-        || (encode_opcode(instrs, W_ITOFF) == NULL))
-    {
-      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
-      return sgResultUnk;
-    }
-
-    free_sem_value(exp);
+    result.type = T_UINT64;
     return result;
   }
 
-  char tname[128];
-  wh_copy_first(tname, exp->val.u_id.name, sizeof tname, exp->val.u_id.length);
-  log_message(parser, parser->bufferPos, MSG_IT_NOTFOUND, tname);
+  if (isIdExpression)
+  {
+    assert (strlen(idName) > 0);
+    log_message(parser, parser->bufferPos, MSG_IT_ID_TYPE_NA, idName);
+  }
+  else
+    log_message(parser, parser->bufferPos, MSG_IT_EXP_TYPE_NA, type_to_text(result.type));
 
   return sgResultUnk;
 }
@@ -3213,7 +3251,7 @@ translate_tree_exp(struct ParserState* const   parser,
     return translate_field_exp(parser, stmt, tree);
 
   else if (tree->opcode == OP_OFFSET)
-    return translate_itoffset_exp(parser, stmt, tree->firstTree);
+    return translate_offset_exp(parser, stmt, tree->firstTree);
 
   assert(tree->firstTree->val_type == VAL_EXP_LINK);
 

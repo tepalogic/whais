@@ -201,3 +201,6 @@ UNIT_EXES+=test_itoffset_op
 test_itoffset_op_SRC=test/test_itoffset_op.c 
 test_itoffset_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
 
+UNIT_EXES+=test_fid_op
+test_fid_op_SRC=test/test_fid_op.c 
+test_fid_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc

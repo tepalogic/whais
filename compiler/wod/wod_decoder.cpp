@@ -539,6 +539,7 @@ const FDECODE_OPCODE wod_dec_w_itbl  = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itn   = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itp   = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_fid   = wod_dec_w_no_ops;
 
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
@@ -718,7 +719,8 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_itbl,
   wod_dec_w_itn,
   wod_dec_w_itp,
-  wod_dec_w_itoff
+  wod_dec_w_itoff,
+  wod_dec_w_fid
 };
 
 const char *wod_str_table[] = {
@@ -899,7 +901,8 @@ const char *wod_str_table[] = {
   "itl",
   "itn",
   "itp",
-  "itoff"
+  "itoff",
+  "fid"
 };
 
 } //namespace wod

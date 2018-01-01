@@ -38,7 +38,7 @@ wslcompiler_SRC=$(wcompiler_SRC)
 wslcompiler_INC=$(wcompiler_INC)
 
 ./compiler/parser/whais.tab.c ./compiler/parser/whais.tab.h : ./compiler/parser/whais.y
-	$(ECHO)if [ ! -f $@ ] ; then bison -d $? -o $@ ; fi
+	$(ECHO)if [ ! -f "$@" ] || ["$?" -nt "$@" ] ; then bison -d $? -o $@ ; fi
 
 
 ifeq ($(BUILD_TESTS),yes)

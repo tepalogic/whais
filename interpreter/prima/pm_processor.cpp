@@ -1391,16 +1391,16 @@ op_start_iterate(ProcedureCall& call, int64_t& offset)
   IOperand& container = stack[stackSize - 1].Operand();
   if (container.IsNull())
   {
-    stack.Push(StackValue(BoolOperand(DBool(false))));
+    stack.Push(DBool(false));
     return;
   }
 
-  StackValue it{NullOperand{}};
+  StackValue it{NullOperand{}};;
   const bool started = container.StartIterate(reverse, it);
 
   stack.Pop(1);
   stack.Push(move(it));
-  stack.Push(StackValue{BoolOperand{DBool{started}}});
+  stack.Push(DBool(started));
 }
 
 
@@ -1415,7 +1415,7 @@ op_iterate(ProcedureCall& call, int64_t& offset)
   IOperand& iteratorOp = stack[stackSize - 1].Operand();
 
   const bool started = iteratorOp.Iterate(reverse);
-  stack.Push(StackValue(BoolOperand(DBool(started))));
+  stack.Push(DBool(started));
 }
 
 static void
@@ -1431,7 +1431,32 @@ op_iterator_offset(ProcedureCall& call, int64_t& offset)
   const uint64_t itOffset = iteratorOp.IteratorOffset();
 
   stack.Pop(1);
-  stack.Push(StackValue(UInt64Operand(DUInt64(itOffset))));
+  stack.Push(DUInt64(itOffset));
+}
+
+
+static void
+op_field_id(ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack = call.GetStack();
+  const size_t stackSize = stack.Size();
+
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <= stackSize);
+
+  IOperand& field = stack[stackSize - 1].Operand();
+  if (field.IsNullExpression() || field.IsNull())
+  {
+    call.GetSession().LogMessage("Cannot get a field index due to NULL field value, "
+                                 "returning NULL also!");
+
+    stack.Pop(1);
+    stack.Push(DUInt64());
+    return ;
+  }
+
+  DUInt64 result(field.GetField());
+  stack.Pop(1);
+  stack.Push(result);
 }
 
 
@@ -1617,7 +1642,8 @@ static OP_FUNC operations[] = {
                                 op_iterate<false>,
                                 op_iterate<true>,
 
-                                op_iterator_offset
+                                op_iterator_offset,
+                                op_field_id
 };
 
 

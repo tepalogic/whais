@@ -364,7 +364,7 @@ exp : const_exp
             $$ = create_exp_link(state, $1, NULL, NULL, OP_NULL);
             CHK_SEM_ERROR;
         }
-     | '@' IDENTIFIER
+     | '@' exp
         {
             $$ = create_exp_link(state, $2, NULL, NULL, OP_OFFSET);
             CHK_SEM_ERROR;
@@ -546,6 +546,12 @@ exp : const_exp
             $$ = create_exp_link(state, $1, $3, NULL, OP_CALL);
             CHK_SEM_ERROR;
         }
+    | '{' not_empty_parameters_list '}'
+        {
+            /* procedure call */
+            $$ = create_exp_link(state, $2, NULL, NULL, OP_CREATE_ARRAY);
+            CHK_SEM_ERROR;
+        }
 ;
 
 const_exp: WHAIS_INTEGER
@@ -600,18 +606,18 @@ parameters_list: /* empty */
                     {
                         $$ = NULL;
                     }
-               | not_empty_paramter_list
+               | not_empty_parameters_list
                     {
                         $$ = $1;
                     }
 ;
 
-not_empty_paramter_list: exp
+not_empty_parameters_list: exp
                             {
                                 $$ = create_arg_link(state, $1, NULL);
                                 CHK_SEM_ERROR;
                             }
-                       | exp ',' parameters_list
+                         | exp ',' parameters_list
                             {
                                 $$ = create_arg_link(state, $1, $3);
                                 CHK_SEM_ERROR;

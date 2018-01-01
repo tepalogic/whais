@@ -133,6 +133,8 @@ public:
   bool IsServerShoutdowing() const { return mServerStopped; }
   uint_t MaxStackCount() const { return mMaxStackCount; }
 
+  void LogMessage(const std::string& msg) {/* TODO: It needs to be implemented */ }
+
 private:
   void DefineTablesGlobalValues();
 
