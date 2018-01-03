@@ -204,3 +204,12 @@ test_itoffset_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom
 UNIT_EXES+=test_fid_op
 test_fid_op_SRC=test/test_fid_op.c 
 test_fid_op_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
+UNIT_EXES+=test_create_array
+test_create_array_SRC=test/test_create_array.c 
+test_create_array_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
+UNIT_EXES+=test_msg_create_array
+test_msg_create_array_SRC=test/test_msg_create_array.c 
+test_msg_create_array_LIB=compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+

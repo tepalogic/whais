@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "whais.h"
 
-enum DBS_FIELD_TYPE
+enum DBS_BASIC_TYPE
 {
   T_UNKNOWN = 0,
   T_BOOL,
@@ -51,13 +51,11 @@ enum DBS_FIELD_TYPE
   T_END_OF_TYPES
 };
 
-typedef enum DBS_FIELD_TYPE DBS_BASIC_TYPE;
-
-
+typedef enum DBS_BASIC_TYPE DBS_FIELD_TYPE;
 struct DBSFieldDescriptor
 {
   const char*          name;
-  enum DBS_FIELD_TYPE  type;
+  DBS_FIELD_TYPE       type;
   bool_t               isArray;
 };
 
@@ -87,7 +85,7 @@ struct DBSFieldDescriptor
 #define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD))
 #define GET_FIELD_TYPE(type)   ((type) \
                                 & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
-#define GET_BASIC_TYPE(type)   ((DBS_BASIC_TYPE)((type) & 0xFF))
+#define GET_BASIC_TYPE(type)   ((enum DBS_BASIC_TYPE)((type) & 0xFF))
 
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF
@@ -137,7 +135,7 @@ extern "C" {
 #endif
 
 int
-wh_define_basic_type(const DBS_BASIC_TYPE type, struct TypeSpec* const dest);
+wh_define_basic_type(const enum DBS_BASIC_TYPE type, struct TypeSpec* const dest);
 
 int
 wh_apply_array_modifier(struct TypeSpec* const ioBuffer);

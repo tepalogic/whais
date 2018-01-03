@@ -546,12 +546,22 @@ exp : const_exp
             $$ = create_exp_link(state, $1, $3, NULL, OP_CALL);
             CHK_SEM_ERROR;
         }
-    | '{' not_empty_parameters_list '}'
+    | '{' not_empty_parameters_list '}' array_construction_type_spec
         {
             /* procedure call */
-            $$ = create_exp_link(state, $2, NULL, NULL, OP_CREATE_ARRAY);
+            $$ = create_exp_link(state, $2, $4, NULL, OP_CREATE_ARRAY);
             CHK_SEM_ERROR;
         }
+;
+
+array_construction_type_spec: /* empty */
+                               {
+                                    $$ = NULL;
+                                }
+                            | basic_type_spec
+                                {
+                                    $$ = $1;
+                                }
 ;
 
 const_exp: WHAIS_INTEGER
@@ -617,7 +627,7 @@ not_empty_parameters_list: exp
                                 $$ = create_arg_link(state, $1, NULL);
                                 CHK_SEM_ERROR;
                             }
-                         | exp ',' parameters_list
+                         | exp ',' not_empty_parameters_list
                             {
                                 $$ = create_arg_link(state, $1, $3);
                                 CHK_SEM_ERROR;

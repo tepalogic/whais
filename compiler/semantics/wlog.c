@@ -221,7 +221,18 @@ static const struct MsgCodeEntry messages[] = {
     "The full type of destination table is %s and of source table is %s."},
   {MSG_ROW_COPY_NOFIELDS_CNT, MSG_ERROR_EVENT,
     "Source and destination field lists do not have the same number of elements."},
-
+  {MSG_ARR_CONSTRUCT_EXP_TYPE_NA, MSG_ERROR_EVENT,
+    "Element number %u of the array construct cannot be of type %s (it needs to be of a basic type)."},
+  {MSG_ARR_CONSTRUCT_DEF_TEXT, MSG_ERROR_EVENT,
+    "Array construction cannot create TEXT ARRAY (this implementation does not support array of text values)."},
+  {MSG_ARR_CONSTRUCT_EXP_TEXT, MSG_ERROR_EVENT,
+    "Element number %u of the array construct cannot be of type TEXT (this implementation does not support array of text values)."},
+  {MSG_ARR_CONSTRUCT_EXP_FAIL, MSG_ERROR_EVENT,
+    "Failed to deduce the type of the resulted array while looking at element %u of the array construction." },
+  {MSG_ARR_CONSTRUCT_EXP_SHOW, MSG_EXTRA_EVENT,
+    "Element %u has type %s." },
+  {MSG_ARR_CONSTRUCT_TYPE_SHOW, MSG_EXTRA_EVENT,
+    "The result should be %s." },
   {0, 0, 0}
 };
 

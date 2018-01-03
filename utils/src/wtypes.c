@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 int
-wh_define_basic_type(const DBS_BASIC_TYPE type, struct TypeSpec* const dest)
+wh_define_basic_type(const enum DBS_BASIC_TYPE type, struct TypeSpec* const dest)
 {
   store_le_int16(type, dest->type);
   store_le_int16(sizeof( dest->data), dest->dataSize);

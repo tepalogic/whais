@@ -2392,9 +2392,9 @@ translate_leaf_exp(struct ParserState* const   parser,
   {
     struct SemCTime* const value = &exp->val.u_time;
 
-    result.type = T_HIRESTIME;
     if (value->usec != 0)
     {
+      result.type = T_HIRESTIME;
       if (encode_opcode(instrs, W_LDHT) == NULL
           || wh_ostream_wint32(instrs, value->usec) == NULL
           || wh_ostream_wint8(instrs, value->sec) == NULL
@@ -2410,6 +2410,7 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else if ((value->sec != 0) || (value->min != 0) || (value->hour != 0))
     {
+      result.type = T_DATETIME;
       if (encode_opcode(instrs, W_LDDT) == NULL
           || wh_ostream_wint8(instrs, value->sec) == NULL
           || wh_ostream_wint8(instrs, value->min) == NULL
@@ -2424,6 +2425,7 @@ translate_leaf_exp(struct ParserState* const   parser,
     }
     else
     {
+      result.type = T_DATE;
       if (encode_opcode(instrs, W_LDD) == NULL
           || wh_ostream_wint8(instrs, value->day) == NULL
           || wh_ostream_wint8(instrs, value->month) == NULL
@@ -2559,7 +2561,7 @@ translate_offset_exp(struct ParserState* const   parser,
       return sgResultUnk;
     }
 
-    result.type = T_UINT64;
+    result.type = T_UINT16;
     return result;
   }
 
@@ -3203,6 +3205,178 @@ translate_field_exp(struct ParserState* const     parser,
   return expType;
 }
 
+
+static struct ExpResultType
+translate_array_construct_exp(struct ParserState* const parser,
+                              struct Statement* const   stmt,
+                              struct SemValue* const exp,
+                              struct SemValue* const type)
+{
+  struct WOutputStream* const instrs = stmt_query_instrs(parser->pCurrentStmt);
+  struct ExpResultType arrayType = {.extra = NULL, .type = T_UNDETERMINED };
+  struct SemProcArgumentsList* list = &exp->val.u_args;
+  struct SemValue* next = NULL;
+  struct SemTypeSpec* const ts = (type == NULL ? NULL : &type->val.u_tspec);
+  const bool_t typeSpecified = (ts != NULL);
+
+  struct WArray listTypes;
+  bool_t testAllExpsFields = FALSE;
+  uint_t i;
+
+  assert (exp->val_type == VAL_PRC_ARG_LINK);
+  assert (type == NULL || type->val_type == VAL_TYPE_SPEC);
+
+  if (typeSpecified && GET_TYPE(ts->type) == T_TEXT)
+  {
+    log_message(parser, parser->bufferPos, MSG_ARR_CONSTRUCT_DEF_TEXT);
+    return sgResultUnk;
+  }
+
+  if (typeSpecified)
+    free_sem_value(type);
+
+  if (wh_array_init(&listTypes, sizeof(uint_t)) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    return sgResultUnk;
+  }
+
+  do
+  {
+    assert (list->expr->val_type == VAL_EXP_LINK);
+    if (next != NULL )
+      free_sem_value(next);
+
+    const struct ExpResultType nodeType = translate_tree_exp(parser, stmt, &list->expr->val.u_exp);
+    free_sem_value(list->expr);
+
+    if (nodeType.type == T_UNKNOWN)
+      goto just_fail;
+
+    if ((! IS_FIELD(nodeType.type))
+        && (GET_TYPE(nodeType.type) < T_BOOL || T_UNDETERMINED <= GET_TYPE(nodeType.type)))
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ARR_CONSTRUCT_EXP_TYPE_NA,
+                  wh_array_count(&listTypes) + 1,
+                  type_to_text(nodeType.type));
+      goto just_fail;
+    }
+    else if (GET_TYPE(nodeType.type) == T_TEXT)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ARR_CONSTRUCT_EXP_TEXT,
+                  wh_array_count(&listTypes));
+      goto just_fail;
+    }
+
+    if (wh_array_add(&listTypes, &nodeType.type) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      goto just_fail;
+    }
+
+    testAllExpsFields |= IS_FIELD(nodeType.type);
+
+    assert ((list->next == NULL) || (list->next->val_type == VAL_PRC_ARG_LINK));
+
+    next = list->next;
+    list = (next == NULL) ? NULL: &next->val.u_args;
+
+  } while (list != NULL);
+
+  free_sem_value(exp);
+
+  if (testAllExpsFields)
+  {
+    for (i = 0; i < wh_array_count(&listTypes); ++i)
+    {
+      const uint_t expType = *(uint_t*)wh_array_get(&listTypes, i);
+      if (! IS_FIELD(expType) )
+      {
+        log_message(parser, parser->bufferPos, MSG_ARR_CONSTRUCT_EXP_FAIL, i + 1);
+        goto dump_types_and_fail;
+      }
+    }
+    if (typeSpecified)
+    {
+      if (! is_integer(ts->type))
+      {
+          log_message(parser, parser->bufferPos, MSG_ARR_CONSTRUCT_EXP_FAIL, 1);
+          goto dump_types_and_fail;
+      }
+      arrayType.type = ts->type;
+    }
+    else
+      arrayType.type = T_UINT16;
+  }
+  else
+  {
+    arrayType.type = typeSpecified ? ts->type : *(uint_t*)wh_array_get(&listTypes, 0);
+    for (i = typeSpecified ? 0 : 1; i <  wh_array_count(&listTypes); ++i)
+    {
+      const struct ExpResultType expType = {.extra = NULL,
+                                            .type = *(uint_t*)wh_array_get(&listTypes, i)};
+      if (typeSpecified)
+      {
+        if (store_op[GET_TYPE(ts->type)][GET_TYPE(expType.type)] != W_NA)
+          continue;
+      }
+      else
+      {
+        const uint_t selection = get_common_subtype(&arrayType, &expType);
+        if (selection != 0)
+        {
+          arrayType.type = (selection == 1) ? arrayType.type : expType.type;
+          continue ;
+        }
+      }
+
+      log_message(parser, parser->bufferPos, MSG_ARR_CONSTRUCT_EXP_FAIL, i + 1);
+      goto dump_types_and_fail;
+    }
+  }
+
+  if (encode_opcode(instrs, W_CARR) == NULL
+      || wh_ostream_wint8(instrs,
+                         (testAllExpsFields ? 0x80 : 0) | GET_BASIC_TYPE(arrayType.type)) == NULL
+      || wh_ostream_wint16(instrs, wh_array_count(&listTypes)) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    goto just_fail;
+  }
+
+  MARK_ARRAY(arrayType.type);
+  wh_array_clean(&listTypes);
+
+  return arrayType;
+
+dump_types_and_fail:
+  for (i = 0; i < wh_array_count(&listTypes); ++i)
+  {
+      const uint_t expType = *(uint_t*)wh_array_get(&listTypes, i);
+      log_message(parser,
+                  IGNORE_BUFFER_POS,
+                  MSG_ARR_CONSTRUCT_EXP_SHOW,
+                  i + 1,
+                  type_to_text(expType));
+  }
+
+  if (typeSpecified)
+  {
+    log_message(parser,
+                IGNORE_BUFFER_POS,
+                MSG_ARR_CONSTRUCT_TYPE_SHOW,
+                type_to_text(MARK_ARRAY(ts->type)));
+  }
+
+just_fail:
+  wh_array_clean(&listTypes);
+  return sgResultUnk;
+}
+
 static struct ExpResultType
 translate_tree_exp(struct ParserState* const   parser,
                    struct Statement* const     stmt,
@@ -3252,6 +3426,9 @@ translate_tree_exp(struct ParserState* const   parser,
 
   else if (tree->opcode == OP_OFFSET)
     return translate_offset_exp(parser, stmt, tree->firstTree);
+
+  else if (tree->opcode == OP_CREATE_ARRAY)
+    return translate_array_construct_exp(parser, stmt, tree->firstTree, tree->secondTree);
 
   assert(tree->firstTree->val_type == VAL_EXP_LINK);
 
