@@ -1391,16 +1391,16 @@ op_start_iterate(ProcedureCall& call, int64_t& offset)
   IOperand& container = stack[stackSize - 1].Operand();
   if (container.IsNull())
   {
-    stack.Push(StackValue(BoolOperand(DBool(false))));
+    stack.Push(DBool(false));
     return;
   }
 
-  StackValue it{NullOperand{}};
+  StackValue it{NullOperand{}};;
   const bool started = container.StartIterate(reverse, it);
 
   stack.Pop(1);
   stack.Push(move(it));
-  stack.Push(StackValue{BoolOperand{DBool{started}}});
+  stack.Push(DBool(started));
 }
 
 
@@ -1415,7 +1415,7 @@ op_iterate(ProcedureCall& call, int64_t& offset)
   IOperand& iteratorOp = stack[stackSize - 1].Operand();
 
   const bool started = iteratorOp.Iterate(reverse);
-  stack.Push(StackValue(BoolOperand(DBool(started))));
+  stack.Push(DBool(started));
 }
 
 static void
@@ -1431,7 +1431,176 @@ op_iterator_offset(ProcedureCall& call, int64_t& offset)
   const uint64_t itOffset = iteratorOp.IteratorOffset();
 
   stack.Pop(1);
-  stack.Push(StackValue(UInt64Operand(DUInt64(itOffset))));
+  stack.Push(DUInt64(itOffset));
+}
+
+
+static void
+op_field_id(ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack = call.GetStack();
+  const size_t stackSize = stack.Size();
+
+  assert((call.StackBegin() + call.LocalsCount() - 1 + 1) <= stackSize);
+
+  IOperand& field = stack[stackSize - 1].Operand();
+  if (field.IsNullExpression() || field.IsNull())
+  {
+    call.GetSession().LogMessage("Cannot get a field index due to NULL field value, "
+                                 "returning NULL also!");
+
+    stack.Pop(1);
+    stack.Push(DUInt64());
+    return ;
+  }
+
+  DUInt64 result(field.GetField());
+  stack.Pop(1);
+  stack.Push(result);
+}
+
+template<typename T> void
+op_fill_array_elems (SessionStack& stack, DArray& result, const uint_t count)
+{
+  const size_t stackSize = stack.Size();
+  assert (count > 0);
+
+  for (auto index = stackSize - count ; index < stackSize; ++index)
+  {
+    IOperand& op = stack[index].Operand();
+    if (op.IsNullExpression() || op.IsNull())
+      continue;
+
+    T e;
+    op.GetValue(e);
+    result.Add(e);
+  }
+}
+
+template<typename T> void
+op_fill_array_field_elems(SessionStack& stack, DArray& result, const uint_t count)
+{
+  const size_t stackSize = stack.Size();
+  assert (count > 0);
+
+  for (auto index = stackSize - count ; index < stackSize; ++index)
+  {
+    IOperand& op = stack[index].Operand();
+    if (op.IsNullExpression() || op.IsNull())
+      continue;
+
+    T e (op.GetField());
+    result.Add(e);
+  }
+}
+
+static void
+op_create_array(ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack = call.GetStack();
+  const uint8_t* const data = call.Code() + call.CurrentOffset() + offset;
+  const uint_t type = data[0];
+  const uint_t count = load_le_int16(data + 1);
+  offset += sizeof(uint8_t) + sizeof(uint16_t);
+
+  DArray result;
+  if (type & 0x80)
+  {
+    switch (type & ~0x80)
+    {
+      case T_INT64:
+        op_fill_array_field_elems<DInt64>(stack, result, count);
+        break;
+      case T_INT32:
+        op_fill_array_field_elems<DInt32>(stack, result, count);
+        break;
+      case T_INT16:
+        op_fill_array_field_elems<DInt16>(stack, result, count);
+        break;
+      case T_INT8:
+        op_fill_array_field_elems<DInt8>(stack, result, count);
+        break;
+
+      case T_UINT64:
+        op_fill_array_field_elems<DUInt64>(stack, result, count);
+        break;
+      case T_UINT32:
+        op_fill_array_field_elems<DUInt32>(stack, result, count);
+        break;
+      case T_UINT16:
+        op_fill_array_field_elems<DUInt16>(stack, result, count);
+        break;
+      case T_UINT8:
+        op_fill_array_field_elems<DUInt8>(stack, result, count);
+        break;
+
+      default:
+        throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+      }
+  }
+  else
+  {
+    switch (type)
+    {
+    case T_BOOL:
+      op_fill_array_elems<DBool>(stack, result, count);
+      break;
+
+    case T_CHAR:
+      op_fill_array_elems<DChar>(stack, result, count);
+      break;
+
+    case T_DATE:
+      op_fill_array_elems<DDate>(stack, result, count);
+      break;
+    case T_DATETIME:
+      op_fill_array_elems<DDateTime>(stack, result, count);
+      break;
+    case T_HIRESTIME:
+      op_fill_array_elems<DHiresTime>(stack, result, count);
+      break;
+
+    case T_INT64:
+      op_fill_array_elems<DInt64>(stack, result, count);
+      break;
+    case T_INT32:
+      op_fill_array_elems<DInt32>(stack, result, count);
+      break;
+    case T_INT16:
+      op_fill_array_elems<DInt16>(stack, result, count);
+      break;
+    case T_INT8:
+      op_fill_array_elems<DInt8>(stack, result, count);
+      break;
+
+    case T_UINT64:
+      op_fill_array_elems<DUInt64>(stack, result, count);
+      break;
+    case T_UINT32:
+      op_fill_array_elems<DUInt32>(stack, result, count);
+      break;
+    case T_UINT16:
+      op_fill_array_elems<DUInt16>(stack, result, count);
+      break;
+    case T_UINT8:
+      op_fill_array_elems<DUInt8>(stack, result, count);
+      break;
+
+    case T_REAL:
+      op_fill_array_elems<DReal>(stack, result, count);
+      break;
+
+    case T_RICHREAL:
+      op_fill_array_elems<DRichReal>(stack, result, count);
+      break;
+
+    default:
+      throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+    }
+  }
+
+  stack.Pop(count);
+  stack.Push(result);
 }
 
 
@@ -1617,7 +1786,9 @@ static OP_FUNC operations[] = {
                                 op_iterate<false>,
                                 op_iterate<true>,
 
-                                op_iterator_offset
+                                op_iterator_offset,
+                                op_field_id,
+                                op_create_array
 };
 
 

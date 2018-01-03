@@ -211,6 +211,9 @@ enum W_OPCODE
   W_ITN,
   W_ITP,
   W_ITOFF,
+  W_FID,
+
+  W_CARR,
 
   W_OP_END_MARK
 };

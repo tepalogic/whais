@@ -29,33 +29,26 @@
 #@guard whais_std_field
 
 
-#Retrieve the table that this field belongs of.
+#Retrieve the table that a field belongs to.
 #In:
-#   @f - The field value.
+#   @f - A field value.
 #Out:
-#   If successfully this will return the table holding the provided field.
-EXTERN PROCEDURE table_of_field(f FIELD) RETURN TABLE;
+#   If successfully, this will return the table that store the field's values.
+EXTERN PROCEDURE get_table(f FIELD) RETURN TABLE;
 
-#Check if the value of a table field are indexed.
+#Check if the values of a table field are indexed.
 #In:
-#   @f - The field value.
+#   @f - A field value.
 #Out:
 #   TRUE if the field values are indexed. 
-EXTERN PROCEDURE field_values_indexed(f FIELD) RETURN BOOL;
+EXTERN PROCEDURE is_indexed(f FIELD) RETURN BOOL;
 
-#Get the associated name of a table field.
+#Get the associated name of a table's field.
 #In:
-#   @f - The field value.
+#   @f - A field value.
 #Out:
-#   A text holding the field name. 
-EXTERN PROCEDURE field_name(f FIELD) RETURN TEXT;
-
-#Get the index of a table field.
-#In:
-#   @f - The field value.
-#Out:
-#   The field index. 
-EXTERN PROCEDURE field_index(f FIELD) RETURN UINT64;
+#   A text holding the table field's name used by the provided field. 
+EXTERN PROCEDURE get_name(f FIELD) RETURN TEXT;
 
 #Retrieves the rows indexes holding values that are in a supplied interval 
 #of values.
@@ -74,35 +67,28 @@ EXTERN PROCEDURE match_rows( f FIELD,
                              from_row UINT64,
                              to_row UINT64) RETURN  UINT64 ARRAY;
 
-#Retrieve a row holding the biggest from the specified field values.
+
+#Retrieve the row holding the lowest from the specified field values.
 #In:
 #   @f - The field value.
+#   @first   - TRUE in case of duplicates entries it will return the last or
+#              the first such index.
+#   @min     - Search only for non null values that are bigger or equal with
+#              this one. 
 #Out:
-#   If successfully this will return a row index that holds
-#   the respective value.
-EXTERN PROCEDURE field_biggest (f FIELD) RETURN UINT64;
+#   If successfully this will return an index pointing at the row from where 
+#   the respective value can be retrieved.
+EXTERN PROCEDURE get_smallest (f FIELD) RETURN UINT64;
 
-#Retrieve a row holding the lowest from the specified field values.
+
+#Retrieve the row holding the biggest from the specified field values.
 #In:
 #   @f - The field value.
+#   @first   - TRUE in case of duplicates entries it will return the last or
+#              the first such index
+#   @max     - Search only for non-null values that are less or equal with 
+#              this one.
 #Out:
-#   If successfully this will return a row index that holds
-#   the respective value.
-EXTERN PROCEDURE field_smallest (f FIELD) RETURN UINT64;
-
-
-#Computes the average value for fields holding numeric values.
-#In:
-#   @f - The field value.
-#Out:
-#   If successfully this will return a row index that holds
-#   the respective value.
-EXTERN PROCEDURE field_average (f FIELD) RETURN RICHREAL;
-
-#Sort a table based on the values of the specified field.
-#In:
-#   @f - The field value.
-#   @r - TRUE to sort reversely.
-#Out:
-#   If successfully this will the sorted table.
-EXTERN PROCEDURE field_sort_table (f FIELD, r BOOL) RETURN TABLE;
+#   If successfully this will return an index pointing at the row from where 
+#   the respective value can be retrieved.
+EXTERN PROCEDURE get_biggest (f FIELD, first BOOL, max UNDEFINED) RETURN UINT64;

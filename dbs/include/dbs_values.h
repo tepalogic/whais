@@ -1456,7 +1456,7 @@ public:
 
   bool IsNull() const { return Count() == 0; }
   uint64_t Count() const;
-  DBS_FIELD_TYPE Type() const;
+  DBS_BASIC_TYPE Type() const;
 
   uint64_t Add(const DBool& value);
   uint64_t Add(const DChar& value);

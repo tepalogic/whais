@@ -196,15 +196,8 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                           /* Array procedures */
                                                     &gProcArrayCount,
                                                     &gProcArraySort,
-                                                    &gProcArrayBinSearch,
-                                                    &gProcArraySearch,
                                                     &gProcArrayMin,
                                                     &gProcArrayMax,
-                                                    &gProcArrayAverage,
-                                                    &gProcArrayIntersect,
-                                                    &gProcArrayUnion,
-                                                    &gProcArrayDiff,
-                                                    &gProcArrayPushBack,
                                                     &gProcArrayTruncate,
                                                     &gProcArrayHash,
                           /* Field procedures */

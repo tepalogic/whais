@@ -113,6 +113,24 @@ const uint8_t callTestProgram[] = ""
     " END\n"
     "\n"
     " RETURN result;\n"
+    "ENDPROC\n"
+    "PROCEDURE field_id_1() RETURN UINT64\n"
+    "DO\n"
+    " VAR result TABLE (f1 INT8 ARRAY, f2 INT8);\n"
+    "\n"
+    " RETURN @result.f1;\n"
+    "ENDPROC\n"
+    "PROCEDURE field_id_2() RETURN UINT64\n"
+    "DO\n"
+    " VAR result TABLE (f1 INT8 ARRAY, f2 INT8);\n"
+    "\n"
+    " RETURN @result.f2;\n"
+    "ENDPROC\n"
+    "PROCEDURE field_id_n() RETURN UINT64\n"
+    "DO\n"
+    " VAR f DATE FIELD;\n"
+    "\n"
+    " RETURN @f;\n"
     "ENDPROC\n";
 
 
@@ -789,6 +807,49 @@ test_op_array_parse(Session& session, const bool reverse)
 }
 
 
+
+static bool
+test_field_id_parse(Session& session)
+{
+  std::cout << "Testing opcode for field id ...\n";
+
+  SessionStack stack;
+  DUInt64 result;
+
+  session.ExecuteProcedure("field_id_1", stack);
+  if (stack.Size() != 1)
+    return false;
+
+  stack[0].Operand().GetValue(result);
+  if (result != DUInt64(0))
+    return false;
+
+  result = DUInt64();
+  stack.Pop(1);
+
+
+  session.ExecuteProcedure("field_id_2", stack);
+  if (stack.Size() != 1)
+    return false;
+
+  stack[0].Operand().GetValue(result);
+  if (result != DUInt64(1))
+    return false;
+
+  stack.Pop(1);
+
+  session.ExecuteProcedure("field_id_n", stack);
+  if (stack.Size() != 1)
+    return false;
+
+  stack[0].Operand().GetValue(result);
+  if (! result.IsNull())
+    return false;
+
+  return true;
+}
+
+
 int
 main()
 {
@@ -826,6 +887,7 @@ main()
     success = success && test_op_jmp(_SC(Session&, commonSession));
     success = success && test_op_array_parse(_SC(Session&, commonSession), false);
     success = success && test_op_array_parse(_SC(Session&, commonSession), true);
+    success = success && test_field_id_parse(_SC(Session&, commonSession));
 
     ReleaseInstance(commonSession);
   }

@@ -42,21 +42,10 @@ static const uint64_t NOT_FOUND_VALUE = ~_SC(uint64_t, 0);
 WLIB_PROC_DESCRIPTION         gProcArrayCount;
 WLIB_PROC_DESCRIPTION         gProcArraySort;
 
-WLIB_PROC_DESCRIPTION         gProcArrayBinSearch;
-
-WLIB_PROC_DESCRIPTION         gProcArraySearch;
-
 WLIB_PROC_DESCRIPTION         gProcArrayMin;
 WLIB_PROC_DESCRIPTION         gProcArrayMax;
-WLIB_PROC_DESCRIPTION         gProcArrayAverage;
 
-WLIB_PROC_DESCRIPTION         gProcArrayIntersect;
-WLIB_PROC_DESCRIPTION         gProcArrayUnion;
-WLIB_PROC_DESCRIPTION         gProcArrayDiff;
-
-WLIB_PROC_DESCRIPTION         gProcArrayPushBack;
 WLIB_PROC_DESCRIPTION         gProcArrayTruncate;
-
 WLIB_PROC_DESCRIPTION         gProcArrayHash;
 
 
@@ -1537,24 +1526,26 @@ base_arrays_init()
                                                 gUInt64Type,
                                                 gGenericArrayType
                                              };
-  gProcArrayCount.name        = "array_count";
+  gProcArrayCount.name        = "count";
   gProcArrayCount.localsCount = 2;
   gProcArrayCount.localsTypes = arrayCountLocals;
   gProcArrayCount.code        = array_elems_count;
 
 
   static const uint8_t* arraySortLocals[]  = {
+                                                gBoolType,
                                                 gGenericArrayType,
-                                                gGenericArrayType,
+                                                gBoolType,
                                                 gBoolType
                                               };
 
-  gProcArraySort.name        = "array_sort";
-  gProcArraySort.localsCount = 3;
+  gProcArraySort.name        = "sort";
+  gProcArraySort.localsCount = 4;
   gProcArraySort.localsTypes = arraySortLocals;
   gProcArraySort.code        = array_sort;
 
 
+#if 0
   static const uint8_t* binSearchLocals[] = {
                                                gUInt64Type,
                                                gGenericArrayType,
@@ -1579,20 +1570,28 @@ base_arrays_init()
   gProcArraySearch.localsCount  = 3;
   gProcArraySearch.localsTypes  = searchLocals;
   gProcArraySearch.code         = unsorted_array_search_proc;
+#endif
+
+  static const uint8_t* minMaxLocals[] = {
+                                            gUInt64Type,
+                                            gGenericArrayType,
+                                            gBoolType,
+                                            gUndefinedType
+                                         };
 
 
-  gProcArrayMin.name         = "array_min";
-  gProcArrayMin.localsCount  = 2;
-  gProcArrayMin.localsTypes  = searchLocals; //reuse
+  gProcArrayMin.name         = "min";
+  gProcArrayMin.localsCount  = 4;
+  gProcArrayMin.localsTypes  = minMaxLocals;
   gProcArrayMin.code         = search_minmax<true>;
 
-  gProcArrayMax.name         = "array_max";
-  gProcArrayMax.localsCount  = 2;
-  gProcArrayMax.localsTypes  = searchLocals; //reuse
+  gProcArrayMax.name         = "max";
+  gProcArrayMax.localsCount  = 4;
+  gProcArrayMax.localsTypes  = minMaxLocals;
   gProcArrayMax.code         = search_minmax<false>;
 
 
-
+#if 0
   static const uint8_t* computeAverageLocals[] = {
                                                     gRichRealType,
                                                     gGenericArrayType
@@ -1637,19 +1636,21 @@ base_arrays_init()
   gProcArrayPushBack.localsTypes = arrayPushBackLocals;
   gProcArrayPushBack.code        = proc_array_pushback;
 
+#endif
+
   static const uint8_t* arrayTruncateLocals[] = {
                                                   gGenericArrayType,
                                                   gGenericArrayType,
                                                   gUInt64Type
                                                 };
 
-  gProcArrayTruncate.name        = "array_truncate";
+  gProcArrayTruncate.name        = "truncate";
   gProcArrayTruncate.localsCount = 3;
   gProcArrayTruncate.localsTypes = arrayTruncateLocals;
   gProcArrayTruncate.code        = proc_array_truncate;
 
 
-  gProcArrayHash.name         = "array_hash";
+  gProcArrayHash.name         = "hash_array";
   gProcArrayHash.localsCount  = 2;
   gProcArrayHash.localsTypes  = arrayCountLocals; //Reusing!
   gProcArrayHash.code         = proc_hash_array;

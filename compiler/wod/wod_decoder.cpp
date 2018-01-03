@@ -539,6 +539,19 @@ const FDECODE_OPCODE wod_dec_w_itbl  = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itn   = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itp   = wod_dec_w_no_ops;
 const FDECODE_OPCODE wod_dec_w_itoff = wod_dec_w_no_ops;
+const FDECODE_OPCODE wod_dec_w_fid   = wod_dec_w_no_ops;
+
+static uint_t
+wod_dec_w_carr(const uint8_t* args, char* const op1, char* const op2)
+{
+  char t_str[MAX_OP_STRING];
+
+  strcpy(op1, into_ascii(args[0], t_str));
+  strcpy(op2, into_ascii(load_le_int16(args + 1), t_str));
+
+  return sizeof(uint8_t) + sizeof (uint16_t);
+}
+
 
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
@@ -718,7 +731,9 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_itbl,
   wod_dec_w_itn,
   wod_dec_w_itp,
-  wod_dec_w_itoff
+  wod_dec_w_itoff,
+  wod_dec_w_fid,
+  wod_dec_w_carr
 };
 
 const char *wod_str_table[] = {
@@ -899,7 +914,9 @@ const char *wod_str_table[] = {
   "itl",
   "itn",
   "itp",
-  "itoff"
+  "itoff",
+  "fid",
+  "carr"
 };
 
 } //namespace wod
