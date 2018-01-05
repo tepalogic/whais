@@ -1494,6 +1494,8 @@ op_fill_array_field_elems(SessionStack& stack, DArray& result, const uint_t coun
   }
 }
 
+
+
 static void
 op_create_array(ProcedureCall& call, int64_t& offset)
 {
@@ -1504,9 +1506,9 @@ op_create_array(ProcedureCall& call, int64_t& offset)
   offset += sizeof(uint8_t) + sizeof(uint16_t);
 
   DArray result;
-  if (type & 0x80)
+  if (type & CARR_FROM_FIELD)
   {
-    switch (type & ~0x80)
+    switch (type & ~CARR_FROM_FIELD)
     {
       case T_INT64:
         op_fill_array_field_elems<DInt64>(stack, result, count);
@@ -1604,8 +1606,262 @@ op_create_array(ProcedureCall& call, int64_t& offset)
 }
 
 
-typedef void(*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
+template<typename T> DArray
+do_array_join (IOperand& op1, IOperand& opB, const bool isOpBArray)
+{
+  DArray result(_SC(const T*, nullptr));
+  op1.GetValue(result);
 
+  if (opB.IsNull())
+    return result;
+
+  if (isOpBArray)
+  {
+    StackValue bIt;
+    if (! opB.StartIterate(false, bIt))
+    {
+      assert (false);
+      return result;
+    }
+
+    do
+    {
+      T el;
+      bIt.Operand().GetValue(el);
+      result.Add(el);
+    }
+    while (bIt.Operand().Iterate(false));
+  }
+  else
+  {
+    T element;
+    opB.GetValue(element);
+    result.Add(element);
+  }
+
+  return result;
+}
+
+template<typename T>  DArray
+do_array_filter_out (IOperand& opA, IOperand& opB, const bool isOpBArray)
+{
+  DArray result(_SC(const T*, nullptr));
+  opA.GetValue(result);
+
+  if (opB.IsNull())
+    return result;
+
+  if (isOpBArray)
+  {
+    StackValue bIt;
+    if (! opB.StartIterate(false, bIt))
+    {
+      assert (false);
+      return result;
+    }
+
+    do
+    {
+      T mark;
+      bIt.Operand().GetValue(mark);
+
+      int count = result.Count();
+      if (count <= 0)
+        break;
+
+      for (int i = count - 1; 0 <= i; --i)
+      {
+        T element;
+
+        result.Get(i, element);
+        if (element == mark)
+          result.Remove(i);
+      }
+    }
+    while (bIt.Operand().Iterate(false));
+  }
+  else
+  {
+    T mark;
+    opB.GetValue(mark);
+
+    for (int i = result.Count() - 1; 0 <= i; --i)
+    {
+      T element;
+
+      result.Get(i, element);
+      if (element == mark)
+        result.Remove(i);
+    }
+  }
+
+  return result;
+}
+
+
+template<typename T> DArray
+do_array_filter_in (IOperand& opA, IOperand& opB, const bool isOpBArray)
+{
+  DArray result(_SC(const T*, nullptr));
+
+  if (opA.IsNull() || opB.IsNull())
+    return result;
+
+  DArray src(_SC(const T*, nullptr));
+  opA.GetValue(src);
+
+  if (isOpBArray)
+  {
+    uint_t count = src.Count();
+    for (uint_t i = 0; i < count; ++i)
+    {
+      T currentEl;
+      src.Get(i, currentEl);
+
+      StackValue bIt;
+      if (! opB.StartIterate(false, bIt))
+      {
+        assert (false);
+        break;
+      }
+
+      do
+      {
+        T mark;
+        bIt.Operand().GetValue(mark);
+        if (mark == currentEl)
+        {
+          result.Add(currentEl);
+          break;
+        }
+      }
+      while (bIt.Operand().Iterate(false));
+    }
+  }
+  else
+  {
+    T mark;
+    opB.GetValue(mark);
+
+    uint_t count = src.Count();
+    for (uint_t i = 0; i < count; ++i)
+    {
+      T element;
+
+      src.Get(i, element);
+      if (element == mark)
+        result.Add(element);
+    }
+  }
+
+  return result;
+}
+
+
+
+enum ARRAY_OPERATION {
+  OP_JOIN,
+  OP_FILTER_IN,
+  OP_FILTER_OUT
+};
+
+
+
+template<typename T, ARRAY_OPERATION o> DArray
+array_operation_wrapper(IOperand& opA, IOperand& opB, const bool isArraySrc)
+{
+  if (o == OP_JOIN)
+    return do_array_join<T>(opA, opB, isArraySrc);
+
+  else if (o == OP_FILTER_IN)
+    return do_array_filter_in<T>(opA, opB, isArraySrc);
+
+  else if (o == OP_FILTER_OUT)
+    return do_array_filter_out<T>(opA, opB, isArraySrc);
+
+  throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+}
+
+
+template<ARRAY_OPERATION o> void
+op_do_array_op(ProcedureCall& call, int64_t& offset)
+{
+  SessionStack& stack = call.GetStack();
+  const uint8_t* const data = call.Code() + call.CurrentOffset() + offset;
+  offset += sizeof(uint8_t);
+
+  IOperand& opA = stack[stack.Size() - 2].Operand();
+  IOperand& opB = stack[stack.Size() - 1].Operand();
+
+  const bool opBIsArray = (*data & A_OPB_A_MASK) != 0;
+  const bool selfOperation = (*data & A_SELF_MASK) != 0;
+
+  DArray result;
+  switch (GET_BASIC_TYPE(*data))
+  {
+  case T_BOOL:
+      result = array_operation_wrapper<DBool, o>(opA, opB, opBIsArray);
+      break;
+  case T_CHAR:
+      result = array_operation_wrapper<DChar, o>(opA, opB, opBIsArray);
+      break;
+  case T_DATE:
+      result = array_operation_wrapper<DDate, o>(opA, opB, opBIsArray);
+      break;
+  case T_DATETIME:
+      result = array_operation_wrapper<DDateTime, o>(opA, opB, opBIsArray);
+      break;
+  case T_HIRESTIME:
+      result = array_operation_wrapper<DHiresTime, o>(opA, opB, opBIsArray);
+      break;
+  case T_INT8:
+      result = array_operation_wrapper<DInt8, o>(opA, opB, opBIsArray);
+      break;
+  case T_INT16:
+      result = array_operation_wrapper<DInt16, o>(opA, opB, opBIsArray);
+      break;
+  case T_INT32:
+      result = array_operation_wrapper<DInt32, o>(opA, opB, opBIsArray);
+      break;
+  case T_INT64:
+      result = array_operation_wrapper<DInt64, o>(opA, opB, opBIsArray);
+      break;
+  case T_UINT8:
+      result = array_operation_wrapper<DUInt8, o>(opA, opB, opBIsArray);
+      break;
+  case T_UINT16:
+      result = array_operation_wrapper<DUInt16, o>(opA, opB, opBIsArray);
+      break;
+  case T_UINT32:
+      result = array_operation_wrapper<DUInt32, o>(opA, opB, opBIsArray);
+      break;
+  case T_UINT64:
+      result = array_operation_wrapper<DUInt64, o>(opA, opB, opBIsArray);
+      break;
+  case T_REAL:
+      result = array_operation_wrapper<DReal, o>(opA, opB, opBIsArray);
+      break;
+  case T_RICHREAL:
+      result = array_operation_wrapper<DRichReal, o>(opA, opB, opBIsArray);
+      break;
+  default:
+      throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+  }
+
+  if (selfOperation)
+  {
+    opA.SetValue(result);
+    stack.Pop(1);
+  }
+  else
+  {
+    stack.Pop(2);
+    stack.Push(result);
+  }
+}
+
+
+typedef void(*OP_FUNC) (ProcedureCall& call, int64_t& ioOffset);
 
 
 static OP_FUNC operations[] = {
@@ -1788,7 +2044,10 @@ static OP_FUNC operations[] = {
 
                                 op_iterator_offset,
                                 op_field_id,
-                                op_create_array
+                                op_create_array,
+                                op_do_array_op<OP_JOIN>,
+                                op_do_array_op<OP_FILTER_OUT>,
+                                op_do_array_op<OP_FILTER_IN>
 };
 
 

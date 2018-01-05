@@ -151,7 +151,30 @@ char proc_decl_buffer[] =
   "ENDPROC\n\n"
   ""
   "PROCEDURE ProcId21(v1 RICHREAL, v2 RICHREAL) RETURN RICHREAL "
-  "DO " "RETURN v1 - v2; " "ENDPROC\n\n" "" "";
+  "DO "
+  "RETURN v1 - v2; "
+  "ENDPROC\n\n"
+
+  "PROCEDURE AProcId0(v1 INT8 ARRAY, v2 INT16) RETURN INT8 ARRAY "
+  "DO "
+  "RETURN v1 - v2; "
+  "ENDPROC\n\n"
+
+  "PROCEDURE AProcId1(v1 HIRESTIME ARRAY, v2 DATETIME ARRAY) RETURN HIRESTIME ARRAY "
+  "DO "
+  "RETURN v1 - v2; "
+  "ENDPROC\n\n"
+
+  "PROCEDURE AProcId2(v1 RICHREAL ARRAY, v2 REAL) RETURN RICHREAL ARRAY "
+  "DO "
+  "RETURN v1 - v2; "
+  "ENDPROC\n\n"
+
+  "PROCEDURE AProcId3(v1 REAL ARRAY, v2 RICHREAL ARRAY) RETURN REAL ARRAY "
+  "DO "
+  "RETURN v1 - v2; "
+  "ENDPROC\n\n";
+
 
 static bool_t
 check_op_symmetry()
@@ -171,6 +194,32 @@ check_op_symmetry()
       /* weird error */
       return FALSE;
     }
+  return TRUE;
+}
+
+static bool_t
+check_array_procedure(struct ParserState *state,
+                      char * proc_name,
+                      uint_t retType,
+                      bool_t opBArray)
+{
+  struct Statement *stmt =
+    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
+  const uint_t opCodeOffset = 2 * (opcode_bytes(W_LDLO8) + 1);
+
+  if (decode_opcode(code + opCodeOffset) != W_AFOUT)
+    return FALSE;
+
+  if (opBArray ^ ((code[opCodeOffset + opcode_bytes(W_AFOUT)] & A_OPB_A_MASK) != 0))
+    return FALSE;
+
+  if ((code[opCodeOffset + opcode_bytes(W_AFOUT)] & A_SELF_MASK) != 0)
+    return FALSE;
+
+  if (GET_BASIC_TYPE(code[opCodeOffset + opcode_bytes(W_AFOUT)]) != retType)
+    return FALSE;
+
   return TRUE;
 }
 
@@ -221,16 +270,22 @@ check_all_procs(struct ParserState *state)
   uint_t count;
   char proc_name[25];
 
+  bool_t result = TRUE;
   for (count = 1; count <= 21; ++count)
     {
       sprintf(proc_name, "ProcId%d", count);
       if (check_procedure( state, proc_name) == FALSE)
         {
-          return FALSE;
+          result &=  FALSE;
         }
     }
 
-  return TRUE;
+  result = result & check_array_procedure(state, "AProcId0", T_INT8, FALSE);
+  result = result & check_array_procedure(state, "AProcId1", T_HIRESTIME, TRUE);
+  result = result & check_array_procedure(state, "AProcId2", T_RICHREAL, FALSE);
+  result = result & check_array_procedure(state, "AProcId3", T_REAL, TRUE);
+
+  return result;
 }
 
 int

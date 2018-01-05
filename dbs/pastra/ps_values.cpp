@@ -970,6 +970,9 @@ DArray::Type() const
 template <class T> inline uint64_t
 DArray::add_array_element(const T& value)
 {
+  if (value.IsNull())
+    throw DBSException(_EXTRA(DBSException::NULL_ARRAY_ELEMENT));
+
   uint64_t result;
   uint8_t rawValue[MAX_VALUE_RAW_STORAGE];
 
