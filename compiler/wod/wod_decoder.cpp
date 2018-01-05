@@ -552,6 +552,10 @@ wod_dec_w_carr(const uint8_t* args, char* const op1, char* const op2)
   return sizeof(uint8_t) + sizeof (uint16_t);
 }
 
+const FDECODE_OPCODE wod_dec_w_ajoin  = wod_dec_w_ldi8;
+const FDECODE_OPCODE wod_dec_w_afout  = wod_dec_w_ldi8;
+const FDECODE_OPCODE wod_dec_w_afin   = wod_dec_w_ldi8;
+
 
 FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_na,
@@ -733,7 +737,11 @@ FDECODE_OPCODE wod_decode_table[] = {
   wod_dec_w_itp,
   wod_dec_w_itoff,
   wod_dec_w_fid,
-  wod_dec_w_carr
+  wod_dec_w_carr,
+
+  wod_dec_w_ajoin,
+  wod_dec_w_afout,
+  wod_dec_w_afin
 };
 
 const char *wod_str_table[] = {
@@ -915,8 +923,19 @@ const char *wod_str_table[] = {
   "itn",
   "itp",
   "itoff",
+
   "fid",
-  "carr"
+
+  "carr",
+
+  "adda",
+  "suba",
+  "moda",
+
+  "ajoin",
+  "afout",
+  "afin"
+
 };
 
 } //namespace wod

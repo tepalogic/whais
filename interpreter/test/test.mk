@@ -98,6 +98,10 @@ UNIT_EXES+=test_ops_create_array
 test_ops_create_array_SRC=test/test_ops_create_array.cpp
 test_ops_create_array_LIB=dbs/wslpastra   interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
 
+UNIT_EXES+=test_ops_array
+test_ops_array_SRC=test/test_ops_array.cpp
+test_ops_array_LIB=dbs/wslpastra   interpreter/wslprima compiler/wslcompiler utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
 
 UNIT_EXES+=test_ops_selfs
 test_ops_selfs_SRC=test/test_ops_selfs.cpp

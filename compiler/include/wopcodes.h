@@ -215,10 +215,19 @@ enum W_OPCODE
 
   W_CARR,
 
+  W_AJOIN,
+  W_AFOUT,
+  W_AFIN,
+
   W_OP_END_MARK
 };
 
 static const int64_t W_LDRR_PRECISSION = 1000000000000000000ll;
+
+static const uint_t CARR_FROM_FIELD = 0x80;
+
+static const uint_t A_SELF_MASK = 0x40;
+static const uint_t A_OPB_A_MASK = 0x80;
 
 
 #ifdef __cplusplus

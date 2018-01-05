@@ -581,6 +581,33 @@ translate_add_exp(struct ParserState* const           parser,
 
   struct ExpResultType result;
 
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AJOIN) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+    result.type = GET_BASIC_TYPE(ftype);
+    MARK_ARRAY(result.type);
+    result.extra = NULL;
+
+    return result;
+  }
+
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = add_op[GET_TYPE( opType1->type)][GET_TYPE( opType2->type)];
 
@@ -649,6 +676,33 @@ translate_sub_exp(struct ParserState* const           parser,
   enum W_OPCODE opcode = W_NA;
 
   struct ExpResultType result;
+
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AFOUT) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+    result.type = GET_BASIC_TYPE(ftype);
+    MARK_ARRAY(result.type);
+    result.extra = NULL;
+
+    return result;
+  }
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = sub_op[ftype][stype];
@@ -826,6 +880,33 @@ translate_mod_exp(struct ParserState* const           parser,
   enum W_OPCODE opcode = W_NA;
 
   struct ExpResultType result;
+
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AFIN) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+    result.type = GET_BASIC_TYPE(ftype);
+    MARK_ARRAY(result.type);
+    result.extra = NULL;
+
+    return result;
+  }
 
   if ((ftype < T_END_OF_TYPES) && (stype < T_END_OF_TYPES))
     opcode = mod_op[ftype][stype];
@@ -1600,6 +1681,32 @@ translate_sadd_exp(struct ParserState* const           parser,
     return sgResultUnk;
   }
 
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode =
+        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AJOIN) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+
+    return *opType1;
+  }
+
   if (is_integer( ftype))
   {
     if (is_integer( stype))
@@ -1657,6 +1764,31 @@ translate_ssub_exp(struct ParserState* const           parser,
   {
     log_message(parser, parser->bufferPos, MSG_SSUB_ELV);
     return sgResultUnk;
+  }
+
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode =
+        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AFOUT) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+
+    return *opType1;
   }
 
   if (is_integer(ftype))
@@ -1819,6 +1951,31 @@ translate_smod_exp(struct ParserState* const           parser,
   {
     log_message(parser, parser->bufferPos, MSG_SMOD_ELV);
     return sgResultUnk;
+  }
+
+  if (IS_ARRAY(ftype))
+  {
+    const uint8_t opBEncode =
+        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+
+    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    {
+      log_message(parser,
+                  parser->bufferPos,
+                  MSG_ADD_NA,
+                  type_to_text(opType1->type),
+                  type_to_text(opType2->type));
+      return sgResultUnk;
+    }
+
+    if (encode_opcode(instrs, W_AFIN) == NULL
+        || wh_ostream_wint8(instrs, opBEncode) == NULL)
+    {
+      log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+      return sgResultUnk;
+    }
+
+    return *opType1;
   }
 
   if (is_integer(ftype))
@@ -3340,8 +3497,9 @@ translate_array_construct_exp(struct ParserState* const parser,
   }
 
   if (encode_opcode(instrs, W_CARR) == NULL
-      || wh_ostream_wint8(instrs,
-                         (testAllExpsFields ? 0x80 : 0) | GET_BASIC_TYPE(arrayType.type)) == NULL
+      || wh_ostream_wint8(
+          instrs,
+          (testAllExpsFields ? CARR_FROM_FIELD : 0) | GET_BASIC_TYPE(arrayType.type)) == NULL
       || wh_ostream_wint16(instrs, wh_array_count(&listTypes)) == NULL)
   {
     log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
