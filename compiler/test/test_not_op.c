@@ -85,19 +85,18 @@ check_procedure(struct ParserState *state,
                  char*             proc_name,
                  const enum W_OPCODE op_expected)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
+  int code_size = wh_ostream_size(stmt_query_instrs(stmt));
 
-  if (code_size < 3)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( code + 2) != op_expected)
-    {
-      return FALSE;
-    }
+  const uint_t opcodeOff = opcode_bytes(W_LDLO8) + 1;
+  uint_t codeSize = opcodeOff + opcode_bytes(op_expected) + opcode_bytes(W_RET);
+
+  if (code_size < codeSize)
+    return FALSE;
+
+  else if (decode_opcode(code + opcodeOff) != op_expected)
+    return FALSE;
 
   return TRUE;
 }

@@ -13,6 +13,8 @@
 
 extern int yyparse(struct ParserState *);
 
+
+
 static void
 init_state_for_test(struct ParserState *state, const char * buffer)
 {
@@ -65,29 +67,25 @@ char proc_decl_buffer[] =
 static bool_t
 check_procedure_1(struct ParserState *pState, char* proc_name)
 {
-  struct Statement* pStmt    = find_proc_decl(pState, proc_name, strlen(proc_name), FALSE);
-  uint8_t*          pCode    = wh_ostream_data(stmt_query_instrs( pStmt));
-  int             codeSize = wh_ostream_size(stmt_query_instrs( pStmt));
-  enum W_OPCODE     opExpect = W_SELF;
+  struct Statement* pStmt = find_proc_decl(pState, proc_name, strlen(proc_name), FALSE);
+  uint8_t* pCode = wh_ostream_data(stmt_query_instrs(pStmt));
+  enum W_OPCODE opExpect = W_SELF;
 
   /* check the opcode based on the return type */
-  if (codeSize < 8)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( pCode + 2) != opExpect)
-    {
-      return FALSE;
-    }
-  else
-    {
-      uint32_t       index  = load_le_int32(pCode + 3);
-      const uint8_t* buffer = wh_ostream_data(&pState->globalStmt.spec.glb.constsArea);
+  if (decode_opcode(pCode + opcode_bytes(W_LDLO8) + 1) != opExpect)
+    return FALSE;
 
-      buffer += index;
-      if (strcmp( (const char *) buffer, "field_1") != 0)
-        return FALSE;
-    }
+  else
+  {
+    uint32_t index = load_le_int32(pCode
+                                   + opcode_bytes(W_LDLO8) + 1
+                                   + opcode_bytes(W_SELF));
+    const uint8_t* buffer = wh_ostream_data( &pState->globalStmt.spec.glb.constsArea);
+
+    buffer += index;
+    if (strcmp((const char *)buffer, "field_1") != 0)
+      return FALSE;
+  }
 
   return TRUE;
 }
@@ -95,29 +93,25 @@ check_procedure_1(struct ParserState *pState, char* proc_name)
 static bool_t
 check_procedure_2(struct ParserState *pState, char* proc_name)
 {
-  struct Statement* pStmt    = find_proc_decl(pState, proc_name, strlen(proc_name), FALSE);
-  uint8_t*          pCode    = wh_ostream_data(stmt_query_instrs( pStmt));
-  int             codeSize = wh_ostream_size(stmt_query_instrs( pStmt));
-  enum W_OPCODE     opExpect = W_INDTA;
+  struct Statement* pStmt = find_proc_decl(pState, proc_name, strlen(proc_name), FALSE);
+  uint8_t* pCode = wh_ostream_data(stmt_query_instrs(pStmt));
+  enum W_OPCODE opExpect = W_INDTA;
+
+  const uint_t LD_SIZE = opcode_bytes(W_LDLO8) + 1;
 
   /* check the opcode based on the return type */
-  if (codeSize < 10)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( pCode + 4) != opExpect)
-    {
-      return FALSE;
-    }
-  else
-    {
-      uint32_t       index  = load_le_int32(pCode + 5);
-      const uint8_t* buffer = wh_ostream_data(&pState->globalStmt.spec.glb.constsArea);
+  if (decode_opcode(pCode + 2 * LD_SIZE) != opExpect)
+    return FALSE;
 
-      buffer += index;
-      if (strcmp( (const char *) buffer, "field_2") != 0)
-        return FALSE;
-    }
+  else
+  {
+    uint32_t index = load_le_int32(pCode + 2 * LD_SIZE + opcode_bytes(W_INDTA));
+    const uint8_t* buffer = wh_ostream_data( &pState->globalStmt.spec.glb.constsArea);
+
+    buffer += index;
+    if (strcmp((const char *)buffer, "field_2") != 0)
+      return FALSE;
+  }
 
   return TRUE;
 }

@@ -107,14 +107,14 @@ check_procedure(struct ParserState* state,
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
   int code_size = wh_ostream_size(stmt_query_instrs( stmt));
 
-  if (code_size < 5)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( code + 4) != op_expect)
-    {
-      return FALSE;
-    }
+  const uint_t opcodeOff = 2 * (opcode_bytes(W_LDLO8) + 1);
+  uint_t codeSize = opcodeOff + opcode_bytes(op_expect) + opcode_bytes(W_RET);
+
+  if (code_size < codeSize)
+    return FALSE;
+
+  else if (decode_opcode(code + opcodeOff) != op_expect)
+    return FALSE;
 
   return TRUE;
 }

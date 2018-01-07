@@ -133,56 +133,47 @@ check_procedure(struct ParserState *state, char * proc_name)
   struct DeclaredVar *var =
     (struct DeclaredVar *) wh_array_get(&stmt->spec.proc.paramsList, 0);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+
   enum W_OPCODE op_expect = W_NA;
+  const uint_t LDSIZE = opcode_bytes(W_LDLO8) + 1;
 
   /* check the opcode based on the return type */
-  switch(var->type)
-    {
-    case T_INT8:
-    case T_INT16:
-    case T_INT32:
-    case T_INT64:
-      op_expect = W_OR;
-      break;
-    case T_BOOL:
-      op_expect = W_ORB;
-      break;
-    default:
-      /* we should no be here */
-      return FALSE;
-    }
+  switch (var->type)
+  {
+  case T_INT8:
+  case T_INT16:
+  case T_INT32:
+  case T_INT64:
+    op_expect = W_OR;
+    break;
+  case T_BOOL:
+    op_expect = W_ORB;
+    break;
+  default:
+    /* we should no be here */
+    return FALSE;
+  }
 
   if (op_expect != W_OR)
-    {
-      if (code_size < 9)
-        {
-          return FALSE;
-        }
-      else if (decode_opcode( code + 9) != op_expect)
-        {
-          return FALSE;
-        }
-      else if (decode_opcode( code + 2) != W_JT)
-        {
-          return FALSE;
-        }
-      else if (load_le_int32(code + 3) != 8)
-        {
-          return FALSE;
-        }
-    }
+  {
+    if (decode_opcode(code
+                      + LDSIZE
+                      + opcode_bytes(W_JT) + 4
+                      + LDSIZE) != op_expect)
+      return FALSE;
+
+    else if (decode_opcode(code + LDSIZE) != W_JT)
+      return FALSE;
+
+    else if (load_le_int32(code + LDSIZE + opcode_bytes(W_JT)) !=
+        opcode_bytes(W_JT) + 4 + LDSIZE +  opcode_bytes(W_OR))
+      return FALSE;
+  }
   else
-    {
-      if (code_size < 5)
-        {
-          return FALSE;
-        }
-      else if (decode_opcode( code + 4) != op_expect)
-        {
-          return FALSE;
-        }
-    }
+  {
+    if (decode_opcode(code + 2 * LDSIZE) != op_expect)
+      return FALSE;
+  }
 
   return TRUE;
 }

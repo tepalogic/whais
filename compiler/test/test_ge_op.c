@@ -218,46 +218,47 @@ check_procedure(struct ParserState *state, char * proc_name)
                                                   strlen("v2"), FALSE, FALSE);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
   int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+
+  const uint_t opcodeOff = 2 * (opcode_bytes(W_LDLO8) + 1);
+  uint_t codeSize = 0;
   enum W_OPCODE op_expect = W_NA;
 
   /* check the opcode based on the return type */
-  switch(v2->type)
-    {
-    case T_CHAR:
-      op_expect = W_GEC;
-      break;
-    case T_DATE:
-      op_expect = W_GED;
-      break;
-    case T_DATETIME:
-      op_expect = W_GEDT;
-      break;
-    case T_HIRESTIME:
-      op_expect = W_GEHT;
-      break;
-    case T_INT8:
-    case T_INT16:
-    case T_INT32:
-    case T_INT64:
-      op_expect = W_GE;
-      break;
-    case T_REAL:
-    case T_RICHREAL:
-      op_expect = W_GERR;
-      break;
-    default:
-      /* we should not be here */
-      return FALSE;
-    }
+  switch (v2->type)
+  {
+  case T_CHAR:
+    op_expect = W_GEC;
+    break;
+  case T_DATE:
+    op_expect = W_GED;
+    break;
+  case T_DATETIME:
+    op_expect = W_GEDT;
+    break;
+  case T_HIRESTIME:
+    op_expect = W_GEHT;
+    break;
+  case T_INT8:
+  case T_INT16:
+  case T_INT32:
+  case T_INT64:
+    op_expect = W_GE;
+    break;
+  case T_REAL:
+  case T_RICHREAL:
+    op_expect = W_GERR;
+    break;
+  default:
+    /* we should not be here */
+    return FALSE;
+  }
 
-  if (code_size < 5)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( code + 4) != op_expect)
-    {
-      return FALSE;
-    }
+  codeSize = opcodeOff + opcode_bytes(op_expect) + opcode_bytes(W_RET);
+  if (code_size < codeSize)
+    return FALSE;
+
+  else if (decode_opcode(code + opcodeOff) != op_expect)
+    return FALSE;
 
   return TRUE;
 }

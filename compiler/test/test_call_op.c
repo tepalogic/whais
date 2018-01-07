@@ -176,47 +176,35 @@ static bool_t
 check_procedure(struct ParserState *state,
                  char * proc_name, char * called_proc, uint_t nargs)
 {
-  struct Statement *stmt = find_proc_decl(state, proc_name,
-                                           strlen(proc_name), FALSE);
-  struct Statement *called_stmt = find_proc_decl(state, called_proc,
-                                                  strlen(called_proc), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  uint_t code_size = wh_ostream_size(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  struct Statement *called_stmt = find_proc_decl(state, called_proc, strlen(called_proc), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
+  uint_t code_size = wh_ostream_size(stmt_query_instrs(stmt));
   uint_t count = 0;
   uint32_t linkid = stmt_get_import_id(called_stmt);
-  uint_t temp = 0;
 
-  if (code_size < ((nargs * 2) + 5))
-    {
-      return FALSE;
-    }
+  const uint_t codeSizeMin = (nargs * (opcode_bytes(W_LDLO8) + 1)) + opcode_bytes(W_CALL) + 4;
+  if (code_size < codeSizeMin)
+    return FALSE;
+
   for (count = 0; count < nargs; ++count)
-    {
-      const uint_t offset = count * 2;
-      if ((decode_opcode( code + offset) != W_LDLO8)
-          || (code[offset + 1] != count))
-        {
-          return FALSE;
-        }
-    }
-  count = nargs * 2;
-  if ((code[count] != W_CALL))
-    {
-      return 0;
-    }
-  count += 4;
-  temp = code[count--];
-  temp <<= 8;
-  temp |= code[count--];
-  temp <<= 8;
-  temp |= code[count--];
-  temp <<= 8;
-  temp |= code[count];
-
-  if (temp != linkid)
+  {
+    const uint_t offset = count * (opcode_bytes(W_LDLO8) + 1);
+    if ((decode_opcode(code + offset) != W_LDLO8)
+        || (code[offset + opcode_bytes(W_LDLO8)] != count))
     {
       return FALSE;
     }
+  }
+  count = nargs * (opcode_bytes(W_LDLO8) + 1);
+  if (decode_opcode(code + count) != W_CALL)
+    return 0;
+
+  code += count + opcode_bytes(W_CALL);
+  if (load_le_int32(code) != linkid)
+  {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -238,18 +226,19 @@ check_procedure_less_params(struct ParserState *state,
   {
     if (count < args_provided)
     {
-      if ((decode_opcode(code + offset) != W_LDLO8) || (code[offset + 1] != count))
+      if ((decode_opcode(code + offset) != W_LDLO8)
+          || (code[offset + opcode_bytes(W_LDLO8)] != count))
       {
         return FALSE;
       }
-      offset += 2;
+      offset += opcode_bytes(W_LDLO8) + 1;
     }
     else
     {
       if (decode_opcode(code + offset) != W_LDNULL)
         return FALSE;
 
-      offset += 1;
+      offset += opcode_bytes(W_LDNULL);
       if (code[offset] != (16 - args_provided))
         return FALSE;
 
@@ -258,9 +247,10 @@ check_procedure_less_params(struct ParserState *state,
     }
   }
 
-  if (code[offset++] != W_CALL)
+  if (code[offset] != W_CALL)
     return FALSE;
 
+  offset += opcode_bytes(W_CALL);
   if (load_le_int32(code + offset) != linkid)
     return FALSE;
 

@@ -31,6 +31,7 @@
 #include "opcodes.h"
 #include "wlog.h"
 
+#define JMP_OP_SIZE opcode_bytes(W_JMP)
 
 void
 check_for_dead_statement(struct ParserState* const parser)
@@ -173,7 +174,7 @@ begin_if_stmt(struct ParserState* const   parser,
   }
 
   branch.type     = branchType;
-  branch.startPos = wh_ostream_size(code) - sizeof(uint32_t) - 1;
+  branch.startPos = wh_ostream_size(code) - sizeof(uint32_t) - JMP_OP_SIZE;
 
   if (wh_array_add( branchStack, &branch) == NULL)
     log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -199,11 +200,11 @@ begin_else_stmt(struct ParserState* const parser)
     }
 
   jumpOffset = wh_ostream_size(code) - branchIt->startPos;
-  branchIt->elsePos            = wh_ostream_size(code) - sizeof(uint32_t) - 1;
+  branchIt->elsePos            = wh_ostream_size(code) - sizeof(uint32_t) - JMP_OP_SIZE;
   branchIt->prevReturnDetected = branchIt->returnDetected;
   branchIt->returnDetected     = FALSE;
 
-  store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->startPos + 1);
+  store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->startPos + JMP_OP_SIZE);
 }
 
 void
@@ -249,7 +250,7 @@ finalize_if_stmt(struct ParserState* const parser)
 
       assert(jumpOffset > 0);
 
-      store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->startPos + 1);
+      store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->startPos + JMP_OP_SIZE);
 
       allBranchesReturn = FALSE;
     }
@@ -260,7 +261,7 @@ finalize_if_stmt(struct ParserState* const parser)
 
       assert(jumpOffset > 0);
 
-      store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->elsePos + 1);
+      store_le_int32(jumpOffset, wh_ostream_data(code) + branchIt->elsePos + JMP_OP_SIZE);
     }
 
     allBranchesReturn &= branchIt->returnDetected;
@@ -447,14 +448,14 @@ finalize_for_stmt(struct ParserState* const parser)
       assert(FALSE);
     }
     /* Make the jump corrections. */
-    store_le_int32(offset, code + loopIt->breakMark + 1);
+    store_le_int32(offset, code + loopIt->breakMark + JMP_OP_SIZE);
   }
   while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   assert((loopIt->type == LE_FOR_BEGIN) || (loopIt->type == LE_FOREACH_BEGIN));
 
   offset = loopIt->continueMark - endForLoopPos;
-  store_le_int32(offset, code + endForLoopPos + 1);
+  store_le_int32(offset, code + endForLoopPos + JMP_OP_SIZE);
 
   if (loopIt->type == LE_FOREACH_BEGIN)
     {
@@ -466,7 +467,7 @@ finalize_for_stmt(struct ParserState* const parser)
       }
 
       struct WArray* const iterators = stmt_query_loop_iterators_stack(stmt);
-      wh_array_resize(iterators, wh_array_count(iterators) -1 );
+      wh_array_resize(iterators, wh_array_count(iterators) - 1);
     }
 
   wh_array_resize(loopsStack, loopId);
@@ -547,14 +548,14 @@ finalize_while_stmt(struct ParserState* const parser)
     }
 
     /* Make the jump corrections. */
-    store_le_int32(offset, code + loopIt->breakMark + 1);
+    store_le_int32(offset, code + loopIt->breakMark + JMP_OP_SIZE);
 
   } while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 
   assert(loopIt->type == LE_WHILE_BEGIN);
 
   offset = loopIt->continueMark - endWhileLoopPos;
-  store_le_int32(offset, code + endWhileLoopPos + 1);
+  store_le_int32(offset, code + endWhileLoopPos + JMP_OP_SIZE);
 
   wh_array_resize(loopsStack, loopId);
 }
@@ -620,15 +621,15 @@ finalize_until_stmt(struct ParserState* const   parser,
       break;
 
     case LE_UNTIL_BEGIN:
-      /* JCT 0x01020304 should be encoded with 5 bytes */
-      loopIt->breakMark = endUntilStmtPos - 5;
+      /* JCT 0x01020304 should be encoded with 6 bytes */
+      loopIt->breakMark = endUntilStmtPos - JMP_OP_SIZE - 4;
       offset = loopIt->continueMark - loopIt->breakMark;
       break;
 
     default:
       assert(0);
     }
-    store_le_int32(offset, code + loopIt->breakMark + 1);
+    store_le_int32(offset, code + loopIt->breakMark + JMP_OP_SIZE);
   }
   while ((loopIt->type == LE_CONTINUE) || (loopIt->type == LE_BREAK));
 

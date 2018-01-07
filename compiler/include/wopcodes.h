@@ -236,9 +236,20 @@ extern "C"
 #endif
 
 
-COMPILER_SHL uint_t
+static INLINE uint_t
 wh_compiler_decode_op(const uint8_t         *instrs,
-                      enum W_OPCODE* const   outOpcode);
+                      enum W_OPCODE* const   outOpcode)
+{
+  return (*outOpcode = (enum W_OPCODE)*instrs, 1);
+}
+
+static INLINE uint_t
+wh_compiler_encode_op(uint8_t* const        instrs,
+                      const enum W_OPCODE   opcode)
+{
+  return (*instrs = opcode, 1);
+}
+
 #ifdef __cplusplus
 }
 #endif
