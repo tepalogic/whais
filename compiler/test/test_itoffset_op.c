@@ -67,9 +67,9 @@ check_procedure(struct ParserState *state)
     find_proc_decl(state, "proc_t", strlen("proc_t"), FALSE);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
 
-  if ((decode_opcode(code + 18) != W_LDLO32)
-      || (load_le_int32(code + 19) != 0x02)
-      || (decode_opcode(code + 23) != W_ITOFF))
+  if ((decode_opcode(code + 16) != W_LDLO32)
+      || (load_le_int32(code + 16 + opcode_bytes(W_LDLO32)) != 0x02)
+      || (decode_opcode(code + 16 + opcode_bytes(W_LDLO32) + 4) != W_ITOFF))
     {
       return FALSE;
     }

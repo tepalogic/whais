@@ -131,7 +131,12 @@ check_procedure(struct ParserState* state,
   uint8_t * const code = wh_ostream_data(stmt_query_instrs( stmt));
   const struct DeclaredVar* const v = stmt_find_declaration(stmt, "a", 1, FALSE, FALSE);
 
-  const uint_t opCodeOffset = e.field ? (e.count * 7) + 2 : (e.count + 1) * 2;
+  const uint_t LDSIZE = opcode_bytes(W_LDLO8) + 1;
+  const uint_t SELFSIZE =  opcode_bytes(W_SELF) + 4;
+  const uint_t opCodeOffset = LDSIZE
+                              + (e.field
+                                 ? (e.count * (LDSIZE + SELFSIZE))
+                                 : (e.count * LDSIZE));
 
   if (e.field)
   {

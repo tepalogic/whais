@@ -181,18 +181,16 @@ my_postman(WH_MESSENGER_CTXT data,
 static uint_t
 w_encode_opcode(W_OPCODE opcode, uint8_t* pOutCode)
 {
-  if (opcode > 0x80)
-    {
-      uint16_t temp = opcode;
-      temp |= 0x8000;
-      pOutCode [0] = (temp & 0xFF);
-      pOutCode [1] = ((temp >> 8) & 0xFF);
-
-      return 2;
-    }
-  pOutCode [0] = opcode;
-  return 1;
+  return wh_compiler_encode_op(pOutCode, opcode);
 }
+
+static uint_t
+opcode_bytes(const W_OPCODE opcode)
+{
+  uint8_t temp[16];
+  return w_encode_opcode(opcode, temp);
+}
+
 
 static bool
 test_op_cts(Session& session)
@@ -483,7 +481,7 @@ test_op_jfc(Session& session)
   opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
   opSize += w_encode_opcode(W_JFC, testCode + opSize);
-  testCode[opSize++] = 8;
+  testCode[opSize++] = (opcode_bytes(W_JFC) + 4 + opcode_bytes(W_LDI8) + 1 + opcode_bytes(W_RET));
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
@@ -542,7 +540,7 @@ test_op_jtc(Session& session)
   opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
   opSize += w_encode_opcode(W_JTC, testCode + opSize);
-  testCode[opSize++] = 8;
+  testCode[opSize++] = (opcode_bytes(W_JTC) + 4 + opcode_bytes(W_LDI8) + 1 + opcode_bytes(W_RET));
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
@@ -601,7 +599,7 @@ test_op_jf(Session& session)
   opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
   opSize += w_encode_opcode(W_JF, testCode + opSize);
-  testCode[opSize++] = 8;
+  testCode[opSize++] = (opcode_bytes(W_JF) + 4 + opcode_bytes(W_LDI8) + 1 + opcode_bytes(W_RET));
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
@@ -659,7 +657,7 @@ test_op_jt(Session& session)
   opSize += w_encode_opcode(W_LDLO8, testCode);
   testCode[opSize++] = 0;
   opSize += w_encode_opcode(W_JT, testCode + opSize);
-  testCode[opSize++] = 8;
+  testCode[opSize++] = (opcode_bytes(W_JT) + 4 + opcode_bytes(W_LDI8) + 1 + opcode_bytes(W_RET));
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
@@ -716,7 +714,7 @@ test_op_jmp(Session& session)
 
   uint8_t opSize = 0;
   opSize += w_encode_opcode(W_JMP, testCode + opSize);
-  testCode[opSize++] = 8;
+  testCode[opSize++] = (opcode_bytes(W_JMP) + 4 + opcode_bytes(W_LDI8) + 1 + opcode_bytes(W_RET));
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;
   testCode[opSize++] = 0;

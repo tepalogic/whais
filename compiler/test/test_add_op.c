@@ -278,43 +278,42 @@ check_op_symmetry()
 static bool_t
 check_procedure(struct ParserState *state, char * proc_name)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  struct DeclaredVar *var =
-    (struct DeclaredVar *) wh_array_get(&stmt->spec.proc.paramsList, 0);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  struct DeclaredVar *var = (struct DeclaredVar *)wh_array_get( &stmt->spec.proc.paramsList, 0);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
+  int code_size = wh_ostream_size(stmt_query_instrs(stmt));
+
+  const uint_t opcodeOff = 2 * (opcode_bytes(W_LDLO8) + 1);
+  uint_t codeSize = 0;
   enum W_OPCODE op_expect = W_NA;
 
   /* check the opcode based on the return type */
-  switch(var->type)
-    {
-    case T_INT8:
-    case T_INT16:
-    case T_INT32:
-    case T_INT64:
-      op_expect = W_ADD;
-      break;
-    case T_REAL:
-    case T_RICHREAL:
-      op_expect = W_ADDRR;
-      break;
-    case T_TEXT:
-      op_expect = W_ADDT;
-      break;
-    default:
-      /* we should no be here */
-      return FALSE;
-    }
+  switch (var->type)
+  {
+  case T_INT8:
+  case T_INT16:
+  case T_INT32:
+  case T_INT64:
+    op_expect = W_ADD;
+    break;
+  case T_REAL:
+  case T_RICHREAL:
+    op_expect = W_ADDRR;
+    break;
+  case T_TEXT:
+    op_expect = W_ADDT;
+    break;
+  default:
+    /* we should no be here */
+    return FALSE;
+  }
 
-  if (code_size < 5)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( code + 4) != op_expect)
-    {
-      return FALSE;
-    }
+  codeSize = opcodeOff + opcode_bytes(op_expect) + opcode_bytes(W_RET);
+  if (code_size < codeSize)
+    return FALSE;
+
+  else if (decode_opcode(code + opcodeOff) != op_expect)
+    return FALSE;
 
   return TRUE;
 }

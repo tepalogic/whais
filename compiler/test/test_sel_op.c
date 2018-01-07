@@ -203,19 +203,19 @@ check_procedure(struct ParserState* state,
   const struct DeclaredVar* const localValue = wh_array_get(&stmt->decls, 0);
 
   static uint8_t code_expected[] = {
-                                  0x0E, 0x02,
-                                  0x03, 0x01,
-                                  0x03, 0x00,
-                                  0x35,
-                                  0x6F, 0x0C, 0x00, 0x00, 0x00,
-                                  0x0E, 0x00,
-                                  0x72, 0x07, 0x00, 0x00, 0x00,
-                                  0x0E, 0x01,
-                                  0x15,
-                                  0x14, 0x01,
-                                  0x0E, 0x02,
-                                  0x29,
-                                  0x2C
+                                      0x0E, 0x02,
+                                      0x03, 0x01,
+                                      0x03, 0x00,
+                                      0x35,
+                                      0x6F, 0x0C, 0x00, 0x00, 0x00,
+                                      0x0E, 0x00,
+                                      0x72, 0x07, 0x00, 0x00, 0x00,
+                                      0x0E, 0x01,
+                                      0x15,
+                                      0x14, 0x01,
+                                      0x0E, 0x02,
+                                      0x29,
+                                      0x2C
                               };
 
 

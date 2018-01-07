@@ -14,13 +14,13 @@ wcompiler_MIN=.0
 
 whc_SRC:=whc/whc_main.cpp whc/whc_cmdline.cpp whc/msglog.cpp \
 		whc/whc_preprocess.cpp
-whc_DEF:=USE_COMPILER_SHL USE_CUSTOM_SHL WVER_MAJ=1 WVER_MIN=2
+whc_DEF:=USE_COMPILER_SHL USE_CUSTOM_SHL WVER_MAJ=1 WVER_MIN=5
 whc_LIB:=utils/wslutils  custom/wslcppmemalloc
 whc_SHL:=compiler/wcompiler custom/wcustom
 
 wod_SRC:=wod/wod_main.cpp wod/wod_cmdline.cpp wod/wod_dump.cpp \
 		wod/wod_decoder.cpp
-wod_DEF:=USE_COMPILER_SHL USE_CUSTOM_SHL WVER_MAJ=1 WVER_MIN=2
+wod_DEF:=USE_COMPILER_SHL USE_CUSTOM_SHL WVER_MAJ=1 WVER_MIN=5
 wod_LIB:=$(whc_LIB)
 wod_SHL:=$(whc_SHL)
  

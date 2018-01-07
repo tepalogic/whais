@@ -357,61 +357,22 @@ const enum W_OPCODE store_op[T_END_OF_TYPES][T_END_OF_TYPES] =
 };
 
 
-static const uint16_t SECOND_BYTE_MARK = 0x80;
-
-
 struct WOutputStream*
 encode_opcode(struct WOutputStream* stream, const enum W_OPCODE opcode)
 {
-  uint16_t tempOpcode = opcode;
+  assert (opcode < 255);
 
-  if (tempOpcode >= SECOND_BYTE_MARK)
-    {
-      tempOpcode |= (SECOND_BYTE_MARK << 8);
-
-     if (wh_ostream_wint8(stream, (uint8_t)((tempOpcode >> 8) & 0xFF)) == NULL)
-       return NULL;
-     return wh_ostream_wint8(stream, (uint8_t)(tempOpcode & 0xFF));
-    }
-
-  return wh_ostream_wint8(stream, (uint8_t)tempOpcode);
+  return wh_ostream_wint8(stream, opcode);
 }
-
 
 enum W_OPCODE
 decode_opcode(const uint8_t* instrs)
 {
-  if (*instrs & SECOND_BYTE_MARK)
-    {
-      uint16_t opcode = (*instrs++ & ~SECOND_BYTE_MARK);
-      opcode += *instrs;
-
-      return opcode;
-    }
-
   return *instrs;
 }
 
 uint_t
 opcode_bytes(const enum W_OPCODE opcode)
 {
-  return(opcode >= SECOND_BYTE_MARK) ? 2 : 1;
-}
-
-
-uint_t
-wh_compiler_decode_op(const uint8_t* instrs, enum W_OPCODE* const outOpcode)
-{
-  if (*instrs & SECOND_BYTE_MARK)
-    {
-      uint16_t opcode = (*instrs++ & ~SECOND_BYTE_MARK);
-      opcode += *instrs;
-
-      *outOpcode  = opcode;
-
-      return 2;
-    }
-
-  *outOpcode = *instrs;
   return 1;
 }

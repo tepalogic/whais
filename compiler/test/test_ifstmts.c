@@ -172,32 +172,31 @@ get_int32(uint8_t * buffer)
 static bool_t
 check_procedure_1(struct ParserState *state, char * proc_name)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
 
-  if (decode_opcode( code + 2) != op_expect)
-    {
-      return FALSE;
-    }
-  shift = get_int32(code + 3);
+  const uint_t LD_SIZE = opcode_bytes(W_LDLO8) + 1;
+  if (decode_opcode(code + LD_SIZE) != op_expect)
+  {
+    return FALSE;
+  }
+  shift = get_int32(code + LD_SIZE + opcode_bytes(op_expect));
 
-  if ((shift <= 5) || (code_size <= 3 + shift))
-    {
-      return FALSE;
-    }
+  if (shift != 11)
+  {
+    return FALSE;
+  }
   else
-    {
-      shift += 2;
-    }
+  {
+    shift += LD_SIZE;
+  }
 
-  if (decode_opcode( code + shift + 2) != W_RET)
-    {
-      return FALSE;
-    }
+  if (decode_opcode(code + shift + LD_SIZE) != W_RET)
+  {
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -205,39 +204,28 @@ check_procedure_1(struct ParserState *state, char * proc_name)
 static bool_t
 check_procedure_2(struct ParserState *state, char * proc_name)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
-  int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int shift_exit = 0;
 
-  if (decode_opcode( code + 2) != op_expect)
-    {
-      return FALSE;
-    }
+  const uint_t LD_SIZE = opcode_bytes(W_LDLO8) + 1;
+  if (decode_opcode(code + LD_SIZE) != op_expect)
+    return FALSE;
 
-  shift = get_int32(code + 3);
+  shift = get_int32(code + LD_SIZE + opcode_bytes(op_expect));
+  if (shift != 16)
+    return FALSE;
 
-  if ((shift <= 5) || (code_size <= 3 + shift))
-    {
-      return FALSE;
-    }
-  shift -= 5;                        /* jmp uint32 */
+  shift -= opcode_bytes(W_JMP) + 4; /* jmp uint32 */
+  if (decode_opcode(code + LD_SIZE + shift) != W_JMP)
+    return FALSE;
 
-  if (decode_opcode( code + 2 + shift) != W_JMP)
-
-    {
-      return FALSE;
-    }
-
-  shift_exit = get_int32(code + 3 + shift);
-
-  if (decode_opcode( code + 2 + shift + shift_exit + 2) != W_RET)
-    {
-      return FALSE;
-    }
+  shift_exit = get_int32(code + LD_SIZE + shift + opcode_bytes(W_JMP));
+  shift_exit += LD_SIZE + shift;
+  if (decode_opcode(code + shift_exit + LD_SIZE) != W_RET)
+    return FALSE;
 
   return TRUE;
 }
@@ -245,48 +233,35 @@ check_procedure_2(struct ParserState *state, char * proc_name)
 static bool_t
 check_procedure_3(struct ParserState *state, char * proc_name)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int if_exit = 0;
   int elseif_skip = 0;
 
-  if (decode_opcode( code + 2) != op_expect)
-    {
-      return FALSE;
-    }
+  const uint_t LD_SIZE = opcode_bytes(W_LDLO8) + 1;
+  if (decode_opcode(code + LD_SIZE) != op_expect)
+    return FALSE;
 
-  shift = get_int32(code + 3);
-  shift += 2;
+  shift = get_int32(code + LD_SIZE + opcode_bytes(op_expect));
+  shift += LD_SIZE;
 
-  shift -= 5;                        /* jmp uint32 */
+  shift -= opcode_bytes(W_JMP) + 4; /* jmp uint32 */
+  if (decode_opcode(code + shift) != W_JMP)
+    return FALSE;
 
-  if (decode_opcode( code + shift) != W_JMP)
+  if_exit = get_int32(code + shift + opcode_bytes(W_JMP)) + shift;
+  if (decode_opcode(code + if_exit + LD_SIZE) != W_RET)
+    return FALSE;
 
-    {
-      return FALSE;
-    }
+  shift += opcode_bytes(W_JMP) + 4 + LD_SIZE;
+  if (decode_opcode(code + shift) != op_expect)
+    return FALSE;
 
-  if_exit = get_int32(code + shift + 1) + shift;
-
-  if (decode_opcode( code + if_exit + 2) != W_RET)
-    {
-      return FALSE;
-    }
-
-  shift += 5 + 2;
-  if (decode_opcode( code + shift) != op_expect)
-    {
-      return FALSE;
-    }
-
-  elseif_skip = get_int32(code + shift + 1) + shift;
+  elseif_skip = get_int32(code + shift + opcode_bytes(op_expect)) + shift;
   if (elseif_skip != if_exit)
-    {
-      return FALSE;
-    }
+    return FALSE;
 
   return TRUE;
 }
@@ -294,52 +269,40 @@ check_procedure_3(struct ParserState *state, char * proc_name)
 static bool_t
 check_procedure_4(struct ParserState *state, char * proc_name)
 {
-  struct Statement *stmt =
-    find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
-  uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
+  struct Statement *stmt = find_proc_decl(state, proc_name, strlen(proc_name), FALSE);
+  uint8_t *code = wh_ostream_data(stmt_query_instrs(stmt));
   enum W_OPCODE op_expect = W_JFC;
   int shift = 0;
   int if_exit = 0;
   int elseif_skip = 0;
   int elseif_exit = 0;
 
-  if (decode_opcode( code + 2) != op_expect)
-    {
-      return FALSE;
-    }
+  const uint_t LD_SIZE = opcode_bytes(W_LDLO8) + 1;
 
-  shift = get_int32(code + 3);
-  shift += 2;
+  if (decode_opcode(code + LD_SIZE) != op_expect)
+    return FALSE;
 
-  shift -= 5;                        /* jmp uint32 */
+  shift = get_int32(code + LD_SIZE + opcode_bytes(op_expect));
+  shift += LD_SIZE;
 
-  if (decode_opcode( code + shift) != W_JMP)
+  shift -= (opcode_bytes(W_JMP) + 4); /* jmp uint32 */
+  if (decode_opcode(code + shift) != W_JMP)
+    return FALSE;
 
-    {
-      return FALSE;
-    }
+  if_exit = get_int32(code + shift + opcode_bytes(W_JMP)) + shift;
+  if (decode_opcode(code + if_exit + LD_SIZE) != W_RET)
+    return FALSE;
 
-  if_exit = get_int32(code + shift + 1) + shift;
+  shift += (opcode_bytes(W_JMP) + 4) + LD_SIZE;
+  if (decode_opcode(code + shift) != op_expect)
+    return FALSE;
 
-  if (decode_opcode( code + if_exit + 2) != W_RET)
-    {
-      return FALSE;
-    }
-
-  shift += 5 + 2;
-  if (decode_opcode( code + shift) != op_expect)
-    {
-      return FALSE;
-    }
-
-  elseif_skip = get_int32(code + shift + 1) + shift;
-  elseif_skip -= 5;
-  elseif_exit = get_int32(code + elseif_skip + 1) + elseif_skip;
+  elseif_skip = get_int32(code + shift + opcode_bytes(op_expect)) + shift;
+  elseif_skip -= (opcode_bytes(W_JMP) + 4);
+  elseif_exit = get_int32(code + elseif_skip + opcode_bytes(W_JMP)) + elseif_skip;
 
   if (elseif_exit != if_exit)
-    {
-      return FALSE;
-    }
+    return FALSE;
 
   return TRUE;
 }

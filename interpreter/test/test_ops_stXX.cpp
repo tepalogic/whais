@@ -74,18 +74,9 @@ my_postman(WH_MESSENGER_CTXT data,
 static uint_t
 w_encode_opcode(W_OPCODE opcode, uint8_t* pOutCode)
 {
-  if (opcode >= 0x80)
-    {
-      uint16_t temp = opcode;
-      temp |= 0x8000;
-      pOutCode [0] = (temp & 0xFF);
-      pOutCode [1] = ((temp >> 8) & 0xFF);
-
-      return 2;
-    }
-  pOutCode [0] = opcode;
-  return 1;
+  return wh_compiler_encode_op(pOutCode, opcode);
 }
+
 
 static bool
 test_op_stb(Session& session)

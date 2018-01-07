@@ -176,6 +176,9 @@ check_procedure(struct ParserState *state, char * proc_name)
     (struct DeclaredVar *) wh_array_get(&stmt->spec.proc.paramsList, 0);
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
   int code_size = wh_ostream_size(stmt_query_instrs( stmt));
+
+  const uint_t opcodeOff = 2 * (opcode_bytes(W_LDLO8) + 1);
+  uint_t codeSize = 0;
   enum W_OPCODE op_expect = W_NA;
 
   /* check the opcode based on the return type */
@@ -192,14 +195,12 @@ check_procedure(struct ParserState *state, char * proc_name)
       return FALSE;
     }
 
-  if (code_size < 5)
-    {
-      return FALSE;
-    }
-  else if (decode_opcode( code + 4) != op_expect)
-    {
-      return FALSE;
-    }
+  codeSize = opcodeOff + opcode_bytes(op_expect) + opcode_bytes(W_RET);
+  if (code_size < codeSize)
+    return FALSE;
+
+  else if (decode_opcode(code + opcodeOff) != op_expect)
+    return FALSE;
 
   return TRUE;
 }

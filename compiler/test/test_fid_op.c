@@ -64,8 +64,8 @@ check_procedure(struct ParserState *state)
   uint8_t *code = wh_ostream_data(stmt_query_instrs( stmt));
 
   if (decode_opcode(code) != W_LDLO8
-      || code[1] != 0
-      || decode_opcode(code + 2) != W_FID)
+      || code[opcode_bytes(W_LDLO8)] != 0
+      || decode_opcode(code + opcode_bytes(W_LDLO8) + 1) != W_FID)
     {
       return FALSE;
     }
