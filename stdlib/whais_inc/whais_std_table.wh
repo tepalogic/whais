@@ -41,7 +41,7 @@ EXTERN PROCEDURE is_persistent( t TABLE) RETURN BOOL;
 #   @t - The table value.
 #Out:
 #   The count of the tables' fields.
-EXTERN PROCEDURE count_fields( t TABLE) RETURN UINT32;
+EXTERN PROCEDURE count_fields( t TABLE) RETURN UINT16;
 
 #Get a field of a table by index.
 #In:
@@ -49,9 +49,9 @@ EXTERN PROCEDURE count_fields( t TABLE) RETURN UINT32;
 #   @i - Field's index.
 #Out:
 #   A value holding the corresponding field.
-EXTERN PROCEDURE get_fieldth ( t TABLE, 
-                             i UINT64) RETURN FIELD;
-                             
+EXTERN PROCEDURE get_fieldth (t TABLE, 
+                              i UINT16) RETURN FIELD;
+
 
 #Get a field of a table by name.
 #In:
@@ -70,14 +70,14 @@ EXTERN PROCEDURE get_field ( t TABLE,
 #Out:
 #   The number of the rows after count.
 EXTERN PROCEDURE count_rows( t TABLE,
-			     empties BOOL) RETURN UINT64;
+                             empties BOOL) RETURN UINT32;
 
 #Allocate a row into a table.
 #In:
 #   @t - The table value.
 #Out:
 #   The index of the allocated row.
-EXTERN PROCEDURE add_row( t TABLE) RETURN UINT64;
+EXTERN PROCEDURE add_row( t TABLE) RETURN UINT32;
 
 #Find a reusable row onto a table (or allocates a row if none is found).
 #A row is considered to be reusable if all fields values are set to NULL.
@@ -85,7 +85,7 @@ EXTERN PROCEDURE add_row( t TABLE) RETURN UINT64;
 #   @t - The table value.
 #Out:
 #   The founded row index.
-EXTERN PROCEDURE get_empty( t TABLE) RETURN UINT64;
+EXTERN PROCEDURE get_empty( t TABLE) RETURN UINT32;
 
 #Mark a row to reuse (e.g. set all rows's field values to NULL).
 #In:
@@ -94,8 +94,8 @@ EXTERN PROCEDURE get_empty( t TABLE) RETURN UINT64;
 #Out:
 #   TRUE if the row was emptied.
 EXTERN PROCEDURE empty_row( t TABLE,
-                            r UINT64) RETURN BOOL;
-                                     
+                            r UINT32) RETURN BOOL;
+
 #Exchange the content of two tables' rows.
 #In:
 #   @t  - The table value
@@ -104,8 +104,8 @@ EXTERN PROCEDURE empty_row( t TABLE,
 #Out:
 #    TRUE if the exchange was made.
 EXTERN PROCEDURE exchg_rows( t TABLE,
-                             r1 UINT64,
-                             r2 UINT64) RETURN BOOL;
+                             r1 UINT32,
+                             r2 UINT32) RETURN BOOL;
 
 #Sort table rows.
 #In:
@@ -120,8 +120,8 @@ EXTERN PROCEDURE exchg_rows( t TABLE,
 #Out:
 #   True if the sort was successful.
 EXTERN PROCEDURE sort_table( t TABLE,
-                             fields UINT32 ARRAY,
+                             columns UINT16 ARRAY,
                              reverse BOOL ARRAY,
-                             from UINT64,
-                             to   UINT64) RETURN BOOL;
+                             from UINT32,
+                             to   UINT32) RETURN BOOL;
                              

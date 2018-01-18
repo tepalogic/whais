@@ -195,9 +195,6 @@ FieldOperand::operator= (const FieldOperand& source)
 {
   if (this != &source)
   {
-    if ((mFieldType != T_UNDETERMINED) && (mFieldType != source.mFieldType))
-      throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
-
     if (mTableRef != nullptr)
       mTableRef->DecrementRefCount();
 

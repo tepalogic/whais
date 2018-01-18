@@ -2105,7 +2105,10 @@ ProcedureCall::ProcedureCall(Session& session, SessionStack& stack, const Proced
       const StackValue *localValue = &GetLocalDefault(local);
       while (local < LocalsCount())
       {
-        stack.Push(StackValue(*localValue));
+        StackValue defaultValue(*localValue);
+        if (IS_TABLE(defaultValue.Operand().GetType())) defaultValue.Operand().GetTable();
+
+        stack.Push(move(defaultValue));
         ++local, ++localValue;
       }
     }

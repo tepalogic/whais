@@ -50,7 +50,9 @@ fi
 
 create_empty_test_db test_exec_db
 echo 'Create test_exec_db database...'
-echo 'add table_glb_pesitent f1 UINT8; add table_glb_pesistent_2 f2 INT16; quit' | wcmd -u test_exec_db -d ./test_exec_db > /dev/null
+echo 'add table_glb_persistent f1 UINT8; add table_glb_persistent_2 f2 INT16; quit' | wcmd -u test_exec_db -d ./test_exec_db > /dev/null
+echo 'add table_glb_index_fields_n f1 REAL f2 INT8; index table_glb_index_fields_n f1; quit' | wcmd -u test_exec_db -d ./test_exec_db > /dev/null
+echo 'add table_glb_index_fields f1 REAL f2 INT8 f3 UINT8 f4 TEXT f5 ARRAY INT8 f6 DATE; index table_glb_index_fields f1 f2 f3 ; quit' | wcmd -u test_exec_db -d ./test_exec_db > /dev/null
 if [ $? -ne 0 ]; then
 	echo "Failed to setup 'test_exec_db' database."
 	exit 1

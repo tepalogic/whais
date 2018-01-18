@@ -31,64 +31,77 @@
 
 #Retrieve the table that a field belongs to.
 #In:
-#   @f - A field value.
+#   @column - A field value.
 #Out:
 #   If successfully, this will return the table that store the field's values.
-EXTERN PROCEDURE get_table(f FIELD) RETURN TABLE;
+EXTERN PROCEDURE get_table(column FIELD) RETURN TABLE;
 
 #Check if the values of a table field are indexed.
 #In:
-#   @f - A field value.
+#   @column - A field value.
 #Out:
 #   TRUE if the field values are indexed. 
-EXTERN PROCEDURE is_indexed(f FIELD) RETURN BOOL;
+EXTERN PROCEDURE is_indexed(column FIELD) RETURN BOOL;
 
 #Get the associated name of a table's field.
 #In:
-#   @f - A field value.
+#   @column - A field value.
 #Out:
 #   A text holding the table field's name used by the provided field. 
-EXTERN PROCEDURE get_name(f FIELD) RETURN TEXT;
+EXTERN PROCEDURE get_name(column FIELD) RETURN TEXT;
 
 #Retrieves the rows indexes holding values that are in a supplied interval 
 #of values.
 #In:
-#   @f          - The field value.
-#   @v_min      - The lower bound of the value interval.
-#   @v_max      - The upper bound of the value interval.
-#   @from_row   - Search from this row upward.
-#   @to_row     - Search until this row.
+#   @column  - The field value.
+#   @min     - The lower bound of the value interval.
+#   @max     - The upper bound of the value interval.
+#   @row     - Search from this row upward.
+#   @row     - Search until this row.
 #Out:
 #   An array holding the rows indexes that holds value in the interval hold by
 #   [@v_min, @v_max].
-EXTERN PROCEDURE match_rows( f FIELD,
-                             v_min UNDEFINED,
-                             v_max UNDEFINED,
-                             from_row UINT64,
-                             to_row UINT64) RETURN  UINT64 ARRAY;
+EXTERN PROCEDURE match_rows(column FIELD,
+                            min UNDEFINED,
+                            max UNDEFINED,
+                            from UINT32,
+                            to UINT32) RETURN UINT32 ARRAY;
+
+#Check the provided rows if they hold a certain value. 
+#In:
+#   @column    - The field value.
+#   @values    - The set values to check against.
+#   @rows      - List of rows to test.
+#   @addNull   - TRUE if the NULL value should be added into the test set.
+#   @filterOut - If TRUE then a row should be added to the result if is not
+#                holding a value specified in the set above.
+#Out:
+#   An array holding the rows indexes that holds value in the interval hold by
+#   [@v_min, @v_max].
+EXTERN PROCEDURE filter_rows(column FIELD,
+                             values ARRAY,
+                             rows UINT32 ARRAY,
+                             addNull BOOL,
+                             filterOut BOOL) RETURN UINT32 ARRAY;
 
 
 #Retrieve the row holding the lowest from the specified field values.
 #In:
-#   @f - The field value.
-#   @first   - TRUE in case of duplicates entries it will return the last or
-#              the first such index.
+#   @column - The field value.
 #   @min     - Search only for non null values that are bigger or equal with
 #              this one. 
 #Out:
-#   If successfully this will return an index pointing at the row from where 
-#   the respective value can be retrieved.
-EXTERN PROCEDURE get_smallest (f FIELD) RETURN UINT64;
+#   A list of rows holding the field's smallest found value.
+EXTERN PROCEDURE get_smallest (column FIELD,
+                               min UNDEFINED) RETURN UINT32 ARRAY;
 
 
 #Retrieve the row holding the biggest from the specified field values.
 #In:
-#   @f - The field value.
-#   @first   - TRUE in case of duplicates entries it will return the last or
-#              the first such index
+#   @column - The field value.
 #   @max     - Search only for non-null values that are less or equal with 
 #              this one.
 #Out:
-#   If successfully this will return an index pointing at the row from where 
-#   the respective value can be retrieved.
-EXTERN PROCEDURE get_biggest (f FIELD, first BOOL, max UNDEFINED) RETURN UINT64;
+#   A list of rows holding the fields' biggest found value.
+EXTERN PROCEDURE get_biggest (column FIELD, 
+                              max UNDEFINED) RETURN UINT32 ARRAY;

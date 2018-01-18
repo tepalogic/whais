@@ -1090,6 +1090,9 @@ DArray::get_array_element(const uint64_t index, T& outElement) const
     return;
   }
 
+  if (outElement.DBSType() != Type())
+    throw DBSException(_EXTRA(DBSException::INVALID_ARRAY_TYPE));
+
   Serializer::Load(rawValue, &outElement);
 }
 

@@ -18,11 +18,11 @@ DO
       RETURN is_persistent(NULL) == NULL;
 
    ELSE IF (tc == 1)
-      RETURN is_persistent(table_glb_pesitent) == TRUE;
+      RETURN is_persistent(table_glb_persistent) == TRUE;
 
    ELSE IF (tc == 2) DO 
-      table_glb_pesistent_2.f2[0] = -100;
-      RETURN is_persistent(table_glb_pesistent_2) == TRUE;
+      table_glb_persistent_2.f2[0] = -100;
+      RETURN is_persistent(table_glb_persistent_2) == TRUE;
 
    ELSE IF (tc == 3) 
       RETURN is_persistent(test_global_table_is_persistent) == FALSE;
@@ -154,31 +154,31 @@ DO
 		RETURN FALSE;
 	END
     ELSE IF (tc == 6) DO 
-	IF (table_glb_pesitent != NULL) DO
-		write_log(_FUNCL_ + ": failed for tc: " + tc + " because table_glb_pesitent is not NULL.");
+	IF (table_glb_persistent != NULL) DO
+		write_log(_FUNCL_ + ": failed for tc: " + tc + " because table_glb_persistent is not NULL.");
 		RETURN NULL;
 	END
-	IF (empty_row(table_glb_pesitent, 0) == FALSE) DO
+	IF (empty_row(table_glb_persistent, 0) == FALSE) DO
 		RETURN TRUE;
 	ELSE DO
 		write_log (_FUNCL_ + ": failed for tc: " + tc);
 		RETURN FALSE;
 	END
     ELSE IF (tc == 7) DO 
-      	table_glb_pesistent_2.f2[0] = -100;
-	IF (empty_row(table_glb_pesistent_2, 0) == TRUE) DO
+      	table_glb_persistent_2.f2[0] = -100;
+	IF (empty_row(table_glb_persistent_2, 0) == TRUE) DO
 		RETURN TRUE;
 	ELSE DO
 		write_log (_FUNCL_ + ": failed for tc: " + tc);
 		RETURN FALSE;
 	END
     ELSE IF (tc == 8) DO
-	IF (empty_row(table_glb_pesistent_2, NULL) == FALSE) DO
+	IF (empty_row(table_glb_persistent_2, NULL) == FALSE) DO
 		RETURN TRUE;
 	ELSE
 		RETURN FALSE;
     ELSE IF (tc == 9) DO
-	IF (empty_row(table_glb_pesistent_2, 1000000) == FALSE) DO
+	IF (empty_row(table_glb_persistent_2, 1000000) == FALSE) DO
 		RETURN TRUE;
 	ELSE
 		RETURN FALSE;
@@ -274,7 +274,7 @@ DO
 	ELSE
 		RETURN TRUE;
     ELSE IF (tc == 4)
-	IF (count_fields(table_glb_pesistent_2) != 1)
+	IF (count_fields(table_glb_persistent_2) != 1)
 		RETURN FALSE;
 	ELSE
 		RETURN TRUE;
@@ -486,7 +486,7 @@ PROCEDURE test_whais_api_sort_table(tc UINT8) RETURN BOOL
 DO
     VAR tlocal TABLE (f1 REAL, f2 UINT32, f3 DATE);
     VAR tlocal2 TABLE;
-    VAR cols UINT32 ARRAY;
+    VAR cols UINT16 ARRAY;
     VAR desc BOOL ARRAY;
 
     tlocal.f1[0] = 0.01; tlocal.f2[0] = 0;

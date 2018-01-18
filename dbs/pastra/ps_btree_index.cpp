@@ -334,7 +334,6 @@ BTree::FindBiggerOrEqual(const IBTreeKey& key, NODE_INDEX* outNode, KEY_INDEX* o
   *outNode = mNodesManager.RootNodeId();
 
   auto node = mNodesManager.RetrieveNode(*outNode);
-
   do
   {
     const bool found = node->FindBiggerOrEqual(key, outKeyIndex);

@@ -32,12 +32,10 @@
 extern whais::WLIB_PROC_DESCRIPTION         gProcFieldTable;
 extern whais::WLIB_PROC_DESCRIPTION         gProcIsFielsIndexed;
 extern whais::WLIB_PROC_DESCRIPTION         gProcFieldName;
-extern whais::WLIB_PROC_DESCRIPTION         gProcFieldIndex;
 extern whais::WLIB_PROC_DESCRIPTION         gProcFindValueRange;
+extern whais::WLIB_PROC_DESCRIPTION         gProcFilterRows;
 extern whais::WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
 extern whais::WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
-extern whais::WLIB_PROC_DESCRIPTION         gProcFieldAverage;
-extern whais::WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 
 whais::WLIB_STATUS

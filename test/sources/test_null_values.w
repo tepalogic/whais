@@ -443,25 +443,25 @@ DO
 
     row = get_empty (result);
     
-    array_pushback(result.field1[row], TRUE);
-    array_pushback(result.field1[row], FALSE);
-    array_pushback(result.field2[row], 'C');
-    array_pushback(result.field2[row], 'D');
-    array_pushback(result.field3[row], '1800/10/14');
-    array_pushback(result.field3[row], '1801/11/13');
+    result.field1[row] += TRUE;
+    result.field1[row] += FALSE;
+    result.field2[row] += 'C';
+    result.field2[row] += 'D';
+    result.field3[row] += '1800/10/14';
+    result.field3[row] += '1801/11/13';
 
-    array_pushback(result.field4[row], '-1/10/14 10:31:12');
-    array_pushback(result.field5[row], '1/10/14 10:31:12.111222');
-    array_pushback(result.field6[row], -8);
-    array_pushback(result.field7[row], -16);
-    array_pushback(result.field8[row], -32);
-    array_pushback(result.field9[row], -64);
-    array_pushback(result.field10[row], 8);
-    array_pushback(result.field11[row], 16);
-    array_pushback(result.field12[row], 32);
-    array_pushback(result.field13[row], 64);
-    array_pushback(result.field14[row], -1.1);
-    array_pushback(result.field15[row], 2.12);
+    result.field4[row] += '-1/10/14 10:31:12';
+    result.field5[row] += '1/10/14 10:31:12.111222';
+    result.field6[row] += -8;
+    result.field7[row] += -16;
+    result.field8[row] += -32;
+    result.field9[row] += -64;
+    result.field10[row] += 8;
+    result.field11[row] += 16;
+    result.field12[row] += 32;
+    result.field13[row] += 64;
+    result.field14[row] += -1.1;
+    result.field15[row] += 2.12;
     result.field16[row] = "Text field";
     
     write_log ("End of null_test_1_2");
@@ -593,24 +593,24 @@ DO
     
     write_log ("...Step 2");
     
-    array_pushback(result.field1[row], TRUE);
-    array_pushback(result.field1[row], FALSE);
-    array_pushback(result.field2[row], 'C');
-    array_pushback(result.field2[row], 'D');
-    array_pushback(result.field3[row], '1800/10/14');
-    array_pushback(result.field3[row], '1801/11/13');
-    array_pushback(result.field4[row], '-1/10/14 10:31:12');
-    array_pushback(result.field5[row], '1/10/14 10:31:12.111222');
-    array_pushback(result.field6[row], -8);
-    array_pushback(result.field7[row], -16);
-    array_pushback(result.field8[row], -32);
-    array_pushback(result.field9[row], -64);
-    array_pushback(result.field10[row], 8);
-    array_pushback(result.field11[row], 16);
-    array_pushback(result.field12[row], 32);
-    array_pushback(result.field13[row], 64);
-    array_pushback(result.field14[row], -1.1);
-    array_pushback(result.field15[row], 2.12);
+    result.field1[row] += TRUE;
+    result.field1[row] += FALSE;
+    result.field2[row] += 'C';
+    result.field2[row] += 'D';
+    result.field3[row] += '1800/10/14';
+    result.field3[row] += '1801/11/13';
+    result.field4[row] += '-1/10/14 10:31:12';
+    result.field5[row] += '1/10/14 10:31:12.111222';
+    result.field6[row] += -8;
+    result.field7[row] += -16;
+    result.field8[row] += -32;
+    result.field9[row] += -64;
+    result.field10[row] += 8;
+    result.field11[row] += 16;
+    result.field12[row] += 32;
+    result.field13[row] += 64;
+    result.field14[row] += -1.1;
+    result.field15[row] += 2.12;
     result.field16[row][0] = 'T';
     
     IF (result.field1[row] == NULL) DO
@@ -804,21 +804,21 @@ DO
     
     write_log ("...Step 4");
 
-    array_pushback(result.field1[row], TRUE);
-    array_pushback(result.field2[row], 'C');
-    array_pushback(result.field3[row], '1800/10/14');
-    array_pushback(result.field4[row], '-1/10/14 10:31:12');
-    array_pushback(result.field5[row], '1/10/14 10:31:12.111222');
-    array_pushback(result.field6[row], -8);
-    array_pushback(result.field7[row], -16);
-    array_pushback(result.field8[row], -32);
-    array_pushback(result.field9[row], -64);
-    array_pushback(result.field10[row], 8);
-    array_pushback(result.field11[row], 16);
-    array_pushback(result.field12[row], 32);
-    array_pushback(result.field13[row], 64);
-    array_pushback(result.field14[row], -1.1);
-    array_pushback(result.field15[row], 2.12);
+    result.field1[row] += TRUE;
+    result.field2[row] += 'C';
+    result.field3[row] += '1800/10/14';
+    result.field4[row] += '-1/10/14 10:31:12';
+    result.field5[row] += '1/10/14 10:31:12.111222';
+    result.field6[row] += -8;
+    result.field7[row] += -16;
+    result.field8[row] += -32;
+    result.field9[row] += -64;
+    result.field10[row] += 8;
+    result.field11[row] += 16;
+    result.field12[row] += 32;
+    result.field13[row] += 64;
+    result.field14[row] += -1.1;
+    result.field15[row] += 2.12;
     
     result.field1[row][0] = TRUE;
     result.field2[row][0] = 'C';
@@ -1135,8 +1135,7 @@ DO
 
     write_log ("... Local values are null by default.");
 
-    array_pushback (result, -1000);
-    array_pushback (result, 20);
+    result += { -1000, 20} INT32;
 
     write_log ("End of null_test_2");
 
@@ -1257,24 +1256,24 @@ DO
 
     write_log ("... Step 2");
     
-    array_pushback(array1, TRUE);
-    array_pushback(array1, FALSE);
-    array_pushback(array2, 'C');
-    array_pushback(array2, 'D');
-    array_pushback(array3, '1800/10/14');
-    array_pushback(array3, '1801/11/13');
-    array_pushback(array4, '-1/10/14 10:31:12');
-    array_pushback(array5, '1/10/14 10:31:12.111222');
-    array_pushback(array6, -8);
-    array_pushback(array7, -16);
-    array_pushback(array8, -32);
-    array_pushback(array9, -64);
-    array_pushback(array10, 8);
-    array_pushback(array11, 16);
-    array_pushback(array12, 32);
-    array_pushback(array13, 64);
-    array_pushback(array14, -1.1);
-    array_pushback(array15, 2.12);
+    array1 += TRUE;
+    array1 += FALSE;
+    array2 += 'C';
+    array2 += 'D';
+    array3 += '1800/10/14';
+    array3 += '1801/11/13';
+    array4 += '-1/10/14 10:31:12';
+    array5 += '1/10/14 10:31:12.111222';
+    array6 += -8;
+    array7 += -16;
+    array8 += -32;
+    array9 += -64;
+    array10 += 8;
+    array11 += 16;
+    array12 += 32;
+    array13 += 64;
+    array14 += -1.1;
+    array15 += 2.12;
     array16[0] = 'T';
     
     IF (array1 == NULL) DO
@@ -1468,21 +1467,21 @@ DO
     
     write_log ("... Step 4");
     
-    array_pushback(array1, TRUE);
-    array_pushback(array2, 'C');
-    array_pushback(array3, '1800/10/14');
-    array_pushback(array4, '-1/10/14 10:31:12');
-    array_pushback(array5, '1/10/14 10:31:12.111222');
-    array_pushback(array6, -8);
-    array_pushback(array7, -16);
-    array_pushback(array8, -32);
-    array_pushback(array9, -64);
-    array_pushback(array10, 8);
-    array_pushback(array11, 16);
-    array_pushback(array12, 32);
-    array_pushback(array13, 64);
-    array_pushback(array14, -1.1);
-    array_pushback(array15, 2.12);
+    array1 += TRUE;
+    array2 += 'C';
+    array3 += '1800/10/14';
+    array4 += '-1/10/14 10:31:12';
+    array5 += '1/10/14 10:31:12.111222';
+    array6 += -8;
+    array7 += -16;
+    array8 += -32;
+    array9 += -64;
+    array10 += 8;
+    array11 += 16;
+    array12 += 32;
+    array13 += 64;
+    array14 += -1.1;
+    array15 += 2.12;
     array16[0] = 'T';
     
     array1[0] = TRUE;
@@ -1738,7 +1737,7 @@ DO
 	RETURN FALSE;
     END
 
-    array_pushback(result, 20);
+    result += 20;
 
     write_log ("End of null_test_2_2");
 

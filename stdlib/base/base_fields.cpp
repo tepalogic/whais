@@ -35,26 +35,22 @@ using namespace whais;
 WLIB_PROC_DESCRIPTION         gProcFieldTable;
 WLIB_PROC_DESCRIPTION         gProcIsFielsIndexed;
 WLIB_PROC_DESCRIPTION         gProcFieldName;
-WLIB_PROC_DESCRIPTION         gProcFieldIndex;
 
 WLIB_PROC_DESCRIPTION         gProcFindValueRange;
+WLIB_PROC_DESCRIPTION         gProcFilterRows;
 
 WLIB_PROC_DESCRIPTION         gProcFieldMinimum;
 WLIB_PROC_DESCRIPTION         gProcFieldMaximum;
 WLIB_PROC_DESCRIPTION         gProcFieldAverage;
 
-WLIB_PROC_DESCRIPTION         gProcFieldSortTable;
 
 
 static WLIB_STATUS
 proc_field_table( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size() - 1].Operand();
-  StackValue temp = op.GetTableValue();
-
-  stack.Pop(1);
-  stack.Push(move(temp));
-
+  const auto stackTop = stack.Size() - 1;
+  IOperand& op = stack[stackTop].Operand();
+  stack[stackTop] = op.IsNull() ? StackValue() : op.GetTableValue();
   return WOP_OK;
 }
 
@@ -62,24 +58,20 @@ proc_field_table( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_field_isindexed( SessionStack& stack, ISession&)
 {
-  IOperand& op = stack[stack.Size() - 1].Operand();
+  const auto stackTop = stack.Size() - 1;
+  IOperand& op = stack[stackTop].Operand();
 
   if (op.IsNull())
   {
-    stack.Pop(1);
-    stack.Push(DBool());
-
+    stack[stackTop] = StackValue::Create(DBool());
     return WOP_OK;
   }
 
   ITable&           table = op.GetTable();
   const FIELD_INDEX field = op.GetField();
 
-  DBool result( table.IsIndexed( field));
-
-  stack.Pop(1);
-  stack.Push( result);
-
+  DBool result(table.IsIndexed(field));
+  stack[stackTop] = StackValue::Create(result);
   return WOP_OK;
 }
 
@@ -87,13 +79,12 @@ proc_field_isindexed( SessionStack& stack, ISession&)
 static WLIB_STATUS
 proc_field_name( SessionStack& stack, ISession&)
 {
+  const auto stackTop = stack.Size() - 1;
   IOperand& op = stack[stack.Size() - 1].Operand();
 
   if (op.IsNull())
   {
-    stack.Pop(1);
-    stack.Push(DText());
-
+    stack[stackTop] = StackValue::Create(DText());
     return WOP_OK;
   }
 
@@ -103,31 +94,7 @@ proc_field_name( SessionStack& stack, ISession&)
   DBSFieldDescriptor fd = table.DescribeField(field);
   DText result(fd.name);
 
-  stack.Pop(1);
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-static WLIB_STATUS
-proc_field_index( SessionStack& stack, ISession&)
-{
-  IOperand& op = stack[stack.Size() - 1].Operand();
-
-  if (op.IsNull())
-  {
-    stack.Pop(1);
-    stack.Push(DUInt64());
-
-    return WOP_OK;
-  }
-
-  const uint64_t field = op.GetField();
-
-  stack.Pop(1);
-  stack.Push(DUInt64(field));
-
+  stack[stackTop] = StackValue::Create(result);
   return WOP_OK;
 }
 
@@ -135,15 +102,19 @@ proc_field_index( SessionStack& stack, ISession&)
 template<typename T> DArray
 match_field_rows( ITable&               table,
                   const FIELD_INDEX     field,
-                  const T&              from,
-                  const T&              to,
-                  const ROW_INDEX       fromRow,
-                  const ROW_INDEX       toRow)
+                  T                     from,
+                  T                     to,
+                  ROW_INDEX             fromRow,
+                  ROW_INDEX             toRow)
 {
-  if (from <= to)
-    return table.MatchRows(from, to, fromRow, toRow, field);
+  if (to < from)
+    swap(from, to);
 
-  return table.MatchRows(to, from, fromRow, toRow, field);
+  if (toRow < fromRow)
+    swap(fromRow, toRow);
+
+  return table.MatchRows(from, to, fromRow, toRow, field);
+
 }
 
 
@@ -164,18 +135,19 @@ proc_field_find_range( SessionStack& stack, ISession&)
   if (IS_ARRAY( fieldType)
       || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
       || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
-    {
-      throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
-                            "Matching field values is available only for "
-                              "basic types( e.g. reals, integers, dates, etc. "
-                              "and not for arrays or text.");
+  {
+    throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
+                          "Matching field values is available only for "
+                          "basic types( e.g. reals, integers, dates, etc. "
+                          "and not for arrays or text.");
 
-    }
+  }
 
-  IOperand& opFrom = stack[stack.Size() - 4].Operand();
-  IOperand& opTo = stack[stack.Size() - 3].Operand();
-  IOperand& opFromRow = stack[stack.Size() - 2].Operand();
-  IOperand& opToRow = stack[stack.Size() - 1].Operand();
+  const auto stackTop = stack.Size() - 1;
+  IOperand& opFrom = stack[stackTop - 3].Operand();
+  IOperand& opTo = stack[stackTop - 2].Operand();
+  IOperand& opFromRow = stack[stackTop - 1].Operand();
+  IOperand& opToRow = stack[stackTop].Operand();
   ITable& table = opField.GetTable();
   DArray result;
   DUInt64 row;
@@ -353,64 +325,252 @@ proc_field_find_range( SessionStack& stack, ISession&)
   return WOP_OK;
 }
 
-
-template<typename T> uint64_t
-retrieve_minim_value(ITable& table, const FIELD_INDEX field)
+template<typename T> bool
+is_in_set(const DArray& set, const T e, const bool addNull)
 {
-  const uint64_t rowsCount = table.AllocatedRows();
-  T minim = T::Max();
-  uint64_t foundRow = 0;
+  if (e.IsNull())
+    return addNull;
 
-  for (ROW_INDEX row = 0; row < rowsCount; ++row)
+  const uint_t to = set.Count();
+  for (uint_t from = 0; from < to; ++from)
   {
-    T value;
-    table.Get(row, field, value);
+    T current;
+    set.Get(from, current);
 
-    if ( !value.IsNull() && (value <= minim))
-    {
-      minim = value;
-      foundRow = row;
-    }
+    if (current == e)
+      return true;
   }
 
-  return foundRow;
+  return false;
+}
+
+template<typename T> DArray
+test_rows (ITable& table,
+           const FIELD_INDEX f,
+           DArray& rows,
+           DArray& set,
+           const bool addNull,
+           const bool fiterOut)
+{
+  DArray result;
+
+  const ROW_INDEX rowsCount = table.AllocatedRows();
+  const ROW_INDEX count = rows.Count();
+  for ( ROW_INDEX i = 0; i < count; ++i)
+  {
+    DROW_INDEX row;
+    rows.Get(i, row);
+
+    if (row.mValue >= rowsCount)
+      continue ;
+
+    T current;
+    table.Get(row.mValue, f, current);
+
+    const bool inSet = is_in_set(set, current, addNull);
+    if (inSet ^ fiterOut)
+      result.Add(row);
+  }
+
+  return result;
 }
 
 
-template<typename T> uint64_t
-retrieve_maxim_value( ITable&           table,
-                      const FIELD_INDEX field)
+
+static WLIB_STATUS
+proc_field_filter_rows(SessionStack& stack, ISession&)
+{
+  DArray result;
+
+  const auto stackTop = stack.Size() - 1;
+  IOperand& field = stack[stackTop - 4].Operand();
+
+  if (field.IsNullExpression() || field.IsNull())
+  {
+    stack.Pop(5);
+    stack.Push(result);
+
+    return WOP_OK;
+  }
+
+  const uint_t fieldType = field.GetType();
+  if (IS_ARRAY( fieldType)
+      || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
+      || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
+  {
+    throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
+                          "Matching field values is available only for "
+                          "basic types( e.g. reals, integers, dates, etc. "
+                          "and not for arrays or text.");
+
+  }
+
+  DArray set, rows;
+  DBool addNull, filterout;
+
+  stack[stackTop - 0].Operand().GetValue(filterout);
+  stack[stackTop - 1].Operand().GetValue(addNull);
+  stack[stackTop - 2].Operand().GetValue(rows);
+  stack[stackTop - 3].Operand().GetValue(set);
+
+  if (filterout.IsNull())
+    filterout = DBool(false);
+
+  if (addNull.IsNull())
+    addNull = DBool(false);
+
+  if ( ! set.IsNull() && GET_BASIC_TYPE(set.Type()) != GET_BASIC_TYPE(fieldType))
+    throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
+
+  ITable& table = field.GetTable();
+  const FIELD_INDEX f = field.GetField();
+  switch (GET_BASIC_TYPE(fieldType))
+  {
+  case T_BOOL:
+    result = test_rows<DBool>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_CHAR:
+    result = test_rows<DChar>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_DATE:
+    result = test_rows<DDate>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_DATETIME:
+    result = test_rows<DDateTime>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_HIRESTIME:
+    result = test_rows<DHiresTime>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_INT8:
+    result = test_rows<DInt8>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_INT16:
+    result = test_rows<DInt16>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_INT32:
+    result = test_rows<DInt32>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_INT64:
+    result = test_rows<DInt64>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_UINT8:
+    result = test_rows<DUInt8>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_UINT16:
+    result = test_rows<DUInt16>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_UINT32:
+    result = test_rows<DUInt32>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_UINT64:
+    result = test_rows<DUInt64>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_REAL:
+    result = test_rows<DUInt64>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  case T_RICHREAL:
+    result = test_rows<DRichReal>(table, f, rows, set, addNull.mValue, filterout.mValue);
+    break;
+
+  default:
+    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+  }
+
+  stack.Pop(5);
+  stack.Push(result);
+  return WOP_OK;
+}
+
+
+template<typename T> DArray
+retrieve_minim_value(ITable& table, const FIELD_INDEX field, T margin)
 {
   const uint64_t rowsCount = table.AllocatedRows();
-  T maxim = T::Min();
-  uint64_t foundRow = 0;
+  T minim = T::Max();
+  DArray result;
+
+  if (margin.IsNull())
+    margin = T::Min();
 
   for (ROW_INDEX row = 0; row < rowsCount; ++row)
   {
     T value;
     table.Get(row, field, value);
 
-    if ( !value.IsNull() && (maxim <= value))
+    if ( ! value.IsNull() && (value > margin))
     {
-      maxim = value;
-      foundRow = row;
+      if (value < minim)
+      {
+        minim = value;
+        result = DArray();
+        result.Add(DROW_INDEX(row));
+      }
+      else if (value == minim)
+        result.Add(DROW_INDEX(row));
     }
   }
 
-  return foundRow;
+  return result;
+}
+
+
+template<typename T> DArray
+retrieve_maxim_value( ITable& table, const FIELD_INDEX field, T margin)
+{
+  const uint64_t rowsCount = table.AllocatedRows();
+  T maxim = T::Min();
+  DArray result;
+
+  if (margin.IsNull())
+    margin = T::Max();
+
+  for (ROW_INDEX row = 0; row < rowsCount; ++row)
+  {
+    T value;
+    table.Get(row, field, value);
+
+    if ( ! value.IsNull() && (value < margin))
+    {
+      if (maxim < value)
+      {
+        maxim = value;
+        result = DArray();
+        result.Add(DROW_INDEX(row));
+      }
+      else if (maxim == value)
+        result.Add(DROW_INDEX(row));
+    }
+  }
+
+  return result;
 }
 
 
 template<bool minSearch> WLIB_STATUS
 field_search_minmax( SessionStack& stack, ISession&)
 {
-  IOperand& opField = stack[stack.Size() - 1].Operand();
-  uint64_t foundRow;
+  const auto stackTop = stack.Size() - 1;
+  IOperand& opField = stack[stackTop - 1].Operand();
+  DArray foundRows;
 
   if (opField.IsNull())
   {
     stack.Pop(1);
-    stack.Push(DUInt64());
+    stack[stackTop - 1] = StackValue::Create(DUInt64());
 
     return WOP_OK;
   }
@@ -432,127 +592,152 @@ field_search_minmax( SessionStack& stack, ISession&)
   {
   case T_BOOL:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DBool>(table, field) : retrieve_maxim_value<DBool>(table, field);
+    DBool margin;
+    stack[stackTop].Operand().GetValue(margin);
+
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_CHAR:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DChar>(table, field) : retrieve_maxim_value<DChar>(table, field);
+    DChar margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_DATE:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DDate>(table, field) : retrieve_maxim_value<DDate>(table, field);
+    DDate margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_DATETIME:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DDateTime>(table, field) :
-            retrieve_maxim_value<DDateTime>(table, field);
+    DDateTime margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_HIRESTIME:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DHiresTime>(table, field) :
-            retrieve_maxim_value<DHiresTime>(table, field);
+    DHiresTime margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_INT8:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DInt8>(table, field) : retrieve_maxim_value<DInt8>(table, field);
+    DInt8 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_INT16:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DInt16>(table, field) : retrieve_maxim_value<DInt16>(table, field);
+    DInt16 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_INT32:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DInt32>(table, field) : retrieve_maxim_value<DInt32>(table, field);
+    DInt32 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_INT64:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DInt32>(table, field) : retrieve_maxim_value<DInt32>(table, field);
+    DInt64 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_UINT8:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DUInt8>(table, field) : retrieve_maxim_value<DUInt8>(table, field);
+    DUInt8 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_UINT16:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DUInt16>(table, field) :
-            retrieve_maxim_value<DUInt16>(table, field);
+    DUInt16 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_UINT32:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DUInt32>(table, field) :
-            retrieve_maxim_value<DUInt32>(table, field);
+    DUInt32 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_UINT64:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DUInt64>(table, field) :
-            retrieve_maxim_value<DUInt64>(table, field);
+    DUInt64 margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_REAL:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DReal>(table, field) : retrieve_maxim_value<DReal>(table, field);
+    DReal margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
   case T_RICHREAL:
   {
-    foundRow =
-        minSearch ?
-            retrieve_minim_value<DRichReal>(table, field) :
-            retrieve_maxim_value<DRichReal>(table, field);
+    DRichReal margin;
+    stack[stackTop].Operand().GetValue(margin);
+    foundRows = minSearch
+                ? retrieve_minim_value(table, field, margin)
+                : retrieve_maxim_value(table, field, margin);
   }
     break;
 
@@ -561,7 +746,7 @@ field_search_minmax( SessionStack& stack, ISession&)
   }
 
   stack.Pop(1);
-  stack.Push(DUInt64(foundRow));
+  stack[stackTop - 1] = StackValue::Create(foundRows);
 
   return WOP_OK;
 }
@@ -594,149 +779,6 @@ compute_integer_field_average_value(ITable& table, const FIELD_INDEX field)
   return DRichReal(quotient + reminder / rowsAdded);
 }
 
-
-template<typename T> DRichReal
-compute_real_field_average_value(ITable& table, const FIELD_INDEX field)
-{
-  const uint64_t rowsCount = table.AllocatedRows();
-  uint64_t rowsAdded = 0;
-  WE_I128 integerSum = 0, fractionalSum = 0;
-
-  T currentValue;
-  for (uint64_t row = 0; row < rowsCount; ++row)
-  {
-    table.Get(row, field, currentValue);
-
-    if ( !currentValue.IsNull())
-    {
-      const RICHREAL_T temp = currentValue.mValue;
-
-      integerSum += temp.Integer();
-      fractionalSum += temp.Fractional();
-
-      ++rowsAdded;
-    }
-  }
-
-  if (rowsAdded == 0)
-    return DRichReal();
-
-  integerSum += fractionalSum / DBS_RICHREAL_PREC;
-  fractionalSum %= DBS_RICHREAL_PREC;
-
-  RICHREAL_T result = _SC(RICHREAL_T, integerSum) / rowsAdded;
-  result += RICHREAL_T(0, toInt64(fractionalSum), DBS_RICHREAL_PREC) / rowsAdded;
-
-  return DRichReal(result);
-}
-
-
-static WLIB_STATUS
-compute_field_average( SessionStack& stack, ISession&)
-{
-  IOperand& opField = stack[stack.Size() - 1].Operand();
-
-  if (opField.IsNull())
-  {
-    stack.Pop(1);
-    stack.Push(DRichReal());
-
-    return WOP_OK;
-  }
-
-  const uint_t fieldType = opField.GetType();
-  if (IS_ARRAY( fieldType)
-      || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
-                         "Computing field average value is available only for basic types( e.g."
-                         " reals, integers, dates, etc. and not for arrays or text.");
-  }
-
-  ITable&           table = opField.GetTable();
-  const FIELD_INDEX field = opField.GetField();
-  DRichReal         result;
-
-  switch (fieldType)
-  {
-  case T_INT8:
-    result = compute_integer_field_average_value<DInt8>(table, field);
-    break;
-
-  case T_INT16:
-    result = compute_integer_field_average_value<DInt16>(table, field);
-    break;
-
-  case T_INT32:
-    result = compute_integer_field_average_value<DInt32>(table, field);
-    break;
-
-  case T_INT64:
-    result = compute_integer_field_average_value<DInt64>(table, field);
-    break;
-
-  case T_UINT8:
-    result = compute_integer_field_average_value<DUInt8>(table, field);
-    break;
-
-  case T_UINT16:
-    result = compute_integer_field_average_value<DUInt16>(table, field);
-    break;
-
-  case T_UINT32:
-    result = compute_integer_field_average_value<DUInt32>(table, field);
-    break;
-
-  case T_UINT64:
-    result = compute_integer_field_average_value<DUInt64>(table, field);
-    break;
-
-  case T_REAL:
-    result = compute_real_field_average_value<DReal>(table, field);
-    break;
-
-  case T_RICHREAL:
-    result = compute_real_field_average_value<DRichReal>(table, field);
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
-  }
-
-  stack.Pop(1);
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-static WLIB_STATUS
-field_sort_table( SessionStack& stack, ISession&)
-{
-  DBool result, reverseSort;
-
-  IOperand& opField = stack[stack.Size() - 2].Operand();
-  stack[stack.Size() - 1].Operand().GetValue(reverseSort);
-
-  if ( !opField.IsNull())
-  {
-    const FIELD_INDEX field = opField.GetField();
-    ITable& table = opField.GetTable();
-
-    const auto rowsCount = table.AllocatedRows();
-    if (rowsCount != 0)
-    {
-      table.Sort(field, 0, rowsCount - 1, reverseSort == DBool(true));
-      result = DBool(true);
-    }
-  }
-
-  stack.Pop(1);
-  return WOP_OK;
-}
-
-
 WLIB_STATUS
 base_fields_init()
 {
@@ -745,7 +787,7 @@ base_fields_init()
                                                 gGenericFieldType
                                              };
 
-  gProcFieldTable.name        = "table_of_field";
+  gProcFieldTable.name        = "get_table";
   gProcFieldTable.localsCount = 2;
   gProcFieldTable.localsTypes = fieldTableLocals;
   gProcFieldTable.code        = proc_field_table;
@@ -756,7 +798,7 @@ base_fields_init()
                                                     gGenericFieldType
                                                  };
 
-  gProcIsFielsIndexed.name        = "field_values_indexed";
+  gProcIsFielsIndexed.name        = "is_indexed";
   gProcIsFielsIndexed.localsCount = 2;
   gProcIsFielsIndexed.localsTypes = fieldIsIndexedLocals;
   gProcIsFielsIndexed.code        = proc_field_isindexed;
@@ -764,30 +806,19 @@ base_fields_init()
 
   static const uint8_t* fieldNameLocals[] = { gTextType, gGenericFieldType };
 
-  gProcFieldName.name        = "field_name";
+  gProcFieldName.name        = "get_name";
   gProcFieldName.localsCount = 2;
   gProcFieldName.localsTypes = fieldNameLocals;
   gProcFieldName.code        = proc_field_name;
 
 
-  static const uint8_t* fieldIndexLocals[] = {
-                                                gUInt64Type,
-                                                gGenericFieldType
-                                             };
-
-  gProcFieldIndex.name        = "field_index";
-  gProcFieldIndex.localsCount = 2;
-  gProcFieldIndex.localsTypes = fieldIndexLocals;
-  gProcFieldIndex.code        = proc_field_index;
-
-
   static const uint8_t* fieldMatchValuesLocals[] = {
-                                                     gAUInt64Type,
+                                                     gAUInt32Type,
                                                      gGenericFieldType,
                                                      gUndefinedType,
                                                      gUndefinedType,
-                                                     gUInt64Type,
-                                                     gUInt64Type
+                                                     gUInt32Type,
+                                                     gUInt32Type
                                                    };
 
   gProcFindValueRange.name        = "match_rows";
@@ -796,45 +827,37 @@ base_fields_init()
   gProcFindValueRange.code        = proc_field_find_range;
 
 
+  static const uint8_t* fieldFilterRowsLocals[] = {
+                                                     gAUInt32Type,
+                                                     gGenericFieldType,
+                                                     gGenericArrayType,
+                                                     gAUInt32Type,
+                                                     gBoolType,
+                                                     gBoolType
+                                                    };
+
+  gProcFilterRows.name        = "filter_rows";
+  gProcFilterRows.localsCount = 6;
+  gProcFilterRows.code        = proc_field_filter_rows;
+  gProcFilterRows.localsTypes = fieldFilterRowsLocals;
+
+
+
   static const uint8_t* fieldMinimumLocals[] = {
-                                                 gUInt64Type,
+                                                 gAUInt32Type,
                                                  gGenericFieldType,
-                                                 gBoolType,
                                                  gUndefinedType
                                                };
 
-  gProcFieldMinimum.name        = "field_biggest";
-  gProcFieldMinimum.localsCount = 4;
+  gProcFieldMinimum.name        = "get_biggest";
+  gProcFieldMinimum.localsCount = 3;
   gProcFieldMinimum.localsTypes = fieldMinimumLocals;
-  gProcFieldMinimum.code        = field_search_minmax<true>;
+  gProcFieldMinimum.code        = field_search_minmax<false>;
 
-  gProcFieldMaximum.name        = "field_smallest";
-  gProcFieldMaximum.localsCount = 4;
+  gProcFieldMaximum.name        = "get_smallest";
+  gProcFieldMaximum.localsCount = 3;
   gProcFieldMaximum.localsTypes = fieldMinimumLocals; //reusing
-  gProcFieldMaximum.code        = field_search_minmax<false>;
-
-
-  static const uint8_t* fieldAverageLocals[] = {
-                                                 gRichRealType,
-                                                 gGenericFieldType
-                                               };
-
-  gProcFieldAverage.name        = "field_average";
-  gProcFieldAverage.localsCount = 2;
-  gProcFieldAverage.localsTypes = fieldAverageLocals;
-  gProcFieldAverage.code        = compute_field_average;
-
-
-  static const uint8_t* fieldSortTableLocals[] = {
-                                                   gGenericTableType,
-                                                   gGenericFieldType,
-                                                   gBoolType
-                                                 };
-
-  gProcFieldSortTable.name        = "field_sort_table";
-  gProcFieldSortTable.localsCount = 3;
-  gProcFieldSortTable.localsTypes = fieldSortTableLocals;
-  gProcFieldSortTable.code        = field_sort_table;
+  gProcFieldMaximum.code        = field_search_minmax<true>;
 
   return WOP_OK;
 }

@@ -54,8 +54,7 @@ DO
 
     test_global_value1 = 1;
     
-    array_pushback (test_global_value2, -1);
-    array_pushback (test_global_value2, -2);
+    test_global_value2 += {-1, -2};
 
     test_global_value3 = "First text";
     
@@ -64,8 +63,8 @@ DO
     test_global_value6 = test_global_value7.f3;
     
     test_global_value4[0] = 10;
-    array_pushback (test_global_value5[0], -10);
-    array_pushback (test_global_value5[0], -20);
+    test_global_value5[0] += -10;
+    test_global_value5[0] += -20;
     
     test_global_value6[0] = "First field text";
 
@@ -83,8 +82,8 @@ DO
     test_global_value1 = 2;
     
     test_global_value2 = NULL;
-    array_pushback (test_global_value2, -3);
-    array_pushback (test_global_value2, -5);
+    test_global_value2 += -3;
+    test_global_value2 += -5;
 
     test_global_value3 = "Second text";
     
@@ -100,8 +99,7 @@ DO
     test_global_value4[0] = -90;
 
     test_global_value4[0] = -13;
-    array_pushback (test_global_value5[0], 45544321);
-    array_pushback (test_global_value5[0], -67811121);
+    test_global_value5[0] += {45544321, -67811121} INT32;
     
     test_global_value6[0] = "Second field text";
 
@@ -124,12 +122,12 @@ DO
         RETURN FALSE;
     END
     
-    IF ((array_count (test_global_value2) != 2)
+    IF ((count (test_global_value2) != 2)
         OR (test_global_value2[0] != -1)
         OR (test_global_value2[1] != -2)) DO
         
         write_log ("First stage global 'test_global_value2' is not correct. ['" +
-			array_count (test_global_value2) + "' '" +
+			count (test_global_value2) + "' '" +
 			test_global_value2[0]	         + "' '" +
 			test_global_value2[1]	         + "']");
         RETURN FALSE;
@@ -147,8 +145,8 @@ DO
         RETURN FALSE;
     END
     
-    IF ((array_count (test_global_value7.f2[0]) != 2)
-        OR (array_count (test_global_value5[0]) != 2)
+    IF ((count (test_global_value7.f2[0]) != 2)
+        OR (count (test_global_value5[0]) != 2)
         OR (test_global_value7.f2[0][0] != -10) OR (test_global_value7.f2[0][0] != test_global_value5[0][0])
         OR (test_global_value7.f2[0][1] != -20) OR (test_global_value7.f2[0][1] != test_global_value5[0][1])) 
     DO
@@ -173,7 +171,7 @@ DO
         RETURN FALSE;
     END
     
-    IF ((array_count (test_global_value2) != 2)
+    IF ((count (test_global_value2) != 2)
         OR (test_global_value2[0] != -3)
         OR (test_global_value2[1] != -5))  DO
         
@@ -202,8 +200,8 @@ DO
         RETURN FALSE;
     END
     
-    IF ((array_count (test_global_value7.f2_2[0]) != 2)
-        OR (array_count (test_global_value5[0]) != 2)
+    IF ((count (test_global_value7.f2_2[0]) != 2)
+        OR (count (test_global_value5[0]) != 2)
         OR (test_global_value7.f2_2[0][0] != 45544321) OR (test_global_value7.f2_2[0][0] != test_global_value5[0][0])
         OR (test_global_value7.f2_2[0][1] != -67811121) OR (test_global_value7.f2_2[0][1] != test_global_value5[0][1])) 
      DO

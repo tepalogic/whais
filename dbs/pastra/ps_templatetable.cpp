@@ -2414,7 +2414,7 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
   FieldIndexNodeManager* const nodeMgr = mvIndexNodeMgrs[field];
 
   NODE_INDEX nodeId;
-  KEY_INDEX keyIndex;
+  KEY_INDEX fromKey;
   const T_BTreeKey<T> firstKey(min, fromRow);
   const T_BTreeKey<T> lastKey(max, toRow);
 
@@ -2426,13 +2426,12 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
   {
     BTree fieldIndexTree( *nodeMgr);
 
-    if ( !fieldIndexTree.FindBiggerOrEqual(firstKey, &nodeId, &keyIndex))
+    if ( !fieldIndexTree.FindBiggerOrEqual(firstKey, &nodeId, &fromKey))
       goto force_return;
 
     auto currentNode = nodeMgr->RetrieveNode(nodeId);
 
-    assert(keyIndex < currentNode->KeysCount());
-
+    assert(fromKey < currentNode->KeysCount());
     while (true)
     {
       IBTreeFieldIndexNode* node = _SC(IBTreeFieldIndexNode*, &*currentNode);
@@ -2450,7 +2449,8 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
       else
         toKey = 0;
 
-      node->GetRows(keyIndex, toKey, result);
+      if (fromKey >= toKey)
+        node->GetRows(fromKey, toKey, fromRow, toRow, result);
 
       if (lastNode || (node->Next() == NIL_NODE))
         break;
@@ -2461,7 +2461,7 @@ PrototypeTable::MatchRowsWithIndex(const T&          min,
 
         assert(currentNode->KeysCount() > 0);
 
-        keyIndex = currentNode->KeysCount() - 1;
+        fromKey = currentNode->KeysCount() - 1;
       }
     }
   }

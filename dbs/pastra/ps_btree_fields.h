@@ -96,7 +96,10 @@ public:
    {
    }
 
-  virtual void GetRows(KEY_INDEX fromPos, KEY_INDEX toPos, DArray& output) const = 0;
+  virtual void GetRows(KEY_INDEX fromPos,
+                       KEY_INDEX toPos,
+                       const ROW_INDEX fromRow,
+                       const ROW_INDEX toRow, DArray& output) const = 0;
 };
 
 
@@ -391,7 +394,11 @@ public:
     return _sentinel;
   }
 
-  virtual void GetRows(KEY_INDEX fromPos, KEY_INDEX toPos, DArray& output) const
+  virtual void GetRows(KEY_INDEX fromPos,
+                       KEY_INDEX toPos,
+                       const ROW_INDEX fromRow,
+                       const ROW_INDEX toRow,
+                       DArray& output) const
   {
     assert(fromPos >= toPos);
     assert(fromPos < KeysCount());
@@ -403,15 +410,19 @@ public:
 
     while (fromPos >= toPos)
     {
-      if (sizeof(ROW_INDEX) == 8)
-        output.Add(DUInt64(Serializer::LoadRow(rows + fromPos)));
-
-      else if (sizeof(ROW_INDEX) == 4)
-        output.Add(DUInt32(Serializer::LoadRow(rows + fromPos)));
-
-      else
+      const auto row = Serializer::LoadRow(rows + fromPos);
+      if (fromRow <= row && row <= toRow)
       {
-        assert(false);
+        if (sizeof(ROW_INDEX) == 8)
+          output.Add(DUInt64(Serializer::LoadRow(rows + fromPos)));
+
+        else if (sizeof(ROW_INDEX) == 4)
+          output.Add(DUInt32(Serializer::LoadRow(rows + fromPos)));
+
+        else
+        {
+          assert(false);
+        }
       }
 
       if (fromPos == 0)

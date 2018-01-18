@@ -12,7 +12,7 @@
 PROCEDURE test_field_sort (t TABLE, f UINT64, reverse BOOL)
 RETURN TABLE
 DO
-	field_sort_table (get_fieldth (t, f), reverse);
+	sort_table (t, {f} UINT16, {reverse} );
 
 	RETURN t;
 ENDPROC
@@ -21,43 +21,35 @@ ENDPROC
 PROCEDURE test_field_mimim (t TABLE, f UINT64)
 RETURN UNDEFINED
 DO
-	return field_smallest (get_fieldth (t, f));
+	return get_smallest (get_fieldth (t, f));
 ENDPROC
 
 
 PROCEDURE test_field_maxim (t TABLE, f UINT64)
 RETURN UNDEFINED
 DO
-	return field_biggest (get_fieldth (t, f));
+	return get_biggest (get_fieldth (t, f));
 ENDPROC
-
-
-PROCEDURE test_field_average (t TABLE, f UINT64)
-RETURN RICHREAL
-DO
-	return field_average (get_fieldth (t, f));
-ENDPROC
-
 
 PROCEDURE test_field_name (t TABLE, f UINT64)
 RETURN TEXT
 DO
-	return field_name (get_fieldth (t, f));
+	return get_name (get_fieldth (t, f));
 ENDPROC
 
 
 PROCEDURE test_field_match (t		TABLE, 
-							f		UINT64,
-						    min		UNDEFINED,
-						    max		UNDEFINED,
-						    fromRow UINT64,
-						    toRow   UINT64)
-RETURN UINT64 ARRAY
+	     		    f		UINT64,
+			    min		UNDEFINED,
+			    max		UNDEFINED,
+			    fromRow UINT64,
+			    toRow   UINT64)
+RETURN UINT32 ARRAY
 DO
 	return match_rows (get_fieldth (t, f), 
 	                   min,
-                       max,
-                       fromRow,
-                       toRow);
+                       	   max,
+	                   fromRow,
+         	           toRow);
 ENDPROC
 

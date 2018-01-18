@@ -171,6 +171,8 @@ basic_type_spec: BOOL
 
 array_type_spec: array_of_clause ARRAY
                     {    $$ = $1; MARK_ARRAY (($$)->val.u_tspec.type); }
+               | ARRAY array_of_clause
+                    {    $$ = $2; MARK_ARRAY (($$)->val.u_tspec.type); }
 ;
 
 array_of_clause: /* empty */
@@ -183,6 +185,8 @@ array_of_clause: /* empty */
 
 field_type_spec: field_of_clause FIELD
                     {   $$ = $1; MARK_FIELD (($$)->val.u_tspec.type); }
+               | FIELD field_of_clause
+                    {   $$ = $2; MARK_FIELD (($$)->val.u_tspec.type); } 
 ;
 
 field_of_clause: /* empty */

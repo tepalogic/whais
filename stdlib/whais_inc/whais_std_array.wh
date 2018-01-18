@@ -44,7 +44,8 @@ EXTERN PROCEDURE sort(a ARRAY, r BOOL, unique BOOL) RETURN BOOL;
 #Search the smallest element.
 #In:
 #   @a       - An array value.
-#   @first   - TRUE in case of duplicates entries it will return the last or
+#   @first   - TRUE in case of duplicates entries it will return the first.
+#              Otherwise it will return the last.
 #              the first such index
 #   @min     - Search only for values that are bigger or equal with this one. 
 #Out:
@@ -54,20 +55,12 @@ EXTERN PROCEDURE get_min(a ARRAY, first BOOL, min UNDEFINED) RETURN UINT64;
 #Search the biggest element.
 #In:
 #   @a       - An array value.
-#   @first   - TRUE in case of duplicates entries it will return the last or
-#              the first such index
+#   @first   - TRUE in case of duplicates entries it will return the first.
+#              Otherwise it will return the last.
 #   @max     - Search only for values that are less or equal with this one. 
 #Out:
 #   The index where the element can be found in the array.
 EXTERN PROCEDURE get_max(a ARRAY, first BOOL, max UNDEFINED) RETURN UINT64;
-
-#Set operations with array elements.
-EXTERN PROCEDURE array_intersection (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
-EXTERN PROCEDURE array_union (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
-EXTERN PROCEDURE array_diff (a1 ARRAY, a2 ARRAY) RETURN ARRAY;
-
-#Add an element into an array
-EXTERN PROCEDURE array_pushback (a1 ARRAY, v UNDEFINED) RETURN ARRAY;
 
 #Truncate an array.
 EXTERN PROCEDURE truncate (a1 ARRAY, count UINT64) RETURN ARRAY;

@@ -204,12 +204,10 @@ static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                     &gProcFieldTable,
                                                     &gProcIsFielsIndexed,
                                                     &gProcFieldName,
-                                                    &gProcFieldIndex,
                                                     &gProcFindValueRange,
+                                                    &gProcFilterRows,
                                                     &gProcFieldMinimum,
                                                     &gProcFieldMaximum,
-                                                    &gProcFieldAverage,
-                                                    &gProcFieldSortTable,
                           /* Table procedures */
                                                     &gProcTableIsPersistent,
                                                     &gProcTableFieldsCount,

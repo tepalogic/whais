@@ -420,11 +420,11 @@ main()
             T_UINT16,
             std::vector<DUInt16>{DUInt16(0), DUInt16(1), DUInt16(0)});
 
-    success = success & test_array_op<DUInt16>(
+    success = success & test_array_op<DUInt32>(
             _SC(Session&, commonSession),
             "test_26",
             T_UINT32,
-            std::vector<DUInt16>{DUInt16(0), DUInt16(1)});
+            std::vector<DUInt32>{DUInt32(0), DUInt32(1)});
 
     success = success & test_array_op<DUInt8>(
             _SC(Session&, commonSession),
