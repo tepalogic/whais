@@ -26,8 +26,9 @@
 #define OPERANDS_H_
 
 #include <assert.h>
-#include <vector>
 #include <cstring>
+#include <vector>
+#include <type_traits>
 
 #include "dbs/dbs_mgr.h"
 #include "dbs/dbs_values.h"
@@ -153,6 +154,7 @@ public:
   explicit StackValue(const OP_T& op)
   {
     static_assert(sizeof(OP_T) <= sizeof(mStorage), "Stack value storage not big enough!");
+    static_assert(std::is_base_of<IOperand, OP_T>::value);
 
     _placement_new(mStorage, op);
 

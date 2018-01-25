@@ -29,7 +29,11 @@
 #@guard whais_std_array
 
 
-#Get the count of elements from an array.
+#Count the elements of an array.
+#In:
+#   @a       - An array value.
+#Out:
+#   The number of the elements contained in the array.
 EXTERN PROCEDURE count(a ARRAY) RETURN UINT64;
 
 #Sort the elements of array
@@ -38,32 +42,38 @@ EXTERN PROCEDURE count(a ARRAY) RETURN UINT64;
 #   @reverse - Set to TRUE to sort reversely.
 #   @unique  - Set to TRUE to remove duplicates.
 #Out:
-#   Another array but with the elements sort based on the specified order.
-EXTERN PROCEDURE sort(a ARRAY, r BOOL, unique BOOL) RETURN BOOL;
+#   Return the number of elements of the array, after sort.
+EXTERN PROCEDURE sort(a ARRAY, reverse BOOL, unique BOOL) RETURN UINT64;
 
 #Search the smallest element.
 #In:
 #   @a       - An array value.
-#   @first   - TRUE in case of duplicates entries it will return the first.
-#              Otherwise it will return the last.
-#              the first such index
-#   @min     - Search only for values that are bigger or equal with this one. 
+#   @min     - Search only for values that are bigger or equal with this one.
+#   @from    - The start position of the search
 #Out:
 #   The index where the element can be found in the array.
-EXTERN PROCEDURE get_min(a ARRAY, first BOOL, min UNDEFINED) RETURN UINT64;
+EXTERN PROCEDURE get_min(a ARRAY, min UNDEFINED, from UINT64) RETURN UINT64;
 
 #Search the biggest element.
 #In:
 #   @a       - An array value.
-#   @first   - TRUE in case of duplicates entries it will return the first.
-#              Otherwise it will return the last.
 #   @max     - Search only for values that are less or equal with this one. 
+#   @from    - The start position of the search
 #Out:
 #   The index where the element can be found in the array.
-EXTERN PROCEDURE get_max(a ARRAY, first BOOL, max UNDEFINED) RETURN UINT64;
+EXTERN PROCEDURE get_max(a ARRAY, max UNDEFINED, from UINT64) RETURN UINT64;
 
-#Truncate an array.
-EXTERN PROCEDURE truncate (a1 ARRAY, count UINT64) RETURN ARRAY;
+#Truncate the content of an array.
+#In:
+#   @a       - An array value.
+#   @count   - The count of the first elements of the array to be kept.  
+#Out:
+#   The new elements' count of the array.
+EXTERN PROCEDURE truncate (a ARRAY, count UINT64) RETURN UINT64;
 
-#Compute the corresponding array hash value.
+#Compute a hash value based on the elements of an array.
+#In:
+#   @a       - An array value.
+#Out:
+#   The hash value.
 EXTERN PROCEDURE hash_array (a ARRAY) RETURN UINT64;

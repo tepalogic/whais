@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <cassert>
+#include <algorithm>
 
 #include "utils/we_int128.h"
 #include "utils/whash.h"
@@ -30,8 +31,8 @@
 #include "base_types.h"
 
 
-
 using namespace whais;
+using namespace std;
 
 
 
@@ -55,12 +56,45 @@ array_elems_count( SessionStack& stack, ISession&)
 {
   DArray array;
 
-  stack[stack.Size() - 1].Operand().GetValue( array);
-  stack.Pop(1);
+  const auto firstParam = stack.Size() - 1;
+  IOperand& op = stack[firstParam].Operand();
 
-  stack.Push( DUInt64(array.Count()));
+  if (op.IsNull())
+  {
+    stack[firstParam] = StackValue::Create(DUInt64(0));
+    return WOP_OK;
+  }
+
+  op.GetValue( array);
+  stack[firstParam] = StackValue::Create(DUInt64(array.Count()));
 
   return WOP_OK;
+}
+
+template<typename T> DArray
+remove_array_duplicates(DArray& source)
+{
+  T value;
+  DArray result;
+
+  source.Get(0, value);
+  result.Add(value);
+
+  const auto count = source.Count();
+  assert (count > 0);
+
+  for (uint64_t i = 1; i < count; ++i)
+  {
+    T elem;
+    source.Get(i, elem);
+    if (elem == value)
+      continue;
+
+    value = elem;
+    result.Add(value);
+  }
+
+  return result;
 }
 
 
@@ -68,621 +102,340 @@ static WLIB_STATUS
 array_sort( SessionStack& stack, ISession&)
 {
   DArray array;
-  DBool  reverse;
+  DBool  reverse, removeDuplicates;
 
-  stack[stack.Size() - 2].Operand().GetValue( array);
-  stack[stack.Size() - 1].Operand().GetValue( reverse);
-  stack.Pop(2);
+  const auto paramsCount = 3;
+  const auto firstParam = stack.Size() - paramsCount;
 
-  array.Sort( reverse == DBool( true));
-
-  stack.Push( array);
-
-  return WOP_OK;
-}
-
-
-template<typename T> uint64_t
-binary_array_search(const DArray& array, const T& value, const DInt8& searchType)
-{
-  if (value.IsNull())
-    return NOT_FOUND_VALUE;
-
-  const uint64_t arrayCount = array.Count();
-
-  assert(arrayCount > 0);
-
-  uint64_t i = 0, j = arrayCount;
-  T current;
-
-  while (i < j)
+  if (stack[firstParam].Operand().IsNull())
   {
-    const uint64_t c = (i + j) / 2;
-
-    array.Get(c, current);
-
-    if (value < current)
-      j = c;
-
-    else
-      i = c;
-  }
-
-  assert(i == j);
-
-  if (i < arrayCount)
-    array.Get(i, current);
-
-  else
-    current = T();
-
-  assert(current.IsNull() || (value <= current));
-
-  if (current == value)
-    return i;
-
-  if (searchType.IsNull() || (searchType.mValue == 0))
-    return NOT_FOUND_VALUE;
-
-  else if (searchType.mValue < 0)
-    return (i == 0) ? NOT_FOUND_VALUE : i - 1;
-
-  return i == array.Count() ? NOT_FOUND_VALUE : i;
-}
-
-
-static WLIB_STATUS
-binary_array_search_proc( SessionStack& stack, ISession&)
-{
-  uint64_t foundPos;
-  DArray array;
-
-  stack[stack.Size() - 3].Operand().GetValue(array);
-
-  if (array.IsNull())
-  {
-    stack.Pop(3);
-    stack.Push(DUInt64());
+    stack.Pop(paramsCount - 1);
+    stack[firstParam] = StackValue::Create(DUInt64(0));
 
     return WOP_OK;
   }
 
-  DInt8 searchType;
-  stack[stack.Size() - 1].Operand().GetValue(searchType);
+  stack[firstParam].Operand().GetValue( array);
+  stack[firstParam + 1].Operand().GetValue(reverse);
+  stack[firstParam + 2].Operand().GetValue(removeDuplicates);
 
-  switch (array.Type())
+  if (reverse.IsNull())
+    reverse = DBool(false);
+
+  if (removeDuplicates.IsNull())
+    removeDuplicates = DBool(false);
+
+  array.Sort(reverse.mValue);
+  if (removeDuplicates.mValue && (array.Count() > 1))
   {
-  case T_BOOL:
-  {
-    DBool value;
+    switch (GET_BASIC_TYPE(array.Type()))
+    {
+    case T_BOOL:
+      array = remove_array_duplicates<DBool>(array);
+      break;
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
+    case T_CHAR:
+      array = remove_array_duplicates<DChar>(array);
+      break;
 
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
+    case T_DATE:
+      array = remove_array_duplicates<DDate>(array);
+      break;
 
-  case T_CHAR:
-  {
-    DChar value;
+    case T_DATETIME:
+      array = remove_array_duplicates<DDateTime>(array);
+      break;
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
+    case T_HIRESTIME:
+      array = remove_array_duplicates<DHiresTime>(array);
+      break;
 
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
+    case T_INT8:
+      array = remove_array_duplicates<DInt8>(array);
+      break;
 
-  case T_DATE:
-  {
-    DDate value;
+    case T_INT16:
+      array = remove_array_duplicates<DInt16>(array);
+      break;
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
+    case T_INT32:
+      array = remove_array_duplicates<DInt32>(array);
+      break;
 
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
+    case T_INT64:
+      array = remove_array_duplicates<DInt64>(array);
+      break;
 
-  case T_DATETIME:
-  {
-    DDate value;
+    case T_UINT8:
+      array = remove_array_duplicates<DUInt8>(array);
+      break;
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
+    case T_UINT16:
+      array = remove_array_duplicates<DUInt16>(array);
+      break;
 
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
+    case T_UINT32:
+      array = remove_array_duplicates<DUInt32>(array);
+      break;
 
-  case T_HIRESTIME:
-  {
-    DDate value;
+    case T_UINT64:
+      array = remove_array_duplicates<DUInt64>(array);
+      break;
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
+    case T_REAL:
+      array = remove_array_duplicates<DReal>(array);
+      break;
 
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
+    case T_RICHREAL:
+      array = remove_array_duplicates<DRichReal>(array);
+      break;
 
-  case T_INT8:
-  {
-    DInt8 value;
+    default:
+        throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
+                             "Unexpected array type.");
 
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_INT16:
-  {
-    DInt16 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_INT32:
-  {
-    DInt32 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_INT64:
-  {
-    DInt64 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_UINT8:
-  {
-    DUInt8 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_UINT16:
-  {
-    DUInt16 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_UINT32:
-  {
-    DUInt32 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_UINT64:
-  {
-    DUInt64 value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_REAL:
-  {
-    DReal value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  case T_RICHREAL:
-  {
-    DReal value;
-
-    stack[stack.Size() - 2].Operand().GetValue(value);
-
-    foundPos = binary_array_search(array, value, searchType);
-  }
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
+    }
   }
 
-  stack.Pop(3);
-  stack.Push(foundPos == NOT_FOUND_VALUE ? DUInt64() : DUInt64(foundPos));
-
-  return WOP_OK;
-}
-
-template<typename T> uint64_t
-unsorted_array_search(const DArray& array, const T& value)
-{
-  if (value.IsNull())
-    return NOT_FOUND_VALUE;
-
-  const uint64_t arrayCount = array.Count();
-
-  assert(arrayCount > 0);
-
-  uint64_t i = 0;
-  T current;
-
-  while (i < arrayCount)
-  {
-    array.Get(i, current);
-
-    if (current == value)
-      return i;
-  }
-
-  return NOT_FOUND_VALUE;
-}
-
-
-static WLIB_STATUS
-unsorted_array_search_proc( SessionStack& stack, ISession&)
-{
-  uint64_t foundPos;
-  DArray array;
-
-  stack[stack.Size() - 2].Operand().GetValue(array);
-
-  if (array.IsNull())
-  {
-    stack.Pop(2);
-    stack.Push(DUInt64());
-
-    return WOP_OK;
-  }
-
-  switch (array.Type())
-  {
-  case T_BOOL:
-  {
-    DBool value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_CHAR:
-  {
-    DChar value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_DATE:
-  {
-    DDate value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_DATETIME:
-  {
-    DDate value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_HIRESTIME:
-  {
-    DDate value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_INT8:
-  {
-    DInt8 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_INT16:
-  {
-    DInt16 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_INT32:
-  {
-    DInt32 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_INT64:
-  {
-    DInt64 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_UINT8:
-  {
-    DUInt8 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_UINT16:
-  {
-    DUInt16 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_UINT32:
-  {
-    DUInt32 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_UINT64:
-  {
-    DUInt64 value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_REAL:
-  {
-    DReal value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  case T_RICHREAL:
-  {
-    DReal value;
-
-    stack[stack.Size() - 1].Operand().GetValue(value);
-
-    foundPos = unsorted_array_search(array, value);
-  }
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
-  }
-
-  stack.Pop(2);
-  stack.Push(foundPos == NOT_FOUND_VALUE ? DUInt64() : DUInt64(foundPos));
+  stack[firstParam].Operand().SetValue(array);
+  stack.Pop(paramsCount - 1);
+  stack[firstParam] = StackValue::Create(DUInt64(array.Count()));
 
   return WOP_OK;
 }
 
 
-template<typename T> uint64_t
-retrieve_minim_value( const DArray& array)
+template<typename T> DUInt64
+retrieve_minim_value( const DArray& array, T margin, const uint64_t from)
 {
-  const uint64_t arrayCount = array.Count();
+  const uint64_t count = array.Count();
 
-  uint64_t pos = 0;
-  uint64_t foundPos = NOT_FOUND_VALUE;
+  DUInt64 result;
   T minim = T::Max();
 
-  while (pos < arrayCount)
-  {
-    T value;
-    array.Get(pos, value);
+  if (margin.IsNull())
+    margin = T::Min();
 
-    if (value < minim)
+  for (uint64_t pos = from; pos < count; ++pos)
+  {
+    T elem;
+    array.Get(pos, elem);
+
+    if (elem < minim && elem >= margin)
     {
-      minim = value;
-      foundPos = pos;
+      result = DUInt64(pos);
+      if (elem == margin)
+        break;
+
+      minim = elem;
     }
-    ++pos;
   }
 
-  return foundPos;
+  return result;
 }
 
 
-template<typename T> uint64_t
-retrieve_maxim_value( const DArray& array)
+template<typename T> DUInt64
+retrieve_maxim_value( const DArray& array, T margin, const uint64_t from)
 {
-  const uint64_t arrayCount = array.Count();
+  const uint64_t count = array.Count();
 
-  uint64_t pos = 0;
-  uint64_t foundPos = NOT_FOUND_VALUE;
+  DUInt64 result;
+
   T maxim = T::Min();
+  if (margin.IsNull())
+    margin = T::Max();
 
-  while (pos < arrayCount)
+  for (uint64_t pos = from; pos < count; ++pos)
   {
-    T value;
-    array.Get(pos, value);
+    T elem;
+    array.Get(pos, elem);
 
-    if (maxim < value)
+    if (elem > maxim && elem <= margin)
     {
-      maxim = value;
-      foundPos = pos;
+      result = DUInt64(pos);
+      if (elem == margin)
+        break;
+
+      maxim = elem;
     }
-    ++pos;
   }
 
-  return foundPos;
+  return result;
 }
 
 
 template<bool minSearch> WLIB_STATUS
 search_minmax( SessionStack& stack, ISession&)
 {
-  uint64_t foundPos;
+  DUInt64 result, from;
   DArray array;
 
-  stack[stack.Size() - 1].Operand().GetValue(array);
-  stack.Pop(1);
+  const auto paramsCount = 3;
+  const auto firstParam = stack.Size() - paramsCount;
 
-  if (array.IsNull())
+  if (stack[firstParam].Operand().IsNull())
   {
-    stack.Push(DUInt64());
+    stack.Pop(paramsCount - 1);
+    stack[firstParam] = StackValue();
     return WOP_OK;
   }
+
+  stack[firstParam].Operand().GetValue(array);
+  stack[firstParam + 2].Operand().GetValue(from);
+
+  if (from.IsNull())
+    from = DUInt64(0);
 
   switch (array.Type())
   {
   case T_BOOL:
   {
-    foundPos = minSearch ? retrieve_minim_value<DBool>(array) : retrieve_maxim_value<DBool>(array);
+    DBool margin;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_CHAR:
   {
-    foundPos = minSearch ? retrieve_minim_value<DChar>(array) : retrieve_maxim_value<DChar>(array);
+    DChar margin;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_DATE:
   {
-    foundPos = minSearch ? retrieve_minim_value<DDate>(array) : retrieve_maxim_value<DDate>(array);
+    DDate margin;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_DATETIME:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DDateTime>(array) : retrieve_maxim_value<DDateTime>(array);
+    DDateTime margin;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_HIRESTIME:
   {
-    foundPos =
-        minSearch ?
-            retrieve_minim_value<DHiresTime>(array) : retrieve_maxim_value<DHiresTime>(array);
+    DHiresTime margin;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_INT8:
   {
-    foundPos = minSearch ? retrieve_minim_value<DInt8>(array) : retrieve_maxim_value<DInt8>(array);
+    DInt8 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_INT16:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DInt16>(array) : retrieve_maxim_value<DInt16>(array);
+    DInt16 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_INT32:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DInt32>(array) : retrieve_maxim_value<DInt32>(array);
+    DInt32 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_INT64:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DInt32>(array) : retrieve_maxim_value<DInt32>(array);
+    DInt64 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_UINT8:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DUInt8>(array) : retrieve_maxim_value<DUInt8>(array);
+    DUInt8 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_UINT16:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DUInt16>(array) : retrieve_maxim_value<DUInt16>(array);
+    DUInt16 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_UINT32:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DUInt32>(array) : retrieve_maxim_value<DUInt32>(array);
+    DUInt32 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_UINT64:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DUInt64>(array) : retrieve_maxim_value<DUInt64>(array);
+    DUInt64 margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_REAL:
   {
-    foundPos = minSearch ? retrieve_minim_value<DReal>(array) : retrieve_maxim_value<DReal>(array);
+    DReal margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
   case T_RICHREAL:
   {
-    foundPos =
-        minSearch ? retrieve_minim_value<DRichReal>(array) : retrieve_maxim_value<DRichReal>(array);
+    DRichReal margin ;
+    stack[firstParam + 1].Operand().GetValue(margin);
+    result = minSearch
+               ? retrieve_minim_value(array, margin, from.mValue)
+               : retrieve_maxim_value(array, margin, from.mValue);
   }
     break;
 
@@ -690,689 +443,8 @@ search_minmax( SessionStack& stack, ISession&)
     throw InterException(_EXTRA(InterException::INTERNAL_ERROR));
   }
 
-  assert(foundPos != NOT_FOUND_VALUE);
-  stack.Push(DUInt64(foundPos));
-
-  return WOP_OK;
-}
-
-template<typename T> DRichReal
-compute_integer_array_average_value( const DArray& array)
-{
-  const uint64_t arrayCount = array.Count();
-
-  assert(arrayCount > 0);
-
-  WE_I128 sum = 0;
-  T currentValue;
-
-  for (uint64_t offset = 0; offset < arrayCount; ++offset)
-  {
-    array.Get(offset, currentValue);
-    sum += currentValue.mValue;
-  }
-
-  const RICHREAL_T quotient = sum / arrayCount;
-  const RICHREAL_T reminder = sum % arrayCount;
-
-  return DRichReal(quotient + reminder / arrayCount);
-}
-
-
-template<typename T> DRichReal
-compute_real_array_average_value( const DArray& array)
-{
-  const uint64_t arrayCount = array.Count();
-
-  assert(arrayCount > 0);
-
-  WE_I128 integerSum = 0, fractionalSum = 0;
-  T currentValue;
-
-  for (uint64_t offset = 0; offset < arrayCount; ++offset)
-  {
-    array.Get(offset, currentValue);
-
-    const RICHREAL_T temp = currentValue.mValue;
-
-    integerSum += temp.Integer();
-    fractionalSum += temp.Fractional();
-  }
-
-  integerSum += fractionalSum / DBS_RICHREAL_PREC;
-  fractionalSum %= DBS_RICHREAL_PREC;
-
-  RICHREAL_T result = _SC(RICHREAL_T, integerSum) / arrayCount;
-  result += RICHREAL_T(0, toInt64(fractionalSum), DBS_RICHREAL_PREC) / arrayCount;
-
-  return DRichReal(result);
-}
-
-
-static WLIB_STATUS
-compute_array_average( SessionStack& stack, ISession&)
-{
-  DArray    array;
-  DRichReal result;
-
-  stack[stack.Size() - 1].Operand().GetValue(array);
-  stack.Pop(1);
-
-  if (array.IsNull())
-  {
-    stack.Push(result);
-
-    return WOP_OK;
-  }
-
-  switch (array.Type())
-  {
-  case T_INT8:
-    result = compute_integer_array_average_value<DInt8>(array);
-    break;
-
-  case T_INT16:
-    result = compute_integer_array_average_value<DInt16>(array);
-    break;
-
-  case T_INT32:
-    result = compute_integer_array_average_value<DInt32>(array);
-    break;
-
-  case T_INT64:
-    result = compute_integer_array_average_value<DInt64>(array);
-    break;
-
-  case T_UINT8:
-    result = compute_integer_array_average_value<DUInt8>(array);
-    break;
-
-  case T_UINT16:
-    result = compute_integer_array_average_value<DUInt16>(array);
-    break;
-
-  case T_UINT32:
-    result = compute_integer_array_average_value<DUInt32>(array);
-    break;
-
-  case T_UINT64:
-    result = compute_integer_array_average_value<DUInt64>(array);
-    break;
-
-  case T_REAL:
-    result = compute_real_array_average_value<DReal>(array);
-    break;
-
-  case T_RICHREAL:
-    result = compute_real_array_average_value<DRichReal>(array);
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
-                         "You need a numeric array type to compute the average.");
-  }
-
-  stack.Push(result);
-  return WOP_OK;
-}
-
-
-template<typename T> DArray
-intersect_arrays( DArray& ar1, DArray ar2)
-{
-  DArray result;
-
-  assert( !ar1.IsNull());
-  assert( !ar2.IsNull());
-
-  ar1.Sort();
-  ar2.Sort();
-
-  int64_t i = ar1.Count() - 1, j = ar2.Count() - 1;
-  while ((0 <= i) && (0 <= j))
-  {
-    T ti, tj;
-
-    ar1.Get(i, ti);
-    ar2.Get(j, tj);
-
-    if (ti == tj)
-    {
-      result.Add(ti);
-      --i, --j;
-    }
-
-    else if (ti < tj)
-      --j;
-
-    else
-      --i;
-  }
-
-  return result;
-}
-
-
-static WLIB_STATUS
-proc_interesect_arrays( SessionStack& stack, ISession&)
-{
-  DArray array1, array2;
-  DArray result;
-
-  stack[stack.Size() - 2].Operand().GetValue(array1);
-  stack[stack.Size() - 1].Operand().GetValue(array2);
-  stack.Pop(2);
-
-  if (array1.Type() != array2.Type())
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
-                         "Intersection requires array of the same type.");
-  }
-
-  if (array1.IsNull())
-  {
-    stack.Push(result);
-
-    return WOP_OK;
-  }
-  else if (array2.IsNull())
-  {
-    stack.Push(array1);
-
-    return WOP_OK;
-  }
-
-  switch (array1.Type())
-  {
-  case T_BOOL:
-    result = intersect_arrays<DBool>(array1, array2);
-    break;
-
-  case T_CHAR:
-    result = intersect_arrays<DChar>(array1, array2);
-    break;
-
-  case T_DATE:
-    result = intersect_arrays<DDate>(array1, array2);
-    break;
-
-  case T_HIRESTIME:
-    result = intersect_arrays<DHiresTime>(array1, array2);
-    break;
-
-  case T_INT8:
-    result = intersect_arrays<DInt8>(array1, array2);
-    break;
-
-  case T_INT16:
-    result = intersect_arrays<DInt16>(array1, array2);
-    break;
-
-  case T_INT32:
-    result = intersect_arrays<DInt32>(array1, array2);
-    break;
-
-  case T_INT64:
-    result = intersect_arrays<DInt64>(array1, array2);
-    break;
-
-  case T_UINT8:
-    result = intersect_arrays<DUInt8>(array1, array2);
-    break;
-
-  case T_UINT16:
-    result = intersect_arrays<DUInt16>(array1, array2);
-    break;
-
-  case T_UINT32:
-    result = intersect_arrays<DUInt32>(array1, array2);
-    break;
-
-  case T_UINT64:
-    result = intersect_arrays<DUInt64>(array1, array2);
-    break;
-
-  case T_REAL:
-    result = intersect_arrays<DReal>(array1, array2);
-    break;
-
-  case T_RICHREAL:
-    result = intersect_arrays<DRichReal>(array1, array2);
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE), "Unexpected array type.");
-  }
-
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-template<typename T> DArray
-diff_arrays( DArray& ar1, DArray ar2)
-{
-  DArray result;
-
-  assert( !ar1.IsNull());
-  assert( !ar2.IsNull());
-
-  ar1.Sort();
-  ar2.Sort();
-
-  int64_t i = ar1.Count() - 1, j = ar2.Count() - 1;
-  while ((0 <= i) && (0 <= j))
-  {
-    T ti, tj;
-
-    ar1.Get(i, ti);
-    ar2.Get(j, tj);
-
-    if (ti == tj)
-      --i;
-
-    else if (ti < tj)
-      --j;
-
-    else
-    {
-      result.Add(ti);
-      --i;
-    }
-  }
-
-  while (0 <= i)
-  {
-    T t;
-
-    ar1.Get(i, t);
-    result.Add(t);
-
-    --i;
-  }
-
-  return result;
-}
-
-
-static WLIB_STATUS
-proc_diff_arrays( SessionStack& stack, ISession&)
-{
-  DArray array1, array2;
-  DArray result;
-
-  stack[stack.Size() - 2].Operand().GetValue(array1);
-  stack[stack.Size() - 1].Operand().GetValue(array2);
-  stack.Pop(2);
-
-  if (array1.Type() != array2.Type())
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
-                         "Differentiation requires arrays of the same type.");
-  }
-
-  if (array1.IsNull())
-  {
-    stack.Push(result);
-
-    return WOP_OK;
-  }
-  else if (array2.IsNull())
-  {
-    stack.Push(array1);
-
-    return WOP_OK;
-  }
-
-  switch (array1.Type())
-  {
-  case T_BOOL:
-    result = diff_arrays<DBool>(array1, array2);
-    break;
-
-  case T_CHAR:
-    result = diff_arrays<DChar>(array1, array2);
-    break;
-
-  case T_DATE:
-    result = diff_arrays<DDate>(array1, array2);
-    break;
-
-  case T_HIRESTIME:
-    result = diff_arrays<DHiresTime>(array1, array2);
-    break;
-
-  case T_INT8:
-    result = diff_arrays<DInt8>(array1, array2);
-    break;
-
-  case T_INT16:
-    result = diff_arrays<DInt16>(array1, array2);
-    break;
-
-  case T_INT32:
-    result = diff_arrays<DInt32>(array1, array2);
-    break;
-
-  case T_INT64:
-    result = diff_arrays<DInt64>(array1, array2);
-    break;
-
-  case T_UINT8:
-    result = diff_arrays<DUInt8>(array1, array2);
-    break;
-
-  case T_UINT16:
-    result = diff_arrays<DUInt16>(array1, array2);
-    break;
-
-  case T_UINT32:
-    result = diff_arrays<DUInt32>(array1, array2);
-    break;
-
-  case T_UINT64:
-    result = diff_arrays<DUInt64>(array1, array2);
-    break;
-
-  case T_REAL:
-    result = diff_arrays<DReal>(array1, array2);
-    break;
-
-  case T_RICHREAL:
-    result = diff_arrays<DRichReal>(array1, array2);
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE), "Unexpected array type.");
-  }
-
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-template<typename T> DArray
-union_arrays(DArray& ar1, DArray ar2)
-{
-  DArray result = ar1;
-
-  const uint64_t ar2Count = ar2.Count();
-
-  for (uint64_t i = 0; i < ar2Count; ++i)
-  {
-    T t;
-
-    ar2.Get(i, t);
-    result.Add(t);
-  }
-
-  return result;
-}
-
-
-static WLIB_STATUS
-proc_union_arrays( SessionStack& stack, ISession&)
-{
-  DArray array1, array2;
-  DArray result;
-
-  stack[stack.Size() - 2].Operand().GetValue(array1);
-  stack[stack.Size() - 1].Operand().GetValue(array2);
-  stack.Pop(2);
-
-  if (array1.Type() != array2.Type())
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
-                         "Union requires arrays of the same type.");
-  }
-
-  if (array1.IsNull())
-  {
-    stack.Push(result);
-
-    return WOP_OK;
-  }
-  else if (array2.IsNull())
-  {
-    stack.Push(array1);
-
-    return WOP_OK;
-  }
-
-  switch (array1.Type())
-  {
-  case T_BOOL:
-    result = union_arrays<DBool>(array1, array2);
-    break;
-
-  case T_CHAR:
-    result = union_arrays<DChar>(array1, array2);
-    break;
-
-  case T_DATE:
-    result = union_arrays<DDate>(array1, array2);
-    break;
-
-  case T_HIRESTIME:
-    result = union_arrays<DHiresTime>(array1, array2);
-    break;
-
-  case T_INT8:
-    result = union_arrays<DInt8>(array1, array2);
-    break;
-
-  case T_INT16:
-    result = union_arrays<DInt16>(array1, array2);
-    break;
-
-  case T_INT32:
-    result = union_arrays<DInt32>(array1, array2);
-    break;
-
-  case T_INT64:
-    result = union_arrays<DInt64>(array1, array2);
-    break;
-
-  case T_UINT8:
-    result = union_arrays<DUInt8>(array1, array2);
-    break;
-
-  case T_UINT16:
-    result = union_arrays<DUInt16>(array1, array2);
-    break;
-
-  case T_UINT32:
-    result = union_arrays<DUInt32>(array1, array2);
-    break;
-
-  case T_UINT64:
-    result = union_arrays<DUInt64>(array1, array2);
-    break;
-
-  case T_REAL:
-    result = union_arrays<DReal>(array1, array2);
-    break;
-
-  case T_RICHREAL:
-    result = union_arrays<DRichReal>(array1, array2);
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE), "Unexpected array type.");
-  }
-
-  stack.Push(result);
-
-  return WOP_OK;
-}
-
-
-static WLIB_STATUS
-proc_array_pushback( SessionStack& stack, ISession&)
-{
-  DArray array;
-
-  IOperand& opArray = stack[stack.Size() - 2].Operand();
-  IOperand& opValue = stack[stack.Size() - 1].Operand();
-
-  if (IS_TABLE( opValue.GetType()) || IS_ARRAY(opValue.GetType()))
-  {
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE));
-  }
-
-  opArray.GetValue(array);
-
-  const uint_t type =
-      (array.Type() != T_UNDETERMINED) ? array.Type() : GET_BASIC_TYPE(opValue.GetType());
-  switch (type)
-  {
-  case T_BOOL:
-  {
-    DBool value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_CHAR:
-  {
-    DChar value;
-
-    opValue.GetValue(value);
-
-    if ( !value.IsNull())
-      array.Add(value);
-  }
-    break;
-
-  case T_DATE:
-  {
-    DDate value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_DATETIME:
-  {
-    DDateTime value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_HIRESTIME:
-  {
-    DHiresTime value;
-
-    opValue.GetValue(value);
-
-    array.Add(value);
-  }
-    break;
-
-  case T_INT8:
-  {
-    DInt8 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_INT16:
-  {
-    DInt16 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_INT32:
-  {
-    DInt32 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_INT64:
-  {
-    DInt64 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_UINT8:
-  {
-    DUInt8 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_UINT16:
-  {
-    DUInt16 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_UINT32:
-  {
-    DUInt32 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_UINT64:
-  {
-    DUInt64 value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_REAL:
-  {
-    DReal value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  case T_RICHREAL:
-  {
-    DRichReal value;
-
-    opValue.GetValue(value);
-    array.Add(value);
-  }
-    break;
-
-  default:
-    throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE));
-  }
-
-  opArray.SetValue(array);
-  stack.Pop(2);
-  stack.Push(array);
+  stack.Pop(paramsCount - 1);
+  stack[firstParam] = StackValue::Create(result);
 
   return WOP_OK;
 }
@@ -1382,29 +454,31 @@ static WLIB_STATUS
 proc_array_truncate( SessionStack& stack, ISession&)
 {
   DArray array;
-  DInt64 newArraySize;
+  DUInt64 newArraySize;
 
-  IOperand& refOp = stack[stack.Size() - 2].Operand();
+  const auto paramsCount = 2;
+  const auto firstParam = stack.Size() - paramsCount;
 
-  stack[stack.Size() - 2].Operand().GetValue(array);
-  stack[stack.Size() - 1].Operand().GetValue(newArraySize);
-
-  if (array.IsNull() || newArraySize.IsNull())
+  IOperand& refOp = stack[firstParam].Operand();
+  if (stack[firstParam].Operand().IsNull())
   {
-    stack.Pop(1);
+    stack.Pop(paramsCount - 1);
+    stack[firstParam] = StackValue::Create(DUInt64(0));
+
     return WOP_OK;
   }
 
-  for (int64_t i = array.Count() - 1;
-  MAX(newArraySize.mValue, 0) <= i; --i)
-  {
+  refOp.GetValue(array);
+  stack[firstParam + 1].Operand().GetValue(newArraySize);
+  if (newArraySize.IsNull())
+    newArraySize = DUInt64(0);
+
+  for (int64_t i = array.Count() - 1; max<decltype(i)>(newArraySize.mValue, 0) <= i; --i)
     array.Remove(i);
-  }
 
   refOp.SetValue(array);
-
-  stack.Pop(2);
-  stack.Push(array);
+  stack.Pop(paramsCount - 1);
+  stack[firstParam] = StackValue::Create(DUInt64(array.Count()));
 
   return WOP_OK;
 }
@@ -1440,13 +514,19 @@ proc_hash_array( SessionStack& stack, ISession&)
   DArray array;
   DUInt64 result;
 
-  stack[stack.Size() - 1].Operand().GetValue(array);
-  stack.Pop(1);
+  const uint64_t firstParameter = stack.Size() - 1;
+
+  IOperand& op = stack[firstParameter].Operand();
+  if (op.IsNull())
+  {
+    stack[firstParameter] = StackValue();
+    return WOP_OK;
+  }
+  stack[firstParameter].Operand().GetValue(array);
 
   if (array.IsNull())
   {
-    stack.Push(result);
-
+    stack[firstParameter] = StackValue::Create(DUInt64(0));
     return WOP_OK;
   }
 
@@ -1512,8 +592,7 @@ proc_hash_array( SessionStack& stack, ISession&)
     throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE), "Unexpected array type.");
   }
 
-  stack.Push(result);
-
+  stack[firstParameter] = StackValue::Create(DUInt64(result));
   return WOP_OK;
 }
 
@@ -1533,7 +612,7 @@ base_arrays_init()
 
 
   static const uint8_t* arraySortLocals[]  = {
-                                                gBoolType,
+                                                gUInt64Type,
                                                 gGenericArrayType,
                                                 gBoolType,
                                                 gBoolType
@@ -1545,101 +624,27 @@ base_arrays_init()
   gProcArraySort.code        = array_sort;
 
 
-#if 0
-  static const uint8_t* binSearchLocals[] = {
-                                               gUInt64Type,
-                                               gGenericArrayType,
-                                               gUndefinedType,
-                                               gInt8Type
-                                            };
-
-  gProcArrayBinSearch.name         = "array_binary_search";
-  gProcArrayBinSearch.localsCount  = 4;
-  gProcArrayBinSearch.localsTypes  = binSearchLocals;
-  gProcArrayBinSearch.code         = binary_array_search_proc;
-
-
-
-  static const uint8_t* searchLocals[] = {
-                                            gUInt64Type,
-                                            gGenericArrayType,
-                                            gUndefinedType
-                                         };
-
-  gProcArraySearch.name         = "array_search";
-  gProcArraySearch.localsCount  = 3;
-  gProcArraySearch.localsTypes  = searchLocals;
-  gProcArraySearch.code         = unsorted_array_search_proc;
-#endif
-
   static const uint8_t* minMaxLocals[] = {
                                             gUInt64Type,
                                             gGenericArrayType,
-                                            gBoolType,
-                                            gUndefinedType
+                                            gUndefinedType,
+                                            gUInt64Type
                                          };
 
 
-  gProcArrayMin.name         = "min";
+  gProcArrayMin.name         = "get_min";
   gProcArrayMin.localsCount  = 4;
   gProcArrayMin.localsTypes  = minMaxLocals;
   gProcArrayMin.code         = search_minmax<true>;
 
-  gProcArrayMax.name         = "max";
+  gProcArrayMax.name         = "get_max";
   gProcArrayMax.localsCount  = 4;
   gProcArrayMax.localsTypes  = minMaxLocals;
   gProcArrayMax.code         = search_minmax<false>;
 
 
-#if 0
-  static const uint8_t* computeAverageLocals[] = {
-                                                    gRichRealType,
-                                                    gGenericArrayType
-                                                 };
-
-  gProcArrayAverage.name        = "array_average";
-  gProcArrayAverage.localsCount = 2;
-  gProcArrayAverage.localsTypes = computeAverageLocals;
-  gProcArrayAverage.code        = compute_array_average;
-
-
-  static const uint8_t* arraySetOperationLocals[] = {
-                                                      gGenericArrayType,
-                                                      gGenericArrayType,
-                                                      gGenericArrayType
-                                                    };
-
-  gProcArrayIntersect.name        = "array_intersection";
-  gProcArrayIntersect.localsCount = 3;
-  gProcArrayIntersect.localsTypes = arraySetOperationLocals;
-  gProcArrayIntersect.code        = proc_interesect_arrays;
-
-  gProcArrayUnion.name            = "array_union";
-  gProcArrayUnion.localsCount     = 3;
-  gProcArrayUnion.localsTypes     = arraySetOperationLocals;
-  gProcArrayUnion.code            = proc_union_arrays;
-
-  gProcArrayDiff.name             = "array_diff";
-  gProcArrayDiff.localsCount      = 3;
-  gProcArrayDiff.localsTypes      = arraySetOperationLocals;
-  gProcArrayDiff.code             = proc_diff_arrays;
-
-
-  static const uint8_t* arrayPushBackLocals[] = {
-                                                  gGenericArrayType,
-                                                  gGenericArrayType,
-                                                  gUndefinedType
-                                                };
-
-  gProcArrayPushBack.name        = "array_pushback";
-  gProcArrayPushBack.localsCount = 3;
-  gProcArrayPushBack.localsTypes = arrayPushBackLocals;
-  gProcArrayPushBack.code        = proc_array_pushback;
-
-#endif
-
   static const uint8_t* arrayTruncateLocals[] = {
-                                                  gGenericArrayType,
+                                                  gUInt64Type,
                                                   gGenericArrayType,
                                                   gUInt64Type
                                                 };
