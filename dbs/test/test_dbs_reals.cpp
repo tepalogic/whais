@@ -17,6 +17,7 @@
 #undef uint_t128
 
 #include "dbs_real.h"
+#include "dbs_values.h"
 #include "utils/we_int128.h"
 #include "utils/wrandom.h"
 #include "custom/include/test/test_fmw.h"
@@ -292,6 +293,57 @@ test_division_real_fail:
 }
 
 
+bool
+test_number_literal()
+{
+  cout << "Testing literal values for real and richreals ... ";
+
+  DReal r1 = 1.0_wr;
+  DReal r2 = -1.0_wr;
+  DReal r3 = 1_wr;
+  DReal r4 = -1._wr;
+  DReal r5 = .1_wr;
+  DReal r6 = 20.1234567_wr;
+  DReal r7 = -2.012_wr;
+
+
+  DRichReal rr1 = -1.0_wrr;
+  DRichReal rr2 = 1.0_wrr;
+  DRichReal rr3 = -1_wrr;
+  DRichReal rr4 = 1._wrr;
+  DRichReal rr5 = .1_wrr;
+  DRichReal rr6 = -20.01_wrr;
+  DRichReal rr7 = 2.012_wrr;
+
+  if ((r1 != DBS_REAL_T(1, 0, 1))
+      || (r2 != DBS_REAL_T(-1, 0, 1))
+      || (r3 != DBS_REAL_T(1, 0, 1))
+      || (r4 != DBS_REAL_T(-1, 0, 1))
+      || (r5 != DBS_REAL_T(0, 1, 10))
+      || (r6 != DBS_REAL_T(20, 12345670, 100000000))
+      || (r7 != DBS_REAL_T(-2, -12, 1000)))
+  {
+    cout << "FAIL\n";
+    return false;
+  }
+
+
+  if ((rr1 != DBS_RICHREAL_T(-1, 0, 1))
+      || (rr2 != DBS_RICHREAL_T(1, 0, 1))
+      || (rr3 != DBS_RICHREAL_T(-1, 0, 1))
+      || (rr4 != DBS_RICHREAL_T(1, 0, 1))
+      || (rr5 != DBS_RICHREAL_T(0, 1, 10))
+      || (rr6 != DBS_RICHREAL_T(-20, -1, 100))
+      || (rr7 != DBS_RICHREAL_T(2, 12, 1000)))
+  {
+    cout << "FAIL\n";
+    return false;
+  }
+
+  cout << "OK\n";
+  return true;
+}
+
 int
 main(int argc, char** argv)
 {
@@ -299,6 +351,8 @@ main(int argc, char** argv)
     _iterationsCount = atol(argv[1]);
 
   bool success = true;
+
+  success = success && test_number_literal();
 
   success = test_addition_real <DBS_REAL_T, DBS_REAL_PREC> ("reals");
   success = test_addition_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC> ("richreals");
@@ -311,7 +365,6 @@ main(int argc, char** argv)
 
   success = test_division_real <DBS_REAL_T, DBS_REAL_PREC, 10000, 0xFFFF> ("reals");
   success = test_division_real <DBS_RICHREAL_T, DBS_RICHREAL_PREC, 100000000, 0xFFFFFFFF> ("richreals");
-
 
   if (!success)
     {

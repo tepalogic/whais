@@ -2781,7 +2781,7 @@ RealArrayFieldElOperand::GetValue(DRichReal& outValue) const
   DReal currValue;
   Get(currValue);
 
-  number_convert(currValue, outValue);
+  outValue = currValue;
 }
 
 

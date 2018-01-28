@@ -52,7 +52,7 @@ struct DBool final
   {
   }
 
-  explicit DBool(const bool value)
+  DBool(const bool value)
     : mValue(value),
       mIsNull(false)
   {
@@ -138,7 +138,7 @@ struct DBS_SHL DChar final
   {
   }
 
-  explicit DChar(const uint32_t codePoint)
+  DChar(const uint32_t codePoint)
     : mValue(codePoint),
       mIsNull((codePoint != 0) ? false : true)
   {
@@ -556,7 +556,7 @@ struct DBS_SHL DUInt8 final
   {
   }
 
-  explicit DUInt8(const uint8_t value)
+  DUInt8(const uint8_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -632,7 +632,7 @@ struct DBS_SHL DUInt16 final
   {
   }
 
-  explicit DUInt16(const uint16_t value)
+  DUInt16(const uint16_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -713,7 +713,7 @@ struct DBS_SHL DUInt32 final
   {
   }
 
-  explicit DUInt32(const uint32_t value)
+  DUInt32(const uint32_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -801,7 +801,7 @@ struct DBS_SHL DUInt64 final
   {
   }
 
-  explicit DUInt64(const uint64_t value)
+  DUInt64(const uint64_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -894,7 +894,7 @@ struct DBS_SHL DInt8 final
   {
   }
 
-  explicit DInt8(const int8_t value)
+  DInt8(const int8_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -969,7 +969,7 @@ struct DBS_SHL DInt16 final
   {
   }
 
-  explicit DInt16(const int16_t value)
+  DInt16(const int16_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -1050,7 +1050,7 @@ struct DBS_SHL DInt32 final
   {
   }
 
-  explicit DInt32(const int32_t value)
+  DInt32(const int32_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -1137,7 +1137,7 @@ struct DBS_SHL DInt64 final
   {
   }
 
-  explicit DInt64(const int64_t value)
+  DInt64(const int64_t value)
     : mValue(value),
       mIsNull(false)
   {
@@ -1230,7 +1230,7 @@ struct DBS_SHL DReal final
   {
   }
 
-  explicit DReal(const REAL_T value)
+  constexpr DReal(const REAL_T value)
     : mValue(value),
       mIsNull(false)
   {
@@ -1266,6 +1266,7 @@ struct DBS_SHL DReal final
     return (mValue == second.mValue);
   }
 
+  constexpr DReal operator- () const { return mValue * -1; }
   bool operator<=(const DReal& second) const { return *this < second || *this == second; }
   bool operator!=(const DReal& second) const { return ! (*this == second); }
   bool operator>(const DReal& second) const { return ! (*this <= second); }
@@ -1295,7 +1296,7 @@ struct DBS_SHL DRichReal final
   {
   }
 
-  DRichReal(const RICHREAL_T value)
+  constexpr DRichReal(const RICHREAL_T value)
     : mValue(value),
       mIsNull(false)
   {
@@ -1336,12 +1337,14 @@ struct DBS_SHL DRichReal final
     return (mValue == second.mValue);
   }
 
+  constexpr DRichReal operator- () const { return mValue * -1; }
   bool operator<=(const DRichReal& second) const { return *this < second || *this == second; }
   bool operator!=(const DRichReal& second) const { return ! (*this == second); }
   bool operator>(const DRichReal& second) const { return ! (*this <= second); }
   bool operator>= (const DRichReal& second) const { return ! (*this < second); }
   DBS_FIELD_TYPE DBSType() const { return T_RICHREAL; }
   bool IsNull() const { return mIsNull; }
+
 
   DRichReal Prev() const;
   DRichReal Next() const;
@@ -1361,7 +1364,7 @@ class ITextStrategy;
 class DBS_SHL DText final
 {
 public:
-  explicit DText(const char* text = nullptr);
+  DText(const char* text = nullptr);
   explicit DText(const uint8_t* utf8Src, const uint_t unitsCount = ~0x0);
   explicit DText(std::shared_ptr<ITextStrategy> strategy);
 
@@ -1523,6 +1526,76 @@ private:
 #pragma warning(default:4251)
 };
 
+
+constexpr DReal
+operator"" _wr(const char* literal)
+{
+  int64_t intPart = 0, decimalPart = 0;
+  uint64_t precision = 1;
+
+  if (*literal == '+')
+    ++literal;
+
+  while (*literal && *literal != '.')
+  {
+    assert (('0' <= *literal) && (*literal <= '9'));
+
+    intPart *= 10;
+    intPart += *literal - '0';
+    ++literal;
+  }
+
+  if (*literal++ == '.')
+  {
+    while (*literal)
+    {
+      assert (('0' <= *literal) && (*literal <= '9'));
+
+      precision *= 10;
+
+      decimalPart *= 10;
+      decimalPart += *literal - '0';
+      ++literal;
+    }
+  }
+
+  return DBS_REAL_T(intPart, decimalPart, precision);
+}
+
+
+constexpr DRichReal
+operator"" _wrr(const char* literal)
+{
+  int64_t intPart = 0, decimalPart = 0;
+  uint64_t precision = 1;
+
+  if (*literal == '+')
+    ++literal;
+
+  while (*literal && *literal != '.')
+  {
+    assert (('0' <= *literal) && (*literal <= '9'));
+
+    intPart *= 10;
+    intPart += *literal - '0';
+    ++literal;
+  }
+
+  if (*literal++ == '.')
+  {
+    while (*literal)
+    {
+      assert (('0' <= *literal) && (*literal <= '9'));
+
+      precision *= 10;
+      decimalPart *= 10;
+      decimalPart += *literal - '0';
+      ++literal;
+    }
+  }
+
+  return DBS_RICHREAL_T(intPart, decimalPart, precision);
+}
 
 
 } //namespace whais
