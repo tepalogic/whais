@@ -174,8 +174,8 @@ static bool_t
 are_fields_compatible(const struct DeclaredVar* const   field1,
                       const struct DeclaredVar* const   field2)
 {
-  const uint_t baseType1 = GET_BASIC_TYPE(field1->type);
-  const uint_t baseType2 = GET_BASIC_TYPE(field2->type);
+  const uint_t baseType1 = GET_BASE_TYPE(field1->type);
+  const uint_t baseType2 = GET_BASE_TYPE(field2->type);
 
   assert(IS_TABLE_FIELD( field1->type));
   assert(IS_TABLE_FIELD( field2->type));
@@ -199,7 +199,7 @@ static const char*
 array_to_text(uint_t type)
 {
   assert(IS_ARRAY( type));
-  type = GET_BASIC_TYPE(type);
+  type = GET_BASE_TYPE(type);
 
   assert(type > T_UNKNOWN || type <= T_UNDETERMINED);
 
@@ -261,8 +261,8 @@ field_to_text(uint_t type)
 
   type = GET_FIELD_TYPE(type);
 
-  assert((GET_BASIC_TYPE( type) > T_UNKNOWN)
-          && (GET_BASIC_TYPE( type) <= T_UNDETERMINED));
+  assert((GET_BASE_TYPE( type) > T_UNKNOWN)
+          && (GET_BASE_TYPE( type) <= T_UNDETERMINED));
 
   if (type == T_BOOL)
     return "BOOL FIELD";
@@ -314,7 +314,7 @@ field_to_text(uint_t type)
 
   else if (IS_ARRAY( type))
   {
-    type = GET_BASIC_TYPE(type);
+    type = GET_BASE_TYPE(type);
     assert(type > T_UNKNOWN || type <= T_UNDETERMINED);
 
     if (type == T_BOOL)
@@ -583,9 +583,9 @@ translate_add_exp(struct ParserState* const           parser,
 
   if (IS_ARRAY(ftype))
   {
-    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+    const uint8_t opBEncode = GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -601,7 +601,7 @@ translate_add_exp(struct ParserState* const           parser,
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
     }
-    result.type = GET_BASIC_TYPE(ftype);
+    result.type = GET_BASE_TYPE(ftype);
     MARK_ARRAY(result.type);
     result.extra = NULL;
 
@@ -679,9 +679,9 @@ translate_sub_exp(struct ParserState* const           parser,
 
   if (IS_ARRAY(ftype))
   {
-    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+    const uint8_t opBEncode = GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -697,7 +697,7 @@ translate_sub_exp(struct ParserState* const           parser,
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
     }
-    result.type = GET_BASIC_TYPE(ftype);
+    result.type = GET_BASE_TYPE(ftype);
     MARK_ARRAY(result.type);
     result.extra = NULL;
 
@@ -883,9 +883,9 @@ translate_mod_exp(struct ParserState* const           parser,
 
   if (IS_ARRAY(ftype))
   {
-    const uint8_t opBEncode = GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
+    const uint8_t opBEncode = GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0);
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -901,7 +901,7 @@ translate_mod_exp(struct ParserState* const           parser,
       log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
       return sgResultUnk;
     }
-    result.type = GET_BASIC_TYPE(ftype);
+    result.type = GET_BASE_TYPE(ftype);
     MARK_ARRAY(result.type);
     result.extra = NULL;
 
@@ -1609,8 +1609,8 @@ translate_store_exp(struct ParserState* const           parser,
     }
     else if (IS_ARRAY( ftype) && IS_ARRAY(stype))
     {
-      const uint_t temp_ftype = GET_BASIC_TYPE(ftype);
-      const uint_t temp_stype = GET_BASIC_TYPE(stype);
+      const uint_t temp_ftype = GET_BASE_TYPE(ftype);
+      const uint_t temp_stype = GET_BASE_TYPE(stype);
 
       assert(temp_ftype <= T_UNDETERMINED);
       assert(temp_stype <= T_UNDETERMINED);
@@ -1684,10 +1684,10 @@ translate_sadd_exp(struct ParserState* const           parser,
   if (IS_ARRAY(ftype))
   {
     const uint8_t opBEncode =
-        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+        GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
 
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -1769,9 +1769,9 @@ translate_ssub_exp(struct ParserState* const           parser,
   if (IS_ARRAY(ftype))
   {
     const uint8_t opBEncode =
-        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+        GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -1956,9 +1956,9 @@ translate_smod_exp(struct ParserState* const           parser,
   if (IS_ARRAY(ftype))
   {
     const uint8_t opBEncode =
-        GET_BASIC_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
+        GET_BASE_TYPE(ftype) | (IS_ARRAY(stype) ? A_OPB_A_MASK : 0) | A_SELF_MASK;
 
-    if (store_op[GET_BASIC_TYPE(ftype)][GET_BASIC_TYPE(stype)] == W_NA)
+    if (store_op[GET_BASE_TYPE(ftype)][GET_BASE_TYPE(stype)] == W_NA)
     {
       log_message(parser,
                   parser->bufferPos,
@@ -2186,7 +2186,7 @@ translate_index_exp(struct ParserState* const           parser,
     assert(opType1->extra == NULL);
 
     opcode = W_INDA;
-    result.type = GET_BASIC_TYPE(ftype);
+    result.type = GET_BASE_TYPE(ftype);
 
     if (result.type == T_UNDETERMINED)
     {
@@ -2831,7 +2831,7 @@ translate_call_exp(struct ParserState* const   parser,
         const bool_t isArgArray = IS_ARRAY(arg_t);
         const bool_t isArgUndet = isArgArray
                                   ? FALSE
-                                  : (GET_BASIC_TYPE(arg_t) == T_UNDETERMINED);
+                                  : (GET_BASE_TYPE(arg_t) == T_UNDETERMINED);
 
         assert((isArgArray == FALSE) || (isArgUndet == FALSE));
 
@@ -2856,8 +2856,8 @@ translate_call_exp(struct ParserState* const   parser,
       {
         if (IS_ARRAY(argType.type) || IS_ARRAY(result.type))
         {
-          const uint_t arg_t  = GET_BASIC_TYPE(argType.type);
-          const uint_t res_t  = GET_BASIC_TYPE(result.type);
+          const uint_t arg_t  = GET_BASE_TYPE(argType.type);
+          const uint_t res_t  = GET_BASE_TYPE(result.type);
 
           assert(arg_t <= T_UNDETERMINED);
           assert(res_t <= T_UNDETERMINED);
@@ -2880,8 +2880,8 @@ translate_call_exp(struct ParserState* const   parser,
         }
         else
         {
-          const uint_t        arg_t  = GET_BASIC_TYPE(argType.type);
-          const uint_t        res_t  = GET_BASIC_TYPE(result.type);
+          const uint_t        arg_t  = GET_BASE_TYPE(argType.type);
+          const uint_t        res_t  = GET_BASE_TYPE(result.type);
           const enum W_OPCODE tempOp = store_op[arg_t][res_t];
 
           assert(arg_t <= T_UNDETERMINED);
@@ -3023,8 +3023,8 @@ static uint_t
 get_common_subtype(const struct ExpResultType* const e1,
                    const struct ExpResultType* const e2)
 {
-  const uint_t baseType1 = GET_BASIC_TYPE(e1->type);
-  const uint_t baseType2 = GET_BASIC_TYPE(e2->type);
+  const uint_t baseType1 = GET_BASE_TYPE(e1->type);
+  const uint_t baseType2 = GET_BASE_TYPE(e2->type);
 
   if (GET_TYPE(e1->type) == T_UNDETERMINED)
     return 2;
@@ -3503,7 +3503,7 @@ translate_array_construct_exp(struct ParserState* const parser,
   if (encode_opcode(instrs, W_CARR) == NULL
       || wh_ostream_wint8(
           instrs,
-          (testAllExpsFields ? CARR_FROM_FIELD : 0) | GET_BASIC_TYPE(arrayType.type)) == NULL
+          (testAllExpsFields ? CARR_FROM_FIELD : 0) | GET_BASE_TYPE(arrayType.type)) == NULL
       || wh_ostream_wint16(instrs, wh_array_count(&listTypes)) == NULL)
   {
     log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
@@ -3537,6 +3537,186 @@ dump_types_and_fail:
 just_fail:
   wh_array_clean(&listTypes);
   return sgResultUnk;
+}
+
+
+static struct ExpResultType
+translate_cast_exp(struct ParserState* const parser,
+                   struct Statement* const stmt,
+                   struct SemValue* const exp,
+                   struct SemValue* const type)
+{
+  assert (exp->val_type = VAL_EXP_LINK);
+  assert (type == NULL || type->val_type == VAL_TYPE_SPEC);
+
+  const struct ExpResultType e = translate_tree_exp(parser, stmt, &exp->val.u_exp);
+  free_sem_value(exp);
+  const struct ExpResultType result = {
+                                       .type  = type->val.u_tspec.type,
+                                       .extra = (struct DeclaredVar*)type->val.u_tspec.extra
+                                      };
+
+  if (e.type == T_UNKNOWN)
+  {
+    assert(parser->abortError);
+    return sgResultUnk;
+  }
+  if (GET_TYPE(e.type) == T_UNDETERMINED)
+    return result;
+
+  if (IS_FIELD(e.type) ^ IS_FIELD(result.type)
+      || IS_ARRAY(e.type) ^ IS_ARRAY(result.type))
+  {
+    goto cast_type_mismatch;
+  }
+
+  if (IS_TABLE(e.type))
+  {
+    if (! IS_TABLE(result.type))
+      goto cast_type_mismatch;
+
+    return result;
+  }
+  else if (IS_FIELD(e.type))
+  {
+    assert (IS_FIELD(result.type));
+
+    if (GET_FIELD_TYPE(e.type) == T_UNDETERMINED
+             || GET_FIELD_TYPE(e.type) == GET_FIELD_TYPE(result.type))
+    {
+      return result;
+    }
+    else if (IS_ARRAY(e.type))
+    {
+      assert (IS_ARRAY(result.type));
+
+      if (is_time_related(GET_BASE_TYPE(e.type)) ^ is_time_related(GET_BASE_TYPE(result.type)))
+        goto cast_type_mismatch;
+
+      else if (is_integer(GET_BASE_TYPE(e.type)) ^ is_integer(GET_BASE_TYPE(result.type)))
+        goto cast_type_mismatch;
+
+      else if (is_real(GET_BASE_TYPE(e.type)) ^ is_real(GET_BASE_TYPE(result.type)))
+        goto cast_type_mismatch;
+
+      else if (is_integer(GET_BASE_TYPE(e.type))
+               || is_time_related(GET_BASE_TYPE(e.type))
+               || is_real(GET_BASE_TYPE(e.type)))
+      {
+        return result;
+      }
+      goto cast_type_mismatch;
+    }
+
+    if (is_time_related(GET_BASE_TYPE(e.type)) ^ is_time_related(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_integer(GET_BASE_TYPE(e.type)) ^ is_integer(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_real(GET_BASE_TYPE(e.type)) ^ is_real(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_integer(GET_BASE_TYPE(e.type))
+             || is_time_related(GET_BASE_TYPE(e.type))
+             || is_real(GET_BASE_TYPE(e.type)))
+    {
+      return result;
+    }
+    goto cast_type_mismatch;
+  }
+  else if (IS_ARRAY(e.type))
+  {
+    assert (IS_ARRAY(result.type));
+
+    if (is_time_related(GET_BASE_TYPE(e.type)) ^ is_time_related(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_integer(GET_BASE_TYPE(e.type)) ^ is_integer(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_real(GET_BASE_TYPE(e.type)) ^ is_real(GET_BASE_TYPE(result.type)))
+      goto cast_type_mismatch;
+
+    else if (is_integer(GET_BASE_TYPE(e.type))
+             || is_time_related(GET_BASE_TYPE(e.type))
+             || is_real(GET_BASE_TYPE(e.type)))
+    {
+      return result;
+    }
+    goto cast_type_mismatch;
+  }
+  else
+  {
+    assert (! (IS_FIELD(result.type) || IS_ARRAY(result.type)));
+
+    if (is_time_related(e.type) ^ is_time_related(result.type))
+      goto cast_type_mismatch;
+
+    else if (is_integer(e.type) ^ is_integer(result.type))
+      goto cast_type_mismatch;
+
+    else if (is_real(e.type) ^ is_real(result.type))
+      goto cast_type_mismatch;
+
+    else if (is_integer(e.type)
+             || is_time_related(e.type)
+             || is_real(e.type))
+    {
+      return result;
+    }
+    goto cast_type_mismatch;
+  }
+
+  return result;
+
+cast_type_mismatch:
+
+  log_message(parser,
+              parser->bufferPos,
+              MSG_CAST_NOT_POSSIBLE,
+              type_to_text(e.type),
+              type_to_text(result.type));
+  parser->abortError = TRUE;
+
+  return sgResultUnk;
+}
+
+
+static struct ExpResultType
+translate_negative_exp(struct ParserState* const parser,
+                       struct Statement* const   stmt,
+                       struct SemValue* const exp)
+{
+  struct WOutputStream* const instrs = stmt_query_instrs(parser->pCurrentStmt);
+
+  assert (exp->val_type = VAL_EXP_LINK);
+
+  const struct ExpResultType expType = translate_tree_exp(parser, stmt, &exp->val.u_exp);
+  free_sem_value(exp);
+
+  if (expType.type == T_UNKNOWN)
+  {
+    assert(parser->abortError);
+    return sgResultUnk;
+  }
+
+  if (! (is_integer(expType.type) || is_real(expType.type)))
+  {
+    log_message(parser, parser->bufferPos, MSG_EXP_NOT_NUMERIC);
+    parser->abortError = TRUE;
+    return sgResultUnk;
+  }
+
+  if (encode_opcode(instrs, W_LDI8) == NULL
+      || wh_ostream_wint8(instrs, 0xFF) == NULL
+      || encode_opcode(instrs, is_real(exp->val_type) ? W_MUL : W_MULRR) == NULL)
+  {
+    log_message(parser, IGNORE_BUFFER_POS, MSG_NO_MEM);
+    return sgResultUnk;
+  }
+
+  return expType;
 }
 
 static struct ExpResultType
@@ -3591,6 +3771,12 @@ translate_tree_exp(struct ParserState* const   parser,
 
   else if (tree->opcode == OP_CREATE_ARRAY)
     return translate_array_construct_exp(parser, stmt, tree->firstTree, tree->secondTree);
+
+  else if (tree->opcode == OP_EXP_CAST)
+    return translate_cast_exp(parser, stmt, tree->secondTree, tree->firstTree);
+
+  else if (tree->opcode == OP_NEGATIVE)
+    return translate_negative_exp(parser, stmt, tree->firstTree);
 
   assert(tree->firstTree->val_type == VAL_EXP_LINK);
 
@@ -3759,7 +3945,7 @@ translate_return_exp(struct ParserState* const   parser,
           && GET_FIELD_TYPE(retType.type) != GET_FIELD_TYPE(expType.type))
       {
         if ( ! (IS_ARRAY(GET_FIELD_TYPE(retType.type))
-                && GET_BASIC_TYPE(retType.type) == T_UNDETERMINED
+                && GET_BASE_TYPE(retType.type) == T_UNDETERMINED
                 && IS_ARRAY(GET_FIELD_TYPE(expType.type))))
         {
           log_message(parser,
@@ -3775,8 +3961,8 @@ translate_return_exp(struct ParserState* const   parser,
     {
       if ( ! IS_ARRAY( retType.type))
       {
-        const uint_t baseExpType = GET_BASIC_TYPE(expType.type);
-        const uint_t baseRetType = GET_BASIC_TYPE(retType.type);
+        const uint_t baseExpType = GET_BASE_TYPE(expType.type);
+        const uint_t baseRetType = GET_BASE_TYPE(retType.type);
 
         const enum W_OPCODE temp_op = store_op[baseRetType][baseExpType];
 
@@ -3799,8 +3985,8 @@ translate_return_exp(struct ParserState* const   parser,
       {
         assert(IS_ARRAY( expType.type));
 
-        if ((GET_BASIC_TYPE(retType.type) != T_UNDETERMINED)
-            && GET_BASIC_TYPE(retType.type) != GET_BASIC_TYPE(expType.type))
+        if ((GET_BASE_TYPE(retType.type) != T_UNDETERMINED)
+            && GET_BASE_TYPE(retType.type) != GET_BASE_TYPE(expType.type))
         {
           log_message(parser,
                       parser->bufferPos,
@@ -3876,7 +4062,7 @@ translate_iterable_exp(struct ParserState* const   parser,
     return GET_FIELD_TYPE(expType.type);
 
   else if (IS_ARRAY(expType.type))
-    return GET_BASIC_TYPE(expType.type);
+    return GET_BASE_TYPE(expType.type);
 
   else if (GET_TYPE(expType.type) == T_TEXT)
     return T_CHAR;

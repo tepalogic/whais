@@ -164,7 +164,7 @@ check_procedure(struct ParserState* state,
   if ((v->extra != NULL)
       || IS_FIELD(v->type) || IS_TABLE(v->type)
       || ! IS_ARRAY(v->type)
-      || GET_BASIC_TYPE(v->type) != e.type)
+      || GET_BASE_TYPE(v->type) != e.type)
   {
     return FALSE;
   }

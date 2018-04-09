@@ -82,14 +82,13 @@ void yyerror(struct ParserState *state,  const char *msg);
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right NOT '!' '~' 
+%right NOT '!' '~'  UMINUS EXPCAST
 %right '@'
 // %right INC DEC
 
 %right FSELECT 
 %left  '[' ']'  '.'
 %left  '(' ')'
-%right UMINUS
 
 
 /////////////
@@ -389,6 +388,10 @@ exp : const_exp
             CHK_SEM_ERROR;
         }
     | '-' exp %prec UMINUS
+        {
+            $$ = create_exp_link(state, $2, NULL, NULL, OP_NEGATIVE);
+            CHK_SEM_ERROR;
+        }
     | exp '+' exp
         {
             $$ = create_exp_link(state, $1, $3, NULL, OP_ADD);
@@ -552,8 +555,12 @@ exp : const_exp
         }
     | '{' not_empty_parameters_list '}' array_construction_type_spec
         {
-            /* procedure call */
             $$ = create_exp_link(state, $2, $4, NULL, OP_CREATE_ARRAY);
+            CHK_SEM_ERROR;
+        }
+    | '(' type_spec ')' exp
+        {
+            $$ = create_exp_link(state, $2, $4, NULL, OP_EXP_CAST);
             CHK_SEM_ERROR;
         }
 ;

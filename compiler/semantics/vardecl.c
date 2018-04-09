@@ -414,7 +414,7 @@ add_field_declaration(struct ParserState* const   parser,
     it = it->extra;
   }
 
-  if (GET_BASIC_TYPE( type->val.u_tspec.type) == T_UNDETERMINED)
+  if (GET_BASE_TYPE( type->val.u_tspec.type) == T_UNDETERMINED)
   {
     char tname[128];
 

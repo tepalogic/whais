@@ -210,7 +210,7 @@ check_procs_decl(struct ParserState *state)
       /* return type not properly encoded */
       return FALSE;
     }
-  if ((GET_BASIC_TYPE( tmp_var->type) != T_TEXT) ||
+  if ((GET_BASE_TYPE( tmp_var->type) != T_TEXT) ||
       (IS_ARRAY( tmp_var->type) == FALSE) ||
       (tmp_var->extra != NULL))
     {
@@ -262,7 +262,7 @@ check_procs_decl(struct ParserState *state)
       return FALSE;
     }
   if ((IS_TABLE( tmp_var->type) == FALSE) ||
-      (GET_BASIC_TYPE( tmp_var->type) != 0) ||
+      (GET_BASE_TYPE( tmp_var->type) != 0) ||
       (tmp_var->extra == NULL))
     {
       return FALSE;
@@ -292,7 +292,7 @@ check_procs_decl(struct ParserState *state)
   if ((tmp_var->labelLength != 4) ||
       (strncmp( tmp_var->label, "Var3", tmp_var->labelLength) != 0) ||
       (tmp_var->extra != NULL) ||
-      (GET_BASIC_TYPE( tmp_var->type) != T_UNDETERMINED) ||
+      (GET_BASE_TYPE( tmp_var->type) != T_UNDETERMINED) ||
       (IS_ARRAY( tmp_var->type) == FALSE))
     {
       return FALSE;
@@ -303,7 +303,7 @@ check_procs_decl(struct ParserState *state)
   if ((tmp_var->labelLength != 4) ||
       (strncmp( tmp_var->label, "Var4", tmp_var->labelLength) != 0) ||
       (IS_TABLE( tmp_var->type) == FALSE) ||
-      (GET_BASIC_TYPE( tmp_var->type) != 0))
+      (GET_BASE_TYPE( tmp_var->type) != 0))
     {
       return FALSE;
     }
@@ -353,7 +353,7 @@ check_procs_decl(struct ParserState *state)
   tmp_var = stmt_find_declaration(proc, "f3", strlen("f3"), FALSE, FALSE);
   if ((IS_FIELD( tmp_var->type) == FALSE) ||
        (IS_ARRAY( GET_FIELD_TYPE(tmp_var->type)) == FALSE) ||
-       (GET_BASIC_TYPE( tmp_var->type) != T_REAL))
+       (GET_BASE_TYPE( tmp_var->type) != T_REAL))
     {
       return FALSE;
     }

@@ -296,7 +296,7 @@ cmd_push_stack(ClientConnection& conn, uint_t* const inoutDataOff)
       *inoutDataOff += sizeof(uint16_t);
 
       fields_[field].isArray = IS_ARRAY(fieldType);
-      fields_[field].type = _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(fieldType));
+      fields_[field].type = _SC(DBS_FIELD_TYPE, GET_BASE_TYPE(fieldType));
 
       if ((_SC(uint_t, fields_[field].type) < WHC_TYPE_BOOL)
           || (_SC(uint_t, fields_[field].type) > WHC_TYPE_TEXT))

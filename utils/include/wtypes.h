@@ -85,7 +85,7 @@ struct DBSFieldDescriptor
 #define GET_TYPE(type)         ((type) & ~(T_L_VALUE | T_TABLE_FIELD) )
 #define GET_FIELD_TYPE(type)   ((type) \
                                 & ~(T_L_VALUE | T_FIELD_MASK | T_TABLE_FIELD))
-#define GET_BASIC_TYPE(type)   ((enum DBS_BASIC_TYPE)((type) & 0x1F))
+#define GET_BASE_TYPE(type)    ((enum DBS_BASIC_TYPE)((type) & 0x1F))
 
 #define TYPE_SPEC_END_MARK      ';'
 #define TYPE_SPEC_INVALID_POS   0xFFFFFFFF

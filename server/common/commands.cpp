@@ -288,7 +288,7 @@ cmd_read_stack(ClientConnection& conn)
 
       status = cmd_read_array_stack_top(conn, topValue, textHint, &dataOff);
     }
-    else if (GET_BASIC_TYPE(valType) == T_TEXT)
+    else if (GET_BASE_TYPE(valType) == T_TEXT)
       status = cmd_read_text_stack_top(conn, topValue, textHint, &dataOff);
 
     else

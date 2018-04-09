@@ -1732,8 +1732,8 @@ public:
       mField(~0),
       mFieldType(fieldType)
   {
-    assert(GET_BASIC_TYPE(fieldType) <= T_UNDETERMINED);
-    assert(GET_BASIC_TYPE(fieldType) > T_UNKNOWN);
+    assert(GET_BASE_TYPE(fieldType) <= T_UNDETERMINED);
+    assert(GET_BASE_TYPE(fieldType) > T_UNKNOWN);
   }
 
   FieldOperand(TableOperand& tableOp, const FIELD_INDEX field);

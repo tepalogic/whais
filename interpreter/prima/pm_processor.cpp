@@ -1797,7 +1797,7 @@ op_do_array_op(ProcedureCall& call, int64_t& offset)
   const bool selfOperation = (*data & A_SELF_MASK) != 0;
 
   DArray result;
-  switch (GET_BASIC_TYPE(*data))
+  switch (GET_BASE_TYPE(*data))
   {
   case T_BOOL:
       result = array_operation_wrapper<DBool, o>(opA, opB, opBIsArray);

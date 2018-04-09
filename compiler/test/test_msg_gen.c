@@ -1217,6 +1217,73 @@ char test_prog_16[] = ""
   "ENDPROC\n";
 
 
+char test_prog_17[] = ""
+  "PROCEDURE Proc(b BOOL) RETURN UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64)b;\n"
+  "ENDPROC\n";
+
+
+char test_prog_18[] = ""
+  "PROCEDURE Proc(b ARRAY INT64) RETURN UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_19[] = ""
+  "PROCEDURE Proc(b ARRAY INT64) RETURN UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_20[] = ""
+  "PROCEDURE Proc(b UINT64 FIELD) RETURN UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_21[] = ""
+  "PROCEDURE Proc(b UINT64 FIELD) RETURN ARRAY UINT64 \n"
+  "DO \n"
+  "  RETURN (ARRAY UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_22[] = ""
+  "PROCEDURE Proc(b UINT64 ARRAY FIELD) RETURN ARRAY UINT64 \n"
+  "DO \n"
+  "  RETURN (ARRAY UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_23[] = ""
+  "PROCEDURE Proc(b UINT64 ARRAY FIELD) RETURN UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_24[] = ""
+  "PROCEDURE Proc(b DATE FIELD) RETURN FIELD UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64 FIELD)b;\n"
+  "ENDPROC\n";
+
+char test_prog_25[] = ""
+  "PROCEDURE Proc(b DATE ARRAY FIELD) RETURN FIELD ARRAY UINT64 \n"
+  "DO \n"
+  "  RETURN (UINT64 ARRAY FIELD)b;\n"
+  "ENDPROC\n";
+
+char test_prog_26[] = ""
+  "PROCEDURE Proc(b TABLE(d DATE)) RETURN FIELD ARRAY UINT64 \n"
+  "DO \n"
+  "  RETURN (FIELD ARRAY UINT64)b;\n"
+  "ENDPROC\n";
+
+char test_prog_27[] = ""
+  "PROCEDURE Proc(d DATE) RETURN TABLE (p DATE)\n"
+  "DO \n"
+  "  RETURN (TABLE (p DATE))d;\n"
+  "ENDPROC\n";
+
 bool_t
 test_for_error(const char *test_buffer, uint_t err_expected, uint_t err_type)
 {
@@ -1348,7 +1415,52 @@ main()
       (test_result == FALSE) ? FALSE : test_for_error(test_prog_16,
                                                        MSG_EXP_NOT_ITERABLE,
                                                        MSG_ERROR_EVENT);
+  test_result =
+        (test_result == FALSE) ? FALSE : test_for_error(test_prog_17,
+                                                         MSG_CAST_NOT_POSSIBLE,
+                                                         MSG_ERROR_EVENT);
+  test_result =
+        (test_result == FALSE) ? FALSE : test_for_error(test_prog_18,
+                                                         MSG_CAST_NOT_POSSIBLE,
+                                                         MSG_ERROR_EVENT);
+  test_result =
+        (test_result == FALSE) ? FALSE : test_for_error(test_prog_19,
+                                                         MSG_CAST_NOT_POSSIBLE,
+                                                         MSG_ERROR_EVENT);
+  test_result =
+        (test_result == FALSE) ? FALSE : test_for_error(test_prog_20,
+                                                         MSG_CAST_NOT_POSSIBLE,
+                                                         MSG_ERROR_EVENT);
+  test_result =
+          (test_result == FALSE) ? FALSE : test_for_error(test_prog_21,
+                                                           MSG_CAST_NOT_POSSIBLE,
+                                                           MSG_ERROR_EVENT);
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_22,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_23,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_24,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_25,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
 
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_26,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
+
+  test_result =
+            (test_result == FALSE) ? FALSE : test_for_error(test_prog_27,
+                                                             MSG_CAST_NOT_POSSIBLE,
+                                                             MSG_ERROR_EVENT);
   if (test_result == FALSE)
     {
       printf("TEST RESULT: FAIL\n");

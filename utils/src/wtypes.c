@@ -47,9 +47,9 @@ wh_apply_array_modifier(struct TypeSpec* const ioBuffer)
   uint16_t type = load_le_int16(ioBuffer->type);
 
   if ( (is_type_spec_valid( ioBuffer) == FALSE)
-      || (GET_BASIC_TYPE( type) == T_TEXT)
-      || (GET_BASIC_TYPE( type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( type) > T_UNDETERMINED))
+      || (GET_BASE_TYPE( type) == T_TEXT)
+      || (GET_BASE_TYPE( type) <= T_UNKNOWN)
+      || (GET_BASE_TYPE( type) > T_UNDETERMINED))
   {
     return -1;
   }
@@ -67,8 +67,8 @@ wh_apply_field_modifier(struct TypeSpec* const ioBuffer)
   uint16_t type = load_le_int16(ioBuffer->type);
 
   if ( (is_type_spec_valid( ioBuffer) == FALSE)
-      || (GET_BASIC_TYPE( type) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( type) > T_UNDETERMINED))
+      || (GET_BASE_TYPE( type) <= T_UNKNOWN)
+      || (GET_BASE_TYPE( type) > T_UNDETERMINED))
   {
     return -1;
   }
@@ -130,16 +130,16 @@ is_type_spec_valid(const struct TypeSpec* spec)
 
     else if (IS_ARRAY( fieldType))
       {
-        if ((GET_BASIC_TYPE( fieldType) == T_UNKNOWN)
-            || (GET_BASIC_TYPE( fieldType) > T_UNDETERMINED))
+        if ((GET_BASE_TYPE( fieldType) == T_UNKNOWN)
+            || (GET_BASE_TYPE( fieldType) > T_UNDETERMINED))
           {
             result = FALSE;
           }
       }
     else
       {
-        if ((GET_BASIC_TYPE( fieldType) == T_UNKNOWN)
-            || (GET_BASIC_TYPE( fieldType) > T_UNDETERMINED))
+        if ((GET_BASE_TYPE( fieldType) == T_UNKNOWN)
+            || (GET_BASE_TYPE( fieldType) > T_UNDETERMINED))
           {
             result = FALSE;
           }
@@ -148,8 +148,8 @@ is_type_spec_valid(const struct TypeSpec* spec)
   else if (IS_ARRAY( htype))
   {
     if ((hsize != 2)
-        || (GET_BASIC_TYPE( htype) == T_UNKNOWN)
-        || (GET_BASIC_TYPE( htype) > T_UNDETERMINED) )
+        || (GET_BASE_TYPE( htype) == T_UNKNOWN)
+        || (GET_BASE_TYPE( htype) > T_UNDETERMINED) )
       {
         result = FALSE;
       }
@@ -158,7 +158,7 @@ is_type_spec_valid(const struct TypeSpec* spec)
   {
     uint_t index = 0;
 
-    if (GET_BASIC_TYPE( htype) != 0)
+    if (GET_BASE_TYPE( htype) != 0)
       result = FALSE;
 
     while ((index < (uint_t) (hsize - 2)) && (result != FALSE))
@@ -171,8 +171,8 @@ is_type_spec_valid(const struct TypeSpec* spec)
       type   = load_le_int16(&(spec->data[index]));
 
       /* Ignore an eventual array mask */
-      if ( (GET_BASIC_TYPE( type) == T_UNKNOWN) ||
-           (GET_BASIC_TYPE( type) > T_UNDETERMINED))
+      if ( (GET_BASE_TYPE( type) == T_UNKNOWN) ||
+           (GET_BASE_TYPE( type) > T_UNDETERMINED))
       {
         result = FALSE;
         break;

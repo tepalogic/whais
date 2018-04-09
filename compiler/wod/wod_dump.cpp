@@ -208,7 +208,7 @@ wod_dump_nontable_type_info(ostream& output, uint16_t type)
   {
     output << "ARRAY";
 
-    type = GET_BASIC_TYPE(type);
+    type = GET_BASE_TYPE(type);
     if (type != T_UNDETERMINED)
       output << " ";
 

@@ -139,7 +139,7 @@ check_array_procedure(struct ParserState *state,
   if ((code[opCodeOffset + opcode_bytes(W_AFIN)] & A_SELF_MASK) == 0)
     return FALSE;
 
-  if (GET_BASIC_TYPE(code[opCodeOffset + opcode_bytes(W_AFIN)]) != retType)
+  if (GET_BASE_TYPE(code[opCodeOffset + opcode_bytes(W_AFIN)]) != retType)
     return FALSE;
 
   return TRUE;

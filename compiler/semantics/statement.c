@@ -421,7 +421,7 @@ type_spec_fill_basic(struct WOutputStream* const       typeStream,
   assert(var->type != T_UNKNOWN);
   assert(var->type <= T_UNDETERMINED);
 
-  store_le_int16(GET_BASIC_TYPE( var->type), spec.type);
+  store_le_int16(GET_BASE_TYPE( var->type), spec.type);
   store_le_int16(2, spec.dataSize);
   spec.data[0] = TYPE_SPEC_END_MARK;
   spec.data[1] = 0;

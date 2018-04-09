@@ -128,7 +128,7 @@ array_sort( SessionStack& stack, ISession&)
   array.Sort(reverse.mValue);
   if (removeDuplicates.mValue && (array.Count() > 1))
   {
-    switch (GET_BASIC_TYPE(array.Type()))
+    switch (GET_BASE_TYPE(array.Type()))
     {
     case T_BOOL:
       array = remove_array_duplicates<DBool>(array);

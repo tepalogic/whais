@@ -169,6 +169,7 @@ static const struct MsgCodeEntry messages[] = {
   {MSG_PROC_RET_NA_EXT, MSG_ERROR_EVENT,
    "Invalid return expression. Cannot return %s from %s."},
   {MSG_PROC_RET_NA, MSG_ERROR_EVENT, "Invalid return expression."},
+  {MSG_EXP_NOT_NUMERIC, MSG_ERROR_EVENT, "The negative operator may be used only with integer or real values."},
   {MSG_EXP_NOT_BOOL, MSG_ERROR_EVENT,
    "The result of a conditional expression should be of type BOOL."},
   {MSG_EXP_NOT_ITERABLE, MSG_ERROR_EVENT,
@@ -233,6 +234,7 @@ static const struct MsgCodeEntry messages[] = {
     "Element %u has type %s." },
   {MSG_ARR_CONSTRUCT_TYPE_SHOW, MSG_EXTRA_EVENT,
     "The result should be %s." },
+  {MSG_CAST_NOT_POSSIBLE, MSG_ERROR_EVENT, "Cannot cast type from %s to %s." },
   {0, 0, 0}
 };
 

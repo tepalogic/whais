@@ -164,7 +164,7 @@ check_vars_decl(struct ParserState *state)
       (IS_FIELD( decl_var->type) == FALSE) ||
       (IS_TABLE_FIELD( decl_var->type) != FALSE) ||
       (IS_ARRAY( GET_FIELD_TYPE(decl_var->type)) == FALSE) ||
-      (GET_BASIC_TYPE( decl_var->type) != T_DATE) ||
+      (GET_BASE_TYPE( decl_var->type) != T_DATE) ||
       decl_var->extra != NULL)
     {
       return FALSE;
@@ -175,7 +175,7 @@ check_vars_decl(struct ParserState *state)
       (IS_FIELD( decl_var->type) == FALSE) ||
       (IS_TABLE_FIELD( decl_var->type) != FALSE) ||
       (IS_ARRAY( GET_FIELD_TYPE(decl_var->type)) != FALSE) ||
-      (GET_BASIC_TYPE( decl_var->type) != T_INT8) ||
+      (GET_BASE_TYPE( decl_var->type) != T_INT8) ||
       decl_var->extra != NULL)
     {
       return FALSE;
@@ -184,7 +184,7 @@ check_vars_decl(struct ParserState *state)
   decl_var = stmt_find_declaration(&state->globalStmt, "vTable2", 7, FALSE, FALSE);
   if (decl_var == NULL ||
       (IS_TABLE( decl_var->type) == FALSE) ||
-      (GET_BASIC_TYPE( decl_var->type) != 0) ||
+      (GET_BASE_TYPE( decl_var->type) != 0) ||
       decl_var->extra == decl_var)
     {
       return FALSE;
@@ -194,7 +194,7 @@ check_vars_decl(struct ParserState *state)
   decl_var = stmt_find_declaration(&state->globalStmt, "vTable3", 7, FALSE, FALSE);
   if (decl_var == NULL ||
       (IS_TABLE( decl_var->type) == FALSE) ||
-      (GET_BASIC_TYPE( decl_var->type) != 0) ||
+      (GET_BASE_TYPE( decl_var->type) != 0) ||
       (decl_var->extra != table_1->extra) ||
       (decl_var->typeSpecOff != table_1->typeSpecOff))
     {

@@ -133,8 +133,8 @@ proc_field_find_range( SessionStack& stack, ISession&)
 
   const uint_t fieldType = opField.GetType();
   if (IS_ARRAY( fieldType)
-      || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
+      || (GET_BASE_TYPE( fieldType) <= T_UNKNOWN)
+      || (GET_BASE_TYPE( fieldType) >= T_TEXT))
   {
     throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                           "Matching field values is available only for "
@@ -159,7 +159,7 @@ proc_field_find_range( SessionStack& stack, ISession&)
   const ROW_INDEX toRow = row.IsNull() ? table.AllocatedRows() - 1 : row.mValue;
 
   const FIELD_INDEX field = opField.GetField();
-  switch (GET_BASIC_TYPE(fieldType))
+  switch (GET_BASE_TYPE(fieldType))
   {
   case T_BOOL:
   {
@@ -395,8 +395,8 @@ proc_field_filter_rows(SessionStack& stack, ISession&)
 
   const uint_t fieldType = field.GetType();
   if (IS_ARRAY( fieldType)
-      || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
+      || (GET_BASE_TYPE( fieldType) <= T_UNKNOWN)
+      || (GET_BASE_TYPE( fieldType) >= T_TEXT))
   {
     throw InterException( _EXTRA( InterException::INVALID_PARAMETER_TYPE),
                           "Matching field values is available only for "
@@ -419,12 +419,12 @@ proc_field_filter_rows(SessionStack& stack, ISession&)
   if (addNull.IsNull())
     addNull = DBool(false);
 
-  if ( ! set.IsNull() && GET_BASIC_TYPE(set.Type()) != GET_BASIC_TYPE(fieldType))
+  if ( ! set.IsNull() && GET_BASE_TYPE(set.Type()) != GET_BASE_TYPE(fieldType))
     throw InterException(_EXTRA(InterException::FIELD_TYPE_MISMATCH));
 
   ITable& table = field.GetTable();
   const FIELD_INDEX f = field.GetField();
-  switch (GET_BASIC_TYPE(fieldType))
+  switch (GET_BASE_TYPE(fieldType))
   {
   case T_BOOL:
     result = test_rows<DBool>(table, f, rows, set, addNull.mValue, filterout.mValue);
@@ -576,8 +576,8 @@ field_search_minmax( SessionStack& stack, ISession&)
   }
 
   const uint_t fieldType = opField.GetType();
-  if (IS_ARRAY(fieldType) || (GET_BASIC_TYPE( fieldType) <= T_UNKNOWN)
-      || (GET_BASIC_TYPE( fieldType) >= T_TEXT))
+  if (IS_ARRAY(fieldType) || (GET_BASE_TYPE( fieldType) <= T_UNKNOWN)
+      || (GET_BASE_TYPE( fieldType) >= T_TEXT))
   {
     throw InterException(_EXTRA(InterException::INVALID_PARAMETER_TYPE),
                          "Searching for min and max values is available "
@@ -588,7 +588,7 @@ field_search_minmax( SessionStack& stack, ISession&)
   ITable& table = opField.GetTable();
   const FIELD_INDEX field = opField.GetField();
 
-  switch (GET_BASIC_TYPE(fieldType))
+  switch (GET_BASE_TYPE(fieldType))
   {
   case T_BOOL:
   {

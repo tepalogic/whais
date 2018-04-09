@@ -879,14 +879,14 @@ FieldValuesSelection::~FieldValuesSelection()
 
 FieldValuesUpdate::~FieldValuesUpdate()
 {
-  assert((T_UNKNOWN < GET_BASIC_TYPE(mFieldType))
+  assert((T_UNKNOWN < GET_BASE_TYPE(mFieldType))
           || (mFieldType == T_UNKNOWN));
-  assert(GET_BASIC_TYPE(mFieldType) < T_UNDETERMINED);
+  assert(GET_BASE_TYPE(mFieldType) < T_UNDETERMINED);
 
   if (IS_ARRAY(mFieldType))
     _RC(DArray*, mValue)->~DArray();
 
-  else if (GET_BASIC_TYPE(mFieldType) == T_TEXT)
+  else if (GET_BASE_TYPE(mFieldType) == T_TEXT)
     _RC(DText*, mValue)->~DText();
 }
 
@@ -967,7 +967,7 @@ ParseFieldUpdateValues(ostream* const              os,
                 }
 
               const size_t temp = offset;
-              switch(GET_BASIC_TYPE(fd.type))
+              switch(GET_BASE_TYPE(fd.type))
                 {
                 case T_BOOL:
                     {

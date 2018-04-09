@@ -119,7 +119,7 @@ tc_settup_connection(int              argc,
 static string
 decode_basic_type(const uint16_t type)
 {
-  switch(GET_BASIC_TYPE(type))
+  switch(GET_BASE_TYPE(type))
   {
   case T_BOOL:
     return "BOOL";
@@ -186,10 +186,10 @@ decode_array_typeinfo(unsigned int type)
   if ( ! IS_ARRAY(type))
     return decode_basic_type(type);
 
-  if (GET_BASIC_TYPE(type) == WHC_TYPE_NOTSET)
+  if (GET_BASE_TYPE(type) == WHC_TYPE_NOTSET)
     return "ARRAY";
 
-  return decode_basic_type(GET_BASIC_TYPE(type)) + " ARRAY";
+  return decode_basic_type(GET_BASE_TYPE(type)) + " ARRAY";
 }
 
 static string

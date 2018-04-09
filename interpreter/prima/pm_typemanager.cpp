@@ -171,7 +171,7 @@ create_non_persistent_table(IDBSHandler& dbs, uint8_t* const inoutTypeDesc)
     typeOff += sizeof(uint16_t);
 
     fd.isArray = IS_ARRAY(type);
-    fd.type = _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(type));
+    fd.type = _SC(DBS_FIELD_TYPE, GET_BASE_TYPE(type));
 
     fields.push_back(fd);
   }
@@ -273,7 +273,7 @@ TypeManager::CreateGlobalValue(uint8_t* inoutTypeDesc, ITable* persitentTable)
   {
     assert(persitentTable == nullptr);
 
-    switch (GET_BASIC_TYPE(spec.Type()))
+    switch (GET_BASE_TYPE(spec.Type()))
     {
     case T_BOOL:
       return GlobalValue(ArrayOperand(DArray((DBool*)nullptr)));
@@ -335,7 +335,7 @@ TypeManager::CreateGlobalValue(uint8_t* inoutTypeDesc, ITable* persitentTable)
     assert(persitentTable == nullptr);
 
     const uint16_t type = GET_FIELD_TYPE(spec.Type());
-    if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
+    if (IS_ARRAY(type) && (GET_BASE_TYPE(type) == T_TEXT))
     {
       throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
     }
@@ -426,7 +426,7 @@ StackValue TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
   }
   else if (IS_ARRAY(spec.Type()))
   {
-    switch (GET_BASIC_TYPE(spec.Type()))
+    switch (GET_BASE_TYPE(spec.Type()))
     {
     case T_BOOL:
       return StackValue(ArrayOperand(DArray((DBool*)nullptr)));
@@ -487,7 +487,7 @@ StackValue TypeManager::CreateLocalValue(uint8_t* inoutTypeDesc)
   else if (IS_FIELD(spec.Type()))
   {
     const uint16_t type = GET_FIELD_TYPE(spec.Type());
-    if (IS_ARRAY(type) && (GET_BASIC_TYPE(type) == T_TEXT))
+    if (IS_ARRAY(type) && (GET_BASE_TYPE(type) == T_TEXT))
     {
       throw InterException(_EXTRA(InterException::TEXT_ARRAY_NOT_SUPP), nullptr);
     }

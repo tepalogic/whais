@@ -223,7 +223,7 @@ PrototypeTable::AddRow(const bool skipThreadSafety)
       {
         BTree fieldIndexTree( *mvIndexNodeMgrs[f]);
 
-        switch (GET_BASIC_TYPE(fd.Type()))
+        switch (GET_BASE_TYPE(fd.Type()))
         {
         case T_BOOL:
         {
@@ -393,7 +393,7 @@ PrototypeTable::MarkRowForReuse(const ROW_INDEX row)
 
     else
     {
-      switch (GET_BASIC_TYPE(field.Type()))
+      switch (GET_BASE_TYPE(field.Type()))
       {
       case T_BOOL:
         Set(row, fieldsCount, DBool());
@@ -1034,7 +1034,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
 {
   const FieldDescriptor& desc = GetFieldDescriptorInternal(field);
 
-  if (IS_ARRAY(desc.Type()) || (GET_BASIC_TYPE(desc.Type()) != T_TEXT))
+  if (IS_ARRAY(desc.Type()) || (GET_BASE_TYPE(desc.Type()) != T_TEXT))
   {
     throw DBSException(_EXTRA(DBSException::FIELD_TYPE_INVALID));
   }
@@ -1177,7 +1177,7 @@ PrototypeTable::StoreEntry(const ROW_INDEX        row,
   LockGuard<Lock> _l(s->mLock);
 
   if ( ! IS_ARRAY(desc.Type())
-      || (GET_BASIC_TYPE(desc.Type()) != s->Type() && s->Count() != 0))
+      || (GET_BASE_TYPE(desc.Type()) != s->Type() && s->Count() != 0))
   {
     throw DBSException(_EXTRA(DBSException::FIELD_TYPE_INVALID));
   }
@@ -1533,7 +1533,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
   if (row >= mRowsCount)
     throw DBSException(_EXTRA(DBSException::ROW_NOT_ALLOCATED));
 
-  if (IS_ARRAY(desc.Type()) || (GET_BASIC_TYPE(desc.Type()) != T_TEXT))
+  if (IS_ARRAY(desc.Type()) || (GET_BASE_TYPE(desc.Type()) != T_TEXT))
   {
     throw DBSException(_EXTRA(DBSException::FIELD_TYPE_INVALID));
   }
@@ -1577,7 +1577,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
     throw DBSException(_EXTRA(DBSException::ROW_NOT_ALLOCATED));
 
   if ( !IS_ARRAY(desc.Type())
-      || ((GET_BASIC_TYPE(desc.Type()) != outValue.Type()) && !outValue.IsNull()))
+      || ((GET_BASE_TYPE(desc.Type()) != outValue.Type()) && !outValue.IsNull()))
   {
     throw DBSException(_EXTRA(DBSException::FIELD_TYPE_INVALID));
   }
@@ -1592,7 +1592,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
 
   if (rowData[byteOff] & (1 << bitOff))
   {
-    switch (GET_BASIC_TYPE(desc.Type()))
+    switch (GET_BASE_TYPE(desc.Type()))
     {
     case T_BOOL:
       outValue = DArray(_SC(DBool *, nullptr));
@@ -1660,7 +1660,7 @@ PrototypeTable::RetrieveEntry(const ROW_INDEX   row,
   }
   else if ((fieldValueSize & 0x8000000000000000ull) != 0)
   {
-    shared_ptr<IArrayStrategy> strategy = shared_make(TemporalArray, GET_BASIC_TYPE(desc.Type()));
+    shared_ptr<IArrayStrategy> strategy = shared_make(TemporalArray, GET_BASE_TYPE(desc.Type()));
     strategy->SetSelfReference(strategy);
 
     assert(((fieldValueSize >> 56) & 0x7F) > 0);

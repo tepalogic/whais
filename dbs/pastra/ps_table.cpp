@@ -86,7 +86,7 @@ field_type_to_text(const uint_t type)
 {
   if (IS_ARRAY(type))
   {
-    switch (GET_BASIC_TYPE(type))
+    switch (GET_BASE_TYPE(type))
     {
     case T_BOOL:
       return "BOOL ARRAY";
@@ -139,7 +139,7 @@ field_type_to_text(const uint_t type)
   }
   else
   {
-    switch (GET_BASIC_TYPE(type))
+    switch (GET_BASE_TYPE(type))
     {
     case T_BOOL:
       return "BOOL";
@@ -435,7 +435,7 @@ repair_table_fields(FieldDescriptor* const           fields,
     else
       fixCallback(INFORMATION, "Field '%s' data offset set at '%u'.", fieldName, rowSize);
 
-    rowSize += Serializer::Size(_SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(fields[i].Type())),
+    rowSize += Serializer::Size(_SC(DBS_FIELD_TYPE, GET_BASE_TYPE(fields[i].Type())),
                                 IS_ARRAY(fields[i].Type()));
   }
   return rowSize;
@@ -1326,7 +1326,7 @@ PersistentTable::RepairTable(DbsHandler&           dbs,
         {
           if ( ! check_array_buffer(fieldData,
                                     (fieldSize >> 56) & 0x7F,
-                                    _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(fds[field].Type()))))
+                                    _SC(DBS_FIELD_TYPE, GET_BASE_TYPE(fds[field].Type()))))
 
           {
             fixCallback(FIX_INFO,
@@ -1337,14 +1337,14 @@ PersistentTable::RepairTable(DbsHandler&           dbs,
         }
         else if ( ! vsData->CheckArrayEntry(fieldEntry,
                                             fieldSize,
-                                            _SC(DBS_FIELD_TYPE, GET_BASIC_TYPE(fds[field].Type()))))
+                                            _SC(DBS_FIELD_TYPE, GET_BASE_TYPE(fds[field].Type()))))
         {
           fixCallback(FIX_INFO, "Detected invalid value of field '%s' at row"
               " %u. Set to nullptr.", fieldsDescs.get() + fds[field].NameOffset(), row);
           isNullValue = true;
         }
       }
-      else if (GET_BASIC_TYPE(fds[field].Type()) == T_TEXT && ! isNullValue)
+      else if (GET_BASE_TYPE(fds[field].Type()) == T_TEXT && ! isNullValue)
       {
         const uint64_t fieldEntry = load_le_int64(fieldData);
         const uint64_t fieldSize = load_le_int64(fieldData + sizeof(uint64_t));
@@ -1368,7 +1368,7 @@ PersistentTable::RepairTable(DbsHandler&           dbs,
       }
       else if ((indexNodeMgrs[field] != nullptr))
       {
-        switch (GET_BASIC_TYPE(fds[field].Type()))
+        switch (GET_BASE_TYPE(fds[field].Type()))
         {
         case T_BOOL:
         {
