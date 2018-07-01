@@ -543,8 +543,8 @@ handle_procedure_array_param(WH_CONNECTION           hnd,
 
 static bool
 handle_procedure_table_param(WH_CONNECTION       hnd,
-                              const string&       cmdLine,
-                              size_t&             inoutLineOff)
+                             const string&       cmdLine,
+                             size_t&             inoutLineOff)
 {
   const char* const   line         = cmdLine.c_str();
   uint_t              wcs          = WCS_OK;

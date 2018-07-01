@@ -25,6 +25,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef WHAIS_SHL_H_
 #define WHAIS_SHL_H_
 
+#ifdef USE_CONNECTOR_SHL
+  #ifdef CONNECTOR_EXPORTING
+    #define CONNECTOR_SHL SHL_EXPORT_SYMBOL
+  #else
+    #define CONNECTOR_SHL SHL_IMPORT_SYMBOL
+  #endif
+#else
+  #define CONNECTOR_SHL
+#endif
+
+
 #ifdef USE_COMPILER_SHL
   #ifdef COMPILER_EXPORTING
     #define COMPILER_SHL SHL_EXPORT_SYMBOL

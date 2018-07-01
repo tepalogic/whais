@@ -24,10 +24,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <assert.h>
 #include <string.h>
 
-#include "whais_connector.h"
-
 #include "whais.h"
 
+#include "whais_connector.h"
 #include "utils/endianness.h"
 #include "utils/wrandom.h"
 #include "utils/wutf.h"
@@ -618,7 +617,8 @@ WPingServer(const WH_CONNECTION hnd)
     cs = WCS_INVALID_FRAME;
   }
 
-  exit_ping_server: return cs;
+exit_ping_server:
+  return cs;
 }
 
 
@@ -3354,11 +3354,20 @@ WExecuteProcedure(const WH_CONNECTION   hnd,
 
   if (hnd_ == NULL
       || procedure == NULL
-      || strlen( procedure) == 0
-      || hnd_->buildingCmd != CMD_INVALID)
+      || strlen( procedure) == 0)
   {
     return WCS_INCOMPLETE_CMD;
   }
+
+  if (hnd_->buildingCmd == CMD_UPDATE_STACK)
+  {
+    cs = WFlush(hnd);
+    if (cs != WCS_OK)
+      return cs;
+  }
+
+  if (hnd_->buildingCmd != CMD_INVALID)
+    return WCS_INCOMPLETE_CMD;
 
   set_data_size(hnd, strlen(procedure) + 1);
   strcpy((char*)data( hnd), procedure);

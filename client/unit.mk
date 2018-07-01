@@ -2,13 +2,22 @@
 UNIT:=client
 
 UNIT_EXES:=wcmd
-UNIT_SHLS:=
 UNIT_LIBS:=wslconnector
+UNIT_SHLS:=wconnector
 
+wslconnector_INC:=
 wslconnector_SRC:=src/connector.c src/client_connection.c
 wslconnector_DEF:=
 wslconnector_LIB:=utils/wslutils custom/wslcustom
 wslconnector_SHL:=
+
+wconnector_INC:=
+wconnector_SRC:=$(wslconnector_SRC)
+wconnector_DEF:=WVER_MAJ=1 WVER_MIN=0 USE_CONNECTOR_SHL CONNECTOR_EXPORTING
+wconnector_LIB:=utils/wslutils custom/wslcustom custom/wslcppmemalloc
+
+wconnector_MAJ=.1
+wconnector_MIN=.0
 
 wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp wcmd/wcmd_execcmd.cpp\
