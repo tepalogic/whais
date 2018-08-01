@@ -1,6 +1,6 @@
 /******************************************************************************
-WOD - Whais Object Dumper.
-Copyright(C) 2009  Iulian Popa
+WHAIS - An advanced database system
+Copyright(C) 2014-2018  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,

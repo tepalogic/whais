@@ -1,6 +1,6 @@
 /******************************************************************************
-WHAISC - A compiler for whais programs
-Copyright(C) 2009  Iulian Popa
+WHAIS - An advanced database system
+Copyright(C) 2014-2018  Iulian Popa
 
 Address: Str Olimp nr. 6
          Pantelimon Ilfov,
@@ -20,7 +20,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
+******************************************************************************/
+
 #include <assert.h>
 #include <string.h>
 

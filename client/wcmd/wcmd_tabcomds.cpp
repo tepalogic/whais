@@ -1,10 +1,10 @@
 /******************************************************************************
-  WCMD - An utility to manage Whais database files.
-  Copyright(C) 2008  Iulian Popa
+WHAIS - An advanced database system
+Copyright(C) 2014-2018  Iulian Popa
 
 Address: Str Olimp nr. 6
-Pantelimon Ilfov,
-Romania
+         Pantelimon Ilfov,
+         Romania
 Phone:   +40721939650
 e-mail:  popaiulian@gmail.com
 

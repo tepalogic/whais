@@ -1,10 +1,10 @@
 /******************************************************************************
-  WCMD - An utility to manage whais database files.
-  Copyright(C) 2008  Iulian Popa
+WHAIS - An advanced database system
+Copyright(C) 2014-2018  Iulian Popa
 
 Address: Str Olimp nr. 6
-Pantelimon Ilfov,
-Romania
+         Pantelimon Ilfov,
+         Romania
 Phone:   +40721939650
 e-mail:  popaiulian@gmail.com
 
@@ -21,6 +21,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
+
 
 #ifndef WCMD_ONLINECMDS_H_
 #define WCMD_ONLINECMDS_H_
