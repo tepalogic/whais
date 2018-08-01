@@ -76,13 +76,13 @@ void yyerror(struct ParserState *state,  const char *msg);
 
 //Operator precedence and associativity
 
-%right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR '?' ':' '$'
+%right '=' SADD SSUB SMUL SDIV SMOD SAND SXOR SOR '?' ':' 
 %left  EQ NE
 %left  AND '&' OR '|' XOR '^'
 %left  '<' '>' LE GE
 %left  '+' '-'
 %left  '*' '/' '%'
-%right NOT '!' '~'  UMINUS EXPCAST
+%right NOT '!' '~'  UMINUS 
 %right '@'
 // %right INC DEC
 

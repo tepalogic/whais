@@ -146,10 +146,11 @@ Socket::Accept()
 uint_t
 Socket::Read(uint8_t* const buffer, const uint_t maxCount)
 {
+  if (mSocket == INVALID_SOCKET)
+    throw SocketException(_EXTRA(WOP_UNKNOW), "Invalid socket used to read.");
+
   uint_t result = maxCount;
   const uint32_t e = whs_read(mSocket, buffer, &result);
-
-  assert(mSocket != INVALID_SOCKET);
 
   if (e != WOP_OK)
     throw SocketException(_EXTRA(e), "Failed to read from socket(%d).", mSocket);
@@ -161,9 +162,10 @@ Socket::Read(uint8_t* const buffer, const uint_t maxCount)
 void
 Socket::Write(const uint8_t* const buffer, const uint_t count)
 {
-  const uint32_t e = whs_write(mSocket, buffer, count);
+  if (mSocket == INVALID_SOCKET)
+    throw SocketException(_EXTRA(WOP_UNKNOW), "Invalid socket used to write.");
 
-  assert(mSocket != INVALID_SOCKET);
+  const uint32_t e = whs_write(mSocket, buffer, count);
 
   if (e != WOP_OK)
     throw SocketException(_EXTRA(e), "Failed to write on socket(%d).", mSocket);
