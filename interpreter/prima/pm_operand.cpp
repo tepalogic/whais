@@ -474,7 +474,7 @@ BaseOperand::RedifineValue(StackValue& source)
 
   auto& op = _SC(BaseOperand&, source.Operand());
   if (op.CustomCopyIncomplete(this))
-    memcpy(this, &source, sizeof source);
+    memcpy(_SC(void*, this), &source, sizeof source);
 }
 
 

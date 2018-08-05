@@ -38,7 +38,7 @@ UndefinedOperand::UndefinedOperand(INativeObject& object)
 
 UndefinedOperand::UndefinedOperand(const UndefinedOperand& source)
 {
-  memcpy(this, &source, sizeof(*this));
+  memcpy(_SC(void*,this), &source, sizeof(*this));
   Initialise();
 }
 
@@ -56,7 +56,7 @@ UndefinedOperand::operator=(const UndefinedOperand& source)
     return *this;
 
   Cleanup();
-  memcpy(this, &source, sizeof(*this));
+  memcpy(_SC(void*, this), &source, sizeof(*this));
   Initialise();
   return *this;
 }

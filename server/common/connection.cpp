@@ -37,9 +37,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 
-static const uint32_t FRAME_SERVER_VERS  = 0x00000001;
-
-
 ConnectionException::ConnectionException(const uint32_t  code,
                                          const char*     file,
                                          uint32_t        line,
@@ -173,8 +170,8 @@ ClientConnection::ClientConnection(UserHandler& client, vector<DBSDescriptors>& 
                            : mUserHandler.mDesc->mUserPasswd;
   if (mCipher == FRAME_ENCTYPE_3K)
   {
-    strncpy(_RC(char*, mKey._3K), password.c_str(), sizeof mKey);
     mKey._3K[sizeof mKey - 1] = 0;
+    strncpy(_RC(char*, mKey._3K), password.c_str(), sizeof mKey - 1);
   }
   else
   {

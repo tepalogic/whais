@@ -36,10 +36,6 @@ using namespace std;
 
 
 
-static const uint64_t NOT_FOUND_VALUE = ~_SC(uint64_t, 0);
-
-
-
 WLIB_PROC_DESCRIPTION         gProcArrayCount;
 WLIB_PROC_DESCRIPTION         gProcArraySort;
 

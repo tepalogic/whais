@@ -225,10 +225,10 @@ EXTERN PROCEDURE replace_str(source TEXT,
 #   @alph   - TRUE to compare alphabetically.
 #Out:
 #   The offset position where the substring was found, NULL if it was not found.
-EXTERN PROCEDURE compare(first TEXT,
-                         second TEXT, 
-                         alph BOOL,
-                         case BOOL) RETURN INT32;
+EXTERN PROCEDURE compare_str(first TEXT,
+                             second TEXT, 
+                             alph BOOL,
+                             case BOOL) RETURN INT32;
 
 # Retrieve the integer value of a digit character of a numeric system.
 #In:

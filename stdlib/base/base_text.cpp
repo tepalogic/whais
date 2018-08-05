@@ -968,7 +968,7 @@ base_text_init()
                                              gUInt64Type
                                            };
 
-  gTextFind.name              = "find";
+  gTextFind.name              = "find_str";
   gTextFind.localsCount       = 6;
   gTextFind.localsTypes       = findTextLocals;
   gTextFind.code              = find_substring_offset;
@@ -984,7 +984,7 @@ base_text_init()
                                                 gUInt64Type
                                               };
 
-  gTextReplace.name          = "replace";
+  gTextReplace.name          = "replace_str";
   gTextReplace.localsCount   = 7;
   gTextReplace.localsTypes   = replaceTextLocals;
   gTextReplace.code          = replace_substring_offset;
@@ -998,7 +998,7 @@ base_text_init()
                                                 gBoolType
                                               };
 
-  gTextCompare.name            = "compare";
+  gTextCompare.name            = "compare_str";
   gTextCompare.localsCount     = 5;
   gTextCompare.localsTypes     = textCompareLocals;
   gTextCompare.code            = compare_texts;
