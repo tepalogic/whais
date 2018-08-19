@@ -1,5 +1,7 @@
 # WHAIS
 
+htttp://www.whais.net
+
 Whais proposes a new type of database server. Traditional SQL based system are very optimized at storing and retrieve chunks of data. However, these are not designed to process the information they store and this situation leads to certain inconsistency of the stored information and longer times to retrieve it. 
 
 This new approach has at its core a new language designed for data manipulation. Differently from SQL, it's not designed to retrieve the information using queries, but to compute it procedurally based on the stored information. The result will be actually based on the analysis of the stored data. 
