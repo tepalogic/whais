@@ -27,7 +27,7 @@ Everyone is welcome to contribute in any way to improve this program. Even if yo
 
 1. Fork it!  
 
-2. Recall to have fun when you do all next steps. Chances are you are going to change the world a little bit.
+2. Recall to have fun while you do all next steps. Chances are you are going to change the world a little bit.
 
 3. Create your feature branch: `git checkout -b my-new-feature`  
 
