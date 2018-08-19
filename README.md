@@ -42,9 +42,7 @@ Everyone is welcome to contribute in any way to improve this program. Even if yo
 
 ## History
 
-19th August 2018 -  
-
-First version publicly available 
+19th August 2018 -  First version publicly available 
 
 
 ## License
