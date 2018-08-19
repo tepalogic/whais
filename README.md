@@ -1,6 +1,7 @@
 # WHAIS
 
 htttp://www.whais.net
+(to be available in the next days)
 
 Whais proposes a new type of database server. Traditional SQL based system are very optimized at storing and retrieve chunks of data. However, these are not designed to process the information they store and this situation leads to certain inconsistency of the stored information and longer times to retrieve it. 
 
