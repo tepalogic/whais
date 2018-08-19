@@ -23,7 +23,7 @@ In case the build fails, you may need some development packages installed on you
 
 ## Contributing
 
-Everyone is welcome to contribute in any way to improve this program. Even if you have an idea how to improve this in do share it here.  Otherwise:  
+Everyone is welcome to contribute in any way to improve this program. Even if you have just an idea how to this, please do share it here.  Otherwise:  
 
 1. Fork it!  
 
@@ -33,7 +33,9 @@ Everyone is welcome to contribute in any way to improve this program. Even if yo
 
 4. Commit your changes: `git commit -am 'Add some feature'`  
 
-5. Push to the branch: `git push origin my-new-feature` 5. Submit a pull request :D 
+5. Push to the branch: `git push origin my-new-feature` 
+
+6. Submit a pull request :D 
 
 ## History
 
