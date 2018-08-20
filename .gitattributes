@@ -1,2 +1,8 @@
 _tools_/* linguist-vendored
 test/* linguist-vendored
+
+*.mk linguist-vendored
+*.w linguist-vendored
+*.wh linguist-vendored
+
+
