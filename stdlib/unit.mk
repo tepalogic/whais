@@ -2,7 +2,7 @@ UNIT:=stdlib
 
 UNIT_EXES:=
 UNIT_LIBS:=
-UNIT_SHLS:=wnl_base
+UNIT_SHLS:=wnl_base wnl_develop
 
 wnl_base_INC:=
 wnl_base_SRC:=base/base.cpp base/base_types.cpp base/base_generics.cpp base/base_constants.cpp\
@@ -14,6 +14,16 @@ wnl_base_SHL:=dbs/wpastra interpreter/wprima custom/wcustom
 	   
 wnl_base_MAJ=.1
 wnl_base_MIN=.0
+
+
+wnl_develop_INC:=
+wnl_develop_SRC:=develop/develop.cpp develop/develop_accessors.cpp
+wnl_develop_LIB:=utils/wslutils custom/wslcppmemalloc
+wnl_develop_DEF:=USE_DBS_SHL USE_CUSTOM_SHL USE_INTERP_SHL
+wnl_develop_SHL:=dbs/wpastra interpreter/wprima custom/wcustom
+
+wnl_develop_MAJ=.1
+wnl_develop_MIN=.0
 
 ifeq ($(BUILD_TESTS),yes)
 -include ./$(UNIT)/test/test.mk

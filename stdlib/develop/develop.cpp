@@ -33,8 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/wthread.h"
 #include "stdlib/interface.h"
 
-#include "math_constants.h"
-
+#include "develop_accessors.h"
 
 
 using namespace whais;
@@ -42,8 +41,10 @@ using namespace whais;
 
 
 static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
-    /* TODO: Add the procedures descriptors here. */
-                                                          };
+                                                           &gGlbBasicVarRead,
+                                                           &gGlbArrayVarRead,
+                                                           &gGlbTableVarRead
+                                                         };
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
     sizeof( sgRegisteredProcs) / sizeof( sgRegisteredProcs[0]),
@@ -68,13 +69,12 @@ wlib_start()
   assert( sgRefsCount >= 0);
 
   if (sgRefsCount == 0)
-    {
-      WLIB_STATUS status = WOP_OK;
+  {
+    WLIB_STATUS status = WOP_OK;
 
-      /* TODO: Add library initilization code here. */
-
+    if ((status = develop_accessors_init()) != WOP_OK)
       return status;
-    }
+  }
 
   sgInited = true;
   sgRefsCount++;
@@ -90,11 +90,10 @@ wlib_end()
 
   assert( (! sgInited) || (sgRefsCount > 0));
 
-  if (sgInited && (--sgRefsCount == 0))
-    {
-      sgInited = false;
-      /* TODO: Add your library clean up code here. */
-    }
+  if (sgInited)
+    --sgRefsCount;
+
+  sgInited = false;
 
   return WOP_OK;
 }
