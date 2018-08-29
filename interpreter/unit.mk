@@ -2,9 +2,7 @@ UNIT:=interpreter
 
 UNIT_EXES:= 
 UNIT_LIBS:=
-ifeq ($(EXTRA_LIBS),yes)
 UNIT_LIBS+=wslprima
-endif
 UNIT_SHLS:=wprima
 
 wprima_INC:=

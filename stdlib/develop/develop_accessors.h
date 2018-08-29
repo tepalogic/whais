@@ -27,8 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "stdlib/interface.h"
 
-extern whais::WLIB_PROC_DESCRIPTION         gGlbBasicVarRead;
-extern whais::WLIB_PROC_DESCRIPTION         gGlbArrayVarRead;
+extern whais::WLIB_PROC_DESCRIPTION         gGlbVarRead;
 extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarRead;
 
 whais::WLIB_STATUS

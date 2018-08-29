@@ -16,11 +16,11 @@ wnl_base_MAJ=.1
 wnl_base_MIN=.0
 
 
-wnl_develop_INC:=
+wnl_develop_INC:=interpreter/include
 wnl_develop_SRC:=develop/develop.cpp develop/develop_accessors.cpp
-wnl_develop_LIB:=utils/wslutils custom/wslcppmemalloc
-wnl_develop_DEF:=USE_DBS_SHL USE_CUSTOM_SHL USE_INTERP_SHL
-wnl_develop_SHL:=dbs/wpastra interpreter/wprima custom/wcustom
+wnl_develop_LIB:=utils/wslutils custom/wslcppmemalloc interpreter/wslprima
+wnl_develop_DEF:=USE_DBS_SHL USE_CUSTOM_SHL
+wnl_develop_SHL:=dbs/wpastra custom/wcustom
 
 wnl_develop_MAJ=.1
 wnl_develop_MIN=.0

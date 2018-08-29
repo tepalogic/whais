@@ -41,8 +41,7 @@ using namespace whais;
 
 
 static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
-                                                           &gGlbBasicVarRead,
-                                                           &gGlbArrayVarRead,
+                                                           &gGlbVarRead,
                                                            &gGlbTableVarRead
                                                          };
 
