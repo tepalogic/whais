@@ -32,8 +32,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "utils/wthread.h"
 #include "stdlib/interface.h"
+#include "dev_prima_accessors.h"
 
-#include "develop_accessors.h"
 
 
 using namespace whais;
@@ -42,7 +42,9 @@ using namespace whais;
 
 static const WLIB_PROC_DESCRIPTION* sgRegisteredProcs[] = {
                                                            &gGlbVarRead,
-                                                           &gGlbTableVarRead
+                                                           &gGlbTableVarRead,
+                                                           &gGlbVarUpdate,
+                                                           &gGlbTableVarUpdate
                                                          };
 
 static const WLIB_DESCRIPTION sgLibraryDescription = {
@@ -71,7 +73,7 @@ wlib_start()
   {
     WLIB_STATUS status = WOP_OK;
 
-    if ((status = develop_accessors_init()) != WOP_OK)
+    if ((status = dev_prima_accessors_init()) != WOP_OK)
       return status;
   }
 

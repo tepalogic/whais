@@ -21,9 +21,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
-#include "whais.h"
+#include "dev_prima_accessors.h"
 
-#include "develop_accessors.h"
+#include "whais.h"
 
 #include <cassert>
 #include <vector>
@@ -32,13 +32,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "interpreter/prima/pm_interpreter.h"
 #include "interpreter/prima/pm_globals.h"
 
-using namespace whais;
 using namespace std;
+using namespace whais;
 
 
-whais::WLIB_PROC_DESCRIPTION         gGlbVarRead;
-whais::WLIB_PROC_DESCRIPTION         gGlbTableVarRead;
-
+static const DInt32                  gVariableUpdated(0);
 static const DInt32                  gNoVariable(-1);
 static const DInt32                  gNullVariableName(-2);
 static const DInt32                  gVariableIsTable(-3);
@@ -49,9 +47,26 @@ static const DInt32                  gVariableNotTable(-6);
 static const DInt32                  gVariableInvalidRow(-7);
 static const DInt32                  gVariableInvalidField(-8);
 
+static const DInt32                  gVariableUnkErr(-1000);
+
+
+WLIB_PROC_DESCRIPTION                gGlbVarRead;
+WLIB_PROC_DESCRIPTION                gGlbTableVarRead;
+WLIB_PROC_DESCRIPTION                gGlbVarUpdate;
+WLIB_PROC_DESCRIPTION                gGlbTableVarUpdate;
+
+
+template<typename T> void
+transfer_value (const IOperand& from, IOperand& to)
+{
+  T temp;
+  from.GetValue(temp);
+  to.SetValue(temp);
+}
+
 
 static void
-update_table_field(IOperand& op, ITable& t, ROW_INDEX r, FIELD_INDEX f)
+update_result_table_field(IOperand& op, ITable& t, ROW_INDEX r, FIELD_INDEX f)
 {
   uint_t type = op.GetType();
 
@@ -88,7 +103,7 @@ update_table_field(IOperand& op, ITable& t, ROW_INDEX r, FIELD_INDEX f)
 
   case T_DATETIME:
     {
-      DDate val;
+      DDateTime val;
       op.GetValue(val);
       t.Set(r, f, val);
     }
@@ -96,7 +111,7 @@ update_table_field(IOperand& op, ITable& t, ROW_INDEX r, FIELD_INDEX f)
 
   case T_HIRESTIME:
     {
-      DDate val;
+      DHiresTime val;
       op.GetValue(val);
       t.Set(r, f, val);
     }
@@ -195,13 +210,14 @@ update_table_field(IOperand& op, ITable& t, ROW_INDEX r, FIELD_INDEX f)
   }
 }
 
-static void copy_table_value (ITable& from,
-                              ITable& to,
-                              const ROW_INDEX fromRow,
-                              const ROW_INDEX toRow,
-                              const FIELD_INDEX fromField,
-                              const FIELD_INDEX toField,
-                              const uint_t type)
+static void
+copy_table_value (ITable& from,
+                  ITable& to,
+                  const ROW_INDEX fromRow,
+                  const ROW_INDEX toRow,
+                  const FIELD_INDEX fromField,
+                  const FIELD_INDEX toField,
+                  const uint_t type)
 {
   if (IS_ARRAY(type))
   {
@@ -347,7 +363,7 @@ static void copy_table_value (ITable& from,
 }
 
 static WLIB_STATUS
-get_glb_variable( SessionStack& stack, ISession& session)
+read_glb_variable( SessionStack& stack, ISession& session)
 {
   DText variableName;
 
@@ -411,9 +427,112 @@ get_glb_variable( SessionStack& stack, ISession& session)
     result.Set(0, valueField, val);
   }
   else
-    update_table_field(op, result, 0, valueField);
+    update_result_table_field(op, result, 0, valueField);
 
   stack.Push(result);
+  return WOP_OK;
+}
+
+
+static WLIB_STATUS
+udpate_glb_variable( SessionStack& stack, ISession& session)
+{
+  DText variableName;
+
+  stack[stack.Size() - 2].Operand().GetValue(variableName);
+  StackValue newValue = stack[stack.Size() - 1];
+  stack.Pop(2);
+
+  if (variableName.IsNull())
+  {
+    stack.Push(gNullVariableName);
+    return WOP_OK;
+  }
+
+  const string name = variableName;
+  prima::Session& s = _SC(prima::Session&, session);
+  uint_t globalId = s.FindGlobal(_RC(const uint8_t*, name.c_str()), name.length());
+  if (! prima::GlobalsManager::IsValid(globalId))
+  {
+    stack.Push(gNoVariable);
+    return WOP_OK;
+  }
+
+  StackValue sv = s.GetGlobalValue(globalId);
+  IOperand& op = sv.Operand();
+  const uint_t type = op.GetType();
+  if (IS_TABLE(type) || IS_TABLE_FIELD(type))
+  {
+    stack.Push(IS_TABLE(type) ? gVariableIsTable : gVariableIsField);
+    return WOP_OK;
+  }
+  else if (IS_ARRAY(type))
+  {
+    if ((GET_BASE_TYPE(type) < T_BOOL) || (T_TEXT < GET_BASE_TYPE(type)))
+    {
+      stack.Push(gVariableArrayUnspp);
+      return WOP_OK;
+    }
+
+    if (GET_BASE_TYPE(op.GetType()) != T_UNDETERMINED
+        && GET_BASE_TYPE(newValue.Operand().GetType()) != GET_BASE_TYPE(op.GetType()))
+    {
+      stack.Push(gVariableArrayUnspp);
+      return WOP_OK;
+    }
+
+    transfer_value<DArray>(newValue.Operand(), op);
+    stack.Push(gVariableUpdated);
+    return WOP_OK;
+  }
+
+  switch (GET_BASE_TYPE(type))
+  {
+    case T_BOOL:
+      transfer_value<DBool>(newValue.Operand(), op);
+      break;
+
+    case T_CHAR:
+      transfer_value<DChar>(newValue.Operand(), op);
+      break;
+
+    case T_DATE:
+    case T_DATETIME:
+    case T_HIRESTIME:
+      transfer_value<DHiresTime>(newValue.Operand(), op);
+      break;
+
+    case T_INT8:
+    case T_INT16:
+    case T_INT32:
+    case T_INT64:
+      transfer_value<DInt64>(newValue.Operand(), op);
+      break;
+
+    case T_UINT8:
+    case T_UINT16:
+    case T_UINT32:
+    case T_UINT64:
+      transfer_value<DUInt64>(newValue.Operand(), op);
+      break;
+
+    case T_REAL:
+    case T_RICHREAL:
+      transfer_value<DRichReal>(newValue.Operand(), op);
+      break;
+
+    case T_TEXT:
+      transfer_value<DText>(newValue.Operand(), op);
+      break;
+
+    default:
+      assert(false);
+
+      stack.Push(gVariableUnkErr);
+      return WOP_OK;
+  }
+
+  stack.Push(gVariableUpdated);
   return WOP_OK;
 }
 
@@ -549,15 +668,141 @@ get_glb_table_variable( SessionStack& stack, ISession& session)
   return WOP_OK;
 }
 
+
+static WLIB_STATUS
+udpate_glb_table_variable_field( SessionStack& stack, ISession& session)
+{
+  DText   variableName;
+  DText   fieldName;
+  DUInt64 rowIndex;
+
+  stack[stack.Size() - 4].Operand().GetValue(variableName);
+  stack[stack.Size() - 3].Operand().GetValue(fieldName);
+  stack[stack.Size() - 2].Operand().GetValue(rowIndex);
+  StackValue newValue = stack[stack.Size() - 1];
+  stack.Pop(4);
+
+  if (variableName.IsNull())
+  {
+    stack.Push(gNullVariableName);
+    return WOP_OK;
+  }
+  else if (fieldName.IsNull())
+  {
+    stack.Push(gVariableInvalidField);
+    return WOP_OK;
+  }
+
+  const string name = variableName;
+  prima::Session& s = _SC(prima::Session&, session);
+  uint_t globalId = s.FindGlobal(_RC(const uint8_t*, name.c_str()), name.length());
+  if (! prima::GlobalsManager::IsValid(globalId))
+  {
+    stack.Push(gNoVariable);
+    return WOP_OK;
+  }
+
+  StackValue sv = s.GetGlobalValue(globalId);
+  IOperand& op = sv.Operand();
+  uint_t type = op.GetType();
+  if (! IS_TABLE(type))
+  {
+    stack.Push(gVariableNotTable);
+    return WOP_OK;
+  }
+
+  ITable& table = op.GetTable();
+  if (rowIndex.IsNull() || (rowIndex.mValue > table.AllocatedRows()))
+  {
+    stack.Push(gVariableInvalidRow);
+    return WOP_OK;
+  }
+
+  StackValue field;
+  try {
+    const string fname= fieldName;
+    field = op.GetFieldAt(table.RetrieveField(fname.c_str()));
+  }
+  catch (DBSException& e)
+  {
+    if (e.Code() != DBSException::FIELD_NOT_FOUND)
+      throw;
+
+    stack.Push(gVariableInvalidField);
+    return WOP_OK;
+  }
+
+  StackValue rowValue = field.Operand().GetValueAt(rowIndex.mValue);
+  type = rowValue.Operand().GetType();
+
+  if (IS_ARRAY(type))
+  {
+    transfer_value<DArray>(newValue.Operand(), rowValue.Operand());
+    stack.Push(gVariableUpdated);
+    return WOP_OK;
+  }
+
+  switch (GET_BASE_TYPE(type))
+  {
+    case T_BOOL:
+      transfer_value<DBool>(newValue.Operand(), op);
+      break;
+
+    case T_CHAR:
+      transfer_value<DChar>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    case T_DATE:
+    case T_DATETIME:
+    case T_HIRESTIME:
+      transfer_value<DHiresTime>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    case T_INT8:
+    case T_INT16:
+    case T_INT32:
+    case T_INT64:
+      transfer_value<DInt64>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    case T_UINT8:
+    case T_UINT16:
+    case T_UINT32:
+    case T_UINT64:
+      transfer_value<DUInt64>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    case T_REAL:
+    case T_RICHREAL:
+      transfer_value<DRichReal>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    case T_TEXT:
+      transfer_value<DText>(newValue.Operand(), rowValue.Operand());
+      break;
+
+    default:
+      assert(false);
+
+      stack.Push(gVariableUnkErr);
+      return WOP_OK;
+  }
+
+  stack.Push(gVariableUpdated);
+  return WOP_OK;
+}
+
 static uint8_t gUndefinedType[sizeof(TypeSpec)];
 static uint8_t gTextType[sizeof(TypeSpec)];
+static uint8_t gInt64Type[sizeof(TypeSpec)];
 static uint8_t gUInt64Type[sizeof(TypeSpec)];
 
 WLIB_STATUS
-develop_accessors_init()
+dev_prima_accessors_init()
 {
   if ((wh_define_basic_type(T_UNDETERMINED, _RC(TypeSpec*, gUndefinedType)) <= 0)
      || (wh_define_basic_type(T_TEXT, _RC(TypeSpec*, gTextType)) <= 0)
+     || (wh_define_basic_type(T_INT64, _RC(TypeSpec*, gInt64Type)) <= 0)
      || (wh_define_basic_type(T_UINT64, _RC(TypeSpec*, gUInt64Type)) <= 0))
   {
     return WOP_UNKNOW;
@@ -570,8 +815,20 @@ develop_accessors_init()
 
   gGlbVarRead.name = "__w_get_glb";
   gGlbVarRead.localsCount = 2;
-  gGlbVarRead.code = get_glb_variable;
+  gGlbVarRead.code = read_glb_variable;
   gGlbVarRead.localsTypes = glbLocals;
+
+
+  static const uint8_t* glbUpdateLocals[]= {
+                                               gInt64Type,
+                                               gTextType,
+                                               gUndefinedType
+                                            };
+
+  gGlbVarUpdate.name = "__w_upd_glb";
+  gGlbVarUpdate.localsCount = 3;
+  gGlbVarUpdate.code = udpate_glb_variable;
+  gGlbVarUpdate.localsTypes = glbUpdateLocals;
 
 
   static const uint8_t* glbTableLocals[]= {
@@ -586,6 +843,19 @@ develop_accessors_init()
   gGlbTableVarRead.localsCount = 5;
   gGlbTableVarRead.code = get_glb_table_variable;
   gGlbTableVarRead.localsTypes = glbTableLocals;
+
+  static const uint8_t* glbTableUpdateLocals[]= {
+                                                  gInt64Type,
+                                                  gTextType,
+                                                  gTextType,
+                                                  gUInt64Type,
+                                                  gUndefinedType
+                                               };
+
+  gGlbTableVarUpdate.name = "__w_upd_glb_tab";
+  gGlbTableVarUpdate.localsCount = 5;
+  gGlbTableVarUpdate.code = udpate_glb_table_variable_field;
+  gGlbTableVarUpdate.localsTypes = glbTableUpdateLocals;
 
   return WOP_OK;
 }

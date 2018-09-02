@@ -22,15 +22,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#ifndef DEVELOP_ACCESSORS_H_
-#define DEVELOP_ACCESSORS_H_
+#ifndef DEV_PRIMA_ACCESSORS_H_
+#define DEV_PRIMA_ACCESSORS_H_
 
 #include "stdlib/interface.h"
 
 extern whais::WLIB_PROC_DESCRIPTION         gGlbVarRead;
 extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarRead;
+extern whais::WLIB_PROC_DESCRIPTION         gGlbVarUpdate;
+extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarUpdate;
 
 whais::WLIB_STATUS
-develop_accessors_init();
+dev_prima_accessors_init();
 
-#endif /* DEVELOP_ACCESSORS_H_ */
+#endif /* DEV_PRIMA_ACCESSORS_H_ */
