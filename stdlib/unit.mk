@@ -18,9 +18,9 @@ wnl_base_MIN=.0
 
 wnl_dev_prima_INC:=interpreter/include
 wnl_dev_prima_SRC:=dev_prima/dev_prima.cpp dev_prima/dev_prima_accessors.cpp
-wnl_dev_prima_LIB:=utils/wslutils custom/wslcppmemalloc interpreter/wslprima
+wnl_dev_prima_LIB:=utils/wslutils custom/wslcppmemalloc interpreter/wslprima dbs/wslpastra
 wnl_dev_prima_DEF:=USE_DBS_SHL USE_CUSTOM_SHL
-wnl_dev_prima_SHL:=dbs/wpastra custom/wcustom
+wnl_dev_prima_SHL:= custom/wcustom
 
 wnl_dev_prima_MAJ=.1
 wnl_dev_prima_MIN=.0

@@ -8,13 +8,10 @@ ARCH_SHL_EXT:=.dll
 ARCH_LIB_PREFIX:=sl
 ARCH_LIB_EXT:=.lib
 
-_vc_native:=amd64
-_windows_cmd_line=cmd.exe /c '$(WHAIS_VC_PATH)\vcvarsall.bat' $(_vc_native) \&\& $(1) 
-
-CC:=$(call _windows_cmd_line, cl.exe)
+CC:=cl.exe
 CXX:=$(CC)
-LD:=$(call _windows_cmd_line, link.exe)
-AR:=$(call _windows_cmd_line, lib.exe)
+LD:=link.exe
+AR:=lib.exe
 
 #Default output directories
 WHAIS_OUT_DIR?=/cygdrive/c/WHAIS
@@ -43,7 +40,7 @@ CC_FLAGS:=$(subst /RTC1,,$(CC_FLAGS))
 endif
 endif
 
-CXX_FLAGS:=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc $(EXT_CXX_FLAGS)
+CXX_FLAGS:=$(subst /TC,/TP,$(CC_FLAGS)) /EHsc /std:c++latest $(EXT_CXX_FLAGS)
 CC_FLAGS+=$(EXT_CC_FLAGS)
 
 DEFINES+=ARCH_WINDOWS_VC
@@ -85,10 +82,9 @@ arch_set_output_library=/OUT:$(call arch_translate_path,./bin/$(ARCH)/$(2)/$(ARC
 
 #set the right  flags for the linker
 
-arch_linker_flags=/NOLOGO /OPT:REF shlwapi.lib advapi32.lib
+arch_linker_flags=/NOLOGO /ignore:4217 /OPT:REF shlwapi.lib advapi32.lib
 ifeq ($(DEBUGINFO),yes)
 arch_linker_flags+=/DEBUG
 endif 
 arch_shl_linker_flags= $(arch_linker_flags) /DLL 
 arch_archiver_flags=/NOLOGO
-

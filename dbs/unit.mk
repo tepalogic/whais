@@ -2,9 +2,7 @@ UNIT:=dbs
 
 UNIT_EXES:=
 UNIT_LIBS:=
-ifeq ($(EXTRA_LIBS),yes)
 UNIT_LIBS+=wslpastra
-endif
 UNIT_SHLS:=wpastra
 
 wpastra_INC:=
