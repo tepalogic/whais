@@ -71,12 +71,7 @@ read_real(const uint8_t* from,
   }
 
   if ( *from == '.')
-  {
     from++, size++;
-
-    if (( *from < '0') || ( *from > '9'))
-      return 0;
-  }
 
   while (('0' <= *from) && ( *from <= '9'))
   {
@@ -277,6 +272,14 @@ Utf8Translator::Read(const uint8_t* const utf8Src,
   return result;
 }
 
+
+int
+Utf8Translator::Read(const uint8_t* const utf8Src,
+                     const uint_t         srcSize,
+                     DChar* const         outValue)
+{
+  return Utf8Translator::Read(utf8Src, srcSize, false, outValue);
+}
 
 int
 Utf8Translator::Read(const uint8_t* const utf8Src,
@@ -663,9 +666,10 @@ Utf8Translator::Read(const uint8_t* const utf8Src, const uint_t srcSize, DReal* 
 
   int64_t intPart, fracPart, precision;
   uint_t result = read_real(utf8Src, &intPart, &fracPart, &precision);
-  assert((precision == 1) || (precision % 10 == 0));
   if ((result == 0) || (result > srcSize))
     return -1;
+
+  assert((precision == 1) || (precision % 10 == 0));
 
   *outValue = DReal(DBS_REAL_T(intPart, fracPart, precision));
 
@@ -689,10 +693,10 @@ Utf8Translator::Read(const uint8_t* const utf8Src,
 
   int64_t intPart, fracPart, precision;
   uint_t result = read_real(utf8Src, &intPart, &fracPart, &precision);
-
-  assert((precision == 1) || (precision % 10 == 0));
   if ((result == 0) || (result > srcSize))
     return -1;
+
+  assert((precision == 1) || (precision % 10 == 0));
 
   *outValue = DRichReal(DBS_RICHREAL_T(intPart, fracPart, precision));
 
@@ -784,6 +788,12 @@ Utf8Translator::Write(uint8_t* const utf8Dest,
   utf8Dest[result++] = 0;
 
   return result;
+}
+
+uint_t
+Utf8Translator::Write(uint8_t* const utf8Dest, const uint_t maxSize, const DChar& value)
+{
+  return Utf8Translator::Write(utf8Dest, maxSize, false, value);
 }
 
 uint_t

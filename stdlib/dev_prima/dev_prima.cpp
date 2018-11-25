@@ -113,3 +113,7 @@ wlib_describe()
 
 } // extern "C"
 
+#ifdef ENABLE_MEMORY_TRACE
+uint32_t    WMemoryTracker::smInitCount = 0;
+const char* WMemoryTracker::smModule    = "wnl_base";
+#endif

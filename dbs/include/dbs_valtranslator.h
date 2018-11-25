@@ -43,6 +43,10 @@ public:
 
   static int Read(const uint8_t* const   utf8Src,
                   const uint_t           srcSize,
+                  whais::DChar* const    outValue);
+
+  static int Read(const uint8_t* const   utf8Src,
+                  const uint_t           srcSize,
                   whais::DDate* const    outValue);
 
   static int Read(const uint8_t* const       utf8Src,
@@ -100,6 +104,10 @@ public:
   static uint_t Write(uint8_t* const        utf8Dest,
                       const uint_t          maxSize,
                       const bool            checkSpecial,
+                      const whais::DChar&   value);
+
+  static uint_t Write(uint8_t* const        utf8Dest,
+                      const uint_t          maxSize,
                       const whais::DChar&   value);
 
   static uint_t Write(uint8_t* const        utf8Dest,
