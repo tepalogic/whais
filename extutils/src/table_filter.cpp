@@ -24,11 +24,70 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "table_filter.h"
 
-#include "dbs/dbs_valtranslator.h"
+#include <memory>
 
+#include "dbs/dbs_valtranslator.h"
+#include "ext_exception.h"
 
 using namespace whais;
 using namespace std;
+
+
+template<typename T> void
+exclude_interval(vector<tuple<T, T>>& dest, T from, T to)
+{
+  if (from > to)
+    swap(from, to);
+
+  auto startEntry = dest.begin();
+  while (startEntry != dest.end())
+  {
+    if (from <= get<1>(*startEntry))
+      break;
+    ++startEntry;
+  }
+  if (startEntry == dest.end())
+    return ;
+
+  auto endEntry = startEntry;
+  do
+  {
+    if (to <= get<1>(*endEntry))
+      break;
+    ++endEntry;
+  } while (endEntry != dest.end());
+
+  if (endEntry == dest.end())
+  {
+    get<1>(*startEntry) = from;
+    dest.erase(startEntry + 1, endEntry);
+    return ;
+  }
+  else if (startEntry != endEntry)
+  {
+    get<1>(*startEntry) = from;
+    get<0>(*endEntry) = to;
+    dest.erase(startEntry + 1, endEntry);
+    return ;
+  }
+
+  if (to < get<0>(*startEntry))
+    return ;
+
+  assert (to <= get<1>(*startEntry));
+
+  if (from < get<0>(*startEntry))
+  {
+    get<0>(*startEntry) = to;
+    return ;
+  }
+
+  auto interval = *startEntry;
+  get<1>(*startEntry) = from;
+  get<0>(interval) = to;
+
+  dest.insert(startEntry, interval);
+}
 
 
 template<typename T> void
@@ -87,7 +146,7 @@ insert_interval(vector<tuple<T, T>>& dest, T from, T to)
 }
 
 template<typename T> void
-insert_string_value(vector<tuple<T, T>>& dest, const std::string& from, const std::string& to)
+insert_string_value(vector<tuple<T, T>>& dest, const string& from, const string& to)
 {
   T f, t;
 
@@ -224,9 +283,9 @@ add_values_to_interval_list(const string& from,
 
 
 void
-TableFilter::AddRow(const ROW_INDEX from, const ROW_INDEX to)
+TableFilter::AddRow(const ROW_INDEX from, const ROW_INDEX to, const bool exclude)
 {
-  insert_interval(mRowsIntervals, from, to);
+  insert_interval(exclude ? mExcludedRowsIntervals : mRowsIntervals, from, to);
 }
 
 
@@ -255,6 +314,559 @@ TableFilter::AddValue(const string& fieldName,
   ValuesIntervalList interval;
   add_values_to_interval_list(from, to, type, interval);
   usedInterval.push_back(make_tuple(fieldName, type, interval));
+}
 
+
+template<typename T>
+class TableFilterRunnerFieldRule : public TableFilterRunnerRule
+{
+public:
+  explicit TableFilterRunnerFieldRule(ITable& table, const string& field)
+    : TableFilterRunnerRule(),
+      mFieldName(field),
+      mTable(table)
+  {
+    auto fieldIdx  = mTable.FieldsCount();
+    while (fieldIdx-- > 0)
+    {
+      if (mTable.DescribeField(fieldIdx).name == mFieldName)
+      {
+        mField = fieldIdx;
+        break;
+      }
+    }
+
+    if (mField == INVALID_FIELD_INDEX)
+    {
+      throw ExtException(_EXTRA(ExtException::FILTER_FIELD_NOT_EXISTENT),
+                         "Field '%s'",
+                         field.c_str());
+    }
+
+    mIsSearchIndexed = mTable.IsIndexed(mField);
+  }
+
+  ~TableFilterRunnerFieldRule() = default;
+
+  DArray MatchRows(const DArray& rowsSet) override
+  {
+    DArray result;
+
+    BuildValuesIntervals();
+    if ( ! IsSearchIndexed())
+    {
+      ROW_INDEX rowsCount = rowsSet.Count();
+      for (ROW_INDEX i = 0; i < rowsCount; ++i)
+      {
+        DUInt32 row;
+        if (RowIsMatching(mTable, row.mValue))
+          result.Add(row);
+      }
+      result.Sort();
+      return result;
+    }
+
+    for (auto entry = mValues.begin(); entry != mValues.end(); ++entry)
+    {
+      DArray entryMatches = mTable.MatchRows(get<0>(*entry),
+                                             get<1>(*entry),
+                                             0,
+                                             mTable.AllocatedRows(),
+                                             mField);
+      entryMatches.Sort();
+      ROW_INDEX rowsCount = rowsSet.Count();
+      for (ROW_INDEX r = 0; r < rowsCount; ++r)
+      {
+        DUInt32 row;
+        rowsSet.Get(r, row);
+
+        ROW_INDEX i = 0, j = entryMatches.Count();
+        do
+        {
+          const ROW_INDEX temp = (i + j) / 2;
+          DUInt32 testRow;
+
+          entryMatches.Get(temp, testRow);
+          if (row == testRow)
+          {
+            result.Add(testRow);
+            break;
+          }
+          else if (row < testRow)
+            j = temp;
+
+          else
+            i = temp;
+
+        } while (i != j);
+      }
+    }
+
+    DArray temp = result;
+    temp.Sort();
+    DUInt32 lastRow;
+    const uint64_t resultCount = temp.Count();
+    result = DArray();
+    for (uint64_t i = 0; i < resultCount; ++i)
+    {
+      DUInt32 current;
+      temp.Get(i, current);
+      if (current == lastRow)
+        continue;
+
+      result.Add(current);
+      lastRow = current;
+    }
+
+    return result;
+  }
+
+  bool RowIsMatching(const ITable& table, ROW_INDEX row) override
+  {
+    T val;
+
+    mTable.Get(row, mField, val);
+    for (auto entry = mValues.cbegin(); entry != mValues.cend(); ++entry)
+    {
+      if (get<0>(*entry) <= val)
+        return val <= get<1>(*entry);
+    }
+    return false;
+  }
+
+  bool IsSearchIndexed() const override
+  {
+    return mTable.IsIndexed(mField);
+  }
+
+  void AddValues (const string& from, const string& to)
+  {
+    T first, last;
+
+    Utf8Translator::Read(_RC(const uint8_t*, from.c_str()), from.length(), &first);
+    Utf8Translator::Read(_RC(const uint8_t*, to.c_str()), to.length(), &last);
+
+    insert_interval(mIncluded, first, last);
+    mAreValuesValid = false;
+  }
+
+  void AddExcludedValues (const string from, const string to)
+  {
+    T first, last;
+
+    Utf8Translator::Read(_RC(const uint8_t*, from.c_str()), from.length(), &first);
+    Utf8Translator::Read(_RC(const uint8_t*, to.c_str()), to.length(), &last);
+
+    insert_interval(mExcluded, first, last);
+    mAreValuesValid = false;
+  }
+
+  bool operator< (const TableFilterRunnerRule& rule) const override
+  {
+    return !IsSearchIndexed();
+  }
+
+private:
+  void BuildValuesIntervals()
+  {
+    if (mAreValuesValid)
+      return ;
+
+    if (mIncluded.size () == 0)
+      mValues.push_back(make_tuple(T{}, T::Max()));
+    else
+    {
+      for (auto entry = mIncluded.begin(); entry != mIncluded.end(); ++entry)
+        insert_interval(mValues, get<0>(*entry), get<1>(*entry));
+    }
+
+    for (auto entry = mExcluded.begin(); entry != mExcluded.end(); ++entry)
+      exclude_interval(mValues, get<0>(*entry), get<1>(*entry));
+
+    mAreValuesValid = true;
+  }
+
+  const string      mFieldName;
+  ITable&           mTable;
+  ROW_INDEX         mField = INVALID_FIELD_INDEX;
+  bool              mAreValuesValid = false;
+  bool              mIsSearchIndexed = false;
+
+  vector<tuple<T, T>> mIncluded;
+  vector<tuple<T, T>> mExcluded;
+  vector<tuple<T, T>> mValues;
+};
+
+
+
+TableFilterRunner::TableFilterRunner(ITable& table)
+   : mTable(table)
+{
+}
+
+
+TableFilterRunner::~TableFilterRunner()
+{
+  for (auto field : mFilterRules)
+    delete field;
+}
+
+
+void
+TableFilterRunner::AddRowInterval(ROW_INDEX from, ROW_INDEX to, const bool excluded)
+{
+  if (to == INVALID_ROW_INDEX)
+    from = to;
+
+  insert_interval(excluded ? mExcludedRowsIntervals : mRowsIntervals, from, to);
+}
+
+
+void
+TableFilterRunner::AddFieldValues(const std::string& field,
+                                  const TableFilter::ValuesIntervalList& values,
+                                  const TableFilter::ValuesIntervalList& excludedValues)
+{
+  FIELD_INDEX fieldIdx = INVALID_FIELD_INDEX;
+  uint16_t    type     = T_UNKNOWN;
+
+  for (FIELD_INDEX f = 0; f < mTable.FieldsCount(); ++f)
+  {
+    const DBSFieldDescriptor fDesc = mTable.DescribeField(f);
+    if (fDesc.name != field)
+      continue ;
+
+    if (fDesc.isArray || fDesc.type == T_TEXT)
+    {
+      throw ExtException(_EXTRA(ExtException::FILTER_FIELD_INVALID_TYPE),
+                         "Field '%s' is either of type TEXT or ARRAY and"
+                           " cannot be used for a filter rule.",
+                         field.c_str());
+    }
+    fieldIdx = f;
+    type     = fDesc.type;
+    break;
+  }
+
+  if (fieldIdx == INVALID_FIELD_INDEX)
+  {
+      throw ExtException(_EXTRA(ExtException::FILTER_FIELD_NOT_EXISTENT),
+                         "Field '%s'",
+                         field.c_str());
+  }
+
+  switch(type)
+  {
+    case T_BOOL:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DBool>> fieldRule(
+          new TableFilterRunnerFieldRule<DBool>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_CHAR:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DChar>> fieldRule(
+          new TableFilterRunnerFieldRule<DChar>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_DATE:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DDate>> fieldRule(
+          new TableFilterRunnerFieldRule<DDate>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_DATETIME:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DDateTime>> fieldRule(
+          new TableFilterRunnerFieldRule<DDateTime>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_HIRESTIME:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DHiresTime>> fieldRule(
+          new TableFilterRunnerFieldRule<DHiresTime>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_INT8:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DInt8>> fieldRule(
+          new TableFilterRunnerFieldRule<DInt8>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_INT16:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DInt16>> fieldRule(
+          new TableFilterRunnerFieldRule<DInt16>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_INT32:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DInt32>> fieldRule(
+          new TableFilterRunnerFieldRule<DInt32>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_INT64:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DInt64>> fieldRule(
+          new TableFilterRunnerFieldRule<DInt64>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_UINT8:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DUInt8>> fieldRule(
+          new TableFilterRunnerFieldRule<DUInt8>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_UINT16:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DUInt16>> fieldRule(
+          new TableFilterRunnerFieldRule<DUInt16>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_UINT32:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DUInt32>> fieldRule(
+          new TableFilterRunnerFieldRule<DUInt32>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_UINT64:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DUInt64>> fieldRule(
+          new TableFilterRunnerFieldRule<DUInt64>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_REAL:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DReal>> fieldRule(
+          new TableFilterRunnerFieldRule<DReal>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    case T_RICHREAL:
+    {
+      unique_ptr<TableFilterRunnerFieldRule<DRichReal>> fieldRule(
+          new TableFilterRunnerFieldRule<DRichReal>(mTable, field));
+
+      for (const auto interval : values)
+        fieldRule->AddValues(get<0>(interval), get<1>(interval));
+
+      for (const auto interval : excludedValues)
+        fieldRule->AddExcludedValues(get<0>(interval), get<1>(interval));
+
+      mFilterRules.push_back(fieldRule.release());
+    }
+    break;
+
+    default:
+      assert(false);
+
+      throw ExtException(_EXTRA(ExtException::GENERAL_CONTROL_ERROR),
+                         "Field '%s' has an unexpected type '%d'. ",
+                         field.c_str(),
+                         type);
+  }
+
+  for (size_t idx = mFilterRules.size() - 1; 0 < idx; --idx)
+  {
+    if (*mFilterRules[idx - 1] < *mFilterRules[idx])
+      swap(mFilterRules[idx - 1], mFilterRules[idx]);
+    else
+      break;
+  }
+}
+
+
+void
+TableFilterRunner::ResetRowsFilter()
+{
+  mRowsIntervals.clear();
+  mExcludedRowsIntervals.clear();
+}
+
+
+void
+TableFilterRunner::ResetFilterRules()
+{
+  for (auto filter : mFilterRules)
+    delete filter;
+
+  mFilterRules.clear();
+}
+
+
+DArray
+TableFilterRunner::Run()
+{
+  if (mTable.AllocatedRows() == 0)
+    return DArray();
+
+  vector<tuple<ROW_INDEX, ROW_INDEX>> rowsIntervals;
+  for (const auto& interval : mRowsIntervals)
+    insert_interval(rowsIntervals, get<0>(interval), get<1>(interval));
+
+  if (rowsIntervals.empty() )
+    insert_interval<ROW_INDEX>(rowsIntervals, 0, mTable.AllocatedRows() - 1);
+
+  for (const auto& interval : mExcludedRowsIntervals)
+    exclude_interval(rowsIntervals, get<0>(interval), get<1>(interval));
+
+  DArray result;
+  for (const auto& interval : rowsIntervals)
+  {
+    for (ROW_INDEX row = get<0>(interval); row <= get<1>(interval); ++row)
+      result.Add(DUInt32(row));
+  }
+
+  size_t rulesUsed;
+  for (rulesUsed = 0;
+       (rulesUsed < mFilterRules.size()) && mFilterRules[rulesUsed]->IsSearchIndexed();
+       ++rulesUsed)
+  {
+    result = mFilterRules[rulesUsed]->MatchRows(result);
+  }
+
+  if (rulesUsed >= mFilterRules.size())
+    return result;
+
+  DArray temp = result;
+  result = DArray();
+  for (uint64_t rowIdx = 0; rowIdx < temp.Count(); ++rowIdx)
+  {
+    bool matches = true;
+    DUInt32 row;
+    temp.Get(rowIdx, row);
+    for (size_t j = rulesUsed; (j < mFilterRules.size()) && matches; ++j)
+      matches = mFilterRules[j]->RowIsMatching(mTable, row.mValue);
+
+    if (matches)
+      result.Add(row);
+  }
+
+  return result;
 }
 

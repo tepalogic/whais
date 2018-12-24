@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace whais {
 
+class TableFilterRunner;
 
 class TableFilter
 {
@@ -43,7 +44,7 @@ public:
   using ValuesIntervalList = std::vector<std::tuple<std::string, std::string>>;
   using ValuesList = std::tuple<std::string, uint16_t, ValuesIntervalList>;
 
-  void AddRow (const ROW_INDEX from, const ROW_INDEX to);
+  void AddRow (const ROW_INDEX from, const ROW_INDEX to, const bool exclude);
   void AddValue (const std::string& fieldName,
                  const uint16_t type,
                  const std::string& from,
@@ -51,6 +52,7 @@ public:
                  const bool exclude);
 protected:
   std::vector<RowEntry>    mRowsIntervals;
+  std::vector<RowEntry>    mExcludedRowsIntervals;
   std::vector<ValuesList>  mValuesIntervals;
   std::vector<ValuesList>  mExcludedValuesintervals;
 };
@@ -61,38 +63,12 @@ class TableFilterRunnerRule
 public:
   virtual ~TableFilterRunnerRule() = default;
 
-  virtual DArray MatchRows(const DArray& rowsSet) const = 0;
-  virtual bool   RowIsMatching(const ITable& table, ROW_INDEX row) const = 0;
-  virtual bool   IsSearchIndexed() const;
+  virtual DArray MatchRows(const DArray& rowsSet) = 0;
+  virtual bool   RowIsMatching(const ITable& table, ROW_INDEX row) = 0;
+  virtual bool   IsSearchIndexed() const = 0;
+
+  virtual bool operator<(const TableFilterRunnerRule& filter) const = 0;
 };
-
-
-template<typename T>
-class TableFilterRunnerFieldRule : public TableFilterRunnerRule
-{
-public:
-  explicit TableFilterRunnerFieldRule(ITable& table, const std::string& row);
-
-  virtual DArray MatchRows(const DArray& rowsSet) const override;
-  virtual bool   RowIsMatching(const ITable& table, ROW_INDEX row) const override;
-  bool           IsSearchIndexed() const override;
-
-  void AddValues (const std::string& from, const std::string& to);
-  void AddExcludedValues (const std::string from, const std::string to);
-
-private:
-  void BuildValuesIntervals();
-
-  const std::string mFieldName;
-  ITable&           mTable;
-  ROW_INDEX         mRow;
-  bool              mAreValuesValid = false;
-
-  std::vector<std::tuple<T, T>> mIncluded;
-  std::vector<std::tuple<T, T>> mExcluded;
-  std::vector<std::tuple<T, T>> mValues;
-};
-
 
 class TableFilterRunner
 {
@@ -100,18 +76,23 @@ public:
   explicit TableFilterRunner(ITable& table);
   virtual ~TableFilterRunner();
 
-  void AddRowInterval(ROW_INDEX from, ROW_INDEX to = INVALID_ROW_INDEX);
-  void AddFieldValues(const std::string& field, const TableFilter::ValuesIntervalList& values);
+  DArray Run();
+
+protected:
+  void AddRowInterval(ROW_INDEX from, ROW_INDEX to = INVALID_ROW_INDEX, const bool excluded = false);
+  void AddFieldValues(const std::string& field,
+                      const TableFilter::ValuesIntervalList& values,
+                      const TableFilter::ValuesIntervalList& excludedValues);
 
   void ResetRowsFilter();
   void ResetFilterRules();
 
-  DArray Run();
+  ITable&                             mTable;
+  std::vector<TableFilterRunnerRule*> mFilterRules;
+  std::vector<TableFilter::RowEntry>  mRowsIntervals;
+  std::vector<TableFilter::RowEntry>  mExcludedRowsIntervals;
 
-private:
-  ITable&                                m_Table;
-  DArray                                 m_Rows;
-  std::vector<TableFilterRunnerRule*>    m_FieldList;
+  friend class TableFilter;
 };
 
 
