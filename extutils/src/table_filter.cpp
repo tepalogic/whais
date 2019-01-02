@@ -22,16 +22,52 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
-#include "table_filter.h"
+#include "../include/table_filter.h"
 
 #include <memory>
 
 #include "dbs/dbs_valtranslator.h"
 #include "ext_exception.h"
+#include "arrays_ops.h"
 
 using namespace whais;
 using namespace std;
 
+template<typename T>
+T operator+ (const T& op, int i)
+{
+  T result = op;
+  if (i < 0)
+  {
+    while (i++ < 0)
+      result = result.Prev();
+  }
+  else
+  {
+    while (i-- > 0)
+      result = result.Next();
+  }
+
+  return result;
+}
+
+template<typename T>
+T operator- (const T& op, int i)
+{
+  T result = op;
+  if (i < 0)
+  {
+    while (i++ < 0)
+      result = result.Next();
+  }
+  else
+  {
+    while (i-- > 0)
+      result = result.Prev();
+  }
+
+  return result;
+}
 
 template<typename T> void
 exclude_interval(vector<tuple<T, T>>& dest, T from, T to)
@@ -60,14 +96,25 @@ exclude_interval(vector<tuple<T, T>>& dest, T from, T to)
   if (endEntry == dest.end())
   {
     get<1>(*startEntry) = from;
-    dest.erase(startEntry + 1, endEntry);
+
+    if (get<0>(*startEntry) <= get<1>(*startEntry))
+      ++startEntry;
+
+    dest.erase(startEntry, endEntry);
     return ;
   }
   else if (startEntry != endEntry)
   {
-    get<1>(*startEntry) = from;
-    get<0>(*endEntry) = to;
-    dest.erase(startEntry + 1, endEntry);
+    get<1>(*startEntry) = from - 1;
+    get<0>(*endEntry) = to + 1;
+
+    if (get<0>(*startEntry) <= get<1>(*startEntry))
+      ++startEntry;
+
+    if (get<1>(*startEntry) < get<0>(*startEntry))
+      ++endEntry;
+
+    dest.erase(startEntry, endEntry);
     return ;
   }
 
@@ -78,15 +125,23 @@ exclude_interval(vector<tuple<T, T>>& dest, T from, T to)
 
   if (from < get<0>(*startEntry))
   {
-    get<0>(*startEntry) = to;
+    get<0>(*startEntry) = to + 1;
+    if (get<1>(*startEntry) < get<0>(*startEntry))
+      dest.erase(startEntry);
+
     return ;
   }
 
   auto interval = *startEntry;
-  get<1>(*startEntry) = from;
-  get<0>(interval) = to;
+  get<1>(*startEntry) = from - 1;
+  get<0>(interval) = to + 1;
 
-  dest.insert(startEntry, interval);
+
+  if (get<1>(*startEntry) < get<0>(*startEntry))
+    dest.erase (startEntry);
+
+  else if (get<0>(interval) <= get<1>(interval))
+      dest.insert(startEntry, interval);
 }
 
 
@@ -157,10 +212,10 @@ insert_string_value(vector<tuple<T, T>>& dest, const string& from, const string&
 }
 
 
-template<typename T> TableFilter::ValuesIntervalList
+template<typename T> TableFieldValuesFilter::ValuesIntervalList
 convert_to_interval_list(const vector<tuple<T,T>>& intervals)
 {
-  TableFilter::ValuesIntervalList result;
+  TableFieldValuesFilter::ValuesIntervalList result;
 
   for (auto& i : intervals)
   {
@@ -177,7 +232,7 @@ convert_to_interval_list(const vector<tuple<T,T>>& intervals)
 
 
 template<typename T> vector<tuple<T,T>>
-convert_from_interval_list(const TableFilter::ValuesIntervalList& intervals)
+convert_from_interval_list(const TableFieldValuesFilter::ValuesIntervalList& intervals)
 {
   vector<tuple<T,T>> result;
 
@@ -195,7 +250,7 @@ convert_from_interval_list(const TableFilter::ValuesIntervalList& intervals)
 }
 
 template<typename T> void
-add_values_to_intervals(TableFilter::ValuesIntervalList& list,
+add_values_to_intervals(TableFieldValuesFilter::ValuesIntervalList& list,
                         const string& from,
                         const string& to)
 {
@@ -209,7 +264,7 @@ bool
 add_values_to_interval_list(const string& from,
                             const string& to,
                             const uint16_t type,
-                            TableFilter::ValuesIntervalList& list)
+                            TableFieldValuesFilter::ValuesIntervalList& list)
 {
   switch(type)
   {
@@ -283,26 +338,28 @@ add_values_to_interval_list(const string& from,
 
 
 void
-TableFilter::AddRow(const ROW_INDEX from, const ROW_INDEX to, const bool exclude)
+TableFieldValuesFilter::AddRow(const ROW_INDEX from, const ROW_INDEX to, const bool exclude)
 {
   insert_interval(exclude ? mExcludedRowsIntervals : mRowsIntervals, from, to);
 }
 
 
 void
-TableFilter::AddValue(const string& fieldName,
+TableFieldValuesFilter::AddValue(const string& fieldName,
                       const uint16_t type,
                       const string& from,
                       const string& to,
-                      const bool    excluded)
+                      const bool exclude)
 {
-  auto& usedInterval = excluded ? mExcludedValuesintervals : mValuesIntervals;
+  auto& usedInterval = exclude ? mExcludedValuesintervals : mValuesIntervals;
 
   auto entry = usedInterval.begin();
   while (entry != usedInterval.end())
   {
     if (get<0>(*entry) == fieldName)
       break;
+
+    ++entry;
   }
 
   if (entry != usedInterval.end())
@@ -315,6 +372,66 @@ TableFilter::AddValue(const string& fieldName,
   add_values_to_interval_list(from, to, type, interval);
   usedInterval.push_back(make_tuple(fieldName, type, interval));
 }
+
+const vector<TableFieldValuesFilter::RowEntry>&
+TableFieldValuesFilter::GetRowsIntervals(const bool exclude) const
+{
+  return exclude ? mExcludedRowsIntervals : mRowsIntervals;
+}
+
+
+set<string>
+TableFieldValuesFilter::GetFields() const
+{
+  set<string> result;
+
+  for (const auto& interval : mValuesIntervals)
+    result.insert(get<0>(interval));
+
+  for (const auto& interval : mExcludedValuesintervals)
+    result.insert(get<0>(interval));
+
+  return result;
+}
+
+
+bool
+TableFieldValuesFilter::GetFieldValues(const std::string& field,
+                                       uint16_t* type,
+                                       ValuesIntervalList* values,
+                                       ValuesIntervalList* excludedValues) const
+{
+  bool fieldFound = false;
+
+  *values = *excludedValues = ValuesIntervalList{};
+
+  for (auto interval : mValuesIntervals)
+  {
+    if (get<0>(interval) == field)
+    {
+      *values = get<2>(interval);
+      *type = get<1>(interval);
+      fieldFound = true;
+
+      break;
+    }
+  }
+
+  for (auto interval : mExcludedValuesintervals)
+  {
+    if (get<0>(interval) == field)
+    {
+      *excludedValues = get<2>(interval);
+      *type = get<1>(interval);
+      fieldFound = true;
+
+      break;
+    }
+  }
+
+  return fieldFound;
+}
+
 
 
 template<typename T>
@@ -373,63 +490,22 @@ public:
                                              0,
                                              mTable.AllocatedRows(),
                                              mField);
-      entryMatches.Sort();
-      ROW_INDEX rowsCount = rowsSet.Count();
-      for (ROW_INDEX r = 0; r < rowsCount; ++r)
-      {
-        DUInt32 row;
-        rowsSet.Get(r, row);
-
-        ROW_INDEX i = 0, j = entryMatches.Count();
-        do
-        {
-          const ROW_INDEX temp = (i + j) / 2;
-          DUInt32 testRow;
-
-          entryMatches.Get(temp, testRow);
-          if (row == testRow)
-          {
-            result.Add(testRow);
-            break;
-          }
-          else if (row < testRow)
-            j = temp;
-
-          else
-            i = temp;
-
-        } while (i != j);
-      }
+      result = array_unite(result, entryMatches);
     }
 
-    DArray temp = result;
-    temp.Sort();
-    DUInt32 lastRow;
-    const uint64_t resultCount = temp.Count();
-    result = DArray();
-    for (uint64_t i = 0; i < resultCount; ++i)
-    {
-      DUInt32 current;
-      temp.Get(i, current);
-      if (current == lastRow)
-        continue;
-
-      result.Add(current);
-      lastRow = current;
-    }
-
-    return result;
+    return array_intersect(rowsSet, result);
   }
 
   bool RowIsMatching(const ITable& table, ROW_INDEX row) override
   {
     T val;
 
+    BuildValuesIntervals();
     mTable.Get(row, mField, val);
     for (auto entry = mValues.cbegin(); entry != mValues.cend(); ++entry)
     {
-      if (get<0>(*entry) <= val)
-        return val <= get<1>(*entry);
+      if ((get<0>(*entry) <= val) && (val <= get<1>(*entry)))
+        return true;
     }
     return false;
   }
@@ -459,11 +535,6 @@ public:
 
     insert_interval(mExcluded, first, last);
     mAreValuesValid = false;
-  }
-
-  bool operator< (const TableFilterRunnerRule& rule) const override
-  {
-    return !IsSearchIndexed();
   }
 
 private:
@@ -512,6 +583,33 @@ TableFilterRunner::~TableFilterRunner()
 }
 
 
+
+bool
+TableFilterRunner::AddFilterRules(TableFieldValuesFilter& filter)
+{
+  set<string> fields = filter.GetFields();
+  for (const auto& f : fields)
+  {
+    uint16_t type;
+    TableFieldValuesFilter::ValuesIntervalList values, excludedValues;
+
+    if (! filter.GetFieldValues(f, &type, &values, &excludedValues))
+      return false;
+
+    AddFieldValues(f, values, excludedValues);
+  }
+
+
+  for (const auto& interval : filter.GetRowsIntervals(false))
+    AddRowInterval(get<0>(interval), get<1>(interval), false);
+
+  for (const auto& interval : filter.GetRowsIntervals(true))
+    AddRowInterval(get<0>(interval), get<1>(interval), true);
+
+  return true;
+}
+
+
 void
 TableFilterRunner::AddRowInterval(ROW_INDEX from, ROW_INDEX to, const bool excluded)
 {
@@ -524,8 +622,8 @@ TableFilterRunner::AddRowInterval(ROW_INDEX from, ROW_INDEX to, const bool exclu
 
 void
 TableFilterRunner::AddFieldValues(const std::string& field,
-                                  const TableFilter::ValuesIntervalList& values,
-                                  const TableFilter::ValuesIntervalList& excludedValues)
+                                  const TableFieldValuesFilter::ValuesIntervalList& values,
+                                  const TableFieldValuesFilter::ValuesIntervalList& excludedValues)
 {
   FIELD_INDEX fieldIdx = INVALID_FIELD_INDEX;
   uint16_t    type     = T_UNKNOWN;
@@ -790,14 +888,6 @@ TableFilterRunner::AddFieldValues(const std::string& field,
                          field.c_str(),
                          type);
   }
-
-  for (size_t idx = mFilterRules.size() - 1; 0 < idx; --idx)
-  {
-    if (*mFilterRules[idx - 1] < *mFilterRules[idx])
-      swap(mFilterRules[idx - 1], mFilterRules[idx]);
-    else
-      break;
-  }
 }
 
 
@@ -842,15 +932,18 @@ TableFilterRunner::Run()
       result.Add(DUInt32(row));
   }
 
-  size_t rulesUsed;
-  for (rulesUsed = 0;
-       (rulesUsed < mFilterRules.size()) && mFilterRules[rulesUsed]->IsSearchIndexed();
-       ++rulesUsed)
+  bool allIndexed = true;
+  for (size_t rulesUsed = 0; rulesUsed < mFilterRules.size(); ++rulesUsed)
   {
+    if (! mFilterRules[rulesUsed]->IsSearchIndexed())
+    {
+      allIndexed = false;
+      continue ;
+    }
     result = mFilterRules[rulesUsed]->MatchRows(result);
   }
 
-  if (rulesUsed >= mFilterRules.size())
+  if (allIndexed)
     return result;
 
   DArray temp = result;
@@ -860,8 +953,12 @@ TableFilterRunner::Run()
     bool matches = true;
     DUInt32 row;
     temp.Get(rowIdx, row);
-    for (size_t j = rulesUsed; (j < mFilterRules.size()) && matches; ++j)
-      matches = mFilterRules[j]->RowIsMatching(mTable, row.mValue);
+    for (size_t rulesUsed = 0; (rulesUsed < mFilterRules.size()) && matches; ++rulesUsed)
+    {
+      if (mFilterRules[rulesUsed]->IsSearchIndexed())
+        continue ;
+      matches &= mFilterRules[rulesUsed]->RowIsMatching(mTable, row.mValue);
+    }
 
     if (matches)
       result.Add(row);

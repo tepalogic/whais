@@ -72,6 +72,9 @@ ExtException::Description() const
   case FILTER_FIELD_INVALID_TYPE:
     return "Filter is of invalid type for requested operation.";
 
+  case ARRAY_TYPES_MISSMATCH:
+    return "Array operation used with array operation holding values of different types.";
+
   case BAD_PARAMETERS:
     return "Program execution could not continue due to invalid parameters.";
 

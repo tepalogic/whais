@@ -1,0 +1,4 @@
+
+UNIT_EXES+=test_field_filter_description
+test_field_filter_description_SRC=test/test_field_filter_description.cpp
+test_field_filter_description_LIB=dbs/wslpastra utils/wslutils custom/wslcustom extutils/wslextutils custom/wslcppmemalloc 
