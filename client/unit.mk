@@ -21,10 +21,10 @@ wconnector_MIN=.0
 
 wcmd_SRC:=wcmd/wcmd.cpp wcmd/wcmd_optglbs.cpp wcmd/wcmd_cmdsmgr.cpp\
 		 wcmd/wcmd_tabcomds.cpp wcmd/wcmd_onlinecmds.cpp wcmd/wcmd_execcmd.cpp\
-		 wcmd/wcmd_valparser.cpp wcmd/wcmd_dbcheck.cpp wcmd/wcmd_altertable.cpp
+		 wcmd/wcmd_valparser.cpp wcmd/wcmd_dbcheck.cpp
 		 
 wcmd_DEF:=USE_CUSTOM_SHL USE_DBS_SHL USE_INTERP_SHL WVER_MAJ=1 WVER_MIN=2
-wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcppmemalloc  
+wcmd_LIB:=client/wslconnector utils/wslutils custom/wslcppmemalloc  extutils/wslextutils
 wcmd_SHL:=dbs/wpastra compiler/wcompiler interpreter/wprima custom/wcustom
 wcmd_INC:=
 

@@ -23,10 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 
+#include "../include/alter_table.h"
+
 #include <memory>
 #include <cstring>
-
-#include "wcmd_altertable.h"
 
 #include "interpreter/interpreter.h"
 #include "interpreter/operands.h"
@@ -583,37 +583,56 @@ TableAlterRules::AddField(const std::string&   name,
 
 void
 TableAlterRules::CommitToTable(const string&           newTableName,
-                                const Range<ROW_INDEX>& selectedRows)
+                               const DArray&           selectedRows,
+                               IDBSHandler* const      otherDbs)
+{
+  Range<ROW_INDEX> rowsRanges;
+  for (uint64_t i = 0; i < selectedRows.Count(); ++i)
+  {
+    DUInt32 row;
+    selectedRows.Get(i, row);
+    rowsRanges.Join(Interval<ROW_INDEX>(row.mValue, row.mValue));
+  }
+
+  CommitToTable(newTableName, rowsRanges, otherDbs);
+}
+
+void
+TableAlterRules::CommitToTable(const string&           newTableName,
+                               const Range<ROW_INDEX>& selectedRows,
+                               IDBSHandler* const      otherDbs)
 
 {
   ITable* table = nullptr;
   vector<DBSFieldDescriptor> dummy = mDstFields;
 
+  IDBSHandler& destDbsHandler = (otherDbs == nullptr) ? mDbs : *otherDbs;
+
   assert(mSrcFields.size() <= mDstFields.size());
 
-  mDbs.AddTable(newTableName.c_str(), dummy.size(), &dummy[0]);
+  destDbsHandler.AddTable(newTableName.c_str(), dummy.size(), &dummy[0]);
 
   try
   {
-      table = &mDbs.RetrievePersistentTable(newTableName.c_str());
+      table = &destDbsHandler.RetrievePersistentTable(newTableName.c_str());
       CommitToTable(*table, selectedRows);
   }
   catch(...)
   {
       if (table != nullptr)
-        mDbs.ReleaseTable(*table);
+        destDbsHandler.ReleaseTable(*table);
 
-      mDbs.DeleteTable(newTableName.c_str());
+      destDbsHandler.DeleteTable(newTableName.c_str());
       throw ;
   }
 
-  mDbs.ReleaseTable(*table);
+  destDbsHandler.ReleaseTable(*table);
 }
 
 
 void
 TableAlterRules::CommitToTable(ITable&                 table,
-                                const Range<ROW_INDEX>& selectedRows)
+                               const Range<ROW_INDEX>& selectedRows)
 
 {
   assert(mSrcFields.size() <= mDstFields.size());

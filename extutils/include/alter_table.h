@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************/
 
 
-#ifndef WCMD_ALTERTABLE_H_
-#define WCMD_ALTERTABLE_h_
+#ifndef ALTER_TABLE_H_
+#define ALTER_TABLE_h_
 
 #include <string>
 #include <vector>
@@ -35,6 +35,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "utils/range.h"
 #include "dbs/dbs_mgr.h"
 
+namespace whais {
 
 class TableAlterRules
 {
@@ -46,23 +47,27 @@ public:
 
   void DropField(const std::string& field);
   void RetypeField(const std::string&   name,
-                    const DBS_FIELD_TYPE type,
-                    const bool           isArray);
+                   const DBS_FIELD_TYPE type,
+                   const bool           isArray);
   void RenameField(const std::string& oldName, const std::string& newName);
   void AddField(const std::string&   name,
-                 const DBS_FIELD_TYPE type,
-                 const bool           isArray);
+                const DBS_FIELD_TYPE type,
+                const bool           isArray);
 
+  void CommitToTable(const std::string&         newTableName,
+                     const DArray&              selectedRows,
+                     whais::IDBSHandler* const  otherDbs = nullptr);
   void CommitToTable(const std::string&             newTableName,
-                      const whais::Range<ROW_INDEX>& selectedRows);
+                     const whais::Range<ROW_INDEX>& selectedRows,
+                     whais::IDBSHandler* const      otherDbs = nullptr);
   void Commit();
 
 private:
   TableAlterRules(whais::IDBSHandler&             dbs,
-                   whais::ITable&                  table);
+                  whais::ITable&                  table);
 
   void CommitToTable(whais::ITable&                 table,
-                      const whais::Range<ROW_INDEX>& selectedRows);
+                     const whais::Range<ROW_INDEX>& selectedRows);
 
   struct FieldConnection
   {
@@ -81,5 +86,7 @@ private:
   std::vector<DBSFieldDescriptor>   mDstFields;
 };
 
+} //namespace whais
 
-#endif /* WCMD_ALTER_TABLE_H_ */
+
+#endif /* ALTER_TABLE_H_ */

@@ -5,7 +5,8 @@ UNIT_EXES:=
 UNIT_LIBS:=wslextutils
 UNIT_SHLS:=
 
-wslextutils_SRC=src/table_filter.cpp src/ext_exception.cpp src/arrays_ops.cpp
+wslextutils_SRC=src/table_filter.cpp src/ext_exception.cpp src/arrays_ops.cpp\
+				src/alter_table.cpp
 wslextutils_DEF:=USE_CUSTOM_SHL USE_DBS_SHL
  
 
