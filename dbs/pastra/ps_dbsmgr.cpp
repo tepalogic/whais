@@ -137,7 +137,8 @@ DbsHandler::DbsHandler(const DBSSettings&   settings,
   buffer += PS_DBS_HEADER_SIZE;
   while (tablesCount-- > 0)
   {
-    mTables.insert(pair<string, PersistentTable*>(_RC(char*, buffer), nullptr));
+    mTables.insert(pair<string, TABLE_DATA>(_RC(char*, buffer),
+                                            make_tuple<PersistentTable*, uint32_t>(nullptr, 0)));
     buffer += strlen(_RC(char*, buffer)) + 1;
   }
 }
@@ -187,17 +188,17 @@ DbsHandler::RetrievePersistentTable(const TABLE_INDEX index)
     ++it;
   }
 
-  if (it->second == nullptr)
-    it->second = new PersistentTable(*this, it->first);
-
-  else
+  if (get<0>(it->second) == nullptr)
   {
-    throw DBSException(_EXTRA(DBSException::TABLE_IN_USE),
-                       "Table with index %u needs to be released before it can be retrieved again.",
-                       index);
-  }
+    assert(get<1>(it->second) == 0);
 
-  return *it->second;
+    get<0>(it->second) = new PersistentTable(*this, it->first);
+    get<1>(it->second) = 1;
+  }
+  else
+    ++get<1>(it->second) += 1;
+
+  return *get<0>(it->second);
 }
 
 ITable&
@@ -209,16 +210,17 @@ DbsHandler::RetrievePersistentTable(const char* const name)
   if (it == mTables.end())
     throw DBSException(_EXTRA(DBSException::TABLE_NOT_FUND), "Cannot retrieve table '%s'.", name);
 
-  if (it->second == nullptr)
-    it->second = new PersistentTable(*this, it->first);
-
-  else
+  if (get<0>(it->second) == nullptr)
   {
-    throw DBSException(_EXTRA(DBSException::TABLE_IN_USE),
-                       "Table '%s' needs to be released before it can be retrieved again.",
-                       name);
+    assert(get<1>(it->second) == 0);
+
+    get<0>(it->second) = new PersistentTable(*this, it->first);
+    get<1>(it->second) = 1;
   }
-  return *it->second;
+  else
+    ++get<1>(it->second) += 1;
+
+  return *get<0>(it->second);
 }
 
 
@@ -249,20 +251,25 @@ DbsHandler::AddTable(const char* const           name,
                        name);
   }
 
-  mTables.insert(pair<string, PersistentTable*>(tableName,
-                                                new PersistentTable(*this,
-                                                                    tableName,
-                                                                    inoutFields,
-                                                                    fieldsCount)));
+  unique_ptr<PersistentTable> table(new PersistentTable(*this,
+                                                        tableName,
+                                                        inoutFields,
+                                                        fieldsCount));
+  const auto tableData = make_tuple<PersistentTable*, uint32_t>(table.get(), 1);
+  mTables.insert(pair<string, TABLE_DATA>(tableName, tableData));
+  table.release();
   SyncToFile();
 
   //Make sure we can retrieve the table later.
   it = mTables.find(tableName);
 
   assert(it != mTables.end());
+  assert(get<0>(it->second) != nullptr);
+  assert(get<1>(it->second) == 1);
 
-  delete it->second;
-  it->second = nullptr;
+  delete get<0>(it->second);
+  get<0>(it->second) = nullptr;
+  get<1>(it->second) = 0;
 }
 
 
@@ -289,11 +296,16 @@ DbsHandler::ReleaseTable(ITable& hndTable)
 
   for (auto it = mTables.begin(); it != mTables.end(); ++it)
   {
-    if (&hndTable == _SC(ITable*, it->second))
+    if (&hndTable == _SC(ITable*, get<0>(it->second)))
     {
-      delete it->second;
-      it->second = nullptr;
-      return;
+      assert (get<1>(it->second) > 0);
+
+      if (--get<1>(it->second) == 0)
+      {
+        delete get<0>(it->second);
+        get<0>(it->second) = nullptr;
+        return;
+      }
     }
   }
 }
@@ -336,12 +348,26 @@ DbsHandler::DeleteTable(const char* const name)
                        name);
   }
 
-  if (it->second == nullptr)
-    it->second = new PersistentTable(*this, it->first);
+  if (get<0>(it->second) == nullptr)
+  {
+    assert (get<1>(it->second) == 0);
 
-  unique_ptr<PersistentTable> table {it->second};
-  it->second = nullptr;
+    get<0>(it->second) = new PersistentTable(*this, it->first);
+    get<1>(it->second) = 1;
+  }
+  else
+  {
+    if (get<1>(it->second) > 1)
+    {
+      throw DBSException(_EXTRA(DBSException::TABLE_IN_USE),
+                         "Cannot delete table '%s'. It is still in use.",
+                         name);
+    }
+  }
 
+  assert (get<1>(it->second) == 1);
+
+  unique_ptr<PersistentTable> table {get<0>(it->second)};
   table->RemoveFromDatabase();
   table.reset();
   mTables.erase(it);
@@ -360,8 +386,8 @@ DbsHandler::SyncAllTablesContent()
 
   for (auto& table: mTables)
   {
-    if (table.second != nullptr)
-      table.second->Flush();
+    if (get<0>(table.second) != nullptr)
+      get<0>(table.second)->Flush();
   }
 
   mNeedsSync = false;
@@ -398,8 +424,8 @@ DbsHandler::SyncTableContent(const TABLE_INDEX index)
     ++it;
   }
 
-  if (it->second != nullptr)
-    it->second->Flush();
+  if (get<0>(it->second) != nullptr)
+    get<0>(it->second)->Flush();
 }
 
 bool
@@ -452,8 +478,9 @@ DbsHandler::Discard()
 
   for (auto& table : mTables)
   {
-    delete table.second;
-    table.second = nullptr;
+    delete get<0>(table.second);
+    get<0>(table.second) = nullptr;
+    get<1>(table.second) = 0;
   }
 }
 
@@ -489,10 +516,17 @@ bool
 DbsHandler::HasUnreleasedTables()
 {
   for (TABLES::iterator it = mTables.begin(); it != mTables.end(); ++it)
+  {
+    if (get<0>(it->second) != nullptr)
     {
-      if (it->second != nullptr)
-        return true;
+      assert (get<1>(it->second) > 0);
+      return true;
     }
+    else
+    {
+      assert (get<1>(it->second) == 0);
+    }
+  }
 
   return mCreatedTemporalTables > 0;
 }
@@ -512,14 +546,11 @@ DbsHandler::RemoveFromStorage()
 
   for (TABLES::iterator it = mTables.begin(); it != mTables.end(); ++it)
     {
-      assert(it->first.c_str() != nullptr);
-      assert(it->second == nullptr);
-
       unique_ptr<PersistentTable> table(unique_make(PersistentTable, *this, it->first));
-
       table->RemoveFromDatabase();
     }
 
+  mTables.clear();
   whf_remove(mFileName.c_str());
 }
 

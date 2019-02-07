@@ -25,6 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef PS_DBSMGR_H_
 #define PS_DBSMGR_H_
 
+#include <tuple>
 #include <map>
 #include <string.h>
 
@@ -81,7 +82,8 @@ public:
 
 
 private:
-  using TABLES = std::map<std::string, PersistentTable*>;
+  using TABLE_DATA = std::tuple<PersistentTable*,uint32_t>;
+  using TABLES = std::map<std::string, TABLE_DATA>;
 
   void SyncToFile();
 
