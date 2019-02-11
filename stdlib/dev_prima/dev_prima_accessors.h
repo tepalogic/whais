@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 extern whais::WLIB_PROC_DESCRIPTION         gGlbVarRead;
 extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarRead;
+extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarRowsCount;
 extern whais::WLIB_PROC_DESCRIPTION         gGlbVarUpdate;
 extern whais::WLIB_PROC_DESCRIPTION         gGlbTableVarUpdate;
 

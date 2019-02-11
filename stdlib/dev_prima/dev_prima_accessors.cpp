@@ -52,6 +52,7 @@ static const DInt32                  gVariableUnkErr(-1000);
 
 WLIB_PROC_DESCRIPTION                gGlbVarRead;
 WLIB_PROC_DESCRIPTION                gGlbTableVarRead;
+WLIB_PROC_DESCRIPTION                gGlbTableVarRowsCount;
 WLIB_PROC_DESCRIPTION                gGlbVarUpdate;
 WLIB_PROC_DESCRIPTION                gGlbTableVarUpdate;
 
@@ -670,6 +671,44 @@ get_glb_table_variable( SessionStack& stack, ISession& session)
 
 
 static WLIB_STATUS
+get_glb_table_rows_count( SessionStack& stack, ISession& session)
+{
+  DText variableName;
+
+  stack[stack.Size() - 1].Operand().GetValue(variableName);
+  stack.Pop(1);
+
+  if (variableName.IsNull())
+  {
+    stack.Push(gNullVariableName);
+    return WOP_OK;
+  }
+
+  const string name = variableName;
+  prima::Session& s = _SC(prima::Session&, session);
+  uint_t globalId = s.FindGlobal(_RC(const uint8_t*, name.c_str()), name.length());
+  if (! prima::GlobalsManager::IsValid(globalId))
+  {
+    stack.Push(gNoVariable);
+    return WOP_OK;
+  }
+
+  StackValue sv = s.GetGlobalValue(globalId);
+  IOperand& op = sv.Operand();
+  const uint_t type = op.GetType();
+  if (!IS_TABLE(type))
+  {
+    stack.Push(gVariableNotTable);
+    return WOP_OK;
+  }
+
+  stack.Push(DInt64(op.GetTable().AllocatedRows()));
+  return WOP_OK;
+}
+
+
+
+static WLIB_STATUS
 udpate_glb_table_variable_field( SessionStack& stack, ISession& session)
 {
   DText   variableName;
@@ -843,6 +882,18 @@ dev_prima_accessors_init()
   gGlbTableVarRead.localsCount = 5;
   gGlbTableVarRead.code = get_glb_table_variable;
   gGlbTableVarRead.localsTypes = glbTableLocals;
+
+  static const uint8_t* glbTableRowsCountLocals[]= {
+                                            gUndefinedType,
+                                            gTextType,
+                                         };
+
+  gGlbTableVarRead.name = "__w_get_glb_tab_rows_count";
+  gGlbTableVarRead.localsCount = 2;
+  gGlbTableVarRead.code = get_glb_table_rows_count;
+  gGlbTableVarRead.localsTypes = glbTableRowsCountLocals;
+
+
 
   static const uint8_t* glbTableUpdateLocals[]= {
                                                   gInt64Type,
