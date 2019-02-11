@@ -888,10 +888,10 @@ dev_prima_accessors_init()
                                             gTextType,
                                          };
 
-  gGlbTableVarRead.name = "__w_get_glb_tab_rows_count";
-  gGlbTableVarRead.localsCount = 2;
-  gGlbTableVarRead.code = get_glb_table_rows_count;
-  gGlbTableVarRead.localsTypes = glbTableRowsCountLocals;
+  gGlbTableVarRowsCount.name = "__w_get_glb_tab_rows_count";
+  gGlbTableVarRowsCount.localsCount = 2;
+  gGlbTableVarRowsCount.code = get_glb_table_rows_count;
+  gGlbTableVarRowsCount.localsTypes = glbTableRowsCountLocals;
 
 
 
